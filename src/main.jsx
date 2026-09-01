@@ -3,11 +3,11 @@ import { Check, ChevronRight, Code2, Filter, Flame, Menu, RotateCcw, Search, Spa
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import problems from './data/problems.json'
-import { runBrowserSimulation } from './browserSimulator'
+import { runBrowserSimulation, getBrowserSimulatorProblems } from './browserSimulator'
 
 const categories = ['All', 'RTL Design', 'SystemVerilog', 'SVA', 'UVM', 'Computer Architecture', 'Protocols', 'FPGA']
 const difficulties = ['All', 'Easy', 'Medium', 'Hard']
-const simulatorProblems = new Set(['rtl-mux', 'rtl-counter', 'rtl-priority', 'rtl-fifo'])
+const simulatorProblems = new Set(getBrowserSimulatorProblems())
 
 const load = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback }
