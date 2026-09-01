@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RTL Design Interview Questions & Practice | HDLForge</title>
+<meta name="description" content="Prepare for RTL design interviews with practical Verilog and RTL questions covering muxes, counters, FIFOs, arbiters, FSMs and synthesizable design.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://hdlforge.netlify.app/learn/rtl-interview/">
+<meta property="og:type" content="article"><meta property="og:site_name" content="HDLForge"><meta property="og:title" content="RTL Design Interview Questions & Practice | HDLForge"><meta property="og:description" content="A practical guide to RTL design interview preparation, with focused Verilog and hardware design problems."><meta property="og:url" content="https://hdlforge.netlify.app/learn/rtl-interview/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"RTL Design Interview Questions and Practice","description":"Practical RTL design interview preparation covering combinational and sequential logic, FIFOs, arbiters, FSMs and synthesizable Verilog.","author":{"@type":"Organization","name":"HDLForge","url":"https://hdlforge.netlify.app/"},"publisher":{"@type":"Organization","name":"HDLForge","url":"https://hdlforge.netlify.app/"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://hdlforge.netlify.app/learn/rtl-interview/"}}</script>
+<style>body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:850px;margin:0 auto;padding:48px 24px;line-height:1.7;color:#171717}h1{line-height:1.15}h2{margin-top:2rem}a{color:inherit}nav{margin-bottom:40px}</style>
+</head><body><nav><a href="/">HDLForge</a> · <a href="/problems/">Problems</a></nav><main>
+<p>HDLForge · RTL interview preparation</p><h1>RTL Design Interview Questions and Practice</h1>
+<p>RTL interviews test whether you can turn a digital specification into correct, synthesizable hardware. The strongest preparation combines short design problems with the ability to explain timing, reset behaviour, corner cases and implementation trade-offs.</p>
+<h2>Core RTL topics</h2><h3>Combinational logic</h3><p>Be comfortable designing multiplexers, decoders, encoders, comparators and priority logic. Know how incomplete assignments can infer unintended storage and how to structure clean combinational logic.</p>
+<h3>Sequential logic</h3><p>Practise counters, shift registers, registers and edge detectors. Be able to explain clock-to-clock behaviour, synchronous versus asynchronous reset, and what belongs in an <code>always_ff</code> block.</p>
+<h3>FSMs and control logic</h3><p>Expect traffic-light controllers, protocol controllers and other finite-state machines. Draw the state diagram first, define outputs and transitions, then consider illegal states and reset recovery.</p>
+<h3>FIFOs and arbiters</h3><p>FIFO questions test pointers, full and empty conditions, simultaneous read/write behaviour and boundary cases. Arbiter questions test priority, fairness and deterministic behaviour under contention.</p>
+<h2>Questions worth practising</h2><ul><li>Design a 2:1 multiplexer in synthesizable RTL.</li><li>Build a parameterized counter with reset and enable.</li><li>Design a synchronous FIFO and explain full/empty handling.</li><li>Implement a priority encoder or priority arbiter.</li><li>Design a traffic-light FSM.</li><li>Implement a rising-edge detector and explain its latency.</li></ul>
+<h2>How to approach an RTL interview problem</h2><ol><li>Clarify clock, reset, latency and interface assumptions.</li><li>Separate combinational decisions from state.</li><li>Write the simplest correct RTL first.</li><li>Walk through reset, minimum, maximum and simultaneous-event cases.</li><li>Explain why the code is synthesizable and how it behaves cycle by cycle.</li></ol>
+<h2>Practise on HDLForge</h2><p><a href="/problems/rtl-mux/">Start with the RTL multiplexer problem</a>, then work through the <a href="/problems/">full hardware design problem set</a>.</p>
+</main></body></html>
