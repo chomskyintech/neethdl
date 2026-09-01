@@ -19,6 +19,7 @@ initial begin
   in=0; #1; if(valid!==0) $fatal(1,"zero input");
   in=8'b00101000; #1; if(valid!==1 || index!==5) $fatal(1,"priority 5");
   in=8'b10001000; #1; if(valid!==1 || index!==7) $fatal(1,"priority 7");
+  in=8'b00000001; #1; if(valid!==1 || index!==0) $fatal(1,"priority 0");
   $display("HDLFORGE_PASS"); $finish;
 end
 endmodule`,
@@ -30,6 +31,7 @@ initial begin
   reset=1; @(posedge clk); #0.1; if(count!==0) $fatal(1,"reset");
   reset=0; @(posedge clk); #0.1; if(count!==1) $fatal(1,"increment 1");
   @(posedge clk); #0.1; if(count!==2) $fatal(1,"increment 2");
+  reset=1; @(posedge clk); #0.1; if(count!==0) $fatal(1,"second reset");
   $display("HDLFORGE_PASS"); $finish;
 end
 endmodule`,
@@ -39,8 +41,90 @@ fifo #(.WIDTH(8),.DEPTH(4)) dut(.clk(clk),.reset(reset),.wr_en(wr_en),.rd_en(rd_
 always #1 clk=~clk;
 initial begin
   reset=1; wr_en=0; rd_en=0; din=0; @(posedge clk); #0.1; if(!empty) $fatal(1,"not empty after reset");
-  reset=0; din=8'hA5; wr_en=1; @(posedge clk); #0.1;
-  wr_en=0; rd_en=1; @(posedge clk); #0.1; if(dout!==8'hA5) $fatal(1,"fifo data");
+  reset=0; din=8'hA5; wr_en=1; @(posedge clk); #0.1; if(empty) $fatal(1,"empty after write");
+  din=8'h3C; @(posedge clk); #0.1; wr_en=0; rd_en=1; if(empty) $fatal(1,"empty with two entries");
+  @(posedge clk); #0.1; if(dout!==8'hA5) $fatal(1,"fifo first data");
+  @(posedge clk); #0.1; if(dout!==8'h3C) $fatal(1,"fifo second data");
+  if(!empty) $fatal(1,"fifo not empty");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-shift-register': `module tb;
+logic clk=0,reset,shift_en,din; logic [7:0] dout;
+shift_reg #(.WIDTH(8)) dut(.clk(clk),.reset(reset),.shift_en(shift_en),.din(din),.dout(dout));
+always #1 clk=~clk;
+initial begin
+  reset=1; shift_en=0; din=0; @(posedge clk); #0.1; if(dout!==0) $fatal(1,"reset");
+  reset=0; shift_en=1; din=1; @(posedge clk); #0.1; if(dout!==8'h01) $fatal(1,"shift 1");
+  din=0; @(posedge clk); #0.1; if(dout!==8'h02) $fatal(1,"shift 2");
+  @(posedge clk); #0.1; if(dout!==8'h04) $fatal(1,"shift 3");
+  shift_en=0; din=1; @(posedge clk); #0.1; if(dout!==8'h04) $fatal(1,"hold");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-edge-detector': `module tb;
+logic clk=0,reset,signal_in,rise;
+edge_detector dut(.clk(clk),.reset(reset),.signal_in(signal_in),.rise(rise));
+always #1 clk=~clk;
+initial begin
+  reset=1; signal_in=0; @(posedge clk); #0.1; if(rise!==0) $fatal(1,"reset");
+  reset=0; signal_in=0; @(posedge clk); #0.1; if(rise!==0) $fatal(1,"low");
+  signal_in=1; @(posedge clk); #0.1; if(rise!==1) $fatal(1,"rising edge");
+  @(posedge clk); #0.1; if(rise!==0) $fatal(1,"held high");
+  signal_in=0; @(posedge clk); #0.1; if(rise!==0) $fatal(1,"falling edge");
+  signal_in=1; @(posedge clk); #0.1; if(rise!==1) $fatal(1,"second rising edge");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-arbiter': `module tb;
+logic [3:0] req,grant;
+arbiter4 dut(.req(req),.grant(grant));
+initial begin
+  req=0; #1; if(grant!==0) $fatal(1,"no request");
+  req=4'b0001; #1; if(grant!==4'b0001) $fatal(1,"request 0");
+  req=4'b0101; #1; if(grant!==4'b0100) $fatal(1,"priority 2");
+  req=4'b1011; #1; if(grant!==4'b1000) $fatal(1,"priority 3");
+  req=4'b0110; #1; if(grant!==4'b0100) $fatal(1,"priority 2 only");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-regfile': `module tb;
+logic clk=0,reset,we; logic [1:0] waddr,raddr1,raddr2; logic [7:0] wdata,rdata1,rdata2;
+regfile4 dut(.clk(clk),.reset(reset),.we(we),.waddr(waddr),.raddr1(raddr1),.raddr2(raddr2),.wdata(wdata),.rdata1(rdata1),.rdata2(rdata2));
+always #1 clk=~clk;
+initial begin
+  reset=1; we=0; waddr=0; raddr1=0; raddr2=1; wdata=0; @(posedge clk); #0.1; if(rdata1!==0 || rdata2!==0) $fatal(1,"reset clear");
+  reset=0; we=1; waddr=2; wdata=8'h5A; @(posedge clk); #0.1;
+  we=0; raddr1=2; raddr2=0; #1; if(rdata1!==8'h5A || rdata2!==0) $fatal(1,"readback");
+  we=1; waddr=0; wdata=8'hC3; @(posedge clk); #0.1; we=0; raddr1=0; #1; if(rdata1!==8'hC3) $fatal(1,"second write");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-lfsr': `module tb;
+logic clk=0,reset,enable; logic [7:0] state;
+lfsr8 dut(.clk(clk),.reset(reset),.enable(enable),.state(state));
+always #1 clk=~clk;
+initial begin
+  reset=1; enable=0; @(posedge clk); #0.1; if(state!==8'h01) $fatal(1,"seed");
+  reset=0; enable=1; @(posedge clk); #0.1; if(state!==8'h02) $fatal(1,"lfsr step 1");
+  @(posedge clk); #0.1; if(state!==8'h04) $fatal(1,"lfsr step 2");
+  @(posedge clk); #0.1; if(state!==8'h08) $fatal(1,"lfsr step 3");
+  @(posedge clk); #0.1; if(state!==8'h11) $fatal(1,"lfsr step 4");
+  enable=0; @(posedge clk); #0.1; if(state!==8'h11) $fatal(1,"hold");
+  $display("HDLFORGE_PASS"); $finish;
+end
+endmodule`,
+  'rtl-clock-divider': `module tb;
+logic clk=0,reset,enable,clk_out;
+clk_div #(.DIV(2)) dut(.clk(clk),.reset(reset),.enable(enable),.clk_out(clk_out));
+always #1 clk=~clk;
+initial begin
+  reset=1; enable=0; @(posedge clk); #0.1; if(clk_out!==0) $fatal(1,"reset");
+  reset=0; enable=1; @(posedge clk); #0.1; if(clk_out!==0) $fatal(1,"early toggle");
+  @(posedge clk); #0.1; if(clk_out!==1) $fatal(1,"first toggle");
+  @(posedge clk); #0.1; if(clk_out!==1) $fatal(1,"hold high");
+  @(posedge clk); #0.1; if(clk_out!==0) $fatal(1,"second toggle");
+  enable=0; @(posedge clk); #0.1; if(clk_out!==0) $fatal(1,"disabled");
   $display("HDLFORGE_PASS"); $finish;
 end
 endmodule`
@@ -116,6 +200,10 @@ async function simulate(initVvp, bytes) {
   module.FS.writeFile('/sim.vvp', bytes)
   module.callMain(['/sim.vvp'])
   return output.join('\n')
+}
+
+export function getBrowserSimulatorProblems() {
+  return Object.keys(benches)
 }
 
 export async function runBrowserSimulation(problemId, source) {
