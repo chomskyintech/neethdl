@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: hdlforge-runner
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGIN
+        sync: false
