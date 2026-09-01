@@ -1,10 +1,39 @@
 # HDLForge
 
-**HDLForge** is a NeetCode-style hardware design interview practice platform for **RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA** topics.
+**HDLForge** is a hardware design interview practice platform for **RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA** topics.
 
-**Try HDLForge:** https://neethdl.netlify.app/
+**Live site:** https://hdlforge.netlify.app/
 
-HDLForge is designed for engineers and students preparing for hardware design, RTL design, verification, FPGA and computer architecture interviews. It provides focused interview-style problems, explanations, reference solutions, progress tracking and HDL practice.
+HDLForge is designed for students, graduate engineers, RTL design candidates, design verification engineers, FPGA engineers, and anyone preparing for hardware design interviews. It provides focused interview-style problems, explanations, reference solutions, progress tracking, and practical HDL practice.
+
+## Why HDLForge
+
+HDLForge focuses specifically on hardware engineering interview preparation rather than general software coding interview practice. Its resources cover both design and verification concepts commonly encountered in RTL, FPGA, ASIC, and hardware verification interviews.
+
+## Topics
+
+HDLForge currently covers:
+
+- RTL design
+- Verilog
+- SystemVerilog
+- SystemVerilog Assertions (SVA)
+- UVM and functional verification
+- Computer architecture
+- Digital design
+- UART and SPI protocols
+- FPGA design
+
+## Practice problems
+
+The platform includes practice covering multiplexers, counters, priority logic, FIFOs, shift registers, edge detectors, arbiters, register files, LFSRs, clock dividers, SystemVerilog constructs and interfaces, SVA handshakes and reset properties, UVM drivers and scoreboards, architecture hazards and caches, UART and SPI, FPGA debouncing, and FSM design.
+
+## Main resources
+
+- **Homepage:** https://hdlforge.netlify.app/
+- **Practice problems:** https://hdlforge.netlify.app/problems/
+- **Hardware design interview guide:** https://hdlforge.netlify.app/learn/hardware-design-interview/
+- **Machine-readable site summary:** https://hdlforge.netlify.app/llms.txt
 
 ## Architecture
 
@@ -30,18 +59,6 @@ PASS / FAIL + simulator output
 - Netlify hosts the frontend.
 - For development/testing, the runner can stay on your own PC and be exposed through a free Cloudflare Quick Tunnel.
 
-## Topics
-
-HDLForge currently covers:
-
-- RTL design
-- SystemVerilog
-- SystemVerilog Assertions (SVA)
-- UVM and functional verification
-- Computer architecture
-- Digital protocols
-- FPGA design
-
 ## Local frontend development
 
 ```bash
@@ -57,7 +74,7 @@ From the repository root:
 
 ```bash
 docker build -t hdlforge-runner ./server
-docker run --rm -p 8787:8787 -e ALLOWED_ORIGIN=https://neethdl.netlify.app hdlforge-runner
+docker run --rm -p 8787:8787 -e ALLOWED_ORIGIN=https://hdlforge.netlify.app hdlforge-runner
 ```
 
 The runner should then respond at `http://localhost:8787/health`.
@@ -96,7 +113,7 @@ VITE_RUNNER_URL=https://some-random-name.trycloudflare.com
 
 Then trigger a new Netlify deploy. HDLForge will use the Verilator runner for the four currently simulated problems: `rtl-mux`, `rtl-counter`, `rtl-priority` and `rtl-fifo`.
 
-The Quick Tunnel URL changes when the tunnel process is restarted, so the Netlify environment variable must be updated when that happens. Cloudflare documents Quick Tunnels as free and intended for testing/development rather than production. They also have a 200 in-flight request limit. See the official Cloudflare Quick Tunnel documentation for current limitations.
+The Quick Tunnel URL changes when the tunnel process is restarted, so the Netlify environment variable must be updated when that happens. Cloudflare documents Quick Tunnels as free and intended for testing/development rather than production. They also have a 200 in-flight request limit.
 
 ## Security
 
