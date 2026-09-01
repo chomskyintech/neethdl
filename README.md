@@ -1,6 +1,10 @@
 # HDLForge
 
-HDLForge is a NeetCode-style hardware interview practice platform for RTL, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA topics.
+**HDLForge** is a NeetCode-style hardware design interview practice platform for **RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA** topics.
+
+**Try HDLForge:** https://neethdl.netlify.app/
+
+HDLForge is designed for engineers and students preparing for hardware design, RTL design, verification, FPGA and computer architecture interviews. It provides focused interview-style problems, explanations, reference solutions, progress tracking and HDL practice.
 
 ## Architecture
 
@@ -25,6 +29,18 @@ PASS / FAIL + simulator output
 - `server/` — HDL execution service using Node.js + Verilator.
 - Netlify hosts the frontend.
 - For development/testing, the runner can stay on your own PC and be exposed through a free Cloudflare Quick Tunnel.
+
+## Topics
+
+HDLForge currently covers:
+
+- RTL design
+- SystemVerilog
+- SystemVerilog Assertions (SVA)
+- UVM and functional verification
+- Computer architecture
+- Digital protocols
+- FPGA design
 
 ## Local frontend development
 
