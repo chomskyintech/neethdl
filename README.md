@@ -4,18 +4,51 @@ HDLForge is a NeetCode-style hardware interview practice platform for RTL, Syste
 
 ## Architecture
 
-- `src/` — React/Vite frontend, problem database, editor and progress tracking.
-- `server/` — optional HDL execution service using Verilator.
-- Netlify can host the frontend; the Verilator runner must be deployed separately on a container-capable service.
+```text
+HDLForge frontend (Netlify)
+        |
+        | HTTPS
+        v
+Cloudflare Quick Tunnel (free)
+        |
+        v
+Your local HDLForge runner
+        |
+        v
+Verilator + hidden-style testbench
+        |
+        v
+PASS / FAIL + simulator output
+```
 
-## Local development
+- `src/` — React/Vite frontend, problem database, editor and progress tracking.
+- `server/` — HDL execution service using Node.js + Verilator.
+- Netlify hosts the frontend.
+- For development/testing, the runner can stay on your own PC and be exposed through a free Cloudflare Quick Tunnel.
+
+## Local frontend development
 
 ```bash
 npm install
 npm run dev
 ```
 
-For the simulator service:
+## Run the Verilator runner
+
+### Option A — Docker (recommended)
+
+From the repository root:
+
+```bash
+docker build -t hdlforge-runner ./server
+docker run --rm -p 8787:8787 -e ALLOWED_ORIGIN=https://neethdl.netlify.app hdlforge-runner
+```
+
+The runner should then respond at `http://localhost:8787/health`.
+
+### Option B — Run Node directly
+
+Install Verilator separately and make sure `verilator` is on `PATH`, then:
 
 ```bash
 cd server
@@ -23,12 +56,36 @@ npm install
 node server.js
 ```
 
-The runner expects `verilator` on `PATH` and exposes `POST /run` and `GET /health`.
+The runner exposes `GET /health` and `POST /run`.
 
-Set `VITE_RUNNER_URL` in the frontend environment to the deployed runner URL. If it is empty, problems without an execution backend use browser-side structural checks instead.
+## Expose the runner with Cloudflare Quick Tunnel
 
-## Security requirements before public deployment
+Install `cloudflared`, then leave the runner running and open a second terminal:
 
-The runner is an execution service and must be isolated. Deploy it in a dedicated container with no network access from simulation jobs, a non-root user, CPU/memory/process limits and a short timeout. Keep the problem/testbench allowlist server-side. Never pass user input to a shell command, and reject dangerous SystemVerilog constructs such as `$system`, arbitrary file access and source includes.
+```bash
+cloudflared tunnel --url http://localhost:8787
+```
 
-The included Dockerfile provides Verilator and Node, but production hardening and platform-specific sandbox limits still need to be configured by the deployment environment.
+Cloudflare will print a temporary URL similar to:
+
+```text
+https://some-random-name.trycloudflare.com
+```
+
+Set that URL as the Netlify environment variable:
+
+```text
+VITE_RUNNER_URL=https://some-random-name.trycloudflare.com
+```
+
+Then trigger a new Netlify deploy. HDLForge will use the Verilator runner for the four currently simulated problems: `rtl-mux`, `rtl-counter`, `rtl-priority` and `rtl-fifo`.
+
+The Quick Tunnel URL changes when the tunnel process is restarted, so the Netlify environment variable must be updated when that happens. Cloudflare documents Quick Tunnels as free and intended for testing/development rather than production. They also have a 200 in-flight request limit. See the official Cloudflare Quick Tunnel documentation for current limitations.
+
+## Security
+
+The runner executes HDL submitted by users and must be treated as an untrusted-code execution service. The current implementation uses an allowlist, source-size limit, timeout and basic blocking of system/file operations. These are **not sufficient for production-grade public execution**.
+
+Before exposing HDLForge to a large public audience, add stronger isolation: dedicated containers or sandboxes per job, no network access from simulation jobs, restricted filesystem permissions, non-root execution, CPU/memory/process limits, rate limiting and stronger SystemVerilog restrictions.
+
+Never commit a real `.env` file or a runner URL containing credentials to GitHub.
