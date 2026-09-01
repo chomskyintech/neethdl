@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://neethdl.netlify.app/sitemap.xml
+Sitemap: https://hdlforge.netlify.app/sitemap.xml
