@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://neethdl.netlify.app/sitemap.xml
