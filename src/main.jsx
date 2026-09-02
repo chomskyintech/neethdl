@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from 'react'
 import {createRoot} from 'react-dom/client'
-import {ArrowLeft,BookOpen,Check,ChevronDown,Code2,FileCode2,Folder,MessageSquare,Play,Plus,RotateCcw,Search,Settings,Terminal,Upload,Waveform as WaveformIcon,X,Zap} from 'lucide-react'
+import {ArrowLeft,BookOpen,Check,ChevronDown,Code2,FileCode2,Folder,MessageSquare,Play,Plus,RotateCcw,Search,Settings,Terminal,Upload,Waves as WaveformIcon,X,Zap} from 'lucide-react'
 import './styles.css'
 import './language-ui.css'
 import './waveform-discussion.css'
