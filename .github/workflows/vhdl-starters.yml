@@ -1,26 +1,22 @@
 name: Fix VHDL starters
-
 on:
   push:
     branches: [main]
-
 permissions:
   contents: write
-
 jobs:
   patch-starters:
     if: ${{ !startsWith(github.event.head_commit.message, 'Fix VHDL starters') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Add executable VHDL starters
+      - name: Patch VHDL starters
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('src/main.jsx')
-          s=p.read_text()
-          old="""function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');return `library ieee;\\nuse ieee.std_logic_1164.all;\\nuse ieee.numeric_std.all;\\n\\n-- ${p.title}\\n-- Implement the required behaviour here.\\nentity ${p.id.replace(/-/g,'_')} is\\n  port (\\n    -- Declare the required ports\\n  );\\nend entity;\\narchitecture rtl of ${p.id.replace(/-/g,'_')} is\\nbegin\\n  -- Your VHDL here\\nend architecture;`}"""
-          new="""const vhdlStarters={
+          import re
+          p=Path('src/main.jsx'); s=p.read_text()
+          starters="""const vhdlStarters={
           'rtl-mux':`library ieee; use ieee.std_logic_1164.all; entity mux2 is port(a,b,sel: in std_logic; y: out std_logic); end; architecture rtl of mux2 is begin -- Your RTL here end;`,
           'rtl-counter':`library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity counter is generic(WIDTH: positive:=8); port(clk,reset: in std_logic; count: out std_logic_vector(WIDTH-1 downto 0)); end; architecture rtl of counter is begin -- Your RTL here end;`,
           'rtl-priority':`library ieee; use ieee.std_logic_1164.all; entity priority_encoder is port(inp: in std_logic_vector(7 downto 0); index: out std_logic_vector(2 downto 0); valid: out std_logic); end; architecture rtl of priority_encoder is begin -- Your RTL here end;`,
@@ -32,18 +28,20 @@ jobs:
           'rtl-lfsr':`library ieee; use ieee.std_logic_1164.all; entity lfsr8 is port(clk,reset,enable: in std_logic; state: out std_logic_vector(7 downto 0)); end; architecture rtl of lfsr8 is begin -- Your RTL here end;`,
           'rtl-clock-divider':`library ieee; use ieee.std_logic_1164.all; entity clk_div is generic(DIV: positive:=2); port(clk,reset,enable: in std_logic; clk_out: out std_logic); end; architecture rtl of clk_div is begin -- Your RTL here end;`
           }
-          function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');if(vhdlStarters[p.id])return vhdlStarters[p.id];return `library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity ${p.id.replace(/-/g,'_')} is end; architecture rtl of ${p.id.replace(/-/g,'_')} is begin -- VHDL editing is supported; this problem has no executable VHDL testbench yet. end;}`}"""
-          if old in s:
-            p.write_text(s.replace(old,new))
-          else:
-            print('VHDL starter patch already applied or source changed; leaving file unchanged')
+          function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');if(vhdlStarters[p.id])return vhdlStarters[p.id];return `library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity ${p.id.replace(/-/g,'_')} is end; architecture rtl of ${p.id.replace(/-/g,'_')} is begin -- VHDL editing is supported; this problem has no executable VHDL testbench yet. end;}`
+          """
+          pattern=r"function languageStarter\(p,lang\).*?\nfunction vcdParse"
+          replacement=starters+"function vcdParse"
+          ns,n=re.subn(pattern,replacement,s,flags=re.S)
+          if n!=1: raise SystemExit(f'Could not locate languageStarter block; matches={n}')
+          p.write_text(ns)
           PY
       - name: Commit
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add src/main.jsx
-          if git diff --cached --quiet; then exit 0; fi
+          git diff --cached --quiet && exit 0
           git commit -m 'Fix VHDL starters'
           git fetch origin main
           git rebase origin/main
