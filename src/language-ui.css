@@ -19,9 +19,25 @@
 .primary{position:relative;overflow:hidden}.primary:after{content:"";position:absolute;inset:-80% -30%;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.18) 50%,transparent 65%);transform:translateX(-70%);transition:transform .6s ease}.primary:hover:after{transform:translateX(70%)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
 
-/* Collapsible sidebar */
-.sidebar{display:none}
-.sidebar.open{display:block;position:fixed;left:0;top:68px;z-index:50;width:280px;height:calc(100vh - 68px);min-height:0;overflow-y:auto;background:#080d14;box-shadow:18px 0 45px rgba(0,0,0,.28)}
-.menu-btn{display:block;margin-left:auto;background:none;border:0;color:#cbd5e1;padding:8px;cursor:pointer}
-.menu-btn:hover{color:#fff}
-@media(max-width:1000px){.sidebar.open{width:280px}.main{padding:40px 28px 70px}.desktop-nav{display:none}.problem-layout{grid-template-columns:1fr}.editor-card{position:static}.topic-grid{grid-template-columns:1fr}}
+/* Homepage workspace navigation */
+.workspace-home{margin-top:42px;padding:24px;border:1px solid var(--line);border-radius:16px;background:rgba(10,16,24,.62);animation:heroRise .7s .28s cubic-bezier(.22,1,.36,1) both}
+.workspace-home .section-heading{margin-bottom:18px}
+.workspace-grid{display:grid;grid-template-columns:1.05fr 1fr 1fr .9fr;gap:12px}
+.workspace-nav,.workspace-list,.workspace-progress{min-width:0;padding:14px;border:1px solid var(--line);border-radius:12px;background:rgba(13,20,30,.72)}
+.workspace-nav{display:flex;flex-direction:column;gap:5px}
+.workspace-nav-item{display:flex;align-items:center;gap:9px;width:100%;padding:10px 11px;border:1px solid transparent;border-radius:8px;background:transparent;color:#8391a5;text-align:left;font-size:12px;font-weight:700;cursor:pointer}
+.workspace-nav-item:hover,.workspace-nav-item.active{color:#e8f5ff;background:rgba(56,189,248,.08);border-color:rgba(125,211,252,.12)}
+.workspace-nav-item svg{color:#6f8095}
+.workspace-nav-item.active svg{color:#7dd3fc}
+.workspace-title{margin:2px 4px 9px;color:#5f6f83;font-size:10px;font-weight:800;letter-spacing:.13em}
+.workspace-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 6px;border:0;border-radius:6px;background:transparent;color:#8492a5;font-size:11px;text-align:left;cursor:pointer}
+.workspace-link span:last-child{color:#536276;font-variant-numeric:tabular-nums}
+.workspace-link:hover,.workspace-link.selected{color:#dce9f5;background:rgba(56,189,248,.07)}
+.workspace-link.selected span:last-child{color:#7dd3fc}
+.workspace-progress .mini-progress{margin-top:18px}
+.workspace-progress .progress-track{margin-bottom:10px}
+@media(max-width:1050px){.workspace-grid{grid-template-columns:1fr 1fr}.workspace-progress{grid-column:span 2}}
+@media(max-width:650px){.workspace-home{padding:16px;margin-top:30px}.workspace-grid{grid-template-columns:1fr}.workspace-progress{grid-column:auto}}
+
+/* Sidebar and hamburger are intentionally removed from the homepage layout. */
+.sidebar{display:none!important}.menu-btn{display:none!important}
