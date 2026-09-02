@@ -1,0 +1,1 @@
+The GHDL runner workflow patches the frontend VHDL execution path on the next push to main.
