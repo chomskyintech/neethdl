@@ -40,12 +40,12 @@ logic clk=0,reset,wr_en,rd_en; logic [7:0] din,dout; logic full,empty;
 fifo #(.WIDTH(8),.DEPTH(4)) dut(.clk(clk),.reset(reset),.wr_en(wr_en),.rd_en(rd_en),.din(din),.dout(dout),.full(full),.empty(empty));
 always #1 clk=~clk;
 initial begin
-  reset=1; wr_en=0; rd_en=0; din=0; @(posedge clk); #0.1; if(!empty) $fatal(1,"not empty after reset");
-  reset=0; din=8'hA5; wr_en=1; @(posedge clk); #0.1; if(empty) $fatal(1,"empty after write");
-  din=8'h3C; @(posedge clk); #0.1; wr_en=0; rd_en=1; if(empty) $fatal(1,"empty with two entries");
-  @(posedge clk); #0.1; if(dout!==8'hA5) $fatal(1,"fifo first data");
+  reset=1; wr_en=0; rd_en=0; din=0; @(posedge clk); #0.1; if(!empty || full) $fatal(1,"reset flags");
+  reset=0; din=8'hA5; wr_en=1; rd_en=0; @(posedge clk); #0.1; if(empty) $fatal(1,"empty after write");
+  din=8'h3C; @(posedge clk); #0.1; if(empty) $fatal(1,"empty with two entries");
+  wr_en=0; rd_en=1; @(posedge clk); #0.1; if(dout!==8'hA5) $fatal(1,"fifo first data");
   @(posedge clk); #0.1; if(dout!==8'h3C) $fatal(1,"fifo second data");
-  if(!empty) $fatal(1,"fifo not empty");
+  @(posedge clk); #0.1; if(!empty) $fatal(1,"fifo not empty");
   $display("HDLFORGE_PASS"); $finish;
 end
 endmodule`,
@@ -131,7 +131,6 @@ endmodule`
 }
 
 const dangerous = /\$(system|popen|fopen|fwrite|fread|fclose|fseek|rewind)\b|`include\b|`system\b/i
-
 let modulesPromise
 
 async function loadModules() {
@@ -144,7 +143,10 @@ async function loadModules() {
       initIvlpp: ivlpp.default,
       initIvl: ivl.default,
       initVvp: vvp.default
-    }))
+    })).catch(error => {
+      modulesPromise = null
+      throw new Error(`Browser simulator could not load: ${error?.message || error}`)
+    })
   }
   return modulesPromise
 }
@@ -158,17 +160,7 @@ function sanitize(source) {
 }
 
 function ivlConfig(generation) {
-  return `basedir:/
-module:system.vpi
-generation:${generation}
-generation:no-specify
-out:/out.vvp
-iwidth:32
-widthcap:65536
-functor:cprop
-functor:nodangle
-flag:DLL=vvp.tgt
-`
+  return `basedir:/\nmodule:system.vpi\ngeneration:${generation}\ngeneration:no-specify\nout:/out.vvp\niwidth:32\nwidthcap:65536\nfunctor:cprop\nfunctor:nodangle\nflag:DLL=vvp.tgt\n`
 }
 
 async function preprocess(initIvlpp, files) {
