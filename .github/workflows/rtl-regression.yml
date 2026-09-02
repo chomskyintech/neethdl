@@ -1,0 +1,23 @@
+name: RTL Regression
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rtl-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+
+      - name: Compile RTL regression
+        run: iverilog -g2012 -Wall -o sim/rtl_regression.out sim/rtl_regression.sv
+
+      - name: Run RTL regression
+        run: vvp sim/rtl_regression.out
