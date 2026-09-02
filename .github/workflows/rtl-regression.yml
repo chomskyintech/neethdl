@@ -16,8 +16,16 @@ jobs:
       - name: Install Icarus Verilog
         run: sudo apt-get update && sudo apt-get install -y iverilog
 
-      - name: Compile RTL regression
-        run: iverilog -g2012 -Wall -o sim/rtl_regression.out sim/rtl_regression.sv
+      - name: Validate simulation catalog
+        run: python3 sim/validate_simulation_catalog.py
 
-      - name: Run RTL regression
-        run: vvp sim/rtl_regression.out
+      - name: Run 10-problem RTL regression
+        run: bash sim/run_regression.sh
+
+      - name: Publish regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hdlforge-rtl-regression-report
+          path: sim/results/
+          if-no-files-found: ignore
