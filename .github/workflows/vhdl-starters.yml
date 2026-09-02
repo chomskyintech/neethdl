@@ -16,25 +16,12 @@ jobs:
           from pathlib import Path
           import re
           p=Path('src/main.jsx'); s=p.read_text()
-          starters="""const vhdlStarters={
-          'rtl-mux':`library ieee; use ieee.std_logic_1164.all; entity mux2 is port(a,b,sel: in std_logic; y: out std_logic); end; architecture rtl of mux2 is begin -- Your RTL here end;`,
-          'rtl-counter':`library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity counter is generic(WIDTH: positive:=8); port(clk,reset: in std_logic; count: out std_logic_vector(WIDTH-1 downto 0)); end; architecture rtl of counter is begin -- Your RTL here end;`,
-          'rtl-priority':`library ieee; use ieee.std_logic_1164.all; entity priority_encoder is port(inp: in std_logic_vector(7 downto 0); index: out std_logic_vector(2 downto 0); valid: out std_logic); end; architecture rtl of priority_encoder is begin -- Your RTL here end;`,
-          'rtl-fifo':`library ieee; use ieee.std_logic_1164.all; entity fifo is generic(WIDTH: positive:=8; DEPTH: positive:=4); port(clk,reset,wr_en,rd_en: in std_logic; din: in std_logic_vector(WIDTH-1 downto 0); dout: out std_logic_vector(WIDTH-1 downto 0); full,empty: out std_logic); end; architecture rtl of fifo is begin -- Your RTL here end;`,
-          'rtl-shift-register':`library ieee; use ieee.std_logic_1164.all; entity shift_reg is generic(WIDTH: positive:=8); port(clk,reset,shift_en,din: in std_logic; dout: out std_logic_vector(WIDTH-1 downto 0)); end; architecture rtl of shift_reg is begin -- Your RTL here end;`,
-          'rtl-edge-detector':`library ieee; use ieee.std_logic_1164.all; entity edge_detector is port(clk,reset,signal_in: in std_logic; rise: out std_logic); end; architecture rtl of edge_detector is begin -- Your RTL here end;`,
-          'rtl-arbiter':`library ieee; use ieee.std_logic_1164.all; entity arbiter4 is port(req: in std_logic_vector(3 downto 0); grant: out std_logic_vector(3 downto 0)); end; architecture rtl of arbiter4 is begin -- Your RTL here end;`,
-          'rtl-regfile':`library ieee; use ieee.std_logic_1164.all; entity regfile4 is port(clk,reset,we: in std_logic; waddr,raddr1,raddr2: in std_logic_vector(1 downto 0); wdata: in std_logic_vector(7 downto 0); rdata1,rdata2: out std_logic_vector(7 downto 0)); end; architecture rtl of regfile4 is begin -- Your RTL here end;`,
-          'rtl-lfsr':`library ieee; use ieee.std_logic_1164.all; entity lfsr8 is port(clk,reset,enable: in std_logic; state: out std_logic_vector(7 downto 0)); end; architecture rtl of lfsr8 is begin -- Your RTL here end;`,
-          'rtl-clock-divider':`library ieee; use ieee.std_logic_1164.all; entity clk_div is generic(DIV: positive:=2); port(clk,reset,enable: in std_logic; clk_out: out std_logic); end; architecture rtl of clk_div is begin -- Your RTL here end;`
-          }
-          function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');if(vhdlStarters[p.id])return vhdlStarters[p.id];return `library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity ${p.id.replace(/-/g,'_')} is end; architecture rtl of ${p.id.replace(/-/g,'_')} is begin -- VHDL editing is supported; this problem has no executable VHDL testbench yet. end;}`
-          """
-          pattern=r"function languageStarter\(p,lang\).*?\nfunction vcdParse"
-          replacement=starters+"function vcdParse"
-          ns,n=re.subn(pattern,replacement,s,flags=re.S)
-          if n!=1: raise SystemExit(f'Could not locate languageStarter block; matches={n}')
-          p.write_text(ns)
+          # Collapse accidental duplicate starter-map declarations from earlier patches.
+          s,n=re.subn(r"const vhdlStarters=\{.*?\n\}\nconst vhdlStarters=", "const vhdlStarters=", s, count=1, flags=re.S)
+          if n:
+            p.write_text(s)
+          else:
+            print('No duplicate VHDL starter map found')
           PY
       - name: Commit
         run: |
