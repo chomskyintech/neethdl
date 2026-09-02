@@ -1,0 +1,415 @@
+/* HDLForge UI polish — NeetCode-inspired practice density without copying its UI. */
+
+:root {
+  --nf-bg: #17181c;
+  --nf-panel: #202126;
+  --nf-panel-2: #25262b;
+  --nf-border: #34363d;
+  --nf-text: #f1f1f2;
+  --nf-muted: #9a9ca3;
+  --nf-green: #52d273;
+  --nf-yellow: #d9b95b;
+}
+
+body {
+  background: var(--nf-bg) !important;
+}
+
+.nav {
+  height: 58px !important;
+  background: #191a1e !important;
+  border-bottom: 1px solid #303137 !important;
+  backdrop-filter: none !important;
+}
+
+.nav-inner {
+  max-width: 1240px !important;
+  padding: 0 18px !important;
+}
+
+.brand {
+  font-size: 18px !important;
+}
+
+.brand-icon {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+
+.desktop-nav {
+  margin-left: 28px !important;
+}
+
+.desktop-nav button {
+  border-radius: 7px !important;
+  padding: 8px 13px !important;
+  font-size: 12px !important;
+}
+
+.desktop-nav .active {
+  background: #2a2b30 !important;
+}
+
+.nav-stat {
+  color: #85878e !important;
+  font-size: 10px !important;
+}
+
+.nav-stat strong {
+  color: #d9dadc !important;
+}
+
+.profile {
+  border-radius: 7px !important;
+}
+
+.main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 38px 28px 70px !important;
+}
+
+/* Practice page: tighter, table-like density inspired by NeetCode's problem lists. */
+.page-head {
+  margin-bottom: 22px !important;
+}
+
+.page-head h1 {
+  font-size: 36px !important;
+  letter-spacing: -.035em !important;
+}
+
+.page-head p {
+  margin: 10px 0 0 !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  max-width: 620px !important;
+}
+
+.toolbar {
+  margin-bottom: 10px !important;
+  gap: 7px !important;
+}
+
+.search {
+  max-width: 520px !important;
+  background: #202126 !important;
+  border-color: #34363d !important;
+  border-radius: 7px !important;
+}
+
+.search input {
+  padding: 9px 0 !important;
+  font-size: 12px !important;
+}
+
+.filters select {
+  min-height: 36px;
+  background: #202126 !important;
+  border-color: #34363d !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+.language-strip {
+  margin-bottom: 12px !important;
+  padding: 6px 8px !important;
+  border-radius: 7px !important;
+  background: #202126 !important;
+  border-color: #34363d !important;
+}
+
+.problem-list {
+  border: 1px solid #3a3b41 !important;
+  border-radius: 7px !important;
+  background: #202126 !important;
+  overflow: hidden;
+}
+
+.problem-row {
+  min-height: 55px !important;
+  padding: 7px 12px !important;
+  gap: 10px !important;
+  border-bottom-color: #303137 !important;
+}
+
+.problem-row:hover {
+  background: #292a2f !important;
+}
+
+.problem-main {
+  gap: 12px !important;
+  padding: 5px 0 !important;
+}
+
+.problem-index {
+  width: 26px !important;
+  color: #656870 !important;
+  font-size: 10px !important;
+}
+
+.problem-main strong {
+  color: #e3e4e6 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.problem-main small {
+  margin-top: 3px !important;
+  color: #85878e !important;
+  font-size: 9px !important;
+}
+
+.problem-main:hover strong {
+  color: #ffffff !important;
+}
+
+.check {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  border-color: #55575e !important;
+}
+
+.check.done {
+  background: var(--nf-green) !important;
+  border-color: var(--nf-green) !important;
+  box-shadow: none !important;
+}
+
+.difficulty {
+  min-width: 54px;
+  text-align: center;
+  padding: 3px 7px !important;
+  border-radius: 4px !important;
+  font-size: 9px !important;
+}
+
+.difficulty.easy {
+  color: #70df8c !important;
+  background: rgba(82,210,115,.09) !important;
+}
+
+.difficulty.medium {
+  color: #e2c866 !important;
+  background: rgba(217,185,91,.09) !important;
+}
+
+.difficulty.hard {
+  color: #ef7d8a !important;
+  background: rgba(239,125,138,.09) !important;
+}
+
+.row-chevron {
+  color: #565960 !important;
+}
+
+/* Roadmap/dashboard: reduce the marketing feel and make progress scannable. */
+.hero {
+  max-width: 760px !important;
+  padding: 34px 0 30px !important;
+}
+
+.hero h1 {
+  font-size: 46px !important;
+}
+
+.hero p {
+  font-size: 15px !important;
+  max-width: 650px !important;
+}
+
+.hero:before {
+  display: none !important;
+}
+
+.primary {
+  box-shadow: none !important;
+  border-radius: 7px !important;
+}
+
+.secondary {
+  border-radius: 7px !important;
+}
+
+.stats {
+  margin: 6px 0 42px !important;
+  border-radius: 7px !important;
+  background: #202126 !important;
+  box-shadow: none !important;
+  border-color: #36373d !important;
+}
+
+.stats div {
+  padding: 16px 18px !important;
+  border-right-color: #34353b !important;
+}
+
+.stats strong {
+  font-size: 23px !important;
+}
+
+.workspace-home {
+  margin-top: 28px !important;
+  padding: 16px !important;
+  border-radius: 7px !important;
+  background: #1e1f23 !important;
+  border-color: #34363d !important;
+  animation: none !important;
+}
+
+.workspace-grid {
+  gap: 8px !important;
+}
+
+.workspace-nav,
+.workspace-list,
+.workspace-progress {
+  padding: 11px !important;
+  border-radius: 6px !important;
+  background: #202126 !important;
+  border-color: #34363d !important;
+}
+
+.workspace-nav-item {
+  border-radius: 5px !important;
+  padding: 8px 9px !important;
+  font-size: 11px !important;
+}
+
+.workspace-link {
+  padding: 6px !important;
+  font-size: 10px !important;
+}
+
+.topic-grid {
+  gap: 8px !important;
+}
+
+.topic-card {
+  border-radius: 7px !important;
+  padding: 16px !important;
+  background: #202126 !important;
+  border-color: #34363d !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+/* Problem workspace: make the editor feel like a real hardware IDE, not a card beside an article. */
+.problem-layout {
+  gap: 22px !important;
+  grid-template-columns: minmax(0, 1fr) minmax(430px, 54%) !important;
+}
+
+.statement {
+  padding-right: 6px !important;
+}
+
+.problem-title-line h1 {
+  font-size: 32px !important;
+}
+
+.problem-tabs {
+  margin: 18px 0 20px !important;
+  background: #1d1e22;
+  border: 1px solid #34363d;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.problem-tabs button {
+  border-radius: 4px;
+  margin: 0 !important;
+  padding: 8px 11px !important;
+}
+
+.problem-tabs button.active {
+  background: #2b2c31;
+  border-bottom: 0 !important;
+  box-shadow: inset 0 -2px 0 #67d5ff;
+}
+
+.editor-card {
+  border-radius: 7px !important;
+  border-color: #383a42 !important;
+  background: #18191d !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,.22) !important;
+}
+
+.editor-head,
+.editor-foot {
+  background: #202126 !important;
+}
+
+.editor-card textarea {
+  background: #15161a !important;
+  font-size: 12px !important;
+  line-height: 1.65 !important;
+}
+
+.run-result {
+  border-radius: 6px !important;
+}
+
+/* Keep the existing Phase 2 IDE components visually consistent if they are rendered. */
+.ide-page {
+  width: min(1240px, calc(100vw - 48px)) !important;
+  margin: -10px auto 0 !important;
+}
+
+.ide-topbar,
+.ide-body,
+.ide-footer,
+.ide-discussion {
+  border-color: #34363d !important;
+}
+
+.ide-topbar,
+.file-tabs,
+.ide-problem,
+.ide-bottom,
+.ide-discussion {
+  background: #1c1d21 !important;
+}
+
+.editor-shell,
+.editor-shell textarea,
+.wave-panel,
+.console,
+.testbench-info {
+  background: #15161a !important;
+}
+
+@media (max-width: 1000px) {
+  .main {
+    padding: 30px 18px 60px !important;
+  }
+
+  .problem-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .nav-inner {
+    padding: 0 12px !important;
+  }
+
+  .nav-stat {
+    display: none !important;
+  }
+
+  .hero h1 {
+    font-size: 37px !important;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .stats div:nth-child(2) {
+    border-right: 0 !important;
+  }
+}
