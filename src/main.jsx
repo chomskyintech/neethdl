@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Check, ChevronRight, Code2, Filter, Flame, Menu, RotateCcw, Search, Sparkles, X, Zap } from 'lucide-react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
+import './language-ui.css'
 import problems from './data/problems.json'
 import { runBrowserSimulation, getBrowserSimulatorProblems } from './browserSimulator'
 
@@ -56,12 +57,9 @@ function Problem({problem,solved,draft,onBack,onToggle,onSave}) {
     if (editorLanguage !== currentLanguage) { setResult({mode:'language',pass:false,output:`This problem is currently authored in ${currentLanguage}. ${editorLanguage} support is available as a language option and more ${editorLanguage} solutions are being added.`}); return }
     setRunning(true); setResult(null)
     if (simulatorProblems.has(problem.id)) {
-      try {
-        const data = await runBrowserSimulation(problem.id, code)
-        setResult({mode:'simulation',pass:data.passed,output:formatSimulationOutput(data.output, data.passed)})
-      } catch(error) {
-        setResult({mode:'simulation',pass:false,output:error?.message||'Browser simulator failed to start.'})
-      } finally { setRunning(false) }
+      try { const data = await runBrowserSimulation(problem.id, code); setResult({mode:'simulation',pass:data.passed,output:formatSimulationOutput(data.output, data.passed)}) }
+      catch(error) { setResult({mode:'simulation',pass:false,output:error?.message||'Browser simulator failed to start.'}) }
+      finally { setRunning(false) }
       return
     }
     const checks=problem.checks||[], missing=checks.filter(c=>!c.patterns.some(pattern=>new RegExp(pattern,'i').test(code))), hasStarter=/Your RTL here|Write your|Add modports|Complete the FSM|Synchronizer \+ debounce logic|Fetch, drive/i.test(code), pass=missing.length===0&&!hasStarter&&code.trim().length>20
