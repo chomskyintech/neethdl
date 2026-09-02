@@ -22,31 +22,9 @@
       {
         "@context": "https://schema.org",
         "@graph": [
-          {
-            "@type": "Organization",
-            "@id": "https://hdlforge.netlify.app/#organization",
-            "name": "HDLForge",
-            "url": "https://hdlforge.netlify.app/",
-            "description": "Hardware design interview preparation and practice platform covering RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA design."
-          },
-          {
-            "@type": "WebSite",
-            "@id": "https://hdlforge.netlify.app/#website",
-            "name": "HDLForge",
-            "url": "https://hdlforge.netlify.app/",
-            "description": "Hardware design interview practice for RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA topics.",
-            "publisher": {"@id": "https://hdlforge.netlify.app/#organization"},
-            "inLanguage": "en-GB"
-          },
-          {
-            "@type": "WebPage",
-            "@id": "https://hdlforge.netlify.app/#webpage",
-            "url": "https://hdlforge.netlify.app/",
-            "name": "HDLForge — Hardware Design Interview Practice",
-            "description": "Practice hardware design interview problems across RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA design.",
-            "isPartOf": {"@id": "https://hdlforge.netlify.app/#website"},
-            "about": {"@id": "https://hdlforge.netlify.app/#organization"}
-          }
+          {"@type":"Organization","@id":"https://hdlforge.netlify.app/#organization","name":"HDLForge","url":"https://hdlforge.netlify.app/","description":"Hardware design interview preparation and practice platform covering RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA design."},
+          {"@type":"WebSite","@id":"https://hdlforge.netlify.app/#website","name":"HDLForge","url":"https://hdlforge.netlify.app/","description":"Hardware design interview practice for RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA topics.","publisher":{"@id":"https://hdlforge.netlify.app/#organization"},"inLanguage":"en-GB"},
+          {"@type":"WebPage","@id":"https://hdlforge.netlify.app/#webpage","url":"https://hdlforge.netlify.app/","name":"HDLForge — Hardware Design Interview Practice","description":"Practice hardware design interview problems across RTL, Verilog, SystemVerilog, SVA, UVM, computer architecture, protocols and FPGA design.","isPartOf":{"@id":"https://hdlforge.netlify.app/#website"},"about":{"@id":"https://hdlforge.netlify.app/#organization"}}
         ]
       }
     </script>
@@ -55,5 +33,6 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script type="module" src="/src/seoProblemBootstrap.js"></script>
+    <script type="module" src="/src/interviewBootstrap.js"></script>
   </body>
 </html>
