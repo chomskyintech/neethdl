@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronRight, Clock3, RotateCcw, Trophy, X } from 'lucide-react'
 import problems from './data/problems.json'
+import { runBrowserSimulation } from './browserSimulator'
 
 const QUESTIONS = [
   { id:'rtl-mux', prompt:'Implement a 2:1 multiplexer. y must select a when sel=0 and b when sel=1.', kind:'RTL' },
@@ -17,7 +18,6 @@ const QUESTIONS = [
   { id:'arch-cache', prompt:'For a 32-bit address, 4 KiB direct-mapped cache and 64-byte lines, derive offset, index and tag widths.', kind:'Architecture' }
 ]
 
-const RTL_IDS = new Set(QUESTIONS.filter(q=>q.kind==='RTL').map(q=>q.id))
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || '').replace(/\/$/,'')
 const loadScore = () => { try { return Number(localStorage.getItem('hdlforge-interview-best') || 0) } catch { return 0 } }
 
@@ -33,10 +33,14 @@ function gradeArchitecture(id, answer) {
 
 async function gradeAnswer(question, answer) {
   if(question.kind==='RTL') {
-    if(!RUNNER_URL) return {score:0, passed:false, detail:'Hidden RTL grading service is not configured.'}
-    const response=await fetch(`${RUNNER_URL}/interview/run`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({problemId:question.id,source:answer})})
-    const data=await response.json()
-    return {score:data.passed?10:0,passed:Boolean(data.passed),detail:data.passed?'Hidden tests passed.':'Hidden tests failed.'}
+    if(RUNNER_URL) {
+      const response=await fetch(`${RUNNER_URL}/interview/run`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({problemId:question.id,source:answer})})
+      if(!response.ok) throw new Error(`Grading service returned HTTP ${response.status}.`)
+      const data=await response.json()
+      return {score:data.passed?10:0,passed:Boolean(data.passed),detail:data.passed?'Hidden tests passed.':'Hidden tests failed.'}
+    }
+    const data=await runBrowserSimulation(question.id,answer)
+    return {score:data.passed?10:0,passed:Boolean(data.passed),detail:data.passed?'RTL simulation passed.':'RTL simulation failed.'}
   }
   const score=gradeArchitecture(question.id,answer)
   return {score,passed:score>=7,detail:score>=7?'Key concepts covered.':'Answer needs stronger timing/technical justification.'}
@@ -66,7 +70,7 @@ export default function InterviewMode({ onExit }) {
   const restart=()=>{setStarted(false);setIndex(0);setAnswer('');setAnswers([]);setTime(20*60);setFinished(false);setGradeError('')}
   const minutes=String(Math.floor(time/60)).padStart(2,'0'), seconds=String(time%60).padStart(2,'0')
 
-  if(!started) return <div className="interview-shell"><div className="interview-card"><div className="eyebrow">INTERVIEW MODE</div><h1>Hardware interview simulation</h1><p>10 timed questions across RTL and computer architecture. RTL answers are evaluated against server-side hidden simulation tests; conceptual answers are scored against a technical rubric.</p><div className="interview-rules"><div><strong>20:00</strong><span>Total time</span></div><div><strong>10</strong><span>Questions</span></div><div><strong>100</strong><span>Maximum score</span></div></div><button className="primary" onClick={()=>setStarted(true)}>Start interview <ChevronRight size={17}/></button><button className="secondary" onClick={onExit}>Back to roadmap</button>{best>0&&<p className="best-score">Best score: {best}/100</p>}</div></div>
+  if(!started) return <div className="interview-shell"><div className="interview-card"><div className="eyebrow">INTERVIEW MODE</div><h1>Hardware interview simulation</h1><p>10 timed questions across RTL and computer architecture. RTL answers are evaluated with HDLForge simulation tests; when the secure grading service is configured, those tests run server-side.</p><div className="interview-rules"><div><strong>20:00</strong><span>Total time</span></div><div><strong>10</strong><span>Questions</span></div><div><strong>100</strong><span>Maximum score</span></div></div><button className="primary" onClick={()=>setStarted(true)}>Start interview <ChevronRight size={17}/></button><button className="secondary" onClick={onExit}>Back to roadmap</button>{best>0&&<p className="best-score">Best score: {best}/100</p>}</div></div>
 
   if(finished){const score=Math.round(answers.reduce((sum,a)=>sum+a.score,0)/(questions.length*10)*100);return <div className="interview-shell"><div className="interview-card result-card"><Trophy size={32}/><div className="eyebrow">INTERVIEW COMPLETE</div><h1>{score}/100</h1><p>You earned {answers.reduce((sum,a)=>sum+a.score,0)} of {questions.length*10} available points.</p><div className="interview-review">{questions.map((item,i)=>{const result=answers.find(a=>a.id===item.id);return <div key={item.id}><span>{i+1}</span><strong>{item.prompt}</strong><em>{result?.passed?<Check size={16}/>:<X size={16}/>}</em><small>{result?.score??0}/10 · {result?.detail||'Not answered'}</small></div>})}</div><button className="primary" onClick={restart}>New interview <RotateCcw size={16}/></button><button className="secondary" onClick={onExit}>Back to roadmap</button></div></div>}
 
