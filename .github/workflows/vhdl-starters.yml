@@ -1,0 +1,45 @@
+name: Fix VHDL starters
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-starters:
+    if: ${{ !startsWith(github.event.head_commit.message, 'Fix VHDL starters') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add executable VHDL starters
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/main.jsx')
+          s=p.read_text()
+          old="""function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');return `library ieee;\\nuse ieee.std_logic_1164.all;\\nuse ieee.numeric_std.all;\\n\\n-- ${p.title}\\n-- Implement the required behaviour here.\\nentity ${p.id.replace(/-/g,'_')} is\\n  port (\\n    -- Declare the required ports\\n  );\\nend entity;\\narchitecture rtl of ${p.id.replace(/-/g,'_')} is\\nbegin\\n  -- Your VHDL here\\nend architecture;`}"""
+          new="""const vhdlStarters={
+          'rtl-mux':`library ieee; use ieee.std_logic_1164.all; entity mux2 is port(a,b,sel: in std_logic; y: out std_logic); end; architecture rtl of mux2 is begin -- Your RTL here end;`,
+          'rtl-counter':`library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity counter is generic(WIDTH: positive:=8); port(clk,reset: in std_logic; count: out std_logic_vector(WIDTH-1 downto 0)); end; architecture rtl of counter is begin -- Your RTL here end;`,
+          'rtl-priority':`library ieee; use ieee.std_logic_1164.all; entity priority_encoder is port(inp: in std_logic_vector(7 downto 0); index: out std_logic_vector(2 downto 0); valid: out std_logic); end; architecture rtl of priority_encoder is begin -- Your RTL here end;`,
+          'rtl-fifo':`library ieee; use ieee.std_logic_1164.all; entity fifo is generic(WIDTH: positive:=8; DEPTH: positive:=4); port(clk,reset,wr_en,rd_en: in std_logic; din: in std_logic_vector(WIDTH-1 downto 0); dout: out std_logic_vector(WIDTH-1 downto 0); full,empty: out std_logic); end; architecture rtl of fifo is begin -- Your RTL here end;`,
+          'rtl-shift-register':`library ieee; use ieee.std_logic_1164.all; entity shift_reg is generic(WIDTH: positive:=8); port(clk,reset,shift_en,din: in std_logic; dout: out std_logic_vector(WIDTH-1 downto 0)); end; architecture rtl of shift_reg is begin -- Your RTL here end;`,
+          'rtl-edge-detector':`library ieee; use ieee.std_logic_1164.all; entity edge_detector is port(clk,reset,signal_in: in std_logic; rise: out std_logic); end; architecture rtl of edge_detector is begin -- Your RTL here end;`,
+          'rtl-arbiter':`library ieee; use ieee.std_logic_1164.all; entity arbiter4 is port(req: in std_logic_vector(3 downto 0); grant: out std_logic_vector(3 downto 0)); end; architecture rtl of arbiter4 is begin -- Your RTL here end;`,
+          'rtl-regfile':`library ieee; use ieee.std_logic_1164.all; entity regfile4 is port(clk,reset,we: in std_logic; waddr,raddr1,raddr2: in std_logic_vector(1 downto 0); wdata: in std_logic_vector(7 downto 0); rdata1,rdata2: out std_logic_vector(7 downto 0)); end; architecture rtl of regfile4 is begin -- Your RTL here end;`,
+          'rtl-lfsr':`library ieee; use ieee.std_logic_1164.all; entity lfsr8 is port(clk,reset,enable: in std_logic; state: out std_logic_vector(7 downto 0)); end; architecture rtl of lfsr8 is begin -- Your RTL here end;`,
+          'rtl-clock-divider':`library ieee; use ieee.std_logic_1164.all; entity clk_div is generic(DIV: positive:=2); port(clk,reset,enable: in std_logic; clk_out: out std_logic); end; architecture rtl of clk_div is begin -- Your RTL here end;`
+          }
+          function languageStarter(p,lang){if(lang===problemLanguage(p))return p.starterCode;if(lang==='Verilog')return p.starterCode.replace(/\\blogic\\b/g,'reg').replace(/\\binput reg\\b/g,'input').replace(/\\boutput reg\\b/g,'output');if(vhdlStarters[p.id])return vhdlStarters[p.id];return `library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity ${p.id.replace(/-/g,'_')} is end; architecture rtl of ${p.id.replace(/-/g,'_')} is begin -- VHDL editing is supported; this problem has no executable VHDL testbench yet. end;}`}"""
+          if old not in s: raise SystemExit('VHDL starter function not found')
+          p.write_text(s.replace(old,new))
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/main.jsx
+          git diff --cached --quiet || git commit -m 'Fix VHDL starters'
+          git push
