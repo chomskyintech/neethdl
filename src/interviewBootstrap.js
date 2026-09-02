@@ -27,7 +27,7 @@ function openInterview() {
   host.id = 'hdlforge-interview-host'
   document.body.appendChild(host)
   root = createRoot(host)
-  root.render(<InterviewMode onExit={closeInterview} />)
+  root.render(React.createElement(InterviewMode, { onExit: closeInterview }))
 }
 
 function install() {
