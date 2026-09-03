@@ -95,17 +95,12 @@ function Waveform({ vcd }) {
   const [zoom, setZoom] = useState(1)
   const parsed = useMemo(() => vcdParse(vcd), [vcd])
 
-  if (!parsed.signals.length) {
-    return <div className="waveform-empty">No waveform was produced by this simulation.</div>
-  }
+  if (!parsed.signals.length) return <div className="waveform-empty">No waveform was produced by this simulation.</div>
 
   return (
     <div className="waveform">
       <div className="wave-head">
-        <div>
-          <strong>Waveform</strong>
-          <span>VCD simulation trace</span>
-        </div>
+        <div><strong>Waveform</strong><span>VCD simulation trace</span></div>
         <div className="wave-tools">
           <button onClick={() => setZoom(Math.max(0.5, zoom - 0.25))}>−</button>
           <span>{Math.round(zoom * 100)}%</span>
@@ -114,28 +109,11 @@ function Waveform({ vcd }) {
       </div>
       <div className="wave-body">
         <div className="wave-signals">
-          {parsed.signals.map((signal) => (
-            <div key={signal.code}>
-              <strong>{signal.name}</strong>
-              <small>{signal.width > 1 ? `[${signal.width - 1}:0]` : '1-bit'}</small>
-            </div>
-          ))}
+          {parsed.signals.map((signal) => <div key={signal.code}><strong>{signal.name}</strong><small>{signal.width > 1 ? `[${signal.width - 1}:0]` : '1-bit'}</small></div>)}
         </div>
         <div className="wave-canvas" style={{ '--wave-zoom': zoom }}>
           <div className="wave-axis">0 <span>{parsed.end} time units</span></div>
-          {parsed.signals.map((signal) => (
-            <div className="wave-track" key={signal.code}>
-              {signal.events.map((event, index) => (
-                <div
-                  className="wave-event"
-                  key={`${signal.code}-${index}`}
-                  style={{ left: `${parsed.end ? (event.t / parsed.end) * 100 : 0}%` }}
-                >
-                  <span>{signal.width > 1 ? `0x${parseInt(event.v, 2).toString(16).toUpperCase() || 'X'}` : event.v}</span>
-                </div>
-              ))}
-            </div>
-          ))}
+          {parsed.signals.map((signal) => <div className="wave-track" key={signal.code}>{signal.events.map((event, index) => <div className="wave-event" key={`${signal.code}-${index}`} style={{ left: `${parsed.end ? (event.t / parsed.end) * 100 : 0}%` }}><span>{signal.width > 1 ? `0x${parseInt(event.v, 2).toString(16).toUpperCase() || 'X'}` : event.v}</span></div>)}</div>)}
         </div>
       </div>
     </div>
@@ -158,34 +136,10 @@ function Discussion({ problem }) {
 
   return (
     <div className="discussion discussion-in-tab">
-      <div className="discussion-head">
-        <div>
-          <h2>Discussion</h2>
-          <p>Ask questions, compare implementations and discuss edge cases.</p>
-        </div>
-        <span><MessageSquare size={15} /> {posts.length} posts</span>
-      </div>
-      <form className="discussion-form" onSubmit={submit}>
-        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Ask a question or share an approach…" />
-        <button className="primary">Post discussion</button>
-      </form>
+      <div className="discussion-head"><div><h2>Discussion</h2><p>Ask questions, compare implementations and discuss edge cases.</p></div><span><MessageSquare size={15} /> {posts.length} posts</span></div>
+      <form className="discussion-form" onSubmit={submit}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Ask a question or share an approach…" /><button className="primary">Post discussion</button></form>
       <div className="discussion-list">
-        {posts.length ? posts.map((post) => (
-          <article className="discussion-post" key={post.id}>
-            <div className="post-avatar">Y</div>
-            <div>
-              <strong>{post.name}</strong>
-              <small>{post.time}</small>
-              <p>{post.text}</p>
-            </div>
-          </article>
-        )) : (
-          <div className="discussion-empty">
-            <MessageSquare size={22} />
-            <strong>Start the discussion</strong>
-            <p>Be the first to ask a question about this problem.</p>
-          </div>
-        )}
+        {posts.length ? posts.map((post) => <article className="discussion-post" key={post.id}><div className="post-avatar">Y</div><div><strong>{post.name}</strong><small>{post.time}</small><p>{post.text}</p></div></article>) : <div className="discussion-empty"><MessageSquare size={22} /><strong>Start the discussion</strong><p>Be the first to ask a question about this problem.</p></div>}
       </div>
     </div>
   )
@@ -203,10 +157,7 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   const [running, setRunning] = useState(false)
   const [statementTab, setStatementTab] = useState('problem')
 
-  const update = (value) => {
-    setCode(value)
-    onSave(problem.id, value)
-  }
+  const update = (value) => { setCode(value); onSave(problem.id, value) }
 
   const changeLanguage = (language) => {
     setEditorLanguage(language)
@@ -218,62 +169,32 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
 
   const run = async () => {
     if (isConceptual) {
-      setResult({
-        pass: false,
-        output: 'Automated answer evaluation is not configured for this problem yet. Review the task and submit an answer through the discussion or interview workflow.',
-        waveform: null,
-      })
+      setResult({ pass: false, output: 'Automated answer evaluation is not configured for this problem yet. Review the task and submit an answer through the discussion or interview workflow.', waveform: null })
       return
     }
-
     setRunning(true)
     setBottomTab('console')
     try {
       let data
       if (editorLanguage === 'VHDL') {
         if (!RUNNER_URL) throw new Error('VHDL simulator is not configured. Set VITE_RUNNER_URL to the HDLForge GHDL runner.')
-        const response = await fetch(`${RUNNER_URL}/run`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ problemId: problem.id, source: code, language: 'VHDL' }),
-        })
+        const response = await fetch(`${RUNNER_URL}/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problemId: problem.id, source: code, language: 'VHDL' }) })
         data = await response.json()
         if (!response.ok || !data.ok) throw new Error(data.error || 'VHDL runner failed.')
-      } else {
-        data = await runBrowserSimulation(problem.id, code)
-      }
-
+      } else data = await runBrowserSimulation(problem.id, code)
       const passed = Boolean(data.passed)
       setResult({ pass: passed, output: data.output || 'Simulation completed.', waveform: data.waveform })
       if (passed && !solved) (onSolved || onToggle)?.(problem.id)
     } catch (error) {
       setResult({ pass: false, output: error?.message || 'Simulator failed.', waveform: null })
-    } finally {
-      setRunning(false)
-    }
+    } finally { setRunning(false) }
   }
 
   const renderProblem = () => (
     <div className="problem-copy">
-      <section className="problem-section first">
-        <h2>Task</h2>
-        <p>{problem.task}</p>
-      </section>
-      <section className="problem-section">
-        <h2>Examples</h2>
-        <div className="examples">
-          {problem.examples.map((example, index) => (
-            <div key={index}>
-              <span>Example {index + 1}</span>
-              <pre>{example}</pre>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="problem-section">
-        <h2>Constraints</h2>
-        <ul>{problem.constraints.map((constraint) => <li key={constraint}>{constraint}</li>)}</ul>
-      </section>
+      <section className="problem-section first"><h2>Task</h2><p>{problem.task}</p></section>
+      <section className="problem-section"><h2>Examples</h2><div className="examples">{problem.examples.map((example, index) => <div key={index}><span>Example {index + 1}</span><pre>{example}</pre></div>)}</div></section>
+      <section className="problem-section"><h2>Constraints</h2><ul>{problem.constraints.map((constraint) => <li key={constraint}>{constraint}</li>)}</ul></section>
     </div>
   )
 
@@ -281,106 +202,42 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     <div className="ide-page">
       <header className="ide-topbar">
         <button className="back" onClick={onBack}>← Problems</button>
-        <div className="ide-title">
-          <span className="eyebrow">{problem.category}</span>
-          <strong>{problem.title}</strong>
-          <span className={`difficulty ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span>
-        </div>
+        <div className="ide-title"><span className="eyebrow">{problem.category}</span><strong>{problem.title}</strong><span className={`difficulty ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span></div>
         <div className="ide-actions">
-          {solved ? (
-            <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div>
-          ) : (
-            <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>
-          )}
-          <button className="primary" disabled={running} onClick={run}>
-            {running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}
-          </button>
+          {solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}
+          <button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button>
         </div>
       </header>
 
       <div className="ide-body">
         <aside className="ide-problem">
+          <nav className="problem-tabs" aria-label="Problem information">
+            {['problem', 'approach', 'solution', 'discussion'].map((tab) => (
+              <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>
+                {tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
           <div className="ide-problem-content">
-            <nav className="problem-tabs" aria-label="Problem information">
-              {['problem', 'approach', 'solution', 'discussion'].map((tab) => (
-                <button
-                  key={tab}
-                  className={statementTab === tab ? 'active' : ''}
-                  onClick={() => setStatementTab(tab)}
-                >
-                  {tab === 'discussion' && <MessageSquare size={13} />}
-                  {tab[0].toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </nav>
-
             {statementTab === 'problem' && renderProblem()}
-            {statementTab === 'approach' && (
-              <div className="content-card">
-                <h2>How to think about it</h2>
-                <p>{problem.approach || 'Identify inputs, outputs, timing, reset semantics and required state. Implement the simplest synthesizable solution and check corner cases.'}</p>
-              </div>
-            )}
-            {statementTab === 'solution' && (
-              <div className="content-card">
-                <h2>Reference solution</h2>
-                <p>Try the problem first, then inspect the reference implementation.</p>
-                <pre className="solution-code">{problem.solution || 'Reference solution will be added for this problem.'}</pre>
-              </div>
-            )}
+            {statementTab === 'approach' && <div className="content-card"><h2>How to think about it</h2><p>{problem.approach || 'Identify inputs, outputs, timing, reset semantics and required state. Implement the simplest synthesizable solution and check corner cases.'}</p></div>}
+            {statementTab === 'solution' && <div className="content-card"><h2>Reference solution</h2><p>Try the problem first, then inspect the reference implementation.</p><pre className="solution-code">{problem.solution || 'Reference solution will be added for this problem.'}</pre></div>}
             {statementTab === 'discussion' && <Discussion problem={problem} />}
           </div>
         </aside>
 
         <section className="ide-workspace">
           <div className="file-tabs">
-            <div className="file-tab active">
-              <FileCode2 size={14} />
-              <span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span>
-              <span className="unsaved">●</span>
-            </div>
-            {!isConceptual && (
-              <>
-                <div className="editor-language">
-                  <select value={editorLanguage} onChange={(event) => changeLanguage(event.target.value)}>
-                    {supported.map((language) => <option key={language}>{language}</option>)}
-                  </select>
-                </div>
-                <button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button>
-              </>
-            )}
+            <div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span><span className="unsaved">●</span></div>
+            {!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={(event) => changeLanguage(event.target.value)}>{supported.map((language) => <option key={language}>{language}</option>)}</select></div><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}
           </div>
-
-          <div className="editor-shell">
-            <div className="editor-gutter">{code.split('\n').map((_, index) => <span key={index}>{index + 1}</span>)}</div>
-            <textarea className="ide-editor" value={code} onChange={(event) => update(event.target.value)} spellCheck="false" aria-label={isConceptual ? 'Answer editor' : 'HDL source editor'} />
-          </div>
-
+          <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, index) => <span key={index}>{index + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={(event) => update(event.target.value)} spellCheck="false" aria-label={isConceptual ? 'Answer editor' : 'HDL source editor'} /></div>
           <div className="ide-bottom">
-            <div className="bottom-tabs">
-              <button className={bottomTab === 'console' ? 'active' : ''} onClick={() => setBottomTab('console')}><Terminal size={14} /> Console</button>
-              {!isConceptual && <button className={bottomTab === 'waveform' ? 'active' : ''} onClick={() => setBottomTab('waveform')}><Activity size={14} /> Waveform</button>}
-              <button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => setBottomTab('testbench')}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button>
-            </div>
+            <div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => setBottomTab('console')}><Terminal size={14} /> Console</button>{!isConceptual && <button className={bottomTab === 'waveform' ? 'active' : ''} onClick={() => setBottomTab('waveform')}><Activity size={14} /> Waveform</button>}<button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => setBottomTab('testbench')}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button></div>
             <div className="console">
-              {bottomTab === 'console' && (
-                result ? (
-                  <div className={result.pass ? 'run-result pass' : 'run-result fail'}>
-                    <strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong>
-                    <pre>{result.output}</pre>
-                  </div>
-                ) : (
-                  <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>
-                )
-              )}
+              {bottomTab === 'console' && (result ? <div className={result.pass ? 'run-result pass' : 'run-result fail'}><strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong><pre>{result.output}</pre></div> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}
               {bottomTab === 'waveform' && !isConceptual && (result?.waveform ? <Waveform vcd={result.waveform} /> : <div className="console-empty"><Activity size={18} /><span>Run a simulation to generate a waveform.</span></div>)}
-              {bottomTab === 'testbench' && (
-                <div className="testbench-info">
-                  <strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong>
-                  <p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p>
-                  <pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre>
-                </div>
-              )}
+              {bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}
             </div>
           </div>
         </section>
