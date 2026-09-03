@@ -40,13 +40,23 @@ jobs:
 '''
           if '/* Final IDE chrome refinement */' not in css:
               c.write_text(css + additions)
+          # The regression testbench uses fractional delays such as #0.1.
+          # Without an explicit timescale Icarus can quantize those to zero,
+          # creating false failures on clocked RTL. Add a stable simulation timescale.
+          t = Path('tests/simulation-regression.py')
+          ts = t.read_text()
+          old_write = '(root / "design.sv").write_text(design)\n        (root / "tb.sv").write_text(bench)'
+          new_write = '(root / "design.sv").write_text("`timescale 1ns/1ps\\n" + design)\n        (root / "tb.sv").write_text("`timescale 1ns/1ps\\n" + bench)'
+          if old_write not in ts:
+              raise SystemExit('Expected regression file write lines were not found')
+          t.write_text(ts.replace(old_write, new_write, 1))
           PY
       - name: Commit refinements
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src/ProblemIDE.jsx src/ide-overrides.css
-          git commit -m 'Refine IDE status controls and bottom output borders'
+          git add src/ProblemIDE.jsx src/ide-overrides.css tests/simulation-regression.py
+          git commit -m 'Refine IDE controls and stabilize RTL regression timing'
           git push
       - name: Remove temporary workflow
         if: success()
