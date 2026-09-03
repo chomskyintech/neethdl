@@ -1,0 +1,72 @@
+name: Refine IDE UI
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  refine:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply IDE refinements
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          p = Path('src/ProblemIDE.jsx')
+          s = p.read_text()
+
+          s = s.replace(
+              "import { Activity, CheckCircle2, Code2, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'",
+              "import { Activity, CheckCircle2, XCircle, Code2, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'"
+          )
+
+          old = "<div className=\"ide-actions\">{solved ? <div className=\"solve-status passed\"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className=\"solve-status\">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className=\"primary\" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div>"
+          new = "<div className=\"ide-actions\">{solved ? <div className=\"solve-status passed icon-only\" title={isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'} aria-label={isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}><CheckCircle2 size={17} /></div> : result ? <div className=\"solve-status failed icon-only\" title={isConceptual ? 'Evaluation unavailable' : 'Tests failed'} aria-label={isConceptual ? 'Evaluation unavailable' : 'Tests failed'}><XCircle size={17} /></div> : null}<button className=\"primary run-icon\" disabled={running} onClick={run} title={running ? 'Running tests' : isConceptual ? 'Evaluate' : 'Run tests'} aria-label={running ? 'Running tests' : isConceptual ? 'Evaluate' : 'Run tests'}>{running ? <Activity size={17} /> : <Play size={17} />}</button></div>"
+          if old not in s:
+              raise SystemExit('Expected topbar controls were not found')
+          s = s.replace(old, new, 1)
+          p.write_text(s)
+
+          c = Path('src/ide-overrides.css')
+          css = c.read_text()
+          additions = """
+
+/* Final IDE chrome refinement */
+.ide-actions{gap:8px}
+.solve-status.icon-only{width:32px;height:32px;box-sizing:border-box;padding:0;display:grid;place-items:center;border-radius:7px}
+.solve-status.icon-only svg{display:block}
+.solve-status.failed{color:#fb7185;border-color:rgba(251,113,133,.28);background:rgba(244,63,94,.06)}
+.ide-actions .run-icon{width:34px;height:34px;min-width:34px;padding:0;display:grid;place-items:center;border-radius:7px}
+.ide-actions .run-icon svg{display:block}
+
+/* Keep the output area visually contained with a clean perimeter and breathing room from the viewport edge. */
+.ide-bottom{flex:0 0 222px;height:222px;min-height:120px;max-height:65%;margin:0 8px 8px;border:1px solid var(--ide-border);border-radius:8px;background:#090f17;box-sizing:border-box}
+.ide-bottom.collapsed{flex-basis:34px;height:34px;min-height:34px;max-height:34px;margin-bottom:8px}
+.ide-bottom .bottom-tabs{border-bottom:1px solid var(--ide-border);border-radius:8px 8px 0 0}
+.ide-bottom .console{border-radius:0 0 8px 8px}
+.ide-workspace{padding-bottom:0}
+"""
+          if '/* Final IDE chrome refinement */' not in css:
+              c.write_text(css + additions)
+          PY
+
+      - name: Commit refinements
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/ProblemIDE.jsx src/ide-overrides.css
+          git commit -m 'Refine IDE status controls and bottom output borders' || true
+          git push
+
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/refine-ide-ui.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/refine-ide-ui.yml
+          git commit -m 'Remove temporary IDE refinement workflow' || true
+          git push
