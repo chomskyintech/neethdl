@@ -1,0 +1,19 @@
+/* Final RTL IDE guardrails: keep the editor as a normal in-flow flex child. */
+.ide-page .editor-stage{display:flex!important;position:relative!important;flex:1 1 auto!important;min-width:0!important;min-height:0!important;width:100%!important;overflow:hidden!important;background:#080d14!important}
+.ide-page .editor-gutter{position:relative!important;flex:0 0 48px!important;width:48px!important;min-width:48px!important;box-sizing:border-box!important;overflow:hidden!important;padding:13px 0 0!important;background:#090f17!important;color:#506176!important;font:12px/20.4px ui-monospace,SFMono-Regular,Consolas,monospace!important;text-align:right!important}
+.ide-page .editor-gutter span{display:block!important;height:20.4px!important;line-height:20.4px!important;padding:0 11px 0 0!important;box-sizing:border-box!important}
+.ide-page .ide-editor{position:relative!important;inset:auto!important;z-index:1!important;display:block!important;flex:1 1 auto!important;width:0!important;min-width:0!important;min-height:0!important;height:auto!important;box-sizing:border-box!important;margin:0!important;padding:13px 16px!important;border:0!important;border-radius:0!important;outline:0!important;resize:none!important;overflow:auto!important;background:#080d14!important;color:#dce8f3!important;-webkit-text-fill-color:#dce8f3!important;caret-color:#f4fbff!important;font:13px/20.4px ui-monospace,SFMono-Regular,Consolas,monospace!important;font-variant-ligatures:none!important;tab-size:2!important;white-space:pre!important;word-break:normal!important;overflow-wrap:normal!important}
+.ide-page .ide-editor::selection{background:rgba(56,189,248,.24)!important;color:#f4fbff!important;-webkit-text-fill-color:#f4fbff!important}
+.ide-page .ide-editor:focus{box-shadow:inset 2px 0 0 #38bdf8!important}
+.ide-page .editor-wrap{display:flex!important;flex:1 1 auto!important;min-width:0!important;min-height:0!important;height:auto!important;flex-direction:column!important;overflow:hidden!important;background:#080d14!important}
+.ide-page .editor-toolbar{flex:0 0 32px!important;height:32px!important;min-height:32px!important}
+.ide-page .editor-search{flex:0 0 34px!important}
+.ide-page .editor-state{display:none!important;height:0!important;min-height:0!important}
+.ide-page .unsaved,.ide-page .file-tab span.unsaved{display:none!important}
+.ide-page .editor-shortcuts span:nth-child(3){display:none!important}
+.ide-page .editor-shortcuts{gap:8px!important}
+.ide-page .editor-shortcuts span{white-space:nowrap!important}
+.ide-page .file-tabs{flex:0 0 44px!important}
+.ide-page .ide-bottom{flex:0 0 205px!important;min-height:205px!important}
+.ide-page .wave-scroll{max-width:100%!important;overflow:auto!important}
+@media(max-width:650px){.ide-page .editor-gutter{flex-basis:40px!important;width:40px!important;min-width:40px!important}.ide-page .editor-gutter span{padding-right:8px!important}.ide-page .ide-editor{padding:12px!important;font-size:12px!important}.ide-page .ide-bottom{flex-basis:190px!important;min-height:190px!important}}
