@@ -13,31 +13,48 @@
 .ide-page .editor-shortcuts span:nth-child(3){display:none!important}
 .ide-page .editor-shortcuts{gap:8px!important}
 .ide-page .editor-shortcuts span{white-space:nowrap!important}
-.ide-page .file-tabs{flex:0 0 44px!important}
-.ide-page .ide-bottom{flex:0 0 205px!important;min-height:205px!important}
-.ide-page .wave-scroll{max-width:100%!important;overflow:auto!important}
 
-/* Make the problem IDE a true full-width, viewport-filling workspace. */
-.layout:has(.ide-page){max-width:none!important}
-.layout:has(.ide-page) .main{padding:18px 0 0!important}
-.layout:has(.ide-page) .ide-page{width:100%!important;max-width:none!important;margin:0!important;height:calc(100vh - 86px)!important;display:flex!important;flex-direction:column!important}
-.ide-page .ide-topbar{flex:0 0 58px!important}
+/* NeetCode-style problem workspace chrome. */
+.app:has(.ide-page) .nav{display:none!important}
+.layout:has(.ide-page){max-width:none!important;width:100%!important}
+.layout:has(.ide-page) .main{padding:0!important;width:100%!important}
+.layout:has(.ide-page) .ide-page{width:100%!important;max-width:none!important;margin:0!important;height:100vh!important;display:flex!important;flex-direction:column!important}
+.ide-page .ide-topbar{flex:0 0 58px!important;height:58px!important;min-height:58px!important;border-bottom:1px solid #202b3a!important}
 .ide-page .ide-body{flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important}
 .ide-page .ide-problem,.ide-page .ide-workspace{min-height:0!important;height:100%!important}
 .ide-page .ide-problem-content{min-height:0!important}
 .ide-page .editor-shell{min-height:0!important}
-.ide-page .ide-bottom{flex:0 0 230px!important;min-height:0!important}
+
+/* Compact HDLForge identity inside the workspace tab row. */
+.ide-page .file-tabs{flex:0 0 44px!important;height:44px!important;min-height:44px!important;display:flex!important;align-items:center!important;gap:0!important;border-bottom:1px solid #202b3a!important;background:#0a0f17!important}
+.ide-page .ide-brand{height:100%!important;display:flex!important;align-items:center!important;gap:8px!important;padding:0 16px!important;border:0!important;border-right:1px solid #202b3a!important;background:transparent!important;color:#e8edf5!important;cursor:pointer!important;font-size:12px!important;font-weight:750!important;letter-spacing:-.01em!important}
+.ide-page .ide-brand:hover{background:#101722!important;color:#fff!important}
+.ide-page .ide-brand-icon{width:25px!important;height:25px!important;border-radius:7px!important;display:grid!important;place-items:center!important;background:linear-gradient(135deg,#38bdf8,#6366f1)!important;color:#fff!important;font-size:8px!important;font-weight:900!important;letter-spacing:-.04em!important;box-shadow:0 4px 16px rgba(56,189,248,.16)!important}
+.ide-page .file-tab{height:100%!important;display:flex!important;align-items:center!important}
+
+/* Bottom console: contained border, draggable height and explicit collapse. */
+.ide-page .ide-bottom{position:relative!important;flex:0 0 230px!important;height:230px!important;min-height:34px!important;max-height:65%!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;resize:vertical!important;border:1px solid #273447!important;border-bottom:0!important;background:#090f17!important}
+.ide-page .ide-bottom:not(.collapsed){min-height:120px!important}
+.ide-page .ide-bottom.collapsed{flex-basis:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important;resize:none!important}
+.ide-page .bottom-tabs{flex:0 0 34px!important;height:34px!important;min-height:34px!important;display:flex!important;align-items:center!important;border-bottom:1px solid #273447!important;background:#0c121b!important}
+.ide-page .bottom-collapse{margin-left:auto!important;height:26px!important;margin-right:6px!important;display:inline-flex!important;align-items:center!important;gap:5px!important;border:1px solid #273447!important;border-radius:6px!important;background:#111a26!important;color:#7f8da1!important;padding:0 8px!important;font-size:10px!important;cursor:pointer!important}
+.ide-page .bottom-collapse:hover{color:#dce8f3!important;background:#172232!important;border-color:#3a4a60!important}
+.ide-page .console{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow:auto!important;border:0!important;background:#090f17!important}
+.ide-page .console-empty{min-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;color:#65748a!important}
+.ide-page .wave-scroll{max-width:100%!important;overflow:auto!important}
 
 @media(max-width:950px){
   .layout:has(.ide-page) .main{padding:0!important}
   .layout:has(.ide-page) .ide-page{height:auto!important;display:block!important}
   .ide-page .ide-body{height:auto!important;max-height:none!important}
   .ide-page .ide-problem,.ide-page .ide-workspace{height:auto!important}
-  .ide-page .ide-bottom{flex-basis:210px!important;min-height:210px!important}
+  .ide-page .ide-bottom{flex-basis:210px!important;min-height:34px!important;height:210px!important;max-height:70vh!important}
 }
 @media(max-width:650px){
   .ide-page .editor-gutter{flex-basis:40px!important;width:40px!important;min-width:40px!important}
   .ide-page .editor-gutter span{padding-right:8px!important}
   .ide-page .ide-editor{padding:12px!important;font-size:12px!important}
-  .ide-page .ide-bottom{flex-basis:190px!important;min-height:190px!important}
+  .ide-page .ide-bottom{height:190px!important;max-height:70vh!important}
+  .ide-page .ide-brand{padding:0 10px!important}
+  .ide-page .ide-brand strong{display:none!important}
 }
