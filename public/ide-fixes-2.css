@@ -1,0 +1,11 @@
+.ide-page .ide-body{position:relative!important;grid-template-columns:var(--ide-panel-split,38%) minmax(0,1fr)!important}
+.ide-page .ide-panel-resizer{position:absolute!important;z-index:20!important;top:0!important;bottom:0!important;left:calc(var(--ide-panel-split,38%) - 5px)!important;width:10px!important;cursor:col-resize!important;touch-action:none!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important}
+.ide-page .ide-panel-resizer::before{content:"";width:2px;height:100%;background:#202b3a!important;transition:width .15s ease,background .15s ease!important}
+.ide-page .ide-panel-resizer span{position:absolute!important;display:flex!important;align-items:center!important;justify-content:center!important;width:18px!important;height:34px!important;border:1px solid #334155!important;border-radius:7px!important;background:#0d1520!important;color:#7c8ba0!important;opacity:0!important;transition:opacity .15s ease!important}
+.ide-page .ide-panel-resizer:hover::before,.ide-page .ide-panel-resizer.dragging::before{width:3px!important;background:#38bdf8!important}
+.ide-page .ide-panel-resizer:hover span,.ide-page .ide-panel-resizer.dragging span{opacity:1!important;color:#dce8f3!important;border-color:#38bdf8!important}
+.ide-page .topbar-navigation{position:static!important;z-index:auto!important;height:36px!important;margin-left:auto!important;display:flex!important;align-items:center!important;gap:4px!important;padding:3px!important;border:1px solid #273447!important;border-radius:8px!important;background:#0c121b!important;box-shadow:none!important}
+.ide-page .topbar-navigation button{height:28px!important;padding:0 8px!important}
+.ide-page .topbar-navigation span{padding:0 4px!important}
+@media(max-width:950px){.ide-page .ide-body{grid-template-columns:1fr!important}.ide-page .ide-panel-resizer{display:none!important}.ide-page .topbar-navigation{margin-left:auto!important}}
+@media(max-width:650px){.ide-page .topbar-navigation span{display:none!important}.ide-page .topbar-navigation button{padding:0 6px!important}}
