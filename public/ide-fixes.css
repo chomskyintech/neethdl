@@ -27,17 +27,15 @@
 .ide-page .ide-brand:hover{background:#101722!important;color:#fff!important}
 .ide-page .ide-brand-icon{width:25px!important;height:25px!important;border-radius:7px!important;display:grid!important;place-items:center!important;background:linear-gradient(135deg,#38bdf8,#6366f1)!important;color:#fff!important;font-size:8px!important;font-weight:900!important;letter-spacing:-.04em!important;box-shadow:0 4px 16px rgba(56,189,248,.16)!important}
 .ide-page .file-tab{height:100%!important;display:flex!important;align-items:center!important}
-.ide-page .ide-bottom{position:relative!important;flex:0 0 230px!important;height:230px!important;min-height:34px!important;max-height:65%!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;resize:none!important;border:1px solid #273447!important;background:#090f17!important}
+.ide-page .ide-bottom{position:relative!important;flex:0 0 auto!important;height:230px!important;min-height:34px!important;max-height:65%!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;resize:vertical!important;border:1px solid #273447!important;background:#090f17!important}
 .ide-page .ide-bottom:not(.collapsed){min-height:120px!important}
-.ide-page .ide-bottom.collapsed{flex-basis:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important}
+.ide-page .ide-bottom.collapsed{flex-basis:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important;resize:none!important}
 .ide-page .bottom-tabs{flex:0 0 34px!important;height:34px!important;min-height:34px!important;display:flex!important;align-items:center!important;border-bottom:1px solid #273447!important;background:#0c121b!important}
 .ide-page .bottom-collapse{margin-left:auto!important;height:26px!important;margin-right:6px!important;display:inline-flex!important;align-items:center!important;gap:5px!important;border:1px solid #273447!important;border-radius:6px!important;background:#111a26!important;color:#7f8da1!important;padding:0 8px!important;font-size:10px!important;cursor:pointer!important}
 .ide-page .bottom-collapse:hover{color:#dce8f3!important;background:#172232!important;border-color:#3a4a60!important}
 .ide-page .console{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow:auto!important;border:0!important;background:#090f17!important}
 .ide-page .console-empty{min-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;color:#65748a!important}
 .ide-page .wave-scroll{max-width:100%!important;overflow:auto!important}
-
-/* Horizontal task/editor resizing. */
 .problem-ide-frame{position:relative!important;width:100%!important;height:100vh!important;min-height:0!important;overflow:hidden!important}
 .problem-ide-frame .ide-page{height:100%!important}
 .ide-horizontal-resizer{position:absolute!important;z-index:50!important;top:58px!important;bottom:0!important;left:calc(var(--ide-problem-split,38%) - 5px)!important;width:10px!important;cursor:col-resize!important;touch-action:none!important;display:flex!important;align-items:center!important;justify-content:center!important;background:transparent!important}
@@ -50,25 +48,5 @@
 .ide-problem-navigation button:hover:not(:disabled){background:#172232!important;color:#fff!important}
 .ide-problem-navigation button:disabled{opacity:.35!important;cursor:not-allowed!important}
 .ide-problem-navigation span{padding:0 5px!important;color:#66758a!important;font:10px ui-monospace,SFMono-Regular,Consolas,monospace!important;white-space:nowrap!important}
-
-@media(max-width:950px){
- .layout:has(.ide-page) .main{padding:0!important}
- .problem-ide-frame{height:auto!important;overflow:visible!important}
- .layout:has(.ide-page) .ide-page{height:auto!important;display:block!important}
- .ide-page .ide-body{height:auto!important;max-height:none!important;grid-template-columns:1fr!important}
- .ide-page .ide-problem,.ide-page .ide-workspace{height:auto!important}
- .ide-page .ide-bottom{flex-basis:210px!important;min-height:34px!important;height:210px!important;max-height:70vh!important}
- .ide-horizontal-resizer{display:none!important}
- .ide-problem-navigation{right:12px!important;top:10px!important}
-}
-@media(max-width:650px){
- .ide-page .editor-gutter{flex-basis:40px!important;width:40px!important;min-width:40px!important}
- .ide-page .editor-gutter span{padding-right:8px!important}
- .ide-page .ide-editor{padding:12px!important;font-size:12px!important}
- .ide-page .ide-bottom{height:190px!important;max-height:70vh!important}
- .ide-page .ide-brand{padding:0 10px!important}
- .ide-page .ide-brand strong{display:none!important}
- .ide-problem-navigation{right:8px!important;max-width:48vw!important}
- .ide-problem-navigation span{display:none!important}
- .ide-problem-navigation button{padding:0 6px!important}
-}
+@media(max-width:950px){.layout:has(.ide-page) .main{padding:0!important}.problem-ide-frame{height:auto!important;overflow:visible!important}.layout:has(.ide-page) .ide-page{height:auto!important;display:block!important}.ide-page .ide-body{height:auto!important;max-height:none!important;grid-template-columns:1fr!important}.ide-page .ide-problem,.ide-page .ide-workspace{height:auto!important}.ide-page .ide-bottom{flex-basis:210px!important;min-height:34px!important;height:210px!important;max-height:70vh!important}.ide-horizontal-resizer{display:none!important}.ide-problem-navigation{right:12px!important;top:10px!important}}
+@media(max-width:650px){.ide-page .editor-gutter{flex-basis:40px!important;width:40px!important;min-width:40px!important}.ide-page .editor-gutter span{padding-right:8px!important}.ide-page .ide-editor{padding:12px!important;font-size:12px!important}.ide-page .ide-bottom{height:190px!important;max-height:70vh!important}.ide-page .ide-brand{padding:0 10px!important}.ide-page .ide-brand strong{display:none!important}.ide-problem-navigation{right:8px!important;max-width:48vw!important}.ide-problem-navigation span{display:none!important}.ide-problem-navigation button{padding:0 6px!important}}
