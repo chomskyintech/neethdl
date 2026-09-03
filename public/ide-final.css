@@ -7,8 +7,9 @@
 .solve-status{font-size:0!important;width:32px!important;height:32px!important;box-sizing:border-box!important;padding:0!important;display:grid!important;place-items:center!important}
 .solve-status svg{display:block!important}
 .solve-status.passed{color:#86efac!important}
+.solve-status.passed::before{content:'✓';font-size:16px}
 .solve-status:not(.passed){color:#fb7185!important}
-.solve-status:not(:has(svg))::before{content:'✓';font-size:16px}
+.solve-status:not(.passed)::before{content:'×';font-size:18px;line-height:1}
 .ide-bottom{flex:0 0 222px!important;height:222px!important;min-height:120px!important;max-height:65%!important;margin:0 8px 8px!important;border:1px solid var(--ide-border)!important;border-radius:8px!important;background:#090f17!important;box-sizing:border-box!important}
 .ide-bottom.collapsed{flex-basis:34px!important;height:34px!important;min-height:34px!important;max-height:34px!important;margin-bottom:8px!important}
 .ide-bottom .bottom-tabs{border-bottom:1px solid var(--ide-border)!important;border-radius:8px 8px 0 0!important}
