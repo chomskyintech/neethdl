@@ -17,14 +17,20 @@
 .ide-page .ide-bottom{flex:0 0 205px!important;min-height:205px!important}
 .ide-page .wave-scroll{max-width:100%!important;overflow:auto!important}
 
-/* Use the available viewport instead of the old 720px floor. The IDE should feel like an actual coding workspace. */
-.ide-page .ide-body{height:calc(100vh - 132px)!important;min-height:0!important;max-height:none!important}
+/* Make the problem IDE a true full-width, viewport-filling workspace. */
+.layout:has(.ide-page){max-width:none!important}
+.layout:has(.ide-page) .main{padding:18px 0 0!important}
+.layout:has(.ide-page) .ide-page{width:100%!important;max-width:none!important;margin:0!important;height:calc(100vh - 86px)!important;display:flex!important;flex-direction:column!important}
+.ide-page .ide-topbar{flex:0 0 58px!important}
+.ide-page .ide-body{flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important}
 .ide-page .ide-problem,.ide-page .ide-workspace{min-height:0!important;height:100%!important}
 .ide-page .ide-problem-content{min-height:0!important}
 .ide-page .editor-shell{min-height:0!important}
-.ide-page .ide-bottom{flex:0 0 230px!important;min-height:230px!important}
+.ide-page .ide-bottom{flex:0 0 230px!important;min-height:0!important}
 
 @media(max-width:950px){
+  .layout:has(.ide-page) .main{padding:0!important}
+  .layout:has(.ide-page) .ide-page{height:auto!important;display:block!important}
   .ide-page .ide-body{height:auto!important;max-height:none!important}
   .ide-page .ide-problem,.ide-page .ide-workspace{height:auto!important}
   .ide-page .ide-bottom{flex-basis:210px!important;min-height:210px!important}
