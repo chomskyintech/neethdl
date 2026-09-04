@@ -4,6 +4,7 @@ import {createRoot} from 'react-dom/client'
 import './styles.css'
 import './language-ui.css'
 import './waveform-discussion.css'
+import './lockedEditor.js'
 import problems from './data/problems.json'
 import ProblemIDE from './ProblemIDE'
 
@@ -34,7 +35,7 @@ function App(){
  return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('problems')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='roadmap'?'active':''} onClick={()=>go('roadmap')}>Roadmap</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{Math.min(99,solved.length+12)}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{solved.length*125}</strong><span>points</span></div><button className="profile"><UserCircle size={20}/><span>TK</span></button></div></header><div className="layout"><main className="main">
  {page==='roadmap'&&<Roadmap solved={solved} onOpen={openProblem} go={go} category={category} setCategory={setCategory} language={language} setLanguage={setLanguage}/>}
  {page==='problems'&&<Problems problems={filtered} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>}
- {page==='problem'&&selected&&<ProblemIDE problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>}
+ {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>}
  {page==='progress'&&<Progress problems={problems} solved={solved} onOpen={openProblem}/>} 
  {page==='interview'&&<InterviewPreview onStart={()=>openProblem(problems[0])}/>} 
  </main></div></div>
