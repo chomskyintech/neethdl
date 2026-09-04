@@ -1,10 +1,11 @@
 const MARKER = /\/\/\s*Your RTL here|--\s*Your RTL here/i
 
 function getEditableRange(value) {
-  const marker = value.search(MARKER)
-  if (marker < 0) return null
-  const markerEnd = value.indexOf('\n', marker)
-  const bodyStart = markerEnd < 0 ? value.length : markerEnd + 1
+  const match = MARKER.exec(value)
+  if (!match) return null
+  const markerEnd = match.index + match[0].length
+  const newlineAfterMarker = value.indexOf('\n', markerEnd)
+  const bodyStart = newlineAfterMarker < 0 ? markerEnd : newlineAfterMarker + 1
   const endModule = value.indexOf('\nendmodule', bodyStart)
   if (endModule >= 0) return { start: bodyStart, end: endModule }
   const endArchitecture = value.search(/\nend\s+architecture\b/i)
@@ -17,6 +18,8 @@ function getEditableRange(value) {
   if (endTask >= 0) return { start: bodyStart, end: endTask }
   const endProperty = value.indexOf('\nendproperty', bodyStart)
   if (endProperty >= 0) return { start: bodyStart, end: endProperty }
+  const inlineEnd = value.indexOf('end;', bodyStart)
+  if (inlineEnd >= 0) return { start: bodyStart, end: inlineEnd }
   return { start: bodyStart, end: value.length }
 }
 
