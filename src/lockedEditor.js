@@ -47,10 +47,10 @@ function restoreDraft(editor) {
   const saved = localStorage.getItem(key)
   if (!saved || saved === editor.value) return
   const currentRange = getEditableRange(editor.value)
-  const savedRange = getEditableRange(saved)
-  if (!currentRange || !savedRange) return
-  if (saved.slice(0, savedRange.start) !== editor.value.slice(0, currentRange.start)) return
-  if (saved.slice(savedRange.end) !== editor.value.slice(currentRange.end)) return
+  if (!currentRange) return
+  const currentPrefix = editor.value.slice(0, currentRange.start)
+  const currentSuffix = editor.value.slice(currentRange.end)
+  if (!saved.startsWith(currentPrefix) || !saved.endsWith(currentSuffix)) return
   const selectionStart = editor.selectionStart
   const selectionEnd = editor.selectionEnd
   setNativeValue(editor, saved)
