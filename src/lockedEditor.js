@@ -6,38 +6,19 @@ function getEditableRange(value) {
   const start = value.lastIndexOf('\n', match.index - 1) + 1
   const markerLineEnd = value.indexOf('\n', match.index)
   const afterMarker = markerLineEnd >= 0 ? markerLineEnd : value.length
-  const endings = [
-    value.indexOf('\nendmodule', afterMarker),
-    value.search(/\nend\s+architecture\b/i),
-    value.indexOf('\nendinterface', afterMarker),
-    value.indexOf('\nendclass', afterMarker),
-    value.indexOf('\nendtask', afterMarker),
-    value.indexOf('\nendproperty', afterMarker)
-  ].filter(index => index >= 0)
+  const endings = [value.indexOf('\nendmodule', afterMarker), value.search(/\nend\s+architecture\b/i), value.indexOf('\nendinterface', afterMarker), value.indexOf('\nendclass', afterMarker), value.indexOf('\nendtask', afterMarker), value.indexOf('\nendproperty', afterMarker)].filter(index => index >= 0)
   return { start, end: endings.length ? Math.min(...endings) : value.length }
 }
 
-function isEditor(element) {
-  return element instanceof HTMLTextAreaElement && element.classList.contains('ide-editor')
-}
-
+function isEditor(element) { return element instanceof HTMLTextAreaElement && element.classList.contains('ide-editor') }
 const snapshots = new WeakMap()
 
 function saveSnapshot(editor) {
   const range = getEditableRange(editor.value)
-  snapshots.set(editor, {
-    value: editor.value,
-    selectionStart: editor.selectionStart,
-    selectionEnd: editor.selectionEnd,
-    prefix: range ? editor.value.slice(0, range.start) : '',
-    suffix: range ? editor.value.slice(range.end) : ''
-  })
+  snapshots.set(editor, { value: editor.value, selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, prefix: range ? editor.value.slice(0, range.start) : '', suffix: range ? editor.value.slice(range.end) : '' })
 }
 
-function validEdit(previous, next) {
-  if (!previous) return true
-  return next.startsWith(previous.prefix) && next.endsWith(previous.suffix)
-}
+function validEdit(previous, next) { return !previous || (next.startsWith(previous.prefix) && next.endsWith(previous.suffix)) }
 
 function restoreSnapshot(editor, snapshot) {
   if (!snapshot) return
@@ -52,9 +33,12 @@ function draftKey(editor) {
   return `hdlforge-editor-draft-${identity.toLowerCase()}-${language}`
 }
 
-function persistDraft(editor) {
-  const key = draftKey(editor)
-  if (key) localStorage.setItem(key, editor.value)
+function persistDraft(editor) { const key = draftKey(editor); if (key) localStorage.setItem(key, editor.value) }
+
+function setNativeValue(editor, value) {
+  const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
+  if (setter) setter.call(editor, value)
+  else editor.value = value
 }
 
 function restoreDraft(editor) {
@@ -67,9 +51,12 @@ function restoreDraft(editor) {
   if (!currentRange || !savedRange) return
   if (saved.slice(0, savedRange.start) !== editor.value.slice(0, currentRange.start)) return
   if (saved.slice(savedRange.end) !== editor.value.slice(currentRange.end)) return
-  editor.value = saved
-  saveSnapshot(editor)
+  const selectionStart = editor.selectionStart
+  const selectionEnd = editor.selectionEnd
+  setNativeValue(editor, saved)
+  editor.setSelectionRange(Math.min(selectionStart, saved.length), Math.min(selectionEnd, saved.length))
   editor.dispatchEvent(new Event('input', { bubbles: true }))
+  saveSnapshot(editor)
 }
 
 function smartKeydown(event) {
@@ -77,8 +64,7 @@ function smartKeydown(event) {
   if (!isEditor(editor) || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
   const range = getEditableRange(editor.value)
   if (!range) return
-  const start = editor.selectionStart
-  const end = editor.selectionEnd
+  const start = editor.selectionStart, end = editor.selectionEnd
   if (start < range.start || end > range.end) return
 
   if (event.key === 'Enter') {
@@ -125,27 +111,19 @@ function handleInput(event) {
   const editor = event.target
   if (!isEditor(editor)) return
   const previous = snapshots.get(editor)
-  if (!validEdit(previous, editor.value)) {
-    restoreSnapshot(editor, previous)
-    return
-  }
+  if (!validEdit(previous, editor.value)) { restoreSnapshot(editor, previous); return }
   saveSnapshot(editor)
   persistDraft(editor)
 }
 
-document.addEventListener('focusin', event => {
-  if (isEditor(event.target)) saveSnapshot(event.target)
-}, true)
+document.addEventListener('focusin', event => { if (isEditor(event.target)) saveSnapshot(event.target) }, true)
 document.addEventListener('input', handleInput, true)
 document.addEventListener('keydown', smartKeydown, true)
 document.addEventListener('paste', event => {
   const editor = event.target
   if (!isEditor(editor)) return
   const range = getEditableRange(editor.value)
-  if (!range || editor.selectionStart < range.start || editor.selectionEnd > range.end) {
-    event.preventDefault()
-    return
-  }
+  if (!range || editor.selectionStart < range.start || editor.selectionEnd > range.end) { event.preventDefault(); return }
   const pasted = event.clipboardData?.getData('text/plain') || ''
   const next = editor.value.slice(0, editor.selectionStart) + pasted + editor.value.slice(editor.selectionEnd)
   if (!validEdit(snapshots.get(editor), next)) event.preventDefault()
@@ -160,10 +138,7 @@ document.addEventListener('change', event => {
     restoreDraft(editor)
   })
 }, true)
-window.addEventListener('beforeunload', () => {
-  const editor = document.querySelector('textarea.ide-editor')
-  if (editor) persistDraft(editor)
-})
+window.addEventListener('beforeunload', () => { const editor = document.querySelector('textarea.ide-editor'); if (editor) persistDraft(editor) })
 
 const dropdownStyle = document.createElement('style')
 dropdownStyle.textContent = `.editor-language{position:relative}.editor-language::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-55%);color:#aebdcd;font-size:11px;font-weight:700;line-height:1;pointer-events:none;z-index:2}.editor-language select{padding-right:30px;appearance:none;-webkit-appearance:none;cursor:pointer}`
