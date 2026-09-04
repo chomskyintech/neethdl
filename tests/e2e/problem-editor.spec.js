@@ -11,44 +11,27 @@ test.describe('HDLForge problem editor', () => {
     const editor = page.locator('textarea.ide-editor')
     const initial = await editor.inputValue()
     expect(initial).toContain('Your RTL here')
-
     const marker = initial.indexOf('Your RTL here')
     const lineStart = initial.lastIndexOf('\n', marker) + 1
     const markerEnd = initial.indexOf('\n', marker)
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start: lineStart, end: markerEnd })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start: lineStart, end: markerEnd })
     await page.keyboard.press('End')
     await page.keyboard.type('  // browser test')
-
     await expect(editor).toHaveValue(/Your RTL here.*browser test/)
   })
 
   test('keeps the scaffold locked outside the implementation region', async ({ page }) => {
     const editor = page.locator('textarea.ide-editor')
     const initial = await editor.inputValue()
-
-    await editor.evaluate(el => {
-      el.focus()
-      el.setSelectionRange(0, 0)
-    })
+    await editor.evaluate(el => { el.focus(); el.setSelectionRange(0, 0) })
     await page.keyboard.type('X')
     await expect(editor).toHaveValue(initial)
-
     const marker = initial.indexOf('Your RTL here')
     const markerEnd = initial.indexOf('\n', marker)
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos, pos)
-    }, markerEnd)
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos, pos) }, markerEnd)
     await page.keyboard.type('\nassign browser_test = 1;')
     await expect(editor).toHaveValue(/assign browser_test = 1;/)
-
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start: 0, end: markerEnd })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start: 0, end: markerEnd })
     await page.keyboard.press('Backspace')
     await expect(editor).toHaveValue(/module mux2.*Your RTL here.*assign browser_test = 1;/s)
   })
@@ -58,24 +41,14 @@ test.describe('HDLForge problem editor', () => {
     const initial = await editor.inputValue()
     const marker = initial.indexOf('Your RTL here')
     const markerEnd = initial.indexOf('\n', marker)
-
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos, pos)
-    }, markerEnd)
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos, pos) }, markerEnd)
     await page.keyboard.type('\nalways_comb begin')
     await page.keyboard.press('Enter')
     await page.keyboard.type('y = a;')
     await expect(editor).toHaveValue(/always_comb begin\n  y = a;/)
-
     await page.keyboard.press('Control+Z')
     await expect(editor).toHaveValue(/always_comb begin\n  y = /)
-
-    await editor.evaluate(el => {
-      const pos = el.value.indexOf('y = ')
-      el.focus()
-      el.setSelectionRange(pos, pos)
-    })
+    await editor.evaluate(el => { const pos = el.value.indexOf('y = '); el.focus(); el.setSelectionRange(pos, pos) })
     await page.keyboard.type('(')
     await expect(editor).toHaveValue(/\(\)/)
   })
@@ -85,23 +58,14 @@ test.describe('HDLForge problem editor', () => {
     const initial = await editor.inputValue()
     const marker = initial.indexOf('Your RTL here')
     const markerEnd = initial.indexOf('\n', marker)
-
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos, pos)
-    }, markerEnd)
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos, pos) }, markerEnd)
     await page.keyboard.type('\nline_one;\nline_two;')
-
     const value = await editor.inputValue()
     const start = value.indexOf('line_one;')
     const end = value.indexOf('line_two;') + 'line_two;'.length
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start, end })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start, end })
     await page.keyboard.press('Tab')
     await expect(editor).toHaveValue(/  line_one;\n  line_two;/)
-
     await page.keyboard.press('Control+F')
     await expect(page.locator('.editor-search')).toBeVisible()
     const search = page.locator('.editor-search input')
@@ -109,11 +73,10 @@ test.describe('HDLForge problem editor', () => {
     await expect(page.locator('.editor-search')).toContainText('1 matches')
   })
 
-  test('supports language switching without breaking the editor', async ({ page }) =>
+  test('supports language switching without breaking the editor', async ({ page }) => {
     const editor = page.locator('textarea.ide-editor')
     const language = page.locator('.editor-language select')
     await expect(language).toHaveValue('SystemVerilog')
-
     await language.selectOption('Verilog')
     await expect(editor).toHaveValue(/Your RTL here/)
     await language.selectOption('VHDL')
@@ -125,29 +88,18 @@ test.describe('HDLForge problem editor', () => {
   test('preserves separate drafts for each HDL language', async ({ page }) => {
     const editor = page.locator('textarea.ide-editor')
     const language = page.locator('.editor-language select')
-
     const systemVerilogInitial = await editor.inputValue()
     const svMarker = systemVerilogInitial.indexOf('Your RTL here')
     const svLineStart = systemVerilogInitial.lastIndexOf('\n', svMarker) + 1
     const svMarkerEnd = systemVerilogInitial.indexOf('\n', svMarker)
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start: svLineStart, end: svMarkerEnd })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start: svLineStart, end: svMarkerEnd })
     await page.keyboard.type('assign y = sel ? b : a;')
     await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
-
     await language.selectOption('Verilog')
     await expect(editor).toHaveValue(/Your RTL here/)
-    await editor.evaluate(el => {
-      const marker = el.value.indexOf('Your RTL here')
-      const end = el.value.indexOf('\n', marker)
-      el.focus()
-      el.setSelectionRange(end, end)
-    })
+    await editor.evaluate(el => { const marker = el.value.indexOf('Your RTL here'); const end = el.value.indexOf('\n', marker); el.focus(); el.setSelectionRange(end, end) })
     await page.keyboard.type('\nassign y = a;')
     await expect(editor).toHaveValue(/assign y = a;/)
-
     await language.selectOption('SystemVerilog')
     await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
     await language.selectOption('Verilog')
@@ -161,18 +113,11 @@ test.describe('HDLForge problem editor', () => {
     const marker = initial.indexOf('Your RTL here')
     const lineStart = initial.lastIndexOf('\n', marker) + 1
     const markerEnd = initial.indexOf('\n', marker)
-
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start: lineStart, end: markerEnd })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start: lineStart, end: markerEnd })
     await page.keyboard.type('assign y = sel ? b : a;')
-
     await page.getByRole('button', { name: /Run/i }).first().click()
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
-
-    const waveformTab = page.getByRole('button', { name: /Waveform/i }).first()
-    await waveformTab.click()
+    await page.getByRole('button', { name: /Waveform/i }).first().click()
     await expect(page.locator('.waveform')).toBeVisible()
     await expect(page.locator('svg.wave-svg')).toBeVisible()
   })
@@ -183,14 +128,9 @@ test.describe('HDLForge problem editor', () => {
     const marker = initial.indexOf('Your RTL here')
     const lineStart = initial.lastIndexOf('\n', marker) + 1
     const markerEnd = initial.indexOf('\n', marker)
-
-    await editor.evaluate((el, pos) => {
-      el.focus()
-      el.setSelectionRange(pos.start, pos.end)
-    }, { start: lineStart, end: markerEnd })
+    await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start: lineStart, end: markerEnd })
     await page.keyboard.type('assign y = sel ? b : a;')
     await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
-
     await page.getByRole('button', { name: /Next/i }).first().click()
     await expect(page.locator('textarea.ide-editor')).toBeVisible()
     await page.getByRole('button', { name: /Previous/i }).first().click()
