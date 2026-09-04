@@ -2,189 +2,169 @@ const MARKER = /\/\/\s*Your RTL here|--\s*Your RTL here/i
 
 function getEditableRange(value) {
   const match = MARKER.exec(value)
-  if (match) {
-    const lineStart = value.lastIndexOf('\n', match.index - 1) + 1
-    const markerLineEnd = value.indexOf('\n', match.index)
-    const start = lineStart
-    const endCandidates = [
-      value.indexOf('\nendmodule', Math.max(markerLineEnd, match.index)),
-      value.search(/\nend\s+architecture\b/i),
-      value.indexOf('\nendinterface', Math.max(markerLineEnd, match.index)),
-      value.indexOf('\nendclass', Math.max(markerLineEnd, match.index)),
-      value.indexOf('\nendtask', Math.max(markerLineEnd, match.index)),
-      value.indexOf('\nendproperty', Math.max(markerLineEnd, match.index))
-    ].filter(i => i >= 0)
-    return { start, end: endCandidates.length ? Math.min(...endCandidates) : value.length }
-  }
-
-  const endModule = value.indexOf('\nendmodule')
-  if (endModule >= 0) {
-    const headerEnd = value.indexOf(');')
-    if (headerEnd >= 0 && headerEnd < endModule) return { start: headerEnd + 2, end: endModule }
-  }
-
-  const architectureBegin = value.search(/\bbegin\b/i)
-  const endArchitecture = value.search(/\nend\s+architecture\b/i)
-  if (architectureBegin >= 0 && endArchitecture > architectureBegin) return { start: architectureBegin, end: endArchitecture }
-  return null
+  if (!match) return null
+  const start = value.lastIndexOf('\n', match.index - 1) + 1
+  const markerLineEnd = value.indexOf('\n', match.index)
+  const afterMarker = markerLineEnd >= 0 ? markerLineEnd : value.length
+  const endings = [
+    value.indexOf('\nendmodule', afterMarker),
+    value.search(/\nend\s+architecture\b/i),
+    value.indexOf('\nendinterface', afterMarker),
+    value.indexOf('\nendclass', afterMarker),
+    value.indexOf('\nendtask', afterMarker),
+    value.indexOf('\nendproperty', afterMarker)
+  ].filter(index => index >= 0)
+  return { start, end: endings.length ? Math.min(...endings) : value.length }
 }
 
-function isEditor(el) {
-  return el instanceof HTMLTextAreaElement && el.classList.contains('ide-editor')
+function isEditor(element) {
+  return element instanceof HTMLTextAreaElement && element.classList.contains('ide-editor')
 }
 
 const snapshots = new WeakMap()
 
-function captureSnapshot(el) {
-  if (!isEditor(el)) return
-  const range = getEditableRange(el.value)
-  snapshots.set(el, {
-    value: el.value,
-    start: el.selectionStart,
-    end: el.selectionEnd,
-    prefix: range ? el.value.slice(0, range.start) : '',
-    suffix: range ? el.value.slice(range.end) : ''
+function saveSnapshot(editor) {
+  const range = getEditableRange(editor.value)
+  snapshots.set(editor, {
+    value: editor.value,
+    selectionStart: editor.selectionStart,
+    selectionEnd: editor.selectionEnd,
+    prefix: range ? editor.value.slice(0, range.start) : '',
+    suffix: range ? editor.value.slice(range.end) : ''
   })
 }
 
-function isAllowedChange(previous, next) {
+function validEdit(previous, next) {
   if (!previous) return true
-  if (previous.prefix && !next.startsWith(previous.prefix)) return false
-  if (previous.suffix && !next.endsWith(previous.suffix)) return false
-  return true
+  return next.startsWith(previous.prefix) && next.endsWith(previous.suffix)
 }
 
-function restoreSnapshot(el, snapshot) {
+function restoreSnapshot(editor, snapshot) {
   if (!snapshot) return
-  el.value = snapshot.value
-  const pos = Math.min(snapshot.start, el.value.length)
-  const end = Math.min(snapshot.end, el.value.length)
-  el.setSelectionRange(pos, end)
+  editor.value = snapshot.value
+  editor.setSelectionRange(
+    Math.min(snapshot.selectionStart, editor.value.length),
+    Math.min(snapshot.selectionEnd, editor.value.length)
+  )
 }
 
-function draftIdentity(value) {
-  const patterns = [/\bmodule\s+([A-Za-z_][\w$]*)/i, /\binterface\s+([A-Za-z_][\w$]*)/i, /\bentity\s+([A-Za-z_][\w$]*)/i, /\bclass\s+([A-Za-z_][\w$]*)/i, /\bproperty\s+([A-Za-z_][\w$]*)/i, /\btask\s+([A-Za-z_][\w$]*)/i]
-  for (const pattern of patterns) {
-    const match = pattern.exec(value)
-    if (match) return match[1].toLowerCase()
-  }
-  return null
+function draftKey(editor) {
+  const identity = editor.value.match(/\b(?:module|interface|entity|class|property|task)\s+([A-Za-z_][\w$]*)/i)?.[1]
+  if (!identity) return null
+  const language = document.querySelector('.editor-language select')?.value || 'SystemVerilog'
+  return `hdlforge-editor-draft-${identity.toLowerCase()}-${language}`
 }
 
-function editorLanguage(el) {
-  return el.closest('.editor-wrap')?.querySelector('.editor-toolbar span')?.textContent?.match(/·\s*(.+)$/)?.[1]?.trim() || 'SystemVerilog'
+function persistDraft(editor) {
+  const key = draftKey(editor)
+  if (key) localStorage.setItem(key, editor.value)
 }
 
-function draftKey(el) {
-  const identity = draftIdentity(el.value)
-  return identity ? `hdlforge-editor-draft-${identity}-${editorLanguage(el)}` : null
-}
-
-function persistDraft(el) {
-  const key = draftKey(el)
-  if (key) localStorage.setItem(key, el.value)
-}
-
-function restoreDraft(el) {
-  const key = draftKey(el)
+function restoreDraft(editor) {
+  const key = draftKey(editor)
   if (!key) return
   const saved = localStorage.getItem(key)
-  if (saved === null || saved === el.value) return
-  const previous = snapshots.get(el)
-  el.value = saved
-  captureSnapshot(el)
-  el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: null }))
-  if (previous) persistDraft(el)
+  if (!saved || saved === editor.value) return
+  const currentRange = getEditableRange(editor.value)
+  const savedRange = getEditableRange(saved)
+  if (!currentRange || !savedRange) return
+  if (saved.slice(0, savedRange.start) !== editor.value.slice(0, currentRange.start)) return
+  if (saved.slice(savedRange.end) !== editor.value.slice(currentRange.end)) return
+  editor.value = saved
+  saveSnapshot(editor)
+  editor.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
-function smartEditorKeydown(event) {
-  const el = event.target
-  if (!isEditor(el) || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
-  const range = getEditableRange(el.value)
-  const start = el.selectionStart
-  const end = el.selectionEnd
-  if (range && (start < range.start || end > range.end)) return
+function smartKeydown(event) {
+  const editor = event.target
+  if (!isEditor(editor) || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+  const range = getEditableRange(editor.value)
+  if (!range) return
+  const start = editor.selectionStart
+  const end = editor.selectionEnd
+  if (start < range.start || end > range.end) return
 
   if (event.key === 'Enter') {
     event.preventDefault()
-    const lineStart = el.value.lastIndexOf('\n', start - 1) + 1
-    const indent = el.value.slice(lineStart, start).match(/^\s*/)?.[0] || ''
-    const line = el.value.slice(lineStart, start).trim()
-    const toolbar = el.closest('.editor-wrap')?.querySelector('.editor-toolbar span')?.textContent || ''
-    const isVhdl = /VHDL/i.test(toolbar)
-    const opens = isVhdl ? /\b(begin|then|loop|process|if|case)\b/i.test(line) && !/^end\b/i.test(line) : /\b(begin|case|fork|function|task|class|interface|generate)\b/.test(line) || /\b(else|always_(comb|ff)|always)\b/.test(line)
-    const closes = isVhdl ? /^(end|elsif|else)\b/i.test(line) : /^(end|else|endcase|endfunction|endtask|endclass|endinterface)\b/.test(line)
-    const nextIndent = closes ? indent.slice(0, Math.max(0, indent.length - 2)) : `${indent}${opens ? '  ' : ''}`
-    const replacement = `\n${nextIndent}`
-    el.setRangeText(replacement, start, end, 'end')
-    el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertLineBreak', data: null }))
+    const lineStart = editor.value.lastIndexOf('\n', start - 1) + 1
+    const line = editor.value.slice(lineStart, start)
+    const indent = line.match(/^\s*/)?.[0] || ''
+    const language = document.querySelector('.editor-language select')?.value || 'SystemVerilog'
+    const isVhdl = /VHDL/i.test(language)
+    const opens = isVhdl
+      ? /\b(begin|then|loop|process|if|case)\b/i.test(line) && !/^\s*end\b/i.test(line)
+      : /\b(begin|case|fork|function|task|class|interface|generate)\b/.test(line) || /\b(else|always(?:_comb|_ff)?)\b/.test(line)
+    const closes = /^\s*(?:end|else|elsif)\b/i.test(line)
+    const nextIndent = closes ? indent.slice(0, Math.max(0, indent.length - 2)) : indent + (opens ? '  ' : '')
+    editor.setRangeText(`\n${nextIndent}`, start, end, 'end')
+    editor.dispatchEvent(new Event('input', { bubbles: true }))
     return
   }
 
   if (event.key === 'Tab') {
     event.preventDefault()
-    const selected = el.value.slice(start, end)
+    const selected = editor.value.slice(start, end)
     const replacement = start === end ? '  ' : selected.split('\n').map(line => `  ${line}`).join('\n')
-    el.setRangeText(replacement, start, end, 'end')
-    el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: replacement }))
+    editor.setRangeText(replacement, start, end, 'end')
+    editor.dispatchEvent(new Event('input', { bubbles: true }))
     return
   }
 
   const pairs = { '(': ')', '[': ']', '{': '}', "'": "'", '"': '"' }
   if (pairs[event.key]) {
     event.preventDefault()
-    const selected = el.value.slice(start, end)
-    if (!selected && el.value[start] === pairs[event.key]) {
-      el.setSelectionRange(start + 1, start + 1)
-      return
-    }
-    const replacement = event.key + selected + pairs[event.key]
-    el.setRangeText(replacement, start, end, 'end')
-    el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: replacement }))
-    el.setSelectionRange(start + (selected ? 1 : 1), start + (selected ? 1 : 1))
+    const selected = editor.value.slice(start, end)
+    editor.setRangeText(event.key + selected + pairs[event.key], start, end, 'end')
+    editor.setSelectionRange(start + 1, start + 1 + selected.length)
+    editor.dispatchEvent(new Event('input', { bubbles: true }))
     return
   }
 
-  if ([')', ']', '}'].includes(event.key) && start === end && el.value[start] === event.key) {
+  if ([')', ']', '}'].includes(event.key) && start === end && editor.value[start] === event.key) {
     event.preventDefault()
-    el.setSelectionRange(start + 1, start + 1)
-    return
-  }
-
-  if (event.key === 'Backspace' && start === end && start >= 2 && ['()', '[]', '{}', "''", '""'].includes(el.value.slice(start - 2, start))) {
-    event.preventDefault()
-    el.setRangeText('', start - 2, start, 'end')
-    el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'deleteContentBackward', data: null }))
+    editor.setSelectionRange(start + 1, start + 1)
   }
 }
 
 function handleInput(event) {
-  const el = event.target
-  if (!isEditor(el)) return
-  const previous = snapshots.get(el)
-  if (!isAllowedChange(previous, el.value)) {
-    restoreSnapshot(el, previous)
+  const editor = event.target
+  if (!isEditor(editor)) return
+  const previous = snapshots.get(editor)
+  if (!validEdit(previous, editor.value)) {
+    restoreSnapshot(editor, previous)
     return
   }
-  captureSnapshot(el)
-  persistDraft(el)
+  saveSnapshot(editor)
+  persistDraft(editor)
 }
 
-document.addEventListener('focusin', event => { if (isEditor(event.target)) captureSnapshot(event.target) }, true)
+document.addEventListener('focusin', event => {
+  if (isEditor(event.target)) saveSnapshot(event.target)
+}, true)
 document.addEventListener('input', handleInput, true)
-document.addEventListener('keydown', smartEditorKeydown, true)
+document.addEventListener('keydown', smartKeydown, true)
+document.addEventListener('paste', event => {
+  const editor = event.target
+  if (!isEditor(editor)) return
+  const range = getEditableRange(editor.value)
+  if (!range || editor.selectionStart < range.start || editor.selectionEnd > range.end) {
+    event.preventDefault()
+    return
+  }
+  const pasted = event.clipboardData?.getData('text/plain') || ''
+  const next = editor.value.slice(0, editor.selectionStart) + pasted + editor.value.slice(editor.selectionEnd)
+  const previous = snapshots.get(editor)
+  if (!validEdit(previous, next)) event.preventDefault()
+}, true)
 document.addEventListener('change', event => {
   const select = event.target
   if (!(select instanceof HTMLSelectElement) || !select.closest('.editor-language')) return
-  const editor = document.querySelector('textarea.ide-editor')
-  if (editor) persistDraft(editor)
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const nextEditor = document.querySelector('textarea.ide-editor')
-    if (nextEditor) {
-      captureSnapshot(nextEditor)
-      restoreDraft(nextEditor)
-    }
-  }))
+  requestAnimationFrame(() => {
+    const editor = document.querySelector('textarea.ide-editor')
+    if (!editor) return
+    saveSnapshot(editor)
+    restoreDraft(editor)
+  })
 }, true)
 window.addEventListener('beforeunload', () => {
   const editor = document.querySelector('textarea.ide-editor')
