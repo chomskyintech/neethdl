@@ -1,42 +1,40 @@
 const MARKER = /\/\/\s*Your RTL here|--\s*Your RTL here/i
-const editorBounds = new WeakMap()
 
-function getEditableRange(value, el = null) {
+function getEditableRange(value) {
   const match = MARKER.exec(value)
   if (match) {
-    const markerStart = match.index
+    const lineStart = value.lastIndexOf('\n', match.index - 1) + 1
     const markerEnd = match.index + match[0].length
-    const newlineAfterMarker = value.indexOf('\n', markerEnd)
-    const bodyStart = newlineAfterMarker < 0 ? markerEnd : newlineAfterMarker + 1
-    const range = { start: markerStart, bodyStart }
-    if (el) editorBounds.set(el, range)
-    return finishRange(value, range)
+    const endModule = value.indexOf('\nendmodule', markerEnd)
+    if (endModule >= 0) return { start: lineStart, end: endModule }
+    const endArchitecture = value.search(/\nend\s+architecture\b/i)
+    if (endArchitecture >= lineStart) return { start: lineStart, end: endArchitecture }
+    const endInterface = value.indexOf('\nendinterface', markerEnd)
+    if (endInterface >= 0) return { start: lineStart, end: endInterface }
+    const endClass = value.indexOf('\nendclass', markerEnd)
+    if (endClass >= 0) return { start: lineStart, end: endClass }
+    const endTask = value.indexOf('\nendtask', markerEnd)
+    if (endTask >= 0) return { start: lineStart, end: endTask }
+    const endProperty = value.indexOf('\nendproperty', markerEnd)
+    if (endProperty >= 0) return { start: lineStart, end: endProperty }
+    return { start: lineStart, end: value.length }
   }
 
-  // If the user has deleted/replaced the placeholder, keep the original
-  // editable boundary for this textarea instead of unlocking the scaffold.
-  const saved = el ? editorBounds.get(el) : null
-  if (saved) return finishRange(value, saved)
-  return null
-}
+  // Keep the implementation region locked to the original module/architecture body
+  // even after the user deletes the placeholder marker.
+  const endModule = value.indexOf('\nendmodule')
+  if (endModule >= 0) {
+    const headerEnd = value.indexOf(');')
+    if (headerEnd >= 0 && headerEnd < endModule) return { start: headerEnd + 2, end: endModule }
+  }
 
-function finishRange(value, range) {
-  const bodyStart = range.bodyStart ?? range.start
-  const endModule = value.indexOf('\nendmodule', bodyStart)
-  if (endModule >= 0) return { start: range.start, end: endModule }
+  const architectureBegin = value.search(/\bbegin\b/i)
   const endArchitecture = value.search(/\nend\s+architecture\b/i)
-  if (endArchitecture >= bodyStart) return { start: range.start, end: endArchitecture }
-  const endInterface = value.indexOf('\nendinterface', bodyStart)
-  if (endInterface >= 0) return { start: range.start, end: endInterface }
-  const endClass = value.indexOf('\nendclass', bodyStart)
-  if (endClass >= 0) return { start: range.start, end: endClass }
-  const endTask = value.indexOf('\nendtask', bodyStart)
-  if (endTask >= 0) return { start: range.start, end: endTask }
-  const endProperty = value.indexOf('\nendproperty', bodyStart)
-  if (endProperty >= 0) return { start: range.start, end: endProperty }
-  const inlineEnd = value.indexOf('end;', bodyStart)
-  if (inlineEnd >= 0) return { start: range.start, end: inlineEnd }
-  return { start: range.start, end: value.length }
+  if (architectureBegin >= 0 && endArchitecture > architectureBegin) {
+    return { start: architectureBegin, end: endArchitecture }
+  }
+
+  return null
 }
 
 function isEditor(el) {
@@ -44,29 +42,23 @@ function isEditor(el) {
 }
 
 function inEditableRange(el, start = el.selectionStart, end = el.selectionEnd) {
-  const range = getEditableRange(el.value, el)
+  const range = getEditableRange(el.value)
   if (!range) return true
   return start >= range.start && end <= range.end
-}
-
-function allowed(el) {
-  return inEditableRange(el)
 }
 
 function guard(event) {
   const el = event.target
   if (!isEditor(el)) return
-  if (event.type === 'beforeinput') {
-    if (!allowed(el)) event.preventDefault()
-    return
-  }
-  if (event.type === 'paste') {
+  const range = getEditableRange(el.value)
+  if (!range) return
+
+  if (event.type === 'beforeinput' || event.type === 'paste') {
     if (!inEditableRange(el)) event.preventDefault()
     return
   }
+
   if (event.type === 'keydown') {
-    const range = getEditableRange(el.value, el)
-    if (!range) return
     if (el.selectionStart < range.start || el.selectionEnd > range.end) {
       const editingKey = event.key.length === 1 || ['Backspace', 'Delete', 'Enter', 'Tab'].includes(event.key)
       if (editingKey && !(event.ctrlKey || event.metaKey)) event.preventDefault()
@@ -161,7 +153,7 @@ function smartEditorKeydown(event) {
 function protectPaste(event) {
   const el = event.target
   if (!isEditor(el)) return
-  const range = getEditableRange(el.value, el)
+  const range = getEditableRange(el.value)
   if (!range) return
   const start = el.selectionStart
   const end = el.selectionEnd
