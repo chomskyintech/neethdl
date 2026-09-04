@@ -59,6 +59,57 @@ function restoreDraft(editor) {
   saveSnapshot(editor)
 }
 
+function escapeHtml(value) { return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;') }
+
+function highlightHDL(source, language) {
+  const escaped = escapeHtml(source)
+  const token = /(\/\/[^\n]*|--[^\n]*|\/\*[\s\S]*?\*\/|'(?:''|[^'])*'|"(?:\\.|[^"])*"|`[A-Za-z_][\w$]*|\b\d+(?:'[bodhBODH][0-9a-fA-F_xXzZ]+)?\b|\b(?:always_ff|always_comb|always_latch|always|assign|begin|end|endmodule|module|interface|endinterface|class|endclass|function|endfunction|task|endtask|case|casex|casez|endcase|default|if|else|elseif|elsif|for|foreach|while|repeat|generate|endgenerate|genvar|wire|logic|reg|integer|time|parameter|localparam|input|output|inout|typedef|struct|enum|return|package|endpackage|import|export|library|use|entity|architecture|process|signal|variable|constant|generic|port|component|configuration|then|loop|endloop|record|end\s+if|end\s+process|end\s+case|std_logic|std_logic_vector|unsigned|signed|bit|boolean|integer|natural|positive|true|false|null)\b)/g
+  let html = '', last = 0, match
+  while ((match = token.exec(escaped))) {
+    html += escaped.slice(last, match.index)
+    const text = match[0]
+    let cls = 'tok-plain'
+    if (/^(\/\/|--|\/\*)/.test(text)) cls = 'tok-comment'
+    else if (/^["'`]/.test(text)) cls = 'tok-string'
+    else if (/^\d/.test(text)) cls = 'tok-number'
+    else if (/^`/.test(text)) cls = 'tok-directive'
+    else if (/^(std_logic|std_logic_vector|unsigned|signed|wire|logic|reg|integer|time|bit|boolean|natural|positive|true|false|null)$/.test(text)) cls = 'tok-type'
+    else cls = 'tok-keyword'
+    html += `<span class="${cls}">${text}</span>`
+    last = match.index + text.length
+  }
+  return html + escaped.slice(last) + (source.endsWith('\n') ? ' ' : '')
+}
+
+const syntaxStates = new WeakMap()
+function syncSyntaxLayer(editor) {
+  if (!isEditor(editor)) return
+  let layer = syntaxStates.get(editor)?.layer
+  if (!layer) return
+  layer.innerHTML = highlightHDL(editor.value, document.querySelector('.editor-language select')?.value || 'SystemVerilog')
+  layer.scrollTop = editor.scrollTop
+  layer.scrollLeft = editor.scrollLeft
+}
+
+function setupSyntaxLayer(editor) {
+  if (!isEditor(editor) || syntaxStates.has(editor)) return
+  const stage = editor.closest('.editor-stage')
+  if (!stage) return
+  const layer = document.createElement('pre')
+  layer.className = 'syntax-layer'
+  layer.setAttribute('aria-hidden', 'true')
+  stage.insertBefore(layer, editor)
+  syntaxStates.set(editor, { layer })
+  editor.style.color = 'transparent'
+  editor.style.webkitTextFillColor = 'transparent'
+  editor.style.caretColor = '#f4fbff'
+  const sync = () => syncSyntaxLayer(editor)
+  editor.addEventListener('scroll', sync)
+  syncSyntaxLayer(editor)
+}
+
+function setupAllSyntaxLayers() { document.querySelectorAll('textarea.ide-editor').forEach(setupSyntaxLayer) }
+
 function smartKeydown(event) {
   const editor = event.target
   if (!isEditor(editor) || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
@@ -111,12 +162,13 @@ function handleInput(event) {
   const editor = event.target
   if (!isEditor(editor)) return
   const previous = snapshots.get(editor)
-  if (!validEdit(previous, editor.value)) { restoreSnapshot(editor, previous); return }
+  if (!validEdit(previous, editor.value)) { restoreSnapshot(editor, previous); syncSyntaxLayer(editor); return }
   saveSnapshot(editor)
   persistDraft(editor)
+  syncSyntaxLayer(editor)
 }
 
-document.addEventListener('focusin', event => { if (isEditor(event.target)) saveSnapshot(event.target) }, true)
+document.addEventListener('focusin', event => { if (isEditor(event.target)) { setupSyntaxLayer(event.target); saveSnapshot(event.target) } }, true)
 document.addEventListener('input', handleInput, true)
 document.addEventListener('keydown', smartKeydown, true)
 document.addEventListener('paste', event => {
@@ -132,14 +184,23 @@ document.addEventListener('change', event => {
   const select = event.target
   if (!(select instanceof HTMLSelectElement) || !select.closest('.editor-language')) return
   requestAnimationFrame(() => {
+    setupAllSyntaxLayers()
     const editor = document.querySelector('textarea.ide-editor')
     if (!editor) return
     saveSnapshot(editor)
     restoreDraft(editor)
+    syncSyntaxLayer(editor)
   })
 }, true)
 window.addEventListener('beforeunload', () => { const editor = document.querySelector('textarea.ide-editor'); if (editor) persistDraft(editor) })
 
+const syntaxStyle = document.createElement('style')
+syntaxStyle.textContent = `.editor-stage{position:relative}.syntax-layer{position:absolute;z-index:0;left:48px;right:0;top:0;bottom:0;margin:0;padding:13px 16px;box-sizing:border-box;overflow:hidden;background:transparent;color:#dce8f3;font:13px/20.4px ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-ligatures:none;white-space:pre;tab-size:2;pointer-events:none;user-select:none}.syntax-layer .tok-keyword{color:#c792ea}.syntax-layer .tok-type{color:#82aaff}.syntax-layer .tok-comment{color:#637083;font-style:italic}.syntax-layer .tok-string{color:#c3e88d}.syntax-layer .tok-number{color:#f78c6c}.syntax-layer .tok-directive{color:#89ddff}.ide-editor{position:relative;z-index:1;color:transparent!important;-webkit-text-fill-color:transparent!important;caret-color:#f4fbff!important;background:transparent!important}.ide-editor::selection{background:rgba(56,189,248,.24);color:transparent!important;-webkit-text-fill-color:transparent!important}`
+document.head.appendChild(syntaxStyle)
+
 const dropdownStyle = document.createElement('style')
 dropdownStyle.textContent = `.editor-language{position:relative}.editor-language::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-55%);color:#aebdcd;font-size:11px;font-weight:700;line-height:1;pointer-events:none;z-index:2}.editor-language select{padding-right:30px;appearance:none;-webkit-appearance:none;cursor:pointer}`
 document.head.appendChild(dropdownStyle)
+
+const observer = new MutationObserver(() => setupAllSyntaxLayers())
+observer.observe(document.body, { childList: true, subtree: true })
