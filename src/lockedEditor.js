@@ -42,10 +42,7 @@ function validEdit(previous, next) {
 function restoreSnapshot(editor, snapshot) {
   if (!snapshot) return
   editor.value = snapshot.value
-  editor.setSelectionRange(
-    Math.min(snapshot.selectionStart, editor.value.length),
-    Math.min(snapshot.selectionEnd, editor.value.length)
-  )
+  editor.setSelectionRange(Math.min(snapshot.selectionStart, editor.value.length), Math.min(snapshot.selectionEnd, editor.value.length))
 }
 
 function draftKey(editor) {
@@ -91,9 +88,7 @@ function smartKeydown(event) {
     const indent = line.match(/^\s*/)?.[0] || ''
     const language = document.querySelector('.editor-language select')?.value || 'SystemVerilog'
     const isVhdl = /VHDL/i.test(language)
-    const opens = isVhdl
-      ? /\b(begin|then|loop|process|if|case)\b/i.test(line) && !/^\s*end\b/i.test(line)
-      : /\b(begin|case|fork|function|task|class|interface|generate)\b/.test(line) || /\b(else|always(?:_comb|_ff)?)\b/.test(line)
+    const opens = isVhdl ? /\b(begin|then|loop|process|if|case)\b/i.test(line) && !/^\s*end\b/i.test(line) : /\b(begin|case|fork|function|task|class|interface|generate)\b/.test(line) || /\b(else|always(?:_comb|_ff)?)\b/.test(line)
     const closes = /^\s*(?:end|else|elsif)\b/i.test(line)
     const nextIndent = closes ? indent.slice(0, Math.max(0, indent.length - 2)) : indent + (opens ? '  ' : '')
     editor.setRangeText(`\n${nextIndent}`, start, end, 'end')
@@ -153,8 +148,7 @@ document.addEventListener('paste', event => {
   }
   const pasted = event.clipboardData?.getData('text/plain') || ''
   const next = editor.value.slice(0, editor.selectionStart) + pasted + editor.value.slice(editor.selectionEnd)
-  const previous = snapshots.get(editor)
-  if (!validEdit(previous, next)) event.preventDefault()
+  if (!validEdit(snapshots.get(editor), next)) event.preventDefault()
 }, true)
 document.addEventListener('change', event => {
   const select = event.target
