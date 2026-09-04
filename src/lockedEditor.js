@@ -48,3 +48,7 @@ function guard(event) {
 
 document.addEventListener('beforeinput', guard, true)
 document.addEventListener('keydown', guard, true)
+
+const dropdownStyle = document.createElement('style')
+dropdownStyle.textContent = `.editor-language{position:relative}.editor-language::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-55%);color:#aebdcd;font-size:11px;font-weight:700;line-height:1;pointer-events:none;z-index:2}.editor-language select{padding-right:30px;appearance:none;-webkit-appearance:none;cursor:pointer}`
+document.head.appendChild(dropdownStyle)
