@@ -48,7 +48,7 @@ test.describe('HDLForge problem editor', () => {
 
   test('supports language switching without breaking the editor', async ({ page }) => {
     const editor = page.locator('textarea.ide-editor')
-    const language = page.getByRole('combobox', { name: 'Select HDL language' })
+    const language = page.locator('.editor-language select')
     await expect(language).toHaveValue('SystemVerilog')
 
     await language.selectOption('Verilog')
@@ -86,13 +86,14 @@ test.describe('HDLForge problem editor', () => {
     const editor = page.locator('textarea.ide-editor')
     const initial = await editor.inputValue()
     const marker = initial.indexOf('Your RTL here')
+    const lineStart = initial.lastIndexOf('\n', marker) + 1
     const markerEnd = initial.indexOf('\n', marker)
 
     await editor.evaluate((el, pos) => {
       el.focus()
-      el.setSelectionRange(pos, pos)
-    }, markerEnd)
-    await page.keyboard.type('\nassign y = sel ? b : a;')
+      el.setSelectionRange(pos.start, pos.end)
+    }, { start: lineStart, end: markerEnd })
+    await page.keyboard.type('assign y = sel ? b : a;')
     await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
 
     await page.getByRole('button', { name: /Next/i }).first().click()
