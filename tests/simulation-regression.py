@@ -19,8 +19,8 @@ CASES = {
 with tempfile.TemporaryDirectory() as d:
     root = Path(d)
     for name, (design, bench) in CASES.items():
-        (root / "design.sv").write_text(design)
-        (root / "tb.sv").write_text(bench)
+        (root / "design.sv").write_text("`timescale 1ns/1ps\n" + design)
+        (root / "tb.sv").write_text("`timescale 1ns/1ps\n" + bench)
         build = subprocess.run(["iverilog", "-g2012", "-s", "tb", "-o", str(root / "sim"), str(root / "design.sv"), str(root / "tb.sv")], capture_output=True, text=True)
         if build.returncode:
             raise SystemExit(f"{name}: compile failed\n{build.stderr}")
