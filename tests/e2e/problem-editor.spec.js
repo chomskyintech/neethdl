@@ -44,6 +44,13 @@ test.describe('HDLForge problem editor', () => {
     }, markerEnd)
     await page.keyboard.type('\nassign browser_test = 1;')
     await expect(editor).toHaveValue(/assign browser_test = 1;/)
+
+    await editor.evaluate((el, pos) => {
+      el.focus()
+      el.setSelectionRange(pos.start, pos.end)
+    }, { start: 0, end: markerEnd })
+    await page.keyboard.press('Backspace')
+    await expect(editor).toHaveValue(/module mux2.*Your RTL here.*assign browser_test = 1;/s)
   })
 
   test('supports language switching without breaking the editor', async ({ page }) => {
@@ -57,6 +64,38 @@ test.describe('HDLForge problem editor', () => {
     await expect(editor).toHaveValue(/Your RTL here/)
     await language.selectOption('SystemVerilog')
     await expect(editor).toHaveValue(/Your RTL here/)
+  })
+
+  test('preserves separate drafts for each HDL language', async ({ page }) => {
+    const editor = page.locator('textarea.ide-editor')
+    const language = page.locator('.editor-language select')
+
+    const systemVerilogInitial = await editor.inputValue()
+    const svMarker = systemVerilogInitial.indexOf('Your RTL here')
+    const svLineStart = systemVerilogInitial.lastIndexOf('\n', svMarker) + 1
+    const svMarkerEnd = systemVerilogInitial.indexOf('\n', svMarker)
+    await editor.evaluate((el, pos) => {
+      el.focus()
+      el.setSelectionRange(pos.start, pos.end)
+    }, { start: svLineStart, end: svMarkerEnd })
+    await page.keyboard.type('assign y = sel ? b : a;')
+    await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
+
+    await language.selectOption('Verilog')
+    await expect(editor).toHaveValue(/Your RTL here/)
+    await editor.evaluate(el => {
+      const marker = el.value.indexOf('Your RTL here')
+      const end = el.value.indexOf('\n', marker)
+      el.focus()
+      el.setSelectionRange(end, end)
+    })
+    await page.keyboard.type('\nassign y = a;')
+    await expect(editor).toHaveValue(/assign y = a;/)
+
+    await language.selectOption('SystemVerilog')
+    await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
+    await language.selectOption('Verilog')
+    await expect(editor).toHaveValue(/assign y = a;/)
   })
 
   test('runs RTL and renders a waveform', async ({ page }) => {
