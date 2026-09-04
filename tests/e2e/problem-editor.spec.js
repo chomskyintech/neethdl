@@ -75,6 +75,21 @@ test.describe('HDLForge problem editor', () => {
     await expect(page.locator('.editor-search')).toContainText('1 matches')
   })
 
+  test('shows IDE-style syntax colours without changing editor behaviour', async ({ page }) => {
+    const editor = page.locator('textarea.ide-editor')
+    await expect(page.locator('.syntax-layer')).toBeVisible()
+    await expect(page.locator('.syntax-layer .tok-keyword').first()).toBeVisible()
+    await expect(page.locator('.syntax-layer .tok-comment').first()).toBeVisible()
+    await expect(page.locator('.syntax-layer .tok-type').first()).toBeVisible()
+    const before = await editor.inputValue()
+    expect(await page.locator('.syntax-layer').evaluate(el => getComputedStyle(el.querySelector('.tok-keyword')).color)).not.toBe(await page.locator('.syntax-layer').evaluate(el => getComputedStyle(el.querySelector('.tok-comment')).color))
+    await editor.focus()
+    await editor.evaluate(el => { const p = el.value.indexOf('Your RTL here'); el.setSelectionRange(p, p) })
+    await page.keyboard.type('assign y = sel ? b : a;')
+    await expect(editor).toHaveValue(/assign y = sel \? b : a;/)
+    expect(await editor.inputValue()).not.toBe(before)
+  })
+
   test('supports language switching without breaking the editor', async ({ page }) => {
     const editor = page.locator('textarea.ide-editor')
     const language = page.locator('.editor-language select')
