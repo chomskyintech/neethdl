@@ -53,7 +53,63 @@ test.describe('HDLForge problem editor', () => {
     await expect(editor).toHaveValue(/module mux2.*Your RTL here.*assign browser_test = 1;/s)
   })
 
-  test('supports language switching without breaking the editor', async ({ page }) => {
+  test('supports normal editor editing shortcuts and auto indentation', async ({ page }) => {
+    const editor = page.locator('textarea.ide-editor')
+    const initial = await editor.inputValue()
+    const marker = initial.indexOf('Your RTL here')
+    const markerEnd = initial.indexOf('\n', marker)
+
+    await editor.evaluate((el, pos) => {
+      el.focus()
+      el.setSelectionRange(pos, pos)
+    }, markerEnd)
+    await page.keyboard.type('\nalways_comb begin')
+    await page.keyboard.press('Enter')
+    await page.keyboard.type('y = a;')
+    await expect(editor).toHaveValue(/always_comb begin\n  y = a;/)
+
+    await page.keyboard.press('Control+Z')
+    await expect(editor).toHaveValue(/always_comb begin\n  y = /)
+
+    await editor.evaluate(el => {
+      const pos = el.value.indexOf('y = ')
+      el.focus()
+      el.setSelectionRange(pos, pos)
+    })
+    await page.keyboard.type('(')
+    await expect(editor).toHaveValue(/\(\)/)
+  })
+
+  test('supports Tab indentation and Ctrl+F find', async ({ page }) => {
+    const editor = page.locator('textarea.ide-editor')
+    const initial = await editor.inputValue()
+    const marker = initial.indexOf('Your RTL here')
+    const markerEnd = initial.indexOf('\n', marker)
+
+    await editor.evaluate((el, pos) => {
+      el.focus()
+      el.setSelectionRange(pos, pos)
+    }, markerEnd)
+    await page.keyboard.type('\nline_one;\nline_two;')
+
+    const value = await editor.inputValue()
+    const start = value.indexOf('line_one;')
+    const end = value.indexOf('line_two;') + 'line_two;'.length
+    await editor.evaluate((el, pos) => {
+      el.focus()
+      el.setSelectionRange(pos.start, pos.end)
+    }, { start, end })
+    await page.keyboard.press('Tab')
+    await expect(editor).toHaveValue(/  line_one;\n  line_two;/)
+
+    await page.keyboard.press('Control+F')
+    await expect(page.locator('.editor-search')).toBeVisible()
+    const search = page.locator('.editor-search input')
+    await search.fill('line_one')
+    await expect(page.locator('.editor-search')).toContainText('1 matches')
+  })
+
+  test('supports language switching without breaking the editor', async ({ page }) =>
     const editor = page.locator('textarea.ide-editor')
     const language = page.locator('.editor-language select')
     await expect(language).toHaveValue('SystemVerilog')
