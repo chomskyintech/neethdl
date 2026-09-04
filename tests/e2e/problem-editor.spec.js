@@ -3,6 +3,8 @@ import { test, expect } from '@playwright/test'
 test.describe('HDLForge problem editor', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
     await page.locator('.problem-row').first().click()
     await expect(page.locator('textarea.ide-editor')).toBeVisible()
   })
@@ -45,9 +47,9 @@ test.describe('HDLForge problem editor', () => {
     await page.keyboard.type('\nalways_comb begin')
     await page.keyboard.press('Enter')
     await page.keyboard.type('y = a;')
-    await expect(editor).toHaveValue(/always_comb begin\n  y = a;/)
+    await expect(editor).toHaveValue(/always_comb begin\n    y = a;/)
     await page.keyboard.press('Control+Z')
-    await expect(editor).toHaveValue(/always_comb begin\n  y = /)
+    await expect(editor).toHaveValue(/always_comb begin\n    y = /)
     await editor.evaluate(el => { const pos = el.value.indexOf('y = '); el.focus(); el.setSelectionRange(pos, pos) })
     await page.keyboard.type('(')
     await expect(editor).toHaveValue(/\(\)/)
@@ -65,7 +67,7 @@ test.describe('HDLForge problem editor', () => {
     const end = value.indexOf('line_two;') + 'line_two;'.length
     await editor.evaluate((el, pos) => { el.focus(); el.setSelectionRange(pos.start, pos.end) }, { start, end })
     await page.keyboard.press('Tab')
-    await expect(editor).toHaveValue(/  line_one;\n  line_two;/)
+    await expect(editor).toHaveValue(/    line_one;\n    line_two;/)
     await page.keyboard.press('Control+F')
     await expect(page.locator('.editor-search')).toBeVisible()
     const search = page.locator('.editor-search input')
