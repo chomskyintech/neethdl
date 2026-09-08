@@ -10,6 +10,7 @@ import problems from './data/problems.json'
 import ProblemIDE from './ProblemIDE'
 import Tracks from './Tracks'
 import AccountModal from './AccountModal'
+import LearningRoadmap from './LearningRoadmap'
 import {addActivityDay,calculatePoints,calculateStreak,topicProgress} from './progressTracking'
 import {initializeAuth,loadCloudProfile,mergeProfiles,saveCloudProfile,watchAuth} from './cloudProfile'
 
@@ -73,7 +74,7 @@ function App(){
 
  const profileLabel=user?(user.name||user.email||'Account').trim().slice(0,2).toUpperCase():'Sign in'
  return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('roadmap')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='roadmap'?'active':''} onClick={()=>go('roadmap')}>Roadmap</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main">
- {page==='roadmap'&&<Roadmap solved={solved} onOpen={openProblem} go={go} category={category} setCategory={setCategory} language={language} setLanguage={setLanguage}/>}
+ {page==='roadmap'&&<LearningRoadmap problems={problems} solved={solved} onOpen={openProblem} go={go}/>}
  {page==='problems'&&<Problems problems={filtered} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>}
  {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>}
  {page==='tracks'&&<Tracks problems={problems} solved={solved} onOpen={openProblem}/>} 
