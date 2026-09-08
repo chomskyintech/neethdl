@@ -5,7 +5,8 @@ test.describe('HDLForge generated SEO coverage',()=>{
   await page.goto('/problems/sv-packed-arrays/index.html')
   await expect(page).toHaveTitle(/Packed.*HDLForge/i)
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hdlforge.netlify.app/problems/sv-packed-arrays/')
-  await expect(page.locator('script[type="application/ld+json"]')).toContainText('BreadcrumbList')
+  const structured=await page.locator('script[type="application/ld+json"]').textContent()
+  expect(structured).toContain('BreadcrumbList')
  })
 
  test('serves topic hubs and deeper guides',async({page})=>{
@@ -28,7 +29,7 @@ test.describe('HDLForge generated SEO coverage',()=>{
 
 test('problem names use a softer neutral color instead of white',async({page})=>{
  await page.goto('/')
- await page.getByRole('button',{name:'Problems'}).click()
+ await page.getByRole('button',{name:'Problems',exact:true}).click()
  const title=page.locator('.problem-main strong').first()
  await expect(title).toBeVisible()
  const color=await title.evaluate(el=>getComputedStyle(el).color)
