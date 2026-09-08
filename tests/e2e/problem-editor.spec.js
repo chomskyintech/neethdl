@@ -8,6 +8,8 @@ async function openFirstProblem(page) {
   await page.goto('/')
   await page.evaluate(() => localStorage.clear())
   await page.reload()
+  await page.getByRole('button', { name: 'Problems', exact: true }).first().click()
+  await expect(page.locator('.problem-row').first()).toBeVisible()
   await page.locator('.problem-row').first().click()
   await expect(page.locator('.monaco-editor')).toBeVisible()
   await expect(page.locator('.monaco-editor .view-lines')).toBeVisible()
@@ -56,11 +58,13 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(editorRoot(page)).toContainText('HDL source · SystemVerilog')
   })
 
-  test('runs valid RTL and renders a waveform', async ({ page }) => {
+  test('runs valid RTL and renders detailed tests plus a waveform', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, muxSolution)
     await page.getByRole('button', { name: /Run tests/i }).first().click()
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
+    await expect(page.locator('.test-case')).toHaveCount(4)
+    await expect(page.locator('.test-case.pass')).toHaveCount(4)
     await page.getByRole('button', { name: /Waveform/i }).click()
     await expect(page.locator('.waveform')).toBeVisible()
     await expect(page.locator('svg.wave-svg')).toBeVisible()
