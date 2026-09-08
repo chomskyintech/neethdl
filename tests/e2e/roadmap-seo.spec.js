@@ -9,8 +9,8 @@ test.describe('HDLForge roadmap and SEO content', () => {
     await expect(page.getByText(/Prerequisite:/).first()).toBeVisible()
   })
 
-  test('serves SEO learn pages with unique metadata', async ({ page }) => {
-    await page.goto('/learn/verilog-interview/')
+  test('serves SEO learn page metadata and canonical route', async ({ page }) => {
+    await page.goto('/learn/verilog-interview/index.html')
     await expect(page).toHaveTitle('Verilog Interview Questions & RTL Practice | HDLForge')
     await expect(page.getByRole('heading', { name: 'Verilog Interview Questions and RTL Practice' })).toBeVisible()
     const canonical = page.locator('link[rel="canonical"]')
