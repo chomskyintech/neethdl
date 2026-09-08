@@ -1,74 +1,77 @@
 :root{
-  --bg:#0b0d0c!important;
-  --panel:#111412!important;
-  --panel-2:#161a17!important;
-  --line:#29302c!important;
-  --line-soft:#202622!important;
-  --text:#edf2ef!important;
-  --muted:#98a39d!important;
-  --dim:#69756e!important;
-  --accent:#34d399!important;
-  --accent-2:#10b981!important;
-  --green:#4ade80!important;
-  --ide-border:#29302c!important;
-  --ide-border-soft:#202622!important;
-  --ide-panel:#111412!important;
-  --ide-editor:#0c0f0d!important;
-  --ide-text:#edf2ef!important;
-  --ide-muted:#98a39d!important;
-  --ide-accent:#34d399!important;
-  --forge-bg:#0b0d0c!important;
-  --forge-surface:#111412!important;
-  --forge-surface-2:#161a17!important;
-  --forge-surface-3:#1b211d!important;
-  --forge-border:#29302c!important;
-  --forge-border-bright:#3a463f!important;
-  --forge-text:#f1f5f2!important;
-  --forge-muted:#98a39d!important;
-  --forge-dim:#69756e!important;
-  --forge-cyan:#34d399!important;
-  --forge-blue:#10b981!important;
-  --forge-indigo:#059669!important;
-  --forge-violet:#6ee7b7!important;
-  --forge-green:#22c55e!important;
+  --bg:#0f0f0f!important;
+  --panel:#151515!important;
+  --panel-2:#1b1b1b!important;
+  --line:#2a2a2a!important;
+  --line-soft:#222!important;
+  --text:#f3f3f3!important;
+  --muted:#a3a3a3!important;
+  --dim:#737373!important;
+  --accent:#2f8f78!important;
+  --accent-2:#277765!important;
+  --green:#3a9b7d!important;
+  --ide-border:#2a2a2a!important;
+  --ide-border-soft:#222!important;
+  --ide-panel:#151515!important;
+  --ide-editor:#101010!important;
+  --ide-text:#f1f1f1!important;
+  --ide-muted:#a3a3a3!important;
+  --ide-accent:#2f8f78!important;
+  --forge-bg:#0f0f0f!important;
+  --forge-surface:#151515!important;
+  --forge-surface-2:#1b1b1b!important;
+  --forge-surface-3:#202020!important;
+  --forge-border:#2a2a2a!important;
+  --forge-border-bright:#3a3a3a!important;
+  --forge-text:#f3f3f3!important;
+  --forge-muted:#a3a3a3!important;
+  --forge-dim:#737373!important;
+  --forge-cyan:#2f8f78!important;
+  --forge-blue:#2f8f78!important;
+  --forge-indigo:#277765!important;
+  --forge-violet:#5f8f82!important;
+  --forge-green:#3a9b7d!important;
 }
-body{background:radial-gradient(900px 420px at 72% -8%,rgba(16,185,129,.13),transparent 62%),radial-gradient(720px 380px at 5% 15%,rgba(52,211,153,.07),transparent 62%),linear-gradient(180deg,#0b0d0c 0%,#0e110f 55%,#090b0a 100%)!important}
-.nav{background:rgba(11,13,12,.9)!important;border-bottom-color:rgba(110,231,183,.12)!important}
-.brand-icon{background:linear-gradient(135deg,#34d399,#10b981 52%,#059669)!important;box-shadow:0 0 28px rgba(52,211,153,.18)!important}
-.brand-accent,.nav-stat svg,.eyebrow,.chevron,.text-btn,.side-nav.active svg,.workspace-nav-item.active svg,.workspace-link.selected span:last-child,.dirty{color:#6ee7b7!important}
-.desktop-nav .active{background:linear-gradient(180deg,rgba(16,185,129,.14),rgba(5,150,105,.07))!important;border-color:rgba(52,211,153,.2)!important}
-.side-nav:hover,.side-link:hover{background:rgba(16,185,129,.06)!important}
-.side-nav.active,.side-link.selected{background:linear-gradient(100deg,rgba(52,211,153,.10),rgba(16,185,129,.08))!important;border-color:rgba(52,211,153,.16)!important;box-shadow:inset 2px 0 #34d399!important}
-.hero h1 span{background:linear-gradient(100deg,#a7f3d0 0%,#34d399 48%,#10b981 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
-.primary{background:linear-gradient(110deg,#059669,#10b981 52%,#34d399)!important;border-color:rgba(110,231,183,.18)!important;box-shadow:0 10px 32px rgba(16,185,129,.18)!important}
-.stats,.problem-list,.content-card,.progress-hero,.topic-card,.interview-card{background:linear-gradient(145deg,rgba(20,24,21,.95),rgba(12,15,13,.94))!important;border-color:#29302c!important}
-.toolbar .search,.filters select,.language-strip{background:rgba(16,20,17,.94)!important;border-color:#303a34!important}
-.search:focus-within,.filters select:focus,.discussion-form input:focus,.discussion-form textarea:focus{border-color:rgba(52,211,153,.65)!important;box-shadow:0 0 0 3px rgba(52,211,153,.09)!important}
-.language-strip button.active,.workspace-nav-item:hover,.workspace-nav-item.active,.workspace-link:hover,.workspace-link.selected{background:rgba(52,211,153,.08)!important;border-color:rgba(52,211,153,.15)!important;color:#d1fae5!important}
-.problem-row:hover{background:linear-gradient(90deg,rgba(52,211,153,.035),rgba(16,185,129,.02))!important}
-.problem-main:hover strong,.back:hover{color:#6ee7b7!important}
-.problem-tabs button.active,.bottom-tabs button.active{color:#d1fae5!important;border-bottom-color:#34d399!important;box-shadow:inset 0 -2px 0 #34d399!important}
-.examples div,.content-card,.discussion-post,.discussion-form input,.discussion-form textarea{background:#111512!important;border-color:#29332d!important}
-.editor-card,.ide-workspace,.editor-shell,.editor-wrap,.editor-stage,.wave-panel,.wave-scroll{background:#0c0f0d!important;border-color:#29302c!important}
-.editor-head,.editor-foot,.ide-topbar,.file-tabs,.bottom-tabs,.ide-discussion{background:#111512!important;border-color:#29302c!important}
-.ide-problem{background:#111412!important;border-color:#29302c!important}
-.ide-problem>.problem-tabs,.file-tab,.editor-language select,.icon-btn,.editor-toolbar,.editor-search,.ide-bottom,.console,.wave-label-bg{background:#141815!important;border-color:#29302c!important}
-.file-tab.active,.editor-shortcuts button,.wave-tools button,.solve-status,.bottom-collapse,.toolbar-btn{background:#181d19!important;border-color:#303a34!important}
-.file-tab.active{box-shadow:inset 0 -2px 0 #34d399!important}
-.ide-problem>.problem-tabs button.active{color:#d1fae5!important;background:#16231c!important;border-color:#28513d!important;box-shadow:inset 0 -2px 0 #34d399!important}
-.ide-title .eyebrow{color:#6ee7b7!important}
-.editor-card textarea,.ide-editor{background:#0c0f0d!important;color:#e2e8e4!important;caret-color:#6ee7b7!important;-webkit-text-fill-color:#e2e8e4!important}
-.editor-card textarea:focus,.discussion-in-tab .discussion-form textarea:focus{box-shadow:inset 0 0 0 1px rgba(52,211,153,.23)!important;border-color:#317a59!important}
-.ide-editor::selection{background:rgba(52,211,153,.22)!important}
-.ide-editor:focus{box-shadow:inset 2px 0 0 #34d399!important}
-.progress-track{background:#202722!important}
-.progress-track div{background:linear-gradient(90deg,#059669,#10b981,#34d399)!important;box-shadow:0 0 18px rgba(52,211,153,.2)!important}
-.ring{border-color:#294035!important;outline-color:#355847!important;background:radial-gradient(circle,#17231c,#0d110e)!important;box-shadow:inset 0 0 28px rgba(52,211,153,.04),0 0 35px rgba(16,185,129,.06)!important}
-.interview-icon{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(16,185,129,.14))!important;color:#6ee7b7!important;border-color:rgba(52,211,153,.16)!important}
-.wave-signals button.selected{background:linear-gradient(90deg,rgba(52,211,153,.11),rgba(16,185,129,.07))!important;color:#d1fae5!important;box-shadow:inset 2px 0 #34d399!important}
-.wave-event{border-color:#34d399!important;box-shadow:0 0 8px rgba(52,211,153,.18)!important}
-.wave-event span,.wave-line span{color:#6ee7b7!important}
-.wave-digital{stroke:#34d399!important}
-.wave-transition{fill:#34d399!important}
-.post-avatar{background:#173324!important;color:#a7f3d0!important;border-color:rgba(52,211,153,.14)!important}
-.status-dot{background:#4ade80!important;box-shadow:0 0 8px rgba(74,222,128,.4)!important}
+html,body,.app{background:#0f0f0f!important;color:#f3f3f3!important}
+body{background-image:none!important}
+.app{background-image:none!important}
+.nav{background:rgba(15,15,15,.96)!important;border-bottom-color:#262626!important;box-shadow:none!important}
+.brand-icon{background:#2f8f78!important;box-shadow:none!important}
+.brand-accent,.nav-stat svg,.eyebrow,.chevron,.text-btn,.side-nav.active svg,.workspace-nav-item.active svg,.workspace-link.selected span:last-child,.dirty,.ide-title .eyebrow{color:#6cae9d!important;text-shadow:none!important}
+.desktop-nav .active,.side-nav.active,.side-link.selected,.language-strip button.active,.workspace-nav-item.active,.workspace-link.selected{background:#1c2421!important;border-color:#30423c!important;color:#f3f3f3!important;box-shadow:inset 2px 0 #2f8f78!important}
+.side-nav:hover,.side-link:hover,.workspace-nav-item:hover,.workspace-link:hover,.problem-row:hover{background:#1a1a1a!important}
+.hero:before{display:none!important}
+.hero h1 span{background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;color:#f3f3f3!important}
+.primary,.success{background:#2f8f78!important;border-color:#397d6d!important;box-shadow:none!important;color:#fff!important}
+.primary:hover,.success:hover{filter:brightness(1.06)!important}
+.primary:after{display:none!important}
+.secondary,.profile,.toolbar-btn,.bottom-collapse,.editor-shortcuts button,.wave-tools button,.solve-status,.file-tab.active{background:#1b1b1b!important;border-color:#303030!important;color:#d9d9d9!important}
+.stats,.problem-list,.content-card,.progress-hero,.topic-card,.interview-card{background:#151515!important;border-color:#292929!important;box-shadow:none!important}
+.topic-card:hover{border-color:#3a3a3a!important;box-shadow:none!important}
+.topic-card:before{display:none!important}
+.toolbar .search,.filters select,.language-strip,.discussion-form input,.discussion-form textarea{background:#171717!important;border-color:#303030!important;color:#e7e7e7!important}
+.search:focus-within,.filters select:focus,.discussion-form input:focus,.discussion-form textarea:focus{border-color:#416c61!important;box-shadow:0 0 0 2px rgba(47,143,120,.1)!important}
+.problem-main:hover strong,.back:hover{color:#d8e9e4!important}
+.problem-tabs button.active,.bottom-tabs button.active{color:#f0f0f0!important;border-bottom-color:#2f8f78!important;box-shadow:inset 0 -2px 0 #2f8f78!important}
+.examples div,.discussion-post,.discussion-empty{background:#141414!important;border-color:#2b2b2b!important}
+.editor-card,.ide-workspace,.editor-shell,.editor-wrap,.editor-stage,.wave-panel,.wave-scroll{background:#101010!important;border-color:#292929!important;box-shadow:none!important}
+.editor-head,.editor-foot,.ide-topbar,.file-tabs,.bottom-tabs,.ide-discussion,.ide-problem>.problem-tabs{background:#161616!important;border-color:#292929!important;box-shadow:none!important}
+.ide-problem{background:#151515!important;border-color:#292929!important}
+.file-tab,.editor-language select,.icon-btn,.editor-toolbar,.editor-search,.ide-bottom,.console{background:#141414!important;border-color:#292929!important;color:#d0d0d0!important}
+.file-tab.active{box-shadow:inset 0 -2px 0 #2f8f78!important}
+.ide-problem>.problem-tabs button.active{color:#f0f0f0!important;background:#1a211f!important;border-color:#31463f!important;box-shadow:inset 0 -2px 0 #2f8f78!important}
+.editor-card textarea,.ide-editor{background:#101010!important;color:#ededed!important;caret-color:#d7e4df!important;-webkit-text-fill-color:#ededed!important}
+.ide-editor::selection{background:rgba(47,143,120,.22)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.ide-editor:focus{box-shadow:inset 2px 0 0 #2f8f78!important}
+.editor-gutter{background:#121212!important;border-color:#242424!important;color:#5f5f5f!important}
+.wave-digital{stroke:#6cae9d!important}
+.wave-event{border-color:#4d8d7d!important;box-shadow:none!important}
+.wave-event span{color:#b8d8cf!important}
+.progress-track{background:#242424!important}
+.progress-track div{background:#2f8f78!important;box-shadow:none!important}
+.ring{border-color:#303030!important;outline-color:#393939!important;background:#171717!important;box-shadow:none!important}
+.interview-icon,.post-avatar{background:#1c2421!important;color:#83b7a9!important;border-color:#30423c!important}
+.check.done{background:#2f8f78!important;border-color:#2f8f78!important;box-shadow:none!important}
+.difficulty.easy{color:#7fc3aa!important;background:#17201d!important;border-color:#263b34!important}
+.difficulty.medium{color:#d2b76f!important;background:#211e16!important;border-color:#3a3325!important}
+.difficulty.hard{color:#d98d8d!important;background:#211717!important;border-color:#3a2727!important}
