@@ -27,8 +27,15 @@ test.describe('HDLForge generated SEO coverage',()=>{
  })
 })
 
-test('problem names use a softer neutral color instead of white',async({page})=>{
+test('roadmap problem rows stay dark and problem names use a softer neutral color',async({page})=>{
  await page.goto('/')
+ const roadmapRow=page.locator('.roadmap-stage .problem-row').first()
+ await expect(roadmapRow).toBeVisible()
+ const roadmapBg=await roadmapRow.evaluate(el=>getComputedStyle(el).backgroundColor)
+ expect(roadmapBg).toBe('rgba(0, 0, 0, 0)')
+ const roadmapTitle=roadmapRow.locator('.problem-main strong')
+ expect(await roadmapTitle.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(201, 201, 201)')
+
  await page.getByRole('button',{name:'Problems',exact:true}).click()
  const title=page.locator('.problem-main strong').first()
  await expect(title).toBeVisible()
