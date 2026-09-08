@@ -1,4 +1,4 @@
-import { getUser, handleAuthCallback, login, logout, onAuthChange, signup } from '@netlify/identity'
+import { getUser, handleAuthCallback, login, logout, oauthLogin, onAuthChange, signup } from '@netlify/identity'
 
 export async function initializeAuth() {
   try { await handleAuthCallback() } catch {}
@@ -11,6 +11,10 @@ export function watchAuth(callback) {
 
 export async function signIn(email, password) {
   return login(email, password)
+}
+
+export function signInWithGoogle() {
+  return oauthLogin('google')
 }
 
 export async function signUp(email, password) {
