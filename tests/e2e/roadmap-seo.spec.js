@@ -4,10 +4,12 @@ test.describe('HDLForge navigation and SEO content', () => {
   test('landing page is a clean hub without problem rows', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: /Prepare for hardware roles/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Problems/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Tracks/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Interview/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Projects/ })).toBeVisible()
+    const destinations = page.locator('.destination-card')
+    await expect(destinations).toHaveCount(4)
+    await expect(destinations.filter({ hasText: 'Problems' })).toBeVisible()
+    await expect(destinations.filter({ hasText: 'Tracks' })).toBeVisible()
+    await expect(destinations.filter({ hasText: 'Interview' })).toBeVisible()
+    await expect(destinations.filter({ hasText: 'Projects' })).toBeVisible()
     await expect(page.locator('.problem-row')).toHaveCount(0)
   })
 
