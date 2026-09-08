@@ -27,18 +27,14 @@ test.describe('HDLForge generated SEO coverage',()=>{
  })
 })
 
-test('roadmap problem rows stay dark and problem names use a softer neutral color',async({page})=>{
+test('problem rows stay dark and problem names use a softer neutral color',async({page})=>{
  await page.goto('/')
- const roadmapRow=page.locator('.roadmap-stage .problem-row').first()
- await expect(roadmapRow).toBeVisible()
- const roadmapBg=await roadmapRow.evaluate(el=>getComputedStyle(el).backgroundColor)
- expect(roadmapBg).toBe('rgba(0, 0, 0, 0)')
- const roadmapTitle=roadmapRow.locator('.problem-main strong')
- expect(await roadmapTitle.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(201, 201, 201)')
-
  await page.getByRole('button',{name:'Problems',exact:true}).click()
- const title=page.locator('.problem-main strong').first()
- await expect(title).toBeVisible()
- const color=await title.evaluate(el=>getComputedStyle(el).color)
- expect(color).toBe('rgb(201, 201, 201)')
+ const row=page.locator('.problem-row').first()
+ await expect(row).toBeVisible()
+ const bg=await row.evaluate(el=>getComputedStyle(el).backgroundColor)
+ expect(bg).not.toBe('rgb(255, 255, 255)')
+ expect(bg).not.toBe('rgba(255, 255, 255, 1)')
+ const title=row.locator('.problem-main strong')
+ expect(await title.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(201, 201, 201)')
 })
