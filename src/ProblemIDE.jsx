@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Activity, CheckCircle2, Code2, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
+import MonacoHDLEditor from './MonacoHDLEditor'
 import './ide-overrides.css'
 
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || '').replace(/\/$/, '')
@@ -56,10 +57,7 @@ function Discussion({ problem }) {
   return <div className="discussion discussion-in-tab"><div className="discussion-head"><div><h2>Discussion</h2><p>Ask questions, compare implementations and discuss edge cases.</p></div><span><MessageSquare size={15} /> {posts.length} posts</span></div><form className="discussion-form" onSubmit={submit}><textarea value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ask a question or share an approach…" /><button className="primary">Post discussion</button></form><div className="discussion-list">{posts.length ? posts.map(post => <article className="discussion-post" key={post.id}><div className="post-avatar">Y</div><div><strong>{post.name}</strong><small>{post.time}</small><p>{post.text}</p></div></article>) : <div className="discussion-empty"><MessageSquare size={22} /><strong>Start the discussion</strong><p>Be the first to ask a question about this problem.</p></div>}</div></div>
 }
 function Editor({ code, language, onChange, onRun }) {
-  const [showFind, setShowFind] = useState(false), [query, setQuery] = useState('')
-  const handleKeyDown = e => { if (e.key === 'Tab') { e.preventDefault(); const el = e.currentTarget, start = el.selectionStart, end = el.selectionEnd, next = code.slice(0, start) + '  ' + code.slice(end); onChange(next); requestAnimationFrame(() => { el.selectionStart = el.selectionEnd = start + 2 }) } if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); onRun() } if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') { e.preventDefault(); setShowFind(true) } }
-  const lines = code.split('\n').length
-  return <div className="editor-wrap"><div className="editor-toolbar"><span>HDL source · {language}</span><div className="editor-shortcuts"><span>Tab indent</span><span>Ctrl+Enter run</span><button title="Find" onClick={() => setShowFind(v => !v)}>⌕</button></div></div>{showFind && <div className="editor-search"><span>⌕</span><input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="Find in source…" /><span>{query ? (code.split(query).length - 1) : 0} matches</span></div>}<div className="editor-stage"><div className="editor-gutter">{Array.from({ length: lines }, (_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => onChange(e.target.value)} onKeyDown={handleKeyDown} spellCheck="false" aria-label="HDL source editor" /></div></div>
+  return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} />
 }
 export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onSolved, onToggle, onPrevious, onNext, hasPrevious, hasNext }) {
   const supported = problem.languages?.length ? problem.languages : languages, evaluationType = problem.evaluation?.type || 'simulation', isConceptual = evaluationType === 'answer', initialLanguage = supported.includes('SystemVerilog') ? 'SystemVerilog' : supported[0] || 'SystemVerilog'
