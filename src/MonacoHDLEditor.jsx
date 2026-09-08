@@ -127,7 +127,7 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun }) {
     editorRef.current?.getAction('actions.find')?.run()
   }
 
-  return <div className="editor-wrap monaco-editor-wrap">
+  return <div className="editor-wrap monaco-editor-wrap" style={{ minHeight: 0 }}>
     <div className="editor-toolbar">
       <span>HDL source · {language}</span>
       <div className="editor-shortcuts">
@@ -136,7 +136,7 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun }) {
         <button title="Find" aria-label="Find in source" onClick={openFind}>⌕</button>
       </div>
     </div>
-    <div className="monaco-editor-stage" aria-label={`${language} HDL source editor`}>
+    <div className="monaco-editor-stage" aria-label={`${language} HDL source editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}>
       <MonacoEditor
         height="100%"
         value={code}
