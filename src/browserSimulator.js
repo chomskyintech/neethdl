@@ -1,8 +1,11 @@
+import extraBenches from './data/extraBenches'
+
 const SIM_BASE = 'https://senolgulgonul.github.io/verisim/'
 const MAX_SOURCE = 20000
 
 // Existing executable RTL benches are retained; each run now also captures a VCD.
 const benches = {
+  ...extraBenches,
   'rtl-mux': `module tb; logic a,b,sel,y; mux2 dut(.a(a),.b(b),.sel(sel),.y(y)); initial begin a=0;b=0;sel=0; #1; if(y!==0) $fatal(1,"mux case 1"); a=0;b=1;sel=0; #1; if(y!==0) $fatal(1,"mux case 2"); a=0;b=1;sel=1; #1; if(y!==1) $fatal(1,"mux case 3"); a=1;b=0;sel=1; #1; if(y!==0) $fatal(1,"mux case 4"); $display("HDLFORGE_PASS"); $finish; end endmodule`,
   'rtl-priority': `module tb; logic [7:0] in; logic [2:0] index; logic valid; priority_encoder dut(.in(in),.index(index),.valid(valid)); initial begin in=0; #1; if(valid!==0) $fatal(1,"zero input"); in=8'b00101000; #1; if(valid!==1 || index!==5) $fatal(1,"priority 5"); in=8'b10001000; #1; if(valid!==1 || index!==7) $fatal(1,"priority 7"); in=8'b00000001; #1; if(valid!==1 || index!==0) $fatal(1,"priority 0"); $display("HDLFORGE_PASS"); $finish; end endmodule`,
   'rtl-counter': `module tb; logic clk=0,reset; logic [7:0] count; counter #(.WIDTH(8)) dut(.clk(clk),.reset(reset),.count(count)); always #1 clk=~clk; initial begin reset=1; @(posedge clk); #0.1; if(count!==0) $fatal(1,"reset"); reset=0; @(posedge clk); #0.1; if(count!==1) $fatal(1,"increment 1"); @(posedge clk); #0.1; if(count!==2) $fatal(1,"increment 2"); reset=1; @(posedge clk); #0.1; if(count!==0) $fatal(1,"second reset"); $display("HDLFORGE_PASS"); $finish; end endmodule`,
