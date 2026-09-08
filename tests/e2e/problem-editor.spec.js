@@ -39,15 +39,11 @@ test.describe('HDLForge Monaco problem editor', () => {
   })
 
   test('supports normal Monaco editing shortcuts', async ({ page }) => {
-    await placeCursorAfterMarker(page)
-    await page.keyboard.press('Enter')
-    await page.keyboard.type('always_comb begin')
-    await page.keyboard.press('Enter')
-    await page.keyboard.type('y = a;')
-    await expect(page.locator('.monaco-editor .view-lines')).toContainText('always_comb begin')
-    await expect(page.locator('.monaco-editor .view-lines')).toContainText('y = a;')
+    const original = await codeText(page)
+    await replaceEditorContents(page, 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a;\nendmodule')
+    expect(await codeText(page)).toContain('assign y = sel ? b : a;')
     await page.keyboard.press('Control+Z')
-    await expect(page.locator('.monaco-editor .view-lines')).not.toContainText('y = a;')
+    await expect.poll(() => codeText(page)).toBe(original)
   })
 
   test('supports Tab indentation and native Ctrl+F find', async ({ page }) => {
