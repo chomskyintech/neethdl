@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Cloud, LogOut, X } from 'lucide-react'
-import { signIn, signOut, signUp } from './cloudProfile'
+import { signIn, signInWithGoogle, signOut, signUp } from './cloudProfile'
 
 export default function AccountModal({ open, user, onClose, syncStatus }) {
   const [mode, setMode] = useState('login')
@@ -30,6 +30,15 @@ export default function AccountModal({ open, user, onClose, syncStatus }) {
     }
   }
 
+  const doGoogleSignIn = () => {
+    setMessage('')
+    try {
+      signInWithGoogle()
+    } catch (error) {
+      setMessage(error?.message || 'Google sign in could not start.')
+    }
+  }
+
   const doSignOut = async () => {
     setBusy(true)
     setMessage('')
@@ -55,6 +64,7 @@ export default function AccountModal({ open, user, onClose, syncStatus }) {
         <button className="secondary account-submit" disabled={busy} onClick={doSignOut}><LogOut size={15}/> Sign out</button>
       </> : <>
         <div className="account-heading"><h2>{mode === 'signup' ? 'Create an account' : 'Sign in to HDLForge'}</h2><p>Sync your progress and drafts across devices.</p></div>
+        <button className="secondary account-submit" type="button" onClick={doGoogleSignIn}>Continue with Google</button>
         <div className="account-tabs"><button className={mode === 'login' ? 'active' : ''} onClick={() => { setMode('login'); setMessage('') }}>Sign in</button><button className={mode === 'signup' ? 'active' : ''} onClick={() => { setMode('signup'); setMessage('') }}>Create account</button></div>
         <form className="account-form" onSubmit={submit}>
           <label>Email<input type="email" required autoComplete="email" value={email} onChange={event => setEmail(event.target.value)} /></label>
