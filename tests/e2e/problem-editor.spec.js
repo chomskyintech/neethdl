@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 const editorRoot = page => page.locator('.monaco-editor-wrap')
-const codeText = async page => page.locator('.monaco-editor .view-lines').innerText()
+const codeText = async page => (await page.locator('.monaco-editor .view-lines').innerText()).replace(/\u00a0/g, ' ')
 
 async function openFirstProblem(page) {
   await page.goto('/')
@@ -17,6 +17,12 @@ async function placeCursorAfterMarker(page) {
   await expect(markerLine).toBeVisible()
   await markerLine.click()
   await page.keyboard.press('End')
+}
+
+async function replaceEditorContents(page, source) {
+  await page.locator('.monaco-editor .view-lines').click()
+  await page.keyboard.press('Control+A')
+  await page.keyboard.insertText(source)
 }
 
 test.describe('HDLForge Monaco problem editor', () => {
@@ -75,10 +81,8 @@ test.describe('HDLForge Monaco problem editor', () => {
 
   test('runs RTL and renders a waveform', async ({ page }) => {
     test.setTimeout(90_000)
-    await placeCursorAfterMarker(page)
-    await page.keyboard.press('Enter')
-    await page.keyboard.type('assign y = sel ? b : a;')
-    await page.getByRole('button', { name: /Run tests/i }).click()
+    await replaceEditorContents(page, 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a;\nendmodule')
+    await page.getByRole('button', { name: /Run tests/i }).first().click()
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
     await page.getByRole('button', { name: /Waveform/i }).click()
     await expect(page.locator('.waveform')).toBeVisible()
