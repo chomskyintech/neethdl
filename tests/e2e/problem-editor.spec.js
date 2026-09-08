@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test'
 
 const editorRoot = page => page.locator('.monaco-editor-wrap')
-const editorInput = page => page.locator('.monaco-editor textarea.inputarea')
 const codeText = async page => page.locator('.monaco-editor .view-lines').innerText()
 
 async function openFirstProblem(page) {
@@ -10,7 +9,7 @@ async function openFirstProblem(page) {
   await page.reload()
   await page.locator('.problem-row').first().click()
   await expect(page.locator('.monaco-editor')).toBeVisible()
-  await expect(editorInput(page)).toBeVisible()
+  await expect(page.locator('.monaco-editor .view-lines')).toBeVisible()
 }
 
 async function placeCursorAfterMarker(page) {
