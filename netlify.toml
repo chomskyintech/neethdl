@@ -7,6 +7,21 @@
   NPM_FLAGS = "--no-audit --no-fund"
 
 [[redirects]]
+  from = "/learn/verilog-interview/"
+  to = "/learn/verilog-interview/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/learn/sva-examples/"
+  to = "/learn/sva-examples/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/learn/rtl-design-exercises/"
+  to = "/learn/rtl-design-exercises/index.html"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
