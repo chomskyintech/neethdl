@@ -47,7 +47,9 @@ test.describe('HDLForge navigation and SEO content', () => {
 
   test('Interview navigation opens only the current interview simulation', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Interview', exact: true }).click()
+    const interviewNav = page.locator('.desktop-nav').getByRole('button', { name: 'Interview', exact: true })
+    await expect(interviewNav).toHaveCount(1)
+    await interviewNav.click()
     await expect(page.getByRole('heading', { name: 'Hardware interview simulation' })).toBeVisible()
     await expect(page.getByText('RTL Screening — Practice')).toHaveCount(0)
     await expect(page.getByRole('button', { name: /Start interview/i })).toBeVisible()
