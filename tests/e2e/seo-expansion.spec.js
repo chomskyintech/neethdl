@@ -17,6 +17,25 @@ test.describe('HDLForge generated SEO coverage',()=>{
   await expect(page.getByRole('heading',{name:'Clock Domain Crossing (CDC) Interview Guide'})).toBeVisible()
  })
 
+ test('serves crawlable problem and learning indexes',async({page})=>{
+  await page.goto('/problems/index.html')
+  await expect(page).toHaveTitle(/Hardware Design Practice Problems.*HDLForge/i)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hdlforge.netlify.app/problems/')
+  await expect(page.locator('a[href="/problems/rtl-fifo/"]')).toBeVisible()
+
+  await page.goto('/learn/index.html')
+  await expect(page).toHaveTitle(/Hardware Design Learning.*HDLForge/i)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hdlforge.netlify.app/learn/')
+  await expect(page.locator('a[href="/learn/verilog-interview/"]')).toBeVisible()
+ })
+
+ test('homepage exposes crawlable links to SEO hubs',async({page})=>{
+  await page.goto('/')
+  await expect(page.locator('a[href="/learn/"]')).toBeVisible()
+  await expect(page.locator('a[href="/problems/"]')).toBeVisible()
+  await expect(page.locator('a[href="/learn/verilog-interview/"]')).toBeVisible()
+ })
+
  test('sitemap includes generated problem and learning URLs',async({request})=>{
   const response=await request.get('/sitemap.xml')
   expect(response.ok()).toBeTruthy()
@@ -24,6 +43,7 @@ test.describe('HDLForge generated SEO coverage',()=>{
   expect(xml).toContain('https://hdlforge.netlify.app/problems/sv-packed-arrays/')
   expect(xml).toContain('https://hdlforge.netlify.app/learn/protocols/')
   expect(xml).toContain('https://hdlforge.netlify.app/learn/cdc-interview/')
+  expect(xml).toContain('https://hdlforge.netlify.app/learn/')
  })
 })
 
