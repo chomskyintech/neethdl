@@ -9,6 +9,13 @@ const destinations=[
  {id:'courses',title:'Courses',description:'Learn hardware skills in order, then reinforce them with relevant problems and projects.',icon:GraduationCap}
 ]
 
+const learningLinks=[
+ {href:'/learn/',title:'Learning & interview guides',description:'Browse all HDLForge topic hubs and interview guides.'},
+ {href:'/problems/',title:'Hardware practice library',description:'Open the complete crawlable index of HDLForge practice problems.'},
+ {href:'/learn/verilog-interview/',title:'Verilog & RTL interviews',description:'Review synthesizable RTL, coding style and common interview topics.'},
+ {href:'/learn/uvm-interview/',title:'Verification interviews',description:'Prepare for UVM, SVA, scoreboards, monitors and verification methodology.'}
+]
+
 export default function LandingHub({go,problemCount,solvedCount}){
  return <div className="landing-hub">
   <section className="hero landing-hero">
@@ -21,6 +28,11 @@ export default function LandingHub({go,problemCount,solvedCount}){
    <div className="destination-grid">{destinations.map(({id,title,description,icon:Icon})=><button className="destination-card" key={id} onClick={()=>go(id)}>
     <span className="destination-icon"><Icon size={22}/></span><span className="destination-copy"><strong>{title}</strong><small>{description}</small></span><ChevronRight size={18}/>
    </button>)}</div>
+  </section>
+  <section style={{marginTop:'54px'}}><div className="section-heading"><div><div className="eyebrow">LEARN</div><h2>Hardware interview resources</h2></div></div>
+   <div className="topic-grid">{learningLinks.map(link=><a className="topic-card" style={{textDecoration:'none'}} href={link.href} key={link.href}>
+    <span className="topic-info"><h3>{link.title}</h3><p>{link.description}</p></span><ChevronRight className="chevron" size={18}/>
+   </a>)}</div>
   </section>
  </div>
 }
