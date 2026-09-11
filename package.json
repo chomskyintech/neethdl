@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-seo.mjs && vite build",
+    "build": "node scripts/generate-seo.mjs && node scripts/generate-crawl-hubs.mjs && vite build",
     "preview": "vite preview",
     "test:e2e": "playwright test"
   },
