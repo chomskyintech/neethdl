@@ -1,5 +1,11 @@
 import React, { useRef } from 'react'
-import MonacoEditor from '@monaco-editor/react'
+import MonacoEditor,{loader}from'@monaco-editor/react'
+import*as monaco from'monaco-editor/esm/vs/editor/editor.api'
+import EditorWorker from'monaco-editor/esm/vs/editor/editor.worker?worker'
+import'monaco-editor/esm/vs/editor/contrib/find/browser/findController'
+
+globalThis.MonacoEnvironment={getWorker:()=>new EditorWorker()}
+loader.config({monaco})
 
 const languageIds = {
   Verilog: 'verilog',

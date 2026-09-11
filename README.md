@@ -28,6 +28,10 @@ HDLForge currently covers:
 
 The platform includes practice covering multiplexers, counters, priority logic, FIFOs, shift registers, edge detectors, arbiters, register files, LFSRs, clock dividers, SystemVerilog constructs and interfaces, SVA handshakes and reset properties, UVM drivers and scoreboards, architecture hazards and caches, UART and SPI, FPGA debouncing, and FSM design.
 
+## Guided projects
+
+The Projects area includes an interactive eight-stage **Build a 32-bit RISC-V CPU core** lab. Learners implement an RV32I single-cycle datapath in SystemVerilog beside the lesson, pass focused stage checks, unlock each next task, and keep their drafts and progress in the browser.
+
 ## Main resources
 
 - **Homepage:** https://hdlforge.netlify.app/

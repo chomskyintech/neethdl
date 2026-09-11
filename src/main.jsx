@@ -7,6 +7,7 @@ import './waveform-discussion.css'
 import './account-tracks.css'
 import './home-projects.css'
 import './courses.css'
+import './riscv-lab.css'
 import './lockedEditor.js'
 import problems from './data/problems.json'
 import ProblemIDE from './ProblemIDE'
@@ -16,6 +17,7 @@ import LandingHub from './LandingHub'
 import Projects from './Projects'
 import Courses from './Courses'
 import InterviewMode from './InterviewMode'
+import RiscvCoreLab from './RiscvCoreLab'
 import {addActivityDay,calculatePoints,calculateStreak,topicProgress} from './progressTracking'
 import {initializeAuth,loadCloudProfile,mergeProfiles,saveCloudProfile,watchAuth} from './cloudProfile'
 
@@ -78,13 +80,14 @@ function App(){
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
  const profileLabel=user?(user.name||user.email||'Account').trim().slice(0,2).toUpperCase():'Sign in'
- return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='interview'?'active':''} onClick={()=>go('interview')}>Interview</button><button className={page==='projects'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main">
+ return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='interview'?'active':''} onClick={()=>go('interview')}>Interview</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main">
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>} 
  {page==='tracks'&&<Tracks problems={problems} solved={solved} onOpen={openProblem}/>} 
  {page==='interview'&&<InterviewMode onExit={()=>go('home')}/>} 
- {page==='projects'&&<Projects/>} 
+ {page==='projects'&&<Projects onStartRiscv={()=>go('riscv-project')}/>}
+ {page==='riscv-project'&&<RiscvCoreLab onExit={()=>go('projects')}/>}
  {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
  {page==='progress'&&<Progress problems={problems} solved={solved} onOpen={openProblem} points={points} streak={streak} topicStats={topicStats}/>} 
  </main></div><AccountModal open={accountOpen} user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></div>
