@@ -6,6 +6,11 @@
   NODE_VERSION = "22.12.0"
   NPM_FLAGS = "--no-audit --no-fund"
 
+[[headers]]
+  for = "/app/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, follow"
+
 [[redirects]]
   from = "/learn/verilog-interview/"
   to = "/learn/verilog-interview/index.html"
@@ -22,6 +27,6 @@
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/app/*"
   to = "/index.html"
   status = 200
