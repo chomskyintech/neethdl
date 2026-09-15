@@ -4,10 +4,7 @@ const MAX_CONSOLE_RATIO = 0.7
 
 let activePanel = null
 let dragging = false
-
-function setConsoleVariable(height) {
-  document.documentElement.style.setProperty('--ide-console-height', `${Math.round(height)}px`)
-}
+let runProxy = null
 
 function applyExpandedHeight(panel, height) {
   const workspace = panel.closest('.ide-workspace')
@@ -19,7 +16,7 @@ function applyExpandedHeight(panel, height) {
   panel.style.setProperty('height', `${nextHeight}px`, 'important')
   panel.style.setProperty('flex-basis', `${nextHeight}px`, 'important')
   panel.style.setProperty('max-height', `${nextHeight}px`, 'important')
-  setConsoleVariable(nextHeight)
+  positionRunProxy()
 }
 
 function syncPanel(panel) {
@@ -36,25 +33,71 @@ function syncPanel(panel) {
     panel.style.removeProperty('height')
     panel.style.removeProperty('flex-basis')
     panel.style.removeProperty('max-height')
-    setConsoleVariable(34)
+    requestAnimationFrame(positionRunProxy)
     return
   }
 
   const saved = Number.parseFloat(panel.dataset.expandedHeight)
-  if (Number.isFinite(saved)) {
-    applyExpandedHeight(panel, saved)
-  } else {
-    const measured = panel.getBoundingClientRect().height || DEFAULT_CONSOLE_HEIGHT
-    panel.dataset.expandedHeight = String(measured)
-    setConsoleVariable(measured)
+  applyExpandedHeight(panel, Number.isFinite(saved) ? saved : DEFAULT_CONSOLE_HEIGHT)
+}
+
+function getOriginalRunButton() {
+  return document.querySelector('.hdlforge-ide-active .ide-actions .primary')
+}
+
+function ensureRunProxy() {
+  const original = getOriginalRunButton()
+  const tabs = document.querySelector('.hdlforge-ide-active .ide-bottom .bottom-tabs')
+
+  if (!original || !tabs) {
+    if (runProxy) runProxy.style.display = 'none'
+    return
   }
+
+  if (!runProxy) {
+    runProxy = document.createElement('button')
+    runProxy.type = 'button'
+    runProxy.id = 'hdlforge-console-run'
+    runProxy.className = 'ide-console-run-proxy'
+    runProxy.title = 'Run tests'
+    runProxy.addEventListener('click', () => {
+      const source = getOriginalRunButton()
+      if (!source || source.disabled) return
+      runProxy.disabled = true
+      source.click()
+      window.setTimeout(ensureRunProxy, 0)
+    })
+    document.body.appendChild(runProxy)
+  }
+
+  runProxy.style.display = 'grid'
+  runProxy.disabled = original.disabled
+  const conceptual = /evaluate/i.test(original.textContent || '')
+  runProxy.setAttribute('aria-label', conceptual ? 'Evaluate' : 'Run tests')
+  runProxy.title = conceptual ? 'Evaluate' : 'Run tests'
+  positionRunProxy()
+}
+
+function positionRunProxy() {
+  if (!runProxy || runProxy.style.display === 'none') return
+  const tabs = document.querySelector('.hdlforge-ide-active .ide-bottom .bottom-tabs')
+  if (!tabs) return
+
+  const rect = tabs.getBoundingClientRect()
+  const size = 30
+  runProxy.style.left = `${Math.max(8, rect.right - size - 12)}px`
+  runProxy.style.top = `${rect.top + Math.max(0, (rect.height - size) / 2)}px`
 }
 
 function syncCurrentPanel() {
   const panel = document.querySelector('.hdlforge-ide-active .ide-bottom')
-  if (!panel) return
+  if (!panel) {
+    if (runProxy) runProxy.style.display = 'none'
+    return
+  }
   activePanel = panel
   syncPanel(panel)
+  ensureRunProxy()
 }
 
 document.addEventListener('pointerdown', event => {
@@ -85,6 +128,7 @@ function stopDragging() {
   if (!dragging) return
   dragging = false
   document.body.classList.remove('ide-console-resizing')
+  positionRunProxy()
 }
 
 document.addEventListener('pointerup', stopDragging)
@@ -94,11 +138,14 @@ new MutationObserver(mutations => {
   for (const mutation of mutations) {
     if (mutation.type === 'attributes' && mutation.target.classList?.contains('ide-bottom')) {
       syncPanel(mutation.target)
-      return
     }
   }
   syncCurrentPanel()
-}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] })
+}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'disabled'] })
 
-window.addEventListener('resize', syncCurrentPanel)
+window.addEventListener('resize', () => {
+  syncCurrentPanel()
+  positionRunProxy()
+})
+
 syncCurrentPanel()
