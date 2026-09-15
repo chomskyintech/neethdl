@@ -9,7 +9,7 @@ import './home-projects.css'
 import './courses.css'
 import './riscv-lab.css'
 import './lockedEditor.js'
-import problems from './data/problems.json'
+import problems from './data/activeProblems'
 import ProblemIDE from './ProblemIDE'
 import Tracks from './Tracks'
 import AccountModal from './AccountModal'
@@ -21,7 +21,7 @@ import RiscvCoreLab from './RiscvCoreLab'
 import {addActivityDay,calculatePoints,calculateStreak,topicProgress} from './progressTracking'
 import {initializeAuth,loadCloudProfile,mergeProfiles,saveCloudProfile,watchAuth} from './cloudProfile'
 
-const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Computer Architecture','Protocols','FPGA']
+const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
@@ -31,6 +31,7 @@ const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problem
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
  if(p.category==='RTL Design'||p.category==='Protocols'||p.category==='FPGA')return ['Verilog','SystemVerilog','VHDL']
+ if(p.category==='Accelerators')return ['Verilog','SystemVerilog']
  if(p.category==='SystemVerilog'||p.category==='SVA'||p.category==='UVM')return ['SystemVerilog']
  return []
 }
