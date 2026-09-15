@@ -25,6 +25,8 @@ const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Computer Archi
 const difficulties=['All','Easy','Medium','Hard']
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
+const appPaths={home:'/',problems:'/app/problems/',tracks:'/app/tracks/',interview:'/app/interview/',projects:'/app/projects/','riscv-project':'/app/projects/riscv-core/',courses:'/app/courses/',progress:'/app/progress/'}
+const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',tracks:'Tracks | HDLForge',interview:'Interview Mode | HDLForge',projects:'Projects | HDLForge','riscv-project':'RISC-V Core Project | HDLForge',courses:'Courses | HDLForge',progress:'Progress | HDLForge'}
 
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
@@ -33,20 +35,56 @@ function problemLanguages(p){
  return []
 }
 function problemLanguageLabel(p){const ls=problemLanguages(p);return ls.length?ls.join(' / '):'Conceptual'}
+function normalizePath(path){return path==='/'?'/':path.replace(/\/+$/,'')}
+function appPath(page,problem){return page==='problem'&&problem?`/app/problems/${encodeURIComponent(problem.id)}/`:(appPaths[page]||'/')}
+function routeFromLocation(){
+ const path=normalizePath(window.location.pathname)
+ const problemMatch=path.match(/^\/app\/problems\/([^/]+)$/)
+ if(problemMatch){
+  const id=decodeURIComponent(problemMatch[1])
+  const problem=problems.find(p=>p.id===id)
+  if(problem)return {page:'problem',problem}
+ }
+ const legacyId=new URLSearchParams(window.location.search).get('problem')
+ if(legacyId){const problem=problems.find(p=>p.id===legacyId);if(problem)return {page:'problem',problem,legacy:true}}
+ for(const [page,target] of Object.entries(appPaths))if(normalizePath(target)===path)return {page,problem:null}
+ return {page:'home',problem:null}
+}
 
 function App(){
- const [page,setPage]=useState('home'),[selected,setSelected]=useState(problems[0]||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
+ const initialRoute=useRef(routeFromLocation()).current
+ const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
  const syncTimer=useRef(null)
  const markSolved=id=>{if(solved.includes(id))return;const n=[...solved,id];setSolved(n);localStorage.setItem('hdlforge-solved',JSON.stringify(n));const days=addActivityDay(activityDays);setActivityDays(days);localStorage.setItem('hdlforge-activity-days',JSON.stringify(days))}
  const saveDraft=(id,code)=>{const n={...drafts,[id]:code},updated={...draftUpdatedAt,[id]:new Date().toISOString()};setDrafts(n);setDraftUpdatedAt(updated);localStorage.setItem('hdlforge-drafts',JSON.stringify(n));localStorage.setItem('hdlforge-draft-updated-at',JSON.stringify(updated))}
  const filtered=useMemo(()=>problems.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.category===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))}),[category,difficulty,language,status,query,solved])
  const points=useMemo(()=>calculatePoints(problems,solved),[solved]),streak=useMemo(()=>calculateStreak(activityDays),[activityDays]),topicStats=useMemo(()=>topicProgress(problems,solved),[solved])
- const openProblem=p=>{setSelected(p);setPage('problem')}; const go=p=>setPage(p)
+ const navigate=(nextPage,problem=null,{replace=false}={})=>{
+  if(nextPage==='problem'&&problem)setSelected(problem)
+  setPage(nextPage)
+  const target=appPath(nextPage,problem)
+  const current=`${window.location.pathname}${window.location.search}`
+  if(current!==target)window.history[replace?'replaceState':'pushState']({page:nextPage,problemId:problem?.id||null},'',target)
+  window.scrollTo({top:0,behavior:'auto'})
+ }
+ const openProblem=p=>navigate('problem',p)
+ const go=p=>navigate(p)
  const selectedIndex=selected?problems.findIndex(p=>p.id===selected.id):-1
  const previousProblem=selectedIndex>0?problems[selectedIndex-1]:null
  const nextProblem=selectedIndex>=0&&selectedIndex<problems.length-1?problems[selectedIndex+1]:null
  const openPrevious=()=>previousProblem&&openProblem(previousProblem)
  const openNext=()=>nextProblem&&openProblem(nextProblem)
+
+ useEffect(()=>{
+  if(initialRoute.legacy&&initialRoute.problem)window.history.replaceState({page:'problem',problemId:initialRoute.problem.id},'',appPath('problem',initialRoute.problem))
+  const onPopState=()=>{const route=routeFromLocation();setPage(route.page);if(route.problem)setSelected(route.problem)}
+  window.addEventListener('popstate',onPopState)
+  return()=>window.removeEventListener('popstate',onPopState)
+ },[])
+
+ useEffect(()=>{
+  document.title=page==='problem'&&selected?`${selected.title} | HDLForge`:(pageTitles[page]||pageTitles.home)
+ },[page,selected?.id])
 
  useEffect(()=>{
   let active=true
