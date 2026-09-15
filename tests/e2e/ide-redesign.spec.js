@@ -1,13 +1,23 @@
 import{test,expect}from'@playwright/test'
 
 test.describe('redesigned IDE shell',()=>{
- test('shows compact problem rail only inside the IDE',async({page})=>{
+ test('shows the Problems button only inside the IDE and no vertical rail',async({page})=>{
   await page.goto('/')
+  await expect(page.locator('#hdlforge-ide-problems-button')).toHaveCount(0)
   await expect(page.locator('#hdlforge-ide-rail')).toHaveCount(0)
   await page.goto('/app/problems/rtl-fifo/')
-  await expect(page.locator('#hdlforge-ide-rail')).toBeVisible()
-  await expect(page.locator('.ide-rail-count')).toHaveText('44')
+  await expect(page.getByRole('button',{name:'Open problems'})).toBeVisible()
+  await expect(page.locator('.ide-topbar-problems-count')).toHaveText('44')
+  await expect(page.locator('#hdlforge-ide-rail')).toHaveCount(0)
   await expect(page.locator('body')).toHaveClass(/hdlforge-ide-active/)
+ })
+
+ test('keeps the problem and editor as separate rounded panes',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  const problemRadius=await page.locator('.ide-problem').evaluate(el=>getComputedStyle(el).borderRadius)
+  const workspaceRadius=await page.locator('.ide-workspace').evaluate(el=>getComputedStyle(el).borderRadius)
+  expect(problemRadius).not.toBe('0px')
+  expect(workspaceRadius).not.toBe('0px')
  })
 
  test('opens, searches and closes the problem drawer',async({page})=>{
@@ -30,6 +40,7 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page).toHaveURL(/\/app\/problems\/proto-apb-register\/$/)
   await expect(page).toHaveTitle(/APB Register Peripheral/)
   await expect(page.getByText('APB Register Peripheral',{exact:true}).first()).toBeVisible()
+  await expect(page.getByRole('button',{name:'Open problems'})).toBeVisible()
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 })
