@@ -1,9 +1,10 @@
 let mounted = false
 let drawer = null
 let backdrop = null
-let rail = null
+let topbarButton = null
 let searchInput = null
 let problemRows = []
+let problemsCache = null
 
 const categories = ['RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 
@@ -15,14 +16,14 @@ function currentProblemId(){
 function closeDrawer(){
   drawer?.classList.remove('open')
   backdrop?.classList.remove('open')
-  rail?.querySelector('.ide-rail-problems')?.classList.remove('active')
+  topbarButton?.classList.remove('active')
   document.body.classList.remove('ide-drawer-open')
 }
 
 function openDrawer(){
   drawer?.classList.add('open')
   backdrop?.classList.add('open')
-  rail?.querySelector('.ide-rail-problems')?.classList.add('active')
+  topbarButton?.classList.add('active')
   document.body.classList.add('ide-drawer-open')
   window.setTimeout(()=>searchInput?.focus(),80)
 }
@@ -38,7 +39,7 @@ function routeToProblem(id){
   if(window.location.pathname===target)return
   window.history.pushState({page:'problem',problemId:id},'',target)
   window.dispatchEvent(new PopStateEvent('popstate'))
-  window.setTimeout(updateActive,0)
+  window.setTimeout(()=>{ensureTopbarButton();updateActive()},0)
 }
 
 function difficultyClass(difficulty=''){
@@ -71,7 +72,7 @@ function createDrawer(problems){
       <div><span class="ide-drawer-eyebrow">Practice library</span><strong>Problems</strong></div>
       <button type="button" class="ide-drawer-close" aria-label="Close problem navigator">×</button>
     </div>
-    <label class="ide-drawer-search"><span>⌕</span><input type="search" placeholder="Search  problems…" aria-label="Search problems"></label>
+    <label class="ide-drawer-search"><span>⌕</span><input type="search" placeholder="Search problems…" aria-label="Search problems"></label>
     <div class="ide-drawer-groups"></div>`
   const groups=drawer.querySelector('.ide-drawer-groups')
   categories.forEach(category=>{
@@ -103,37 +104,55 @@ function createDrawer(problems){
   return drawer
 }
 
-function createRail(problemCount){
-  rail=document.createElement('aside')
-  rail.id='hdlforge-ide-rail'
-  rail.className='ide-problem-rail'
-  rail.setAttribute('aria-label','IDE navigation')
-  rail.innerHTML=`
-    <button type="button" class="ide-rail-problems" aria-label="Open problems">
-      <span class="ide-rail-icon">▦</span>
-      <span class="ide-rail-label">Problems</span>
-      <span class="ide-rail-count"></span>
-    </button>
-    <div class="ide-rail-spacer"></div>
-    <div class="ide-rail-hint">P</div>`
-  rail.querySelector('.ide-rail-count').textContent=String(problemCount)
-  rail.querySelector('.ide-rail-problems').addEventListener('click',()=>drawer?.classList.contains('open')?closeDrawer():openDrawer())
-  return rail
+function createTopbarButton(problemCount){
+  const button=document.createElement('button')
+  button.type='button'
+  button.id='hdlforge-ide-problems-button'
+  button.className='ide-topbar-problems'
+  button.setAttribute('aria-label','Open problems')
+  button.innerHTML=`<span class="ide-topbar-problems-icon">▦</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count"></span>`
+  button.querySelector('.ide-topbar-problems-count').textContent=String(problemCount)
+  button.addEventListener('click',()=>drawer?.classList.contains('open')?closeDrawer():openDrawer())
+  return button
+}
+
+function ensureTopbarButton(){
+  if(!problemsCache)return
+  const topbar=document.querySelector('.ide-page .ide-topbar')
+  if(!topbar)return
+  const existing=topbar.querySelector('#hdlforge-ide-problems-button')
+  if(existing){
+    topbarButton=existing
+    existing.querySelector('.ide-topbar-problems-count').textContent=String(problemsCache.length)
+    return
+  }
+  topbarButton=createTopbarButton(problemsCache.length)
+  const brand=topbar.querySelector('.ide-brand')
+  if(brand)brand.after(topbarButton)
+  else topbar.prepend(topbarButton)
 }
 
 async function mount(){
-  if(mounted||!document.querySelector('.ide-page'))return
-  mounted=true
+  if(!document.querySelector('.ide-page'))return
   document.body.classList.add('hdlforge-ide-active')
+  if(mounted){ensureTopbarButton();return}
+  mounted=true
   const {default: problems}=await import('./data/activeProblems')
-  if(!document.querySelector('.ide-page')){mounted=false;document.body.classList.remove('hdlforge-ide-active');return}
+  problemsCache=problems
+  if(!document.querySelector('.ide-page')){
+    mounted=false
+    problemsCache=null
+    document.body.classList.remove('hdlforge-ide-active')
+    return
+  }
   backdrop=document.createElement('button')
   backdrop.type='button'
   backdrop.id='hdlforge-ide-backdrop'
   backdrop.className='ide-drawer-backdrop'
   backdrop.setAttribute('aria-label','Close problem navigator')
   backdrop.addEventListener('click',closeDrawer)
-  document.body.append(createRail(problems.length),backdrop,createDrawer(problems))
+  document.body.append(backdrop,createDrawer(problems))
+  ensureTopbarButton()
   updateActive()
 }
 
@@ -141,9 +160,12 @@ function unmount(){
   if(document.querySelector('.ide-page'))return
   mounted=false
   closeDrawer()
-  rail?.remove();drawer?.remove();backdrop?.remove()
-  rail=drawer=backdrop=searchInput=null
+  topbarButton?.remove()
+  drawer?.remove()
+  backdrop?.remove()
+  topbarButton=drawer=backdrop=searchInput=null
   problemRows=[]
+  problemsCache=null
   document.body.classList.remove('hdlforge-ide-active','ide-drawer-open')
 }
 
@@ -153,14 +175,15 @@ function sync(){
 }
 
 new MutationObserver(sync).observe(document.documentElement,{childList:true,subtree:true})
-window.addEventListener('popstate',()=>window.setTimeout(updateActive,0))
-document.addEventListener('click',()=>window.setTimeout(()=>{sync();updateActive()},0))
+window.addEventListener('popstate',()=>window.setTimeout(()=>{ensureTopbarButton();updateActive()},0))
+document.addEventListener('click',()=>window.setTimeout(()=>{sync();ensureTopbarButton();updateActive()},0))
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape')closeDrawer()
   if((event.key==='p'||event.key==='P')&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&document.body.classList.contains('hdlforge-ide-active')){
     const tag=document.activeElement?.tagName?.toLowerCase()
-    if(tag!=='input'&&tag!=='textarea'&&document.activeElement?.getAttribute('contenteditable')!=='true'){
-      event.preventDefault();drawer?.classList.contains('open')?closeDrawer():openDrawer()
+    if(tag!=='input'&&tag!=='textarea'&&tag!=='select'&&document.activeElement?.getAttribute('contenteditable')!=='true'){
+      event.preventDefault()
+      drawer?.classList.contains('open')?closeDrawer():openDrawer()
     }
   }
 })
