@@ -1,7 +1,7 @@
 import problems from './data/activeProblems'
 
 const topPaneBorderStyle=document.createElement('style')
-topPaneBorderStyle.textContent='.ide-topbar{border-color:transparent!important}'
+topPaneBorderStyle.textContent='.ide-topbar{border-color:transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}'
 document.head.appendChild(topPaneBorderStyle)
 
 let mounted = false
