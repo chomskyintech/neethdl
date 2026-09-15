@@ -1,5 +1,23 @@
 /* Compact IDE controls: borderless problem navigation plus a NeetCode-style draggable console header. */
 
+/* Match the reference header: section selector is plain inline content, not a button block. */
+body.hdlforge-ide-active .ide-page .ide-topbar-problems{
+  height:38px!important;
+  min-height:38px!important;
+  padding:0 6px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar-problems:hover,
+body.hdlforge-ide-active .ide-page .ide-topbar-problems.active{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#eef4fb!important;
+}
+
 body.hdlforge-ide-active .ide-page .ide-problem-navigation{
   height:38px!important;
   padding:0!important;
