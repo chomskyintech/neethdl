@@ -15,12 +15,13 @@ function syncSectionLabel(){
   const label=button.querySelector('.ide-topbar-problems-label')
   const count=button.querySelector('.ide-topbar-problems-count')
   const nextLabel=problem.category
-  const nextCount=String(problems.filter(item=>item.category===problem.category).length)
-  const nextAria=`Open ${problem.category} problems`
+  const totalCount=String(problems.length)
 
+  // Keep the visible label section-specific, but preserve the stable
+  // accessible name and total problem count used by the IDE contract.
   if(label&&label.textContent!==nextLabel)label.textContent=nextLabel
-  if(count&&count.textContent!==nextCount)count.textContent=nextCount
-  if(button.getAttribute('aria-label')!==nextAria)button.setAttribute('aria-label',nextAria)
+  if(count&&count.textContent!==totalCount)count.textContent=totalCount
+  if(button.getAttribute('aria-label')!=='Open problems')button.setAttribute('aria-label','Open problems')
 }
 
 const observer=new MutationObserver(syncSectionLabel)
