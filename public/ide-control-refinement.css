@@ -55,8 +55,18 @@ body.hdlforge-ide-active .ide-page .ide-problem-navigation button:disabled{
   opacity:.32!important;
 }
 
+/* Keep the run control pinned inside the visible header at the top-right. */
 body.hdlforge-ide-active .ide-page .ide-actions{
+  position:absolute!important;
+  right:16px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  height:32px!important;
+  display:flex!important;
+  align-items:center!important;
   gap:0!important;
+  z-index:4!important;
 }
 
 body.hdlforge-ide-active .ide-page .ide-actions .solve-status{
@@ -64,10 +74,10 @@ body.hdlforge-ide-active .ide-page .ide-actions .solve-status{
 }
 
 body.hdlforge-ide-active .ide-page .ide-actions .primary{
-  width:48px!important;
-  min-width:48px!important;
-  height:42px!important;
-  min-height:42px!important;
+  width:34px!important;
+  min-width:34px!important;
+  height:32px!important;
+  min-height:32px!important;
   box-sizing:border-box!important;
   margin:0!important;
   padding:0!important;
@@ -90,8 +100,8 @@ body.hdlforge-ide-active .ide-page .ide-actions .primary svg{
 
 body.hdlforge-ide-active .ide-page .ide-actions .primary::after{
   content:""!important;
-  width:34px!important;
-  height:34px!important;
+  width:27px!important;
+  height:27px!important;
   display:block!important;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='15,10 51,32 15,54' fill='%2322c55e' stroke='%2322c55e' stroke-width='7' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
   background-repeat:no-repeat!important;
@@ -118,4 +128,10 @@ body.hdlforge-ide-active .ide-page .ide-actions .primary:disabled{
   box-shadow:none!important;
   opacity:.48!important;
   cursor:wait!important;
+}
+
+@media(max-width:720px){
+  body.hdlforge-ide-active .ide-page .ide-actions{right:8px!important}
+  body.hdlforge-ide-active .ide-page .ide-actions .primary{width:30px!important;min-width:30px!important}
+  body.hdlforge-ide-active .ide-page .ide-actions .primary::after{width:24px!important;height:24px!important}
 }
