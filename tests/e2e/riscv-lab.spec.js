@@ -44,7 +44,7 @@ test.describe('guided RV32I project',()=>{
   await page.getByRole('button',{name:/Next step/i}).click()
   await expect(page.getByRole('heading',{name:'Decode an instruction'})).toBeVisible()
   await page.reload()
-  await page.getByRole('button',{name:'Projects',exact:true}).click()
+  await page.locator('.desktop-nav').getByRole('button',{name:'Projects',exact:true}).click()
   await page.getByRole('button',{name:/Start building/i}).click()
   await expect(page.getByRole('heading',{name:'Decode an instruction'})).toBeVisible()
   await expect(page.locator('.lab-steps>button').first()).toHaveClass(/done/)
