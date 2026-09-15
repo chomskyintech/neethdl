@@ -22,7 +22,9 @@ async function openLab(page){
 }
 
 async function replaceCode(page,source){
- await page.locator('.monaco-editor .view-lines').click()
+ const input=page.locator('.monaco-editor textarea.inputarea').first()
+ await expect(input).toBeAttached()
+ await input.focus()
  await page.keyboard.press('Control+A')
  await page.keyboard.insertText(source)
 }
