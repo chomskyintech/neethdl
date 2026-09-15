@@ -1,7 +1,9 @@
 import acceleratorBenches from './acceleratorBenches'
+import expansionBenches from './expansionBenches'
 
 const extraBenches = {
   ...acceleratorBenches,
+  ...expansionBenches,
   'rtl-parity': `module tb; logic [7:0] data; logic parity; parity8 dut(.data(data),.parity(parity)); initial begin data=8'h00; #1; if(parity!==0) $fatal(1,"zero parity"); data=8'h01; #1; if(parity!==1) $fatal(1,"single one"); data=8'hA5; #1; if(parity!==0) $fatal(1,"even ones"); data=8'h7F; #1; if(parity!==1) $fatal(1,"seven ones"); $display("HDLFORGE_PASS"); $finish; end endmodule`,
   'rtl-saturating-counter': `module tb; logic clk=0,reset,enable,up; logic [3:0] count; saturating_counter #(.WIDTH(4)) dut(.clk(clk),.reset(reset),.enable(enable),.up(up),.count(count)); always #1 clk=~clk; initial begin reset=1;enable=0;up=1; @(posedge clk); #0.1; if(count!==0)$fatal(1,"reset"); reset=0;enable=1; repeat(20) @(posedge clk); #0.1; if(count!==4'hF)$fatal(1,"upper saturation"); up=0; repeat(20) @(posedge clk); #0.1; if(count!==0)$fatal(1,"lower saturation"); enable=0;up=1; @(posedge clk); #0.1; if(count!==0)$fatal(1,"hold"); $display("HDLFORGE_PASS");$finish;end endmodule`,
   'rtl-sequence-detector': `module tb; logic clk=0,reset,din,match; seq1011 dut(.clk(clk),.reset(reset),.din(din),.match(match)); always #1 clk=~clk; task bitin(input logic b); begin din=b; @(posedge clk); #0.1; end endtask initial begin reset=1;din=0;@(posedge clk);#0.1;if(match!==0)$fatal(1,"reset");reset=0;bitin(1);bitin(0);bitin(1);bitin(1);if(match!==1)$fatal(1,"first match");bitin(0);if(match!==0)$fatal(1,"pulse width");bitin(1);bitin(1);if(match!==1)$fatal(1,"overlap match");$display("HDLFORGE_PASS");$finish;end endmodule`,
