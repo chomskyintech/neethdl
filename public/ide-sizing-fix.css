@@ -1,0 +1,17 @@
+.hdlforge-ide-active .ide-topbar{
+  height:48px!important;
+  min-height:48px!important;
+  flex-basis:48px!important;
+  padding:0 16px!important;
+  margin-bottom:4px!important;
+}
+
+@media(max-width:720px){
+  .hdlforge-ide-active .ide-topbar{
+    height:52px!important;
+    min-height:52px!important;
+    flex-basis:52px!important;
+    padding:0 8px!important;
+    margin-bottom:4px!important;
+  }
+}
