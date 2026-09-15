@@ -10,6 +10,7 @@ const destinations=[
 ]
 
 const learningLinks=[
+ {href:'/practice/',title:'Structured hardware practice paths',description:'Follow focused Verilog, RTL, design verification, FPGA, protocol and computer architecture problem sequences.'},
  {href:'/problems/',title:'Hardware design practice problems',description:'Browse the complete crawlable RTL, FPGA, verification, protocol and architecture problem library.'},
  {href:'/companies/',title:'Company interview practice',description:'Prepare with company-style tracks for Jane Street, AMD, Arm, NVIDIA, Qualcomm and Apple.'},
  {href:'/projects/',title:'Hardware design projects',description:'Build portfolio projects in RTL, verification, FPGA, RISC-V, SoC and low-latency hardware.'},
