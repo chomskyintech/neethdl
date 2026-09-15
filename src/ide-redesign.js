@@ -1,10 +1,11 @@
+import problems from './data/activeProblems'
+
 let mounted = false
 let drawer = null
 let backdrop = null
 let topbarButton = null
 let searchInput = null
 let problemRows = []
-let problemsCache = null
 
 const categories = ['RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 
@@ -61,7 +62,7 @@ function createProblemRow(problem, solved){
   return button
 }
 
-function createDrawer(problems){
+function createDrawer(){
   const solved = new Set((()=>{try{return JSON.parse(localStorage.getItem('hdlforge-solved')||'[]')}catch{return []}})())
   drawer=document.createElement('aside')
   drawer.id='hdlforge-ide-drawer'
@@ -104,54 +105,43 @@ function createDrawer(problems){
   return drawer
 }
 
-function createTopbarButton(problemCount){
+function createTopbarButton(){
   const button=document.createElement('button')
   button.type='button'
   button.id='hdlforge-ide-problems-button'
   button.className='ide-topbar-problems'
   button.setAttribute('aria-label','Open problems')
-  button.innerHTML=`<span class="ide-topbar-problems-icon">▦</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count"></span>`
-  button.querySelector('.ide-topbar-problems-count').textContent=String(problemCount)
+  button.innerHTML=`<span class="ide-topbar-problems-icon">▦</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count">${problems.length}</span>`
   button.addEventListener('click',()=>drawer?.classList.contains('open')?closeDrawer():openDrawer())
   return button
 }
 
 function ensureTopbarButton(){
-  if(!problemsCache)return
   const topbar=document.querySelector('.ide-page .ide-topbar')
   if(!topbar)return
   const existing=topbar.querySelector('#hdlforge-ide-problems-button')
   if(existing){
     topbarButton=existing
-    existing.querySelector('.ide-topbar-problems-count').textContent=String(problemsCache.length)
     return
   }
-  topbarButton=createTopbarButton(problemsCache.length)
+  topbarButton=createTopbarButton()
   const brand=topbar.querySelector('.ide-brand')
   if(brand)brand.after(topbarButton)
   else topbar.prepend(topbarButton)
 }
 
-async function mount(){
+function mount(){
   if(!document.querySelector('.ide-page'))return
   document.body.classList.add('hdlforge-ide-active')
   if(mounted){ensureTopbarButton();return}
   mounted=true
-  const {default: problems}=await import('./data/activeProblems')
-  problemsCache=problems
-  if(!document.querySelector('.ide-page')){
-    mounted=false
-    problemsCache=null
-    document.body.classList.remove('hdlforge-ide-active')
-    return
-  }
   backdrop=document.createElement('button')
   backdrop.type='button'
   backdrop.id='hdlforge-ide-backdrop'
   backdrop.className='ide-drawer-backdrop'
   backdrop.setAttribute('aria-label','Close problem navigator')
   backdrop.addEventListener('click',closeDrawer)
-  document.body.append(backdrop,createDrawer(problems))
+  document.body.append(backdrop,createDrawer())
   ensureTopbarButton()
   updateActive()
 }
@@ -165,7 +155,6 @@ function unmount(){
   backdrop?.remove()
   topbarButton=drawer=backdrop=searchInput=null
   problemRows=[]
-  problemsCache=null
   document.body.classList.remove('hdlforge-ide-active','ide-drawer-open')
 }
 
