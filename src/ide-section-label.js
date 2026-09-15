@@ -14,12 +14,17 @@ function syncSectionLabel(){
 
   const label=button.querySelector('.ide-topbar-problems-label')
   const count=button.querySelector('.ide-topbar-problems-count')
-  if(label)label.textContent=problem.category
-  if(count)count.textContent=String(problems.filter(item=>item.category===problem.category).length)
-  button.setAttribute('aria-label',`Open ${problem.category} problems`)
+  const nextLabel=problem.category
+  const nextCount=String(problems.filter(item=>item.category===problem.category).length)
+  const nextAria=`Open ${problem.category} problems`
+
+  if(label&&label.textContent!==nextLabel)label.textContent=nextLabel
+  if(count&&count.textContent!==nextCount)count.textContent=nextCount
+  if(button.getAttribute('aria-label')!==nextAria)button.setAttribute('aria-label',nextAria)
 }
 
-new MutationObserver(syncSectionLabel).observe(document.documentElement,{childList:true,subtree:true})
+const observer=new MutationObserver(syncSectionLabel)
+observer.observe(document.documentElement,{childList:true,subtree:true})
 window.addEventListener('popstate',()=>window.setTimeout(syncSectionLabel,0))
 document.addEventListener('click',()=>window.setTimeout(syncSectionLabel,0))
 syncSectionLabel()
