@@ -4,13 +4,20 @@ const topPaneBorderStyle=document.createElement('style')
 topPaneBorderStyle.textContent=`
 .ide-topbar{border-color:transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 .ide-problem-navigation .section-navigation{display:none!important}
-.ide-problem-navigation button:not(.section-navigation){min-width:34px;padding:0 10px!important;font-size:18px!important;line-height:1!important}
-.ide-actions .ide-run-test{background:#22c55e!important;border-color:#22c55e!important;color:#06130a!important;box-shadow:0 7px 20px rgba(34,197,94,.22)!important;font-weight:800!important}
-.ide-actions .ide-run-test:hover:not(:disabled){background:#16a34a!important;border-color:#16a34a!important;color:#fff!important}
-.ide-actions .ide-run-test:disabled{opacity:.6!important;cursor:wait!important}
-.ide-actions .ide-result-indicator{width:30px;height:30px;min-width:30px;padding:0!important;display:grid!important;place-items:center!important;border-radius:7px!important;font-size:16px!important;line-height:1!important;font-weight:900!important}
-.ide-actions .ide-result-indicator.passed{color:#4ade80!important;border-color:rgba(74,222,128,.28)!important;background:rgba(34,197,94,.08)!important}
-.ide-actions .ide-result-indicator:not(.passed){color:#fb7185!important;border-color:rgba(251,113,133,.26)!important;background:rgba(244,63,94,.07)!important}
+.ide-problem-navigation button:first-child,
+.ide-problem-navigation button:last-child{min-width:34px;padding:0 10px!important;font-size:0!important;line-height:1!important}
+.ide-problem-navigation button:first-child::after{content:'<';font-size:18px;line-height:1}
+.ide-problem-navigation button:last-child::after{content:'>';font-size:18px;line-height:1}
+.ide-actions .primary{background:#22c55e!important;border-color:#22c55e!important;color:#06130a!important;box-shadow:0 7px 20px rgba(34,197,94,.22)!important;font-weight:800!important;font-size:0!important}
+.ide-actions .primary svg{display:none!important}
+.ide-actions .primary::after{content:'Run test';font-size:11px;line-height:1}
+.ide-actions .primary:hover:not(:disabled){background:#16a34a!important;border-color:#16a34a!important;color:#fff!important}
+.ide-actions .primary:disabled{opacity:.6!important;cursor:wait!important}
+.ide-actions .solve-status{width:30px;height:30px;min-width:30px;padding:0!important;display:grid!important;place-items:center!important;border-radius:7px!important;font-size:0!important;line-height:1!important;font-weight:900!important;color:#fb7185!important;border-color:rgba(251,113,133,.26)!important;background:rgba(244,63,94,.07)!important}
+.ide-actions .solve-status svg{display:none!important}
+.ide-actions .solve-status::after{content:'✕';font-size:16px;line-height:1}
+.ide-actions .solve-status.passed{color:#4ade80!important;border-color:rgba(74,222,128,.28)!important;background:rgba(34,197,94,.08)!important}
+.ide-actions .solve-status.passed::after{content:'✓'}
 `
 document.head.appendChild(topPaneBorderStyle)
 
@@ -54,7 +61,7 @@ function routeToProblem(id){
   if(window.location.pathname===target)return
   window.history.pushState({page:'problem',problemId:id},'',target)
   window.dispatchEvent(new PopStateEvent('popstate'))
-  window.setTimeout(()=>{ensureTopbarButton();syncCompactControls();updateActive()},0)
+  window.setTimeout(()=>{ensureTopbarButton();updateActive()},0)
 }
 
 function difficultyClass(difficulty=''){
@@ -144,51 +151,10 @@ function ensureTopbarButton(){
   else topbar.prepend(topbarButton)
 }
 
-function syncCompactControls(){
-  const nav=document.querySelector('.ide-page .ide-problem-navigation')
-  if(nav){
-    const buttons=[...nav.querySelectorAll('button')]
-    const previous=buttons[0]
-    const next=buttons.at(-1)
-    if(previous){
-      if(previous.textContent!=='<')previous.textContent='<'
-      if(previous.getAttribute('aria-label')!=='Previous')previous.setAttribute('aria-label','Previous')
-      previous.title='Previous problem'
-    }
-    if(next){
-      if(next.textContent!=='>')next.textContent='>'
-      if(next.getAttribute('aria-label')!=='Next')next.setAttribute('aria-label','Next')
-      next.title='Next problem'
-    }
-  }
-
-  const actions=document.querySelector('.ide-page .ide-actions')
-  if(!actions)return
-
-  const status=actions.querySelector('.solve-status')
-  if(status){
-    const passed=status.classList.contains('passed')
-    const symbol=passed?'✓':'✕'
-    const label=passed?'Tests passed':'Tests not passed'
-    status.classList.add('ide-result-indicator')
-    if(status.textContent!==symbol)status.textContent=symbol
-    if(status.getAttribute('aria-label')!==label)status.setAttribute('aria-label',label)
-    status.title=label
-  }
-
-  const runButton=actions.querySelector('button.primary')
-  if(runButton){
-    runButton.classList.add('ide-run-test')
-    if(runButton.textContent.trim()!=='Run test')runButton.textContent='Run test'
-    if(runButton.getAttribute('aria-label')!=='Run tests')runButton.setAttribute('aria-label','Run tests')
-    runButton.title='Run test'
-  }
-}
-
 function mount(){
   if(!document.querySelector('.ide-page'))return
   document.body.classList.add('hdlforge-ide-active')
-  if(mounted){ensureTopbarButton();syncCompactControls();return}
+  if(mounted){ensureTopbarButton();return}
   mounted=true
   backdrop=document.createElement('button')
   backdrop.type='button'
@@ -198,7 +164,6 @@ function mount(){
   backdrop.addEventListener('click',closeDrawer)
   document.body.append(backdrop,createDrawer())
   ensureTopbarButton()
-  syncCompactControls()
   updateActive()
 }
 
@@ -220,8 +185,8 @@ function sync(){
 }
 
 new MutationObserver(sync).observe(document.documentElement,{childList:true,subtree:true})
-window.addEventListener('popstate',()=>window.setTimeout(()=>{ensureTopbarButton();syncCompactControls();updateActive()},0))
-document.addEventListener('click',()=>window.setTimeout(()=>{sync();ensureTopbarButton();syncCompactControls();updateActive()},0))
+window.addEventListener('popstate',()=>window.setTimeout(()=>{ensureTopbarButton();updateActive()},0))
+document.addEventListener('click',()=>window.setTimeout(()=>{sync();ensureTopbarButton();updateActive()},0))
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape')closeDrawer()
   if((event.key==='p'||event.key==='P')&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&document.body.classList.contains('hdlforge-ide-active')){
