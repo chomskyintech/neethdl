@@ -18,6 +18,10 @@ topPaneBorderStyle.textContent=`
 .ide-actions .solve-status::after{content:'✕';font-size:16px;line-height:1}
 .ide-actions .solve-status.passed{color:#4ade80!important;border-color:rgba(74,222,128,.28)!important;background:rgba(34,197,94,.08)!important}
 .ide-actions .solve-status.passed::after{content:'✓'}
+.ide-topbar-signin{position:absolute;right:16px;top:50%;transform:translateY(-50%);height:32px;display:inline-flex;align-items:center;gap:7px;padding:0 4px;border:0;border-radius:0;background:transparent;color:#9aa7b7;font-size:13px;font-weight:700;cursor:pointer;z-index:80}
+.ide-topbar-signin:hover{color:#eef4fb;background:transparent}
+.ide-topbar-signin svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:720px){.ide-topbar-signin{right:8px;width:32px;padding:0;justify-content:center}.ide-topbar-signin span{display:none}}
 `
 document.head.appendChild(topPaneBorderStyle)
 
@@ -25,6 +29,7 @@ let mounted = false
 let drawer = null
 let backdrop = null
 let topbarButton = null
+let signInButton = null
 let searchInput = null
 let problemRows = []
 
@@ -61,7 +66,7 @@ function routeToProblem(id){
   if(window.location.pathname===target)return
   window.history.pushState({page:'problem',problemId:id},'',target)
   window.dispatchEvent(new PopStateEvent('popstate'))
-  window.setTimeout(()=>{ensureTopbarButton();updateActive()},0)
+  window.setTimeout(()=>{ensureTopbarButton();ensureSignInButton();updateActive()},0)
 }
 
 function difficultyClass(difficulty=''){
@@ -132,8 +137,20 @@ function createTopbarButton(){
   button.id='hdlforge-ide-problems-button'
   button.className='ide-topbar-problems'
   button.setAttribute('aria-label','Open problems')
-  button.innerHTML=`<span class="ide-topbar-problems-icon">▦</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count">${problems.length}</span>`
+  button.innerHTML=`<span class="ide-topbar-problems-icon">☰</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count">${problems.length}</span>`
   button.addEventListener('click',()=>drawer?.classList.contains('open')?closeDrawer():openDrawer())
+  return button
+}
+
+function createSignInButton(){
+  const button=document.createElement('button')
+  button.type='button'
+  button.id='hdlforge-ide-signin'
+  button.className='ide-topbar-signin'
+  button.setAttribute('aria-label','Sign in')
+  button.title='Sign in'
+  button.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 20c.8-4 3-6 6.5-6s5.7 2 6.5 6"></path></svg><span>Sign in</span>`
+  button.addEventListener('click',()=>document.querySelector('.app>.nav .profile')?.click())
   return button
 }
 
@@ -151,10 +168,19 @@ function ensureTopbarButton(){
   else topbar.prepend(topbarButton)
 }
 
+function ensureSignInButton(){
+  const topbar=document.querySelector('.ide-page .ide-topbar')
+  if(!topbar)return
+  const existing=topbar.querySelector('#hdlforge-ide-signin')
+  if(existing){signInButton=existing;return}
+  signInButton=createSignInButton()
+  topbar.appendChild(signInButton)
+}
+
 function mount(){
   if(!document.querySelector('.ide-page'))return
   document.body.classList.add('hdlforge-ide-active')
-  if(mounted){ensureTopbarButton();return}
+  if(mounted){ensureTopbarButton();ensureSignInButton();return}
   mounted=true
   backdrop=document.createElement('button')
   backdrop.type='button'
@@ -164,6 +190,7 @@ function mount(){
   backdrop.addEventListener('click',closeDrawer)
   document.body.append(backdrop,createDrawer())
   ensureTopbarButton()
+  ensureSignInButton()
   updateActive()
 }
 
@@ -172,9 +199,10 @@ function unmount(){
   mounted=false
   closeDrawer()
   topbarButton?.remove()
+  signInButton?.remove()
   drawer?.remove()
   backdrop?.remove()
-  topbarButton=drawer=backdrop=searchInput=null
+  topbarButton=signInButton=drawer=backdrop=searchInput=null
   problemRows=[]
   document.body.classList.remove('hdlforge-ide-active','ide-drawer-open')
 }
@@ -185,8 +213,8 @@ function sync(){
 }
 
 new MutationObserver(sync).observe(document.documentElement,{childList:true,subtree:true})
-window.addEventListener('popstate',()=>window.setTimeout(()=>{ensureTopbarButton();updateActive()},0))
-document.addEventListener('click',()=>window.setTimeout(()=>{sync();ensureTopbarButton();updateActive()},0))
+window.addEventListener('popstate',()=>window.setTimeout(()=>{ensureTopbarButton();ensureSignInButton();updateActive()},0))
+document.addEventListener('click',()=>window.setTimeout(()=>{sync();ensureTopbarButton();ensureSignInButton();updateActive()},0))
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape')closeDrawer()
   if((event.key==='p'||event.key==='P')&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&document.body.classList.contains('hdlforge-ide-active')){
