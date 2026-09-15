@@ -33,6 +33,7 @@ try{
  await runGenerator('generate-practice-pages.mjs')
  await runGenerator('enrich-seo.mjs')
  await runGenerator('generate-accelerator-seo.mjs')
+ await runGenerator('generate-intent-guides.mjs')
 
  fs.writeFileSync(problemFile,originalProblems)
  fs.writeFileSync(acceleratorFile,originalAccelerators)
