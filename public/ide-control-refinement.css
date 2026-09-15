@@ -244,3 +244,265 @@ body.hdlforge-ide-active .ide-page .console-empty{
     margin-bottom:2px!important;
   }
 }
+
+/* Final approved mockup alignment. */
+body.hdlforge-ide-active .ide-page .ide-brand strong{
+  font-size:20px!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar-problems{
+  gap:10px!important;
+  padding-left:5px!important;
+  padding-right:5px!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar-problems-label{
+  font-size:17px!important;
+  font-weight:800!important;
+  letter-spacing:-.015em!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar-problems-count{
+  font-size:11px!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar-problems-icon{
+  width:17px!important;
+  height:14px!important;
+  flex:0 0 17px!important;
+  display:block!important;
+  font-size:0!important;
+  color:transparent!important;
+  background:
+    linear-gradient(#54d6ff,#54d6ff) 0 0/17px 2px no-repeat,
+    linear-gradient(#54d6ff,#54d6ff) 0 6px/17px 2px no-repeat,
+    linear-gradient(#54d6ff,#54d6ff) 0 12px/17px 2px no-repeat!important;
+}
+
+/* Surface the real account control in the otherwise hidden IDE nav. */
+body.hdlforge-ide-active>.app>.nav{
+  display:block!important;
+  position:fixed!important;
+  inset:0 0 auto 0!important;
+  width:100%!important;
+  height:0!important;
+  min-height:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  pointer-events:none!important;
+  z-index:150!important;
+}
+body.hdlforge-ide-active>.app>.nav>.nav-inner{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  height:0!important;
+  min-height:0!important;
+  padding:0!important;
+  margin:0!important;
+}
+body.hdlforge-ide-active>.app>.nav>.nav-inner>*:not(.profile){
+  display:none!important;
+}
+body.hdlforge-ide-active>.app>.nav .profile{
+  position:fixed!important;
+  top:8px!important;
+  right:16px!important;
+  z-index:151!important;
+  height:32px!important;
+  min-height:32px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  margin:0!important;
+  padding:0 4px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#9aa7b7!important;
+  font-size:13px!important;
+  font-weight:700!important;
+  pointer-events:auto!important;
+}
+body.hdlforge-ide-active>.app>.nav .profile:hover{
+  background:transparent!important;
+  color:#eef4fb!important;
+}
+
+/* Active controls use a simple underline rather than a filled button block. */
+body.hdlforge-ide-active .ide-page .problem-tabs button{
+  font-size:14px!important;
+  font-weight:780!important;
+}
+body.hdlforge-ide-active .ide-page .problem-tabs button:hover{
+  background:transparent!important;
+  color:#d9e2ec!important;
+}
+body.hdlforge-ide-active .ide-page .problem-tabs button.active{
+  color:#fff!important;
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:inset 0 -2px 0 #31977f!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs button.active{
+  background:transparent!important;
+  border-bottom-color:#31977f!important;
+}
+
+/* Match the larger statement typography from the approved mockup. */
+body.hdlforge-ide-active .ide-page .problem-heading h1{
+  font-size:27px!important;
+  line-height:1.15!important;
+  font-weight:850!important;
+  letter-spacing:-.03em!important;
+}
+body.hdlforge-ide-active .ide-page .problem-category{
+  margin-top:14px!important;
+  font-size:13px!important;
+  letter-spacing:.04em!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section h2,
+body.hdlforge-ide-active .ide-page .content-card h2{
+  font-size:14px!important;
+  font-weight:850!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section p,
+body.hdlforge-ide-active .ide-page .content-card p{
+  font-size:17px!important;
+  line-height:1.62!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section ul{
+  font-size:16px!important;
+  line-height:1.7!important;
+}
+body.hdlforge-ide-active .ide-page .examples span{
+  font-size:13px!important;
+}
+body.hdlforge-ide-active .ide-page .examples pre,
+body.hdlforge-ide-active .ide-page .solution-code{
+  font-size:14px!important;
+}
+
+/* Replace solution.sv with a functional, borderless language selector integrated into the file bar. */
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .file-tab{
+  display:none!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language){
+  align-items:center!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language{
+  position:relative!important;
+  order:1!important;
+  height:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  margin-left:0!important;
+  padding:0 0 0 18px!important;
+  box-shadow:inset 0 -2px 0 #31977f!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language::before{
+  content:"</>";
+  margin-right:9px;
+  color:#67d5ff;
+  font:700 14px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:-.08em;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language::after{
+  content:"⌄";
+  position:absolute;
+  right:4px;
+  top:50%;
+  transform:translateY(-53%);
+  color:#7f8b9a;
+  font-size:15px;
+  line-height:1;
+  pointer-events:none;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  height:100%!important;
+  min-height:100%!important;
+  padding:0 25px 0 0!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#eef4fb!important;
+  font-size:15px!important;
+  font-weight:750!important;
+  cursor:pointer!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .icon-btn{
+  order:2!important;
+  margin-left:auto!important;
+  margin-right:10px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .icon-btn:hover{
+  background:rgba(255,255,255,.035)!important;
+  color:#eef4fb!important;
+}
+body.hdlforge-ide-active .ide-page .file-tab.active{
+  background:transparent!important;
+  border-right:0!important;
+  box-shadow:inset 0 -2px 0 #31977f!important;
+}
+body.hdlforge-ide-active .ide-page .editor-toolbar{
+  font-size:12px!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs button,
+body.hdlforge-ide-active .ide-page .console,
+body.hdlforge-ide-active .ide-page .testbench-info,
+body.hdlforge-ide-active .ide-page .console-empty{
+  font-size:14px!important;
+}
+
+/* Round the play glyph itself and mute it; keep the button container invisible. */
+.ide-console-run-proxy{
+  width:34px!important;
+  min-width:34px!important;
+  height:34px!important;
+  min-height:34px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.ide-console-run-proxy::after{
+  content:""!important;
+  width:25px!important;
+  height:25px!important;
+  margin-left:2px!important;
+  border:0!important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18 12 Q18 8 22 10 L50 28 Q55 32 50 36 L22 54 Q18 56 18 52 Z' fill='%235f9d72'/%3E%3C/svg%3E")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  filter:drop-shadow(0 1px 3px rgba(70,125,86,.16))!important;
+  opacity:.9!important;
+  transition:transform .14s ease,filter .14s ease,opacity .14s ease!important;
+}
+.ide-console-run-proxy:hover:not(:disabled){
+  background:transparent!important;
+}
+.ide-console-run-proxy:hover:not(:disabled)::after{
+  transform:scale(1.06)!important;
+  filter:drop-shadow(0 2px 4px rgba(70,125,86,.24))!important;
+  opacity:1!important;
+}
+
+@media(max-width:720px){
+  body.hdlforge-ide-active>.app>.nav .profile{
+    top:10px!important;
+    right:10px!important;
+    width:32px!important;
+    padding:0!important;
+    justify-content:center!important;
+  }
+  body.hdlforge-ide-active>.app>.nav .profile span{
+    display:none!important;
+  }
+}
