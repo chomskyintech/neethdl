@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useRef,useState} from 'react'
+import React,{lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
 import {ChevronRight,Filter,Flame,Sparkles,Search,UserCircle,Zap}from'lucide-react'
 import {createRoot} from 'react-dom/client'
 import './styles.css'
@@ -10,16 +10,16 @@ import './courses.css'
 import './riscv-lab.css'
 import './lockedEditor.js'
 import problems from './data/activeProblems'
-import ProblemIDE from './ProblemIDE'
-import Tracks from './Tracks'
-import AccountModal from './AccountModal'
 import LandingHub from './LandingHub'
-import Projects from './Projects'
-import Courses from './Courses'
-import InterviewMode from './InterviewMode'
-import RiscvCoreLab from './RiscvCoreLab'
 import {addActivityDay,calculatePoints,calculateStreak,topicProgress} from './progressTracking'
-import {initializeAuth,loadCloudProfile,mergeProfiles,saveCloudProfile,watchAuth} from './cloudProfile'
+
+const ProblemIDE=lazy(()=>import('./ProblemIDE'))
+const Tracks=lazy(()=>import('./Tracks'))
+const AccountModal=lazy(()=>import('./AccountModal'))
+const Projects=lazy(()=>import('./Projects'))
+const Courses=lazy(()=>import('./Courses'))
+const InterviewMode=lazy(()=>import('./InterviewMode'))
+const RiscvCoreLab=lazy(()=>import('./RiscvCoreLab'))
 
 const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
@@ -51,6 +51,7 @@ function routeFromLocation(){
  for(const [page,target] of Object.entries(appPaths))if(normalizePath(target)===path)return {page,problem:null}
  return {page:'home',problem:null}
 }
+function RouteLoading(){return <div role="status" aria-live="polite" style={{padding:'48px 24px',color:'var(--muted)'}}>Loading HDLForge…</div>}
 
 function App(){
  const initialRoute=useRef(routeFromLocation()).current
@@ -88,9 +89,12 @@ function App(){
  },[page,selected?.id])
 
  useEffect(()=>{
-  let active=true
-  initializeAuth().then(current=>{if(active)setUser(current)})
-  const stop=watchAuth(current=>{if(!active)return;setUser(current);setCloudReady(false);if(!current)setSyncStatus('Local only')})
+  let active=true,stop=()=>{}
+  import('./cloudProfile').then(({initializeAuth,watchAuth})=>{
+   if(!active)return
+   initializeAuth().then(current=>{if(active)setUser(current)})
+   stop=watchAuth(current=>{if(!active)return;setUser(current);setCloudReady(false);if(!current)setSyncStatus('Local only')})
+  }).catch(()=>{if(active)setSyncStatus('Local only')})
   return()=>{active=false;stop?.()}
  },[])
 
@@ -98,13 +102,13 @@ function App(){
   if(!user){setCloudReady(false);return}
   let cancelled=false
   setSyncStatus('Syncing…')
-  loadCloudProfile().then(cloud=>{
+  import('./cloudProfile').then(({loadCloudProfile,mergeProfiles})=>loadCloudProfile().then(cloud=>{
    if(cancelled)return
    const merged=mergeProfiles({solved,drafts,draftUpdatedAt,activityDays},cloud)
    setSolved(merged.solved);setDrafts(merged.drafts);setDraftUpdatedAt(merged.draftUpdatedAt);setActivityDays(merged.activityDays)
    localStorage.setItem('hdlforge-solved',JSON.stringify(merged.solved));localStorage.setItem('hdlforge-drafts',JSON.stringify(merged.drafts));localStorage.setItem('hdlforge-draft-updated-at',JSON.stringify(merged.draftUpdatedAt));localStorage.setItem('hdlforge-activity-days',JSON.stringify(merged.activityDays));localStorage.setItem('hdlforge-cloud-user',user.id)
    setCloudReady(true);setSyncStatus('Synced')
-  }).catch(()=>{if(!cancelled){setCloudReady(false);setSyncStatus('Offline · saved locally')}})
+  })).catch(()=>{if(!cancelled){setCloudReady(false);setSyncStatus('Offline · saved locally')}})
   return()=>{cancelled=true}
  },[user?.id])
 
@@ -113,13 +117,13 @@ function App(){
   clearTimeout(syncTimer.current)
   syncTimer.current=setTimeout(()=>{
    setSyncStatus('Syncing…')
-   saveCloudProfile({solved,drafts,draftUpdatedAt,activityDays}).then(()=>setSyncStatus('Synced')).catch(()=>setSyncStatus('Offline · saved locally'))
+   import('./cloudProfile').then(({saveCloudProfile})=>saveCloudProfile({solved,drafts,draftUpdatedAt,activityDays})).then(()=>setSyncStatus('Synced')).catch(()=>setSyncStatus('Offline · saved locally'))
   },700)
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
  const profileLabel=user?(user.name||user.email||'Account').trim().slice(0,2).toUpperCase():'Sign in'
- return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='interview'?'active':''} onClick={()=>go('interview')}>Interview</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main">
+ return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='interview'?'active':''} onClick={()=>go('interview')}>Interview</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>} 
@@ -129,7 +133,7 @@ function App(){
  {page==='riscv-project'&&<RiscvCoreLab onExit={()=>go('projects')}/>}
  {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
  {page==='progress'&&<Progress problems={problems} solved={solved} onOpen={openProblem} points={points} streak={streak} topicStats={topicStats}/>} 
- </main></div><AccountModal open={accountOpen} user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></div>
+ </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
 function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen}){return <div><div className="page-head"><div className="eyebrow">PROBLEM SET</div><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Choose a section or use the filters below.</p></div><div className="problem-sections"><button className={category==='All'?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory('All')}>All · {allProblems.length}</button>{categories.slice(1).map(c=><button key={c} className={category===c?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory(c)}>{c} · {allProblems.filter(p=>p.category===c).length}</button>)}</div><div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div><div className="problem-list">{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div></div>}
