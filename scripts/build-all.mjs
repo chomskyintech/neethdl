@@ -7,11 +7,13 @@ const problemFile=path.join(root,'src/data/problems.json')
 const acceleratorFile=path.join(root,'src/data/acceleratorProblems.json')
 const expansionFile=path.join(root,'src/data/expansionProblems.json')
 const originalProblems=fs.readFileSync(problemFile,'utf8')
+const originalAccelerators=fs.readFileSync(acceleratorFile,'utf8')
 const baseProblems=JSON.parse(originalProblems)
-const acceleratorProblems=JSON.parse(fs.readFileSync(acceleratorFile,'utf8'))
+const acceleratorProblems=JSON.parse(originalAccelerators)
 const expansionProblems=JSON.parse(fs.readFileSync(expansionFile,'utf8'))
 const codingProblems=baseProblems.filter(problem=>problem.evaluation?.type!=='answer')
 const activeProblems=[...codingProblems,...acceleratorProblems,...expansionProblems]
+const allAccelerators=activeProblems.filter(problem=>problem.category==='Accelerators')
 const removedCount=baseProblems.length-codingProblems.length
 
 async function runGenerator(name){
@@ -19,9 +21,11 @@ async function runGenerator(name){
 }
 
 try{
- // Existing SEO generators read problems.json directly. Give them the exact active,
- // coding-only catalog used by the interactive app, then restore the source file.
+ // Legacy SEO generators read problems.json (and the accelerator generator reads
+ // acceleratorProblems.json) directly. Temporarily expose the complete coding-only
+ // catalogs to those generators, then restore source data BEFORE Vite bundles the app.
  fs.writeFileSync(problemFile,JSON.stringify(activeProblems,null,2)+'\n')
+ fs.writeFileSync(acceleratorFile,JSON.stringify(allAccelerators,null,2)+'\n')
 
  await runGenerator('generate-seo.mjs')
  await runGenerator('generate-crawl-hubs.mjs')
@@ -30,8 +34,12 @@ try{
  await runGenerator('enrich-seo.mjs')
  await runGenerator('generate-accelerator-seo.mjs')
 
+ fs.writeFileSync(problemFile,originalProblems)
+ fs.writeFileSync(acceleratorFile,originalAccelerators)
+
  await build()
- console.log(`Built HDLForge with ${activeProblems.length} coding problems; removed ${removedCount} theory-only problems, including ${acceleratorProblems.length + expansionProblems.filter(p=>p.category==='Accelerators').length} accelerator problems.`)
+ console.log(`Built HDLForge with ${activeProblems.length} coding problems; removed ${removedCount} theory-only problems, including ${allAccelerators.length} accelerator problems.`)
 } finally {
  fs.writeFileSync(problemFile,originalProblems)
+ fs.writeFileSync(acceleratorFile,originalAccelerators)
 }
