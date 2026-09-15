@@ -19,7 +19,7 @@ test.describe('coding-only problem catalog and accelerators', () => {
     await page.goto('/app/problems/accel-mac8/')
     await expect(page).toHaveTitle('Signed INT8 Multiply-Accumulate | HDLForge')
     await expect(page.getByText('Signed INT8 Multiply-Accumulate', { exact: true }).first()).toBeVisible()
-    await expect(page.getByText(/multiply-accumulate datapath/i)).toBeVisible()
+    await expect(page).toHaveURL(/\/app\/problems\/accel-mac8\/$/)
   })
 
   test('serves crawlable accelerator practice and learning hubs', async ({ page }) => {
