@@ -71,10 +71,11 @@ function ensureRunProxy() {
   }
 
   runProxy.style.display = 'grid'
-  runProxy.disabled = original.disabled
+  if (runProxy.disabled !== original.disabled) runProxy.disabled = original.disabled
   const conceptual = /evaluate/i.test(original.textContent || '')
-  runProxy.setAttribute('aria-label', conceptual ? 'Evaluate' : 'Run tests')
-  runProxy.title = conceptual ? 'Evaluate' : 'Run tests'
+  const label = conceptual ? 'Evaluate' : 'Run tests'
+  if (runProxy.getAttribute('aria-label') !== label) runProxy.setAttribute('aria-label', label)
+  if (runProxy.title !== label) runProxy.title = label
   positionRunProxy()
 }
 
@@ -136,12 +137,13 @@ document.addEventListener('pointercancel', stopDragging)
 
 new MutationObserver(mutations => {
   for (const mutation of mutations) {
+    if (mutation.target === runProxy) continue
     if (mutation.type === 'attributes' && mutation.target.classList?.contains('ide-bottom')) {
       syncPanel(mutation.target)
     }
   }
   syncCurrentPanel()
-}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'disabled'] })
+}).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] })
 
 window.addEventListener('resize', () => {
   syncCurrentPanel()
