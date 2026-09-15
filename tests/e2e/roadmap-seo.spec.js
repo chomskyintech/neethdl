@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('HDLForge navigation and SEO content', () => {
   test('landing page is a clean hub without problem rows', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: /Prepare for hardware roles/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Hardware design practice for RTL, FPGA & verification roles/i })).toBeVisible()
     const destinations = page.locator('.destination-card')
     await expect(destinations).toHaveCount(5)
     await expect(destinations.getByText('Problems', { exact: true })).toBeVisible()
@@ -25,7 +25,7 @@ test.describe('HDLForge navigation and SEO content', () => {
   test('Projects page groups portfolio projects by hardware role', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Projects', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Projects for hardware roles' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Hardware design projects' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Design Verification' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'RTL / Digital Design' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'FPGA', exact: true })).toBeVisible()
