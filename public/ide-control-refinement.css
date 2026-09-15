@@ -135,15 +135,21 @@ body.ide-console-resizing *{
   user-select:none!important;
 }
 
-/* Replace the old text Collapse button with its chevron beside Console. */
+/* NeetCode-like console header: collapse chevron first, then Console. */
 body.hdlforge-ide-active .ide-page .bottom-tabs>button{order:3}
-body.hdlforge-ide-active .ide-page .bottom-tabs>button:first-child{order:1}
-body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse{
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:first-child{
   order:2;
-  width:24px!important;
-  min-width:24px!important;
+  gap:0!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:first-child>svg{
+  display:none!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse{
+  order:1;
+  width:26px!important;
+  min-width:26px!important;
   height:28px!important;
-  margin:0 6px 0 -5px!important;
+  margin:0 2px 0 0!important;
   padding:0!important;
   display:grid!important;
   place-items:center!important;
@@ -151,7 +157,7 @@ body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse{
   border:0!important;
   border-radius:5px!important;
   background:transparent!important;
-  color:#7f8da1!important;
+  color:#8c9bad!important;
   font-size:0!important;
   box-shadow:none!important;
 }
@@ -160,8 +166,63 @@ body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse:hover{
   color:#eef4fb!important;
 }
 body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse svg{
-  width:14px!important;
-  height:14px!important;
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+}
+
+/* Reclaim unused header height so the Problem and Editor cards start higher. */
+body.hdlforge-ide-active .ide-page{
+  padding-top:4px!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar{
+  height:42px!important;
+  min-height:42px!important;
+  flex-basis:42px!important;
+  margin-bottom:2px!important;
+  padding-top:0!important;
+  padding-bottom:0!important;
+}
+
+/* Larger, NeetCode-like interface typography. */
+body.hdlforge-ide-active .ide-page .problem-tabs button{
+  font-size:12px!important;
+  font-weight:750!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section h2,
+body.hdlforge-ide-active .ide-page .content-card h2{
+  font-size:12px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section p,
+body.hdlforge-ide-active .ide-page .content-card p,
+body.hdlforge-ide-active .ide-page .problem-section ul{
+  font-size:14.5px!important;
+  line-height:1.7!important;
+}
+body.hdlforge-ide-active .ide-page .examples span{
+  font-size:10px!important;
+}
+body.hdlforge-ide-active .ide-page .examples pre,
+body.hdlforge-ide-active .ide-page .solution-code{
+  font-size:12.5px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tab{
+  font-size:12.5px!important;
+}
+body.hdlforge-ide-active .ide-page .editor-language select{
+  font-size:11.5px!important;
+}
+body.hdlforge-ide-active .ide-page .editor-toolbar{
+  font-size:10.5px!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs button{
+  font-size:12.5px!important;
+  font-weight:750!important;
+}
+body.hdlforge-ide-active .ide-page .console,
+body.hdlforge-ide-active .ide-page .testbench-info,
+body.hdlforge-ide-active .ide-page .console-empty{
+  font-size:12.5px!important;
 }
 
 @media(max-width:720px){
@@ -175,5 +236,11 @@ body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse svg{
     border-top-width:8px;
     border-bottom-width:8px;
     border-left-width:14px;
+  }
+  body.hdlforge-ide-active .ide-page .ide-topbar{
+    height:46px!important;
+    min-height:46px!important;
+    flex-basis:46px!important;
+    margin-bottom:2px!important;
   }
 }
