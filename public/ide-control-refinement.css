@@ -1,7 +1,4 @@
-/* Compact IDE controls: borderless problem navigation plus a NeetCode-style
-   draggable console header with an icon-only collapse affordance and run action. */
-
-:root{--ide-console-height:188px}
+/* Compact IDE controls: borderless problem navigation plus a NeetCode-style draggable console header. */
 
 body.hdlforge-ide-active .ide-page .ide-problem-navigation{
   height:38px!important;
@@ -43,7 +40,6 @@ body.hdlforge-ide-active .ide-page .ide-problem-navigation button:last-child::af
   font-size:25px!important;
   font-weight:700!important;
   font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
-  transform:none!important;
 }
 
 body.hdlforge-ide-active .ide-page .ide-problem-navigation button:first-child:hover:not(:disabled),
@@ -57,81 +53,54 @@ body.hdlforge-ide-active .ide-page .ide-problem-navigation button:disabled{
   opacity:.32!important;
 }
 
-/* The pass/fail state belongs in the console, not the header. */
-body.hdlforge-ide-active .ide-page .ide-actions .solve-status{
+/* Keep pass/fail feedback in the console. The React run button remains mounted for logic only. */
+body.hdlforge-ide-active .ide-page .ide-actions .solve-status,
+body.hdlforge-ide-active .ide-page .ide-actions .primary{
   display:none!important;
 }
-
-/* Keep the React-owned run button intact, but visually position it in the
-   console header. --ide-console-height is updated while the panel is dragged. */
 body.hdlforge-ide-active .ide-page .ide-actions{
   width:0!important;
   height:0!important;
   margin-left:auto!important;
-  overflow:visible!important;
 }
 
-body.hdlforge-ide-active .ide-page .ide-actions .primary{
-  position:fixed!important;
-  right:24px!important;
-  bottom:calc(var(--ide-console-height) - 23px)!important;
-  z-index:80!important;
-  width:30px!important;
-  min-width:30px!important;
-  height:30px!important;
-  min-height:30px!important;
-  box-sizing:border-box!important;
-  margin:0!important;
-  padding:0!important;
-  display:grid!important;
-  place-items:center!important;
-  border:0!important;
-  border-radius:6px!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  color:transparent!important;
-  font-size:0!important;
-  line-height:0!important;
-  overflow:visible!important;
+/* Console-bound play control positioned by console-panel-resize.js. */
+.ide-console-run-proxy{
+  position:fixed;
+  z-index:90;
+  width:30px;
+  min-width:30px;
+  height:30px;
+  min-height:30px;
+  box-sizing:border-box;
+  padding:0;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:6px;
+  background:transparent;
+  box-shadow:none;
+  cursor:pointer;
 }
-
-body.hdlforge-ide-active .ide-page .ide-actions .primary svg{
-  display:none!important;
+.ide-console-run-proxy::after{
+  content:"";
+  width:0;
+  height:0;
+  margin-left:3px;
+  border-top:9px solid transparent;
+  border-bottom:9px solid transparent;
+  border-left:16px solid #22c55e;
+  filter:drop-shadow(0 2px 5px rgba(34,197,94,.28));
+  transition:transform .14s ease,filter .14s ease;
 }
-
-body.hdlforge-ide-active .ide-page .ide-actions .primary::after{
-  content:""!important;
-  width:23px!important;
-  height:23px!important;
-  display:block!important;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='15,10 51,32 15,54' fill='%2322c55e' stroke='%2322c55e' stroke-width='7' stroke-linejoin='round'/%3E%3C/svg%3E")!important;
-  background-repeat:no-repeat!important;
-  background-position:center!important;
-  background-size:contain!important;
-  filter:drop-shadow(0 2px 6px rgba(34,197,94,.24))!important;
-  transition:transform .14s ease,filter .14s ease!important;
+.ide-console-run-proxy:hover:not(:disabled){background:rgba(34,197,94,.08)}
+.ide-console-run-proxy:hover:not(:disabled)::after{
+  transform:scale(1.07);
+  filter:drop-shadow(0 3px 6px rgba(34,197,94,.36));
 }
+.ide-console-run-proxy:disabled{opacity:.45;cursor:wait}
 
-body.hdlforge-ide-active .ide-page .ide-actions .primary:hover:not(:disabled){
-  border:0!important;
-  background:rgba(34,197,94,.08)!important;
-  box-shadow:none!important;
-}
-
-body.hdlforge-ide-active .ide-page .ide-actions .primary:hover:not(:disabled)::after{
-  transform:scale(1.07)!important;
-  filter:drop-shadow(0 3px 7px rgba(34,197,94,.34)) brightness(1.06)!important;
-}
-
-body.hdlforge-ide-active .ide-page .ide-actions .primary:disabled{
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  opacity:.45!important;
-  cursor:wait!important;
-}
-
-/* The top few pixels of the console are the drag handle. */
+/* The top edge of the console is draggable. */
 body.hdlforge-ide-active .ide-page .ide-bottom::before{
   content:"";
   position:absolute;
@@ -142,21 +111,15 @@ body.hdlforge-ide-active .ide-page .ide-bottom::before{
   z-index:10;
   cursor:row-resize;
 }
-
 body.ide-console-resizing,
 body.ide-console-resizing *{
   cursor:row-resize!important;
   user-select:none!important;
 }
 
-/* Put the existing collapse chevron immediately beside Console and remove
-   the old text/button treatment. */
-body.hdlforge-ide-active .ide-page .bottom-tabs>button{
-  order:3;
-}
-body.hdlforge-ide-active .ide-page .bottom-tabs>button:first-child{
-  order:1;
-}
+/* Replace the old text Collapse button with its chevron beside Console. */
+body.hdlforge-ide-active .ide-page .bottom-tabs>button{order:3}
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:first-child{order:1}
 body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse{
   order:2;
   width:24px!important;
@@ -184,15 +147,15 @@ body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse svg{
 }
 
 @media(max-width:720px){
-  body.hdlforge-ide-active .ide-page .ide-actions .primary{
-    right:16px!important;
-    width:28px!important;
-    min-width:28px!important;
-    height:28px!important;
-    min-height:28px!important;
+  .ide-console-run-proxy{
+    width:28px;
+    min-width:28px;
+    height:28px;
+    min-height:28px;
   }
-  body.hdlforge-ide-active .ide-page .ide-actions .primary::after{
-    width:21px!important;
-    height:21px!important;
+  .ide-console-run-proxy::after{
+    border-top-width:8px;
+    border-bottom-width:8px;
+    border-left-width:14px;
   }
 }
