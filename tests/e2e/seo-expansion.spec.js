@@ -7,11 +7,25 @@ test.describe('HDLForge generated SEO coverage',()=>{
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hdlforge.netlify.app/problems/sv-packed-arrays/')
   const structured=await page.locator('script[type="application/ld+json"]').textContent()
   expect(structured).toContain('BreadcrumbList')
+  await expect(page.getByRole('heading',{name:'What this problem is testing'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Verification plan'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Common mistakes'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Interview follow-up questions'})).toBeVisible()
+ })
+
+ test('adds deeper verification guidance and crawl paths to RTL problems',async({page})=>{
+  await page.goto('/problems/rtl-fifo/index.html')
+  await expect(page.getByRole('heading',{name:'Edge cases worth testing'})).toBeVisible()
+  await expect(page.getByText('Simultaneous read and write.')).toBeVisible()
+  await expect(page.locator('a[href="/?problem=rtl-fifo"]')).toBeVisible()
+  await expect(page.getByRole('heading',{name:'Continue practising'})).toBeVisible()
  })
 
  test('serves topic hubs and deeper guides',async({page})=>{
   await page.goto('/learn/sva/index.html')
   await expect(page.getByRole('heading',{name:/SystemVerilog Assertions.*Practice/i})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'What interviewers usually look for'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'How to practise this topic'})).toBeVisible()
   await page.goto('/learn/cdc-interview/index.html')
   await expect(page).toHaveTitle(/Clock Domain Crossing.*HDLForge/i)
   await expect(page.getByRole('heading',{name:'Clock Domain Crossing (CDC) Interview Guide'})).toBeVisible()
