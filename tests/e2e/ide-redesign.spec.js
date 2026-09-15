@@ -43,4 +43,36 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.getByRole('button',{name:'Open problems'})).toBeVisible()
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
+
+ test('keeps run and collapse controls in the draggable console header',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  await expect(page.locator('.ide-bottom')).toBeVisible()
+
+  const consolePanel=page.locator('.ide-bottom')
+  const runButton=page.getByRole('button',{name:/Run tests/i}).first()
+  const collapseButton=page.locator('.bottom-collapse')
+
+  await expect(runButton).toBeVisible()
+  await expect(collapseButton).toBeVisible()
+  expect(await collapseButton.evaluate(el=>getComputedStyle(el).fontSize)).toBe('0px')
+
+  const before=await consolePanel.boundingBox()
+  const runBox=await runButton.boundingBox()
+  expect(before).toBeTruthy()
+  expect(runBox).toBeTruthy()
+  expect(runBox.x).toBeGreaterThan(before.x+before.width-90)
+  expect(runBox.y).toBeGreaterThanOrEqual(before.y-2)
+  expect(runBox.y+runBox.height).toBeLessThanOrEqual(before.y+42)
+
+  await page.mouse.move(before.x+before.width/2,before.y+4)
+  await page.mouse.down()
+  await page.mouse.move(before.x+before.width/2,before.y-60,{steps:6})
+  await page.mouse.up()
+
+  const after=await consolePanel.boundingBox()
+  expect(after.height).toBeGreaterThan(before.height+30)
+
+  await collapseButton.click()
+  await expect(consolePanel).toHaveClass(/collapsed/)
+ })
 })
