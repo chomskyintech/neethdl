@@ -6,6 +6,11 @@
   margin-bottom:4px!important;
 }
 
+/* The current section now lives in the left Problems button. */
+.hdlforge-ide-active .section-navigation{
+  display:none!important;
+}
+
 @media(max-width:720px){
   .hdlforge-ide-active .ide-topbar{
     height:52px!important;
