@@ -1,5 +1,9 @@
 import problems from './data/activeProblems'
 
+const topPaneBorderStyle=document.createElement('style')
+topPaneBorderStyle.textContent='.ide-topbar{border-color:transparent!important}'
+document.head.appendChild(topPaneBorderStyle)
+
 let mounted = false
 let drawer = null
 let backdrop = null
