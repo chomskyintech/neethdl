@@ -18,7 +18,13 @@ async function setSource(page, source) {
   await page.keyboard.insertText(source)
 }
 
-test('waveform launches beside Reset editor and owns the editor workspace', async ({ page }) => {
+function expectSameBox(before, after, tolerance = 2) {
+  for (const key of ['x', 'y', 'width', 'height']) {
+    expect(Math.abs(after[key] - before[key])).toBeLessThanOrEqual(tolerance)
+  }
+}
+
+test('waveform opens only over the editor and leaves console independent', async ({ page }) => {
   test.setTimeout(90_000)
   await openMux(page)
   await setSource(page, muxSolution)
@@ -27,38 +33,64 @@ test('waveform launches beside Reset editor and owns the editor workspace', asyn
 
   const reset = page.getByRole('button', { name: 'Reset editor' })
   const launcher = page.getByRole('button', { name: 'Waveform', exact: true })
+  const consolePanel = page.locator('.ide-bottom')
+  const stage = page.locator('.waveform-editor-stage')
+  const editor = page.locator('.monaco-editor-wrap')
+
   await expect(reset).toBeVisible()
   await expect(launcher).toBeVisible()
+  await expect(page.locator('.bottom-tabs > button').filter({ hasText: /^Waveform$/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Console', exact: true })).toHaveClass(/active/)
 
-  const bottomWaveform = page.locator('.bottom-tabs > button').filter({ hasText: /^Waveform$/ })
-  await expect(bottomWaveform).toBeHidden()
-
+  const launcherBox = await launcher.boundingBox()
   const resetBox = await reset.boundingBox()
-  const launchBox = await launcher.boundingBox()
-  expect(resetBox && launchBox).toBeTruthy()
-  expect(Math.abs(launchBox.y - resetBox.y)).toBeLessThanOrEqual(2)
-  expect(launchBox.x).toBeGreaterThanOrEqual(resetBox.x + resetBox.width - 2)
-  expect(launchBox.x - (resetBox.x + resetBox.width)).toBeLessThanOrEqual(20)
+  expect(launcherBox && resetBox).toBeTruthy()
+  expect(Math.abs(launcherBox.y - resetBox.y)).toBeLessThanOrEqual(2)
+  expect(launcherBox.x + launcherBox.width).toBeLessThanOrEqual(resetBox.x + 3)
+  expect(resetBox.x - (launcherBox.x + launcherBox.width)).toBeLessThanOrEqual(16)
+
+  const beforeConsole = await consolePanel.boundingBox()
+  const beforeStage = await stage.boundingBox()
+  expect(beforeConsole && beforeStage).toBeTruthy()
 
   await launcher.click()
-  const waveform = page.locator('.waveform-v2')
+
+  const window = page.locator('.waveform-window')
+  const waveform = page.locator('.waveform-window .waveform-v2')
+  await expect(window).toBeVisible()
   await expect(waveform).toBeVisible()
-  await expect(page.locator('.monaco-editor-wrap')).toBeHidden()
-
-  const geometryError = await page.evaluate(() => {
-    const bottom = document.querySelector('.ide-bottom')?.getBoundingClientRect()
-    const workspace = document.querySelector('.ide-workspace')?.getBoundingClientRect()
-    const tabs = document.querySelector('.file-tabs')?.getBoundingClientRect()
-    if (!bottom || !workspace || !tabs) return 999
-    return Math.max(
-      Math.abs(bottom.left - workspace.left),
-      Math.abs(bottom.right - workspace.right),
-      Math.abs(bottom.top - tabs.bottom),
-      Math.abs(bottom.height - (workspace.height - tabs.height - 2)),
-    )
-  })
-  expect(geometryError).toBeLessThanOrEqual(4)
-
-  await expect(page.locator('.sim-v2-wave-toolbar')).toBeVisible()
+  await expect(page.locator('.waveform-window .sim-v2-wave-toolbar')).toBeVisible()
   await expect(launcher).toHaveAttribute('aria-pressed', 'true')
+
+  // Opening waveform must not expand, collapse, switch or otherwise move Console.
+  const afterConsole = await consolePanel.boundingBox()
+  expect(afterConsole).toBeTruthy()
+  expectSameBox(beforeConsole, afterConsole)
+  await expect(page.getByRole('button', { name: 'Console', exact: true })).toHaveClass(/active/)
+  await expect(consolePanel).not.toHaveClass(/collapsed/)
+
+  // Monaco stays mounted underneath the waveform instead of being hidden with Console.
+  await expect(editor).toBeVisible()
+
+  // The waveform window owns exactly the editor stage and must stop above Console.
+  const overlayBox = await window.boundingBox()
+  const stageBox = await stage.boundingBox()
+  expect(overlayBox && stageBox).toBeTruthy()
+  expectSameBox(stageBox, overlayBox)
+  expect(overlayBox.y + overlayBox.height).toBeLessThanOrEqual(afterConsole.y + 2)
+
+  // Closing with the window X restores the editor without changing Console.
+  await page.getByRole('button', { name: 'Close waveform' }).click()
+  await expect(window).toHaveCount(0)
+  await expect(launcher).toHaveAttribute('aria-pressed', 'false')
+  expectSameBox(beforeConsole, await consolePanel.boundingBox())
+  await expect(editor).toBeVisible()
+
+  // Escape provides the same independent close path.
+  await launcher.click()
+  await expect(window).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(window).toHaveCount(0)
+  await expect(launcher).toHaveAttribute('aria-pressed', 'false')
+  expectSameBox(beforeConsole, await consolePanel.boundingBox())
 })
