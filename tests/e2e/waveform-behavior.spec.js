@@ -22,9 +22,9 @@ async function runAndOpenWaveform(page) {
   await setSource(page, muxSolution)
   await page.getByRole('button', { name: /Run tests/i }).first().click()
   await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
-  await page.getByRole('button', { name: /Waveform/i }).click()
-  await expect(page.locator('.waveform-v2')).toBeVisible()
-  await expect(page.locator('.sim-v2-wave-toolbar')).toBeVisible()
+  await page.getByRole('button', { name: 'Waveform', exact: true }).click()
+  await expect(page.locator('.waveform-window .waveform-v2')).toBeVisible()
+  await expect(page.locator('.waveform-window .sim-v2-wave-toolbar')).toBeVisible()
 }
 
 test.describe('waveform layout behavior', () => {
@@ -32,20 +32,19 @@ test.describe('waveform layout behavior', () => {
     await openMux(page)
   })
 
-  test('keeps zoom, scrolling, fullscreen and panel transitions geometrically correct', async ({ page }) => {
+  test('keeps zoom, scrolling, fullscreen and console independence geometrically correct', async ({ page }) => {
     test.setTimeout(90_000)
     await runAndOpenWaveform(page)
 
-    const waveform = page.locator('.waveform-v2')
-    const toolbar = page.locator('.sim-v2-wave-toolbar')
+    const waveform = page.locator('.waveform-window .waveform-v2')
+    const window = page.locator('.waveform-window')
+    const toolbar = waveform.locator('.sim-v2-wave-toolbar')
     const zoomOut = toolbar.locator('.sim-v2-zoom-out')
     const zoomLabel = toolbar.locator('.sim-v2-zoom-label')
     const zoomIn = toolbar.locator('.sim-v2-zoom-in')
-    const svg = waveform.locator('svg.wave-svg')
     const signalPanel = waveform.locator('.sim-v2-signal-panel')
     const bottomPanel = page.locator('.ide-bottom')
-    const workspace = page.locator('.ide-workspace')
-    const fileTabs = page.locator('.file-tabs')
+    const stage = page.locator('.waveform-editor-stage')
 
     const zoomOrder = await toolbar.locator('.sim-v2-zoom-out, .sim-v2-zoom-label, .sim-v2-zoom-in').evaluateAll(nodes =>
       nodes.map(node => node.className)
@@ -61,14 +60,14 @@ test.describe('waveform layout behavior', () => {
     await zoomIn.click()
     await zoomIn.click()
     await expect.poll(() => page.evaluate(() => {
-      const el = document.querySelector('.waveform-v2 .wave-scroll')
+      const el = document.querySelector('.waveform-window .waveform-v2 .wave-scroll')
       return el ? el.scrollWidth - el.clientWidth : 0
     })).toBeGreaterThan(100)
 
     const beforePan = await page.evaluate(() => {
-      const s = document.querySelector('.waveform-v2 .wave-scroll')
-      const svg = document.querySelector('.waveform-v2 svg.wave-svg')
-      const panel = document.querySelector('.waveform-v2 .sim-v2-signal-panel')
+      const s = document.querySelector('.waveform-window .waveform-v2 .wave-scroll')
+      const svg = document.querySelector('.waveform-window .waveform-v2 svg.wave-svg')
+      const panel = document.querySelector('.waveform-window .waveform-v2 .sim-v2-signal-panel')
       if (!s || !svg || !panel) return null
       const a = svg.getBoundingClientRect()
       const p = panel.getBoundingClientRect()
@@ -77,17 +76,17 @@ test.describe('waveform layout behavior', () => {
     expect(beforePan).toBeTruthy()
 
     await page.evaluate(() => {
-      const el = document.querySelector('.waveform-v2 .wave-scroll')
+      const el = document.querySelector('.waveform-window .waveform-v2 .wave-scroll')
       el.scrollLeft = Math.round((el.scrollWidth - el.clientWidth) * 0.55)
       el.dispatchEvent(new Event('scroll'))
     })
-    await expect.poll(() => page.evaluate(() => document.querySelector('.waveform-v2 .wave-scroll')?.scrollLeft || 0)).toBeGreaterThan(50)
+    await expect.poll(() => page.evaluate(() => document.querySelector('.waveform-window .waveform-v2 .wave-scroll')?.scrollLeft || 0)).toBeGreaterThan(50)
 
     const afterPan = await page.evaluate(() => {
-      const s = document.querySelector('.waveform-v2 .wave-scroll')
-      const svg = document.querySelector('.waveform-v2 svg.wave-svg')
-      const panel = document.querySelector('.waveform-v2 .sim-v2-signal-panel')
-      const ruler = document.querySelector('.waveform-v2 .sim-v2-ruler')
+      const s = document.querySelector('.waveform-window .waveform-v2 .wave-scroll')
+      const svg = document.querySelector('.waveform-window .waveform-v2 svg.wave-svg')
+      const panel = document.querySelector('.waveform-window .waveform-v2 .sim-v2-signal-panel')
+      const ruler = document.querySelector('.waveform-window .waveform-v2 .sim-v2-ruler')
       if (!s || !svg || !panel || !ruler) return null
       const a = svg.getBoundingClientRect()
       const p = panel.getBoundingClientRect()
@@ -112,8 +111,8 @@ test.describe('waveform layout behavior', () => {
     expect(Math.abs((afterPan.viewportLeft - afterPan.scrollLeft) - afterPan.rulerLeft)).toBeLessThanOrEqual(3)
 
     const maxAlignmentError = await page.evaluate(() => {
-      const labels = [...document.querySelectorAll('.sim-v2-signal-row[data-sim-quality-kept="true"]')]
-      const traces = [...document.querySelectorAll('svg.wave-svg g[data-sim-quality-kept="true"]')]
+      const labels = [...document.querySelectorAll('.waveform-window .sim-v2-signal-row[data-sim-quality-kept="true"]')]
+      const traces = [...document.querySelectorAll('.waveform-window svg.wave-svg g[data-sim-quality-kept="true"]')]
       if (!labels.length || labels.length !== traces.length) return 999
       return Math.max(...labels.map((label, i) => {
         const a = label.getBoundingClientRect()
@@ -123,15 +122,16 @@ test.describe('waveform layout behavior', () => {
     })
     expect(maxAlignmentError).toBeLessThanOrEqual(6)
 
+    // Full screen belongs to the waveform itself, never to Console.
     const fullscreenButton = page.getByRole('button', { name: 'Full screen' })
     await fullscreenButton.click()
     await expect.poll(() => page.evaluate(() => {
-      const w = document.querySelector('.waveform-v2')
+      const w = document.querySelector('.waveform-window .waveform-v2')
       return Boolean(w && (document.fullscreenElement === w || w.classList.contains('sim-v2-wave-only-fullscreen')))
     })).toBe(true)
 
     const fullscreenState = await page.evaluate(() => {
-      const w = document.querySelector('.waveform-v2')
+      const w = document.querySelector('.waveform-window .waveform-v2')
       const bottom = document.querySelector('.ide-bottom')
       const rect = w?.getBoundingClientRect()
       return {
@@ -150,27 +150,37 @@ test.describe('waveform layout behavior', () => {
 
     await fullscreenButton.click()
     await expect.poll(() => page.evaluate(() => {
-      const w = document.querySelector('.waveform-v2')
+      const w = document.querySelector('.waveform-window .waveform-v2')
       return Boolean(document.fullscreenElement === w || w?.classList.contains('sim-v2-wave-only-fullscreen'))
     })).toBe(false)
 
-    await page.getByRole('button', { name: 'Console', exact: true }).click()
-    await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
-    await expect.poll(async () => {
-      const bottom = await bottomPanel.boundingBox()
-      const work = await workspace.boundingBox()
-      const tabs = await fileTabs.boundingBox()
-      if (!bottom || !work || !tabs) return 999
-      return Math.abs(bottom.height - (work.height - tabs.height - 2))
-    }).toBeLessThanOrEqual(4)
-    await expect(page.locator('.monaco-editor-wrap')).toBeHidden()
+    const consoleBeforeCollapse = await bottomPanel.boundingBox()
+    const stageBeforeCollapse = await stage.boundingBox()
+    expect(consoleBeforeCollapse && stageBeforeCollapse).toBeTruthy()
 
-    await page.getByRole('button', { name: /Waveform/i }).click()
-    await expect(waveform).toBeVisible()
+    // Console collapse is independent: waveform stays open while its editor stage grows.
     const collapse = page.locator('.bottom-collapse')
     await collapse.click()
     await expect(bottomPanel).toHaveClass(/collapsed/)
+    await expect(window).toBeVisible()
+    await expect(waveform).toBeVisible()
+    const stageCollapsed = await stage.boundingBox()
+    expect(stageCollapsed.height).toBeGreaterThan(stageBeforeCollapse.height + 80)
+
+    // Expanding Console again shrinks only the editor/waveform stage.
+    await collapse.click()
+    await expect(bottomPanel).not.toHaveClass(/collapsed/)
+    await expect(window).toBeVisible()
+    const consoleRestored = await bottomPanel.boundingBox()
+    const stageRestored = await stage.boundingBox()
+    expect(Math.abs(consoleRestored.height - consoleBeforeCollapse.height)).toBeLessThanOrEqual(4)
+    expect(Math.abs(stageRestored.height - stageBeforeCollapse.height)).toBeLessThanOrEqual(4)
+
+    // Closing waveform restores the editor while Console stays exactly where it was.
+    await page.getByRole('button', { name: 'Close waveform' }).click()
+    await expect(window).toHaveCount(0)
     await expect(page.locator('.monaco-editor-wrap')).toBeVisible()
-    await expect.poll(async () => (await bottomPanel.boundingBox())?.height || 999).toBeLessThan(80)
+    const consoleAfterClose = await bottomPanel.boundingBox()
+    expect(Math.abs(consoleAfterClose.height - consoleRestored.height)).toBeLessThanOrEqual(2)
   })
 })
