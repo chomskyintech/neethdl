@@ -3,13 +3,21 @@ import { test, expect } from '@playwright/test'
 test.describe('HDLForge navigation and SEO content', () => {
   test('landing page keeps only the primary hero content', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: /Hardware design practice for RTL, FPGA & verification roles/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /Hardware design practice for RTL, FPGA, VLSI & verification roles/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Start practice', exact: true })).toBeVisible()
     await expect(page.locator('.landing-stats')).toHaveCount(0)
     await expect(page.locator('.destination-card')).toHaveCount(0)
     await expect(page.getByRole('heading', { name: 'Choose your workspace' })).toHaveCount(0)
     await expect(page.getByRole('heading', { name: 'Hardware design practice resources' })).toHaveCount(0)
     await expect(page.locator('.topic-card')).toHaveCount(0)
     await expect(page.locator('.problem-row')).toHaveCount(0)
+  })
+
+  test('Start practice opens the Problems workspace', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('button', { name: 'Start practice', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
+    await expect(page).toHaveURL(/\/app\/problems\/$/)
   })
 
   test('Problems page owns problem sections and problem rows', async ({ page }) => {
