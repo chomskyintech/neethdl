@@ -44,6 +44,32 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
+ test('keeps the collapse chevron visually attached to Console',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+
+  const tabs=page.locator('.bottom-tabs')
+  const consoleTab=page.locator('.bottom-tabs>button').first()
+  const collapseButton=page.locator('.bottom-collapse')
+
+  await expect(tabs).toBeVisible()
+  await expect(consoleTab).toContainText('Console')
+  await expect(collapseButton).toBeVisible()
+
+  const tabsBox=await tabs.boundingBox()
+  const consoleBox=await consoleTab.boundingBox()
+  const collapseBox=await collapseButton.boundingBox()
+  expect(tabsBox).toBeTruthy()
+  expect(consoleBox).toBeTruthy()
+  expect(collapseBox).toBeTruthy()
+
+  expect(collapseBox.x).toBeGreaterThanOrEqual(consoleBox.x)
+  expect(collapseBox.x+collapseBox.width).toBeLessThanOrEqual(consoleBox.x+40)
+  expect(collapseBox.x-tabsBox.x).toBeLessThan(36)
+  const collapseCenterY=collapseBox.y+collapseBox.height/2
+  const consoleCenterY=consoleBox.y+consoleBox.height/2
+  expect(Math.abs(collapseCenterY-consoleCenterY)).toBeLessThanOrEqual(2)
+ })
+
  test('keeps run and collapse controls in the draggable console header',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await expect(page.locator('.ide-bottom')).toBeVisible()
