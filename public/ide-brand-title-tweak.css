@@ -1,26 +1,33 @@
-/* Final IDE-only brand/title refinements. */
+/* IDE-only brand/title refinements.
+   The task/editor page uses the supplied HDLForge lightning icon only. */
 body.hdlforge-ide-active .ide-page .ide-brand{
+  width:38px!important;
+  min-width:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:0!important;
   border:0!important;
-  background:transparent!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAA3CAYAAACsLgJ7AAAF9UlEQVR4nO2a2VNTVxzHP1kIWYgxEAigGFxHHBALFrGtS91GHW1dwLeO4xKotQ92mU4f+if0xYfasqgzjp3pCBRanapTpdVaxZ0Wd0QRXMImYEJIIOT2QaFeElDMvUg7fN7O+d17zvc759xffpNzYJRRXhuKob4Q985sQTd1AppoMyqjAXWEXnJRPpebHmcHXU2tdN66x6M/Lw5J50s/nLhhhWB8MxmlWjV0lSHi9/XgPFdFbdGRl9L7wofGL58vmOalodZrQ1cXIj63h/aTF7h/9NSgugcNJqx6VzAvykChGPIulQ1BEGg9VkH9LycGFDVgIGHlAiFy6Vx5lEnA41/PDGhMGawzZtYMwbw4U15VIWJenIk1LVkIFgtuKmspCuXI2XLBUCgVRK9dFDQWYMq2bpmgMuhkFyUFqgg9tnXLAlYrwNSYjOThUSQRwfSKTFkzZgrKcM2wCZICZbgm4NsSmYpInjq8iiTCkDxF1BaZ0sRZhlWMVIQnWEVt9fMNpTZc1smTreP5ZP5KJkdZOVZ9ha9PHMLj6w553P66RaZUOvlMpY1LZNfazWjVYQBkpWRgMRjZ8fO+kMdWasV5QLT9FCp5itXUuAl8s2YTWnUYF+7f5cvDPwCwcFIS+rDQE5NSrRa3Qx7xBaTEJvDdui3owjRcfljLx2V7aevsAKCpw4m7u0vyOWU1NT0mnrz1W9GFaahy1LPtxz14fN2sTkoD4Oitv2SZVzZTU6KsFKy3ow/TcL3xATklhXh83WhUapZMSwHg8I3/kKkpUVZ2Z+dgDNdyvfEB9uICOp9ts6XTUghXqalvb+Fqw305ppfeVKI5mt3ZOZi0eqqbHdiLC3B1efviq5LeAORbJeiX0kMl0RzN3g25mLR6bjU72FqULzJk1hmYO+Fp1WI1mvgwcwkAPf4eKupuU+Wol0SHZKZsYy0UZtkx6wzcedxIbkkhT7ydomeUCgUCAgoUvD8jXRTb/tYy9l44wc5TR0LWIompWKOJwuwcLAYjta1NbCnKp/VZ2n6eFreLzw5+z4bUTNTKf38TNSoVM+MmsGn2Ag5dv0xNS0NIeiQx9cXC1UQbjNxrax7QUC/lNVcpr7kq6ovSR1D8wQ7MOgMxEWNGhql4oxmA32uuMTEyhomRMX2x+rYWGlztA74bpY9gT3YuZp2BurYWKh/eC1mPJKaKq87x1eI1bEyfz8b0+aKYgMCnB/fzW821gPfMOgMFWXZsZgstbhfbS/f2pf5QkCSlF1ed5duKYzicgSuiQMGyaTMD+k1aPYVZdiZFxvDY7WLzgTzq21ukkCNd9surOE5exXFR38FNn5NgiuLyg1pR/5hwHYVZdiZHWWnt7GBzUT732pqlkiJfmTQ9Op4EUxQ+fw+Hb1b29UdowtmdncNUSyztHjebDuRR29ok6dyymVoxPRWAk3du4PR6ANCFaSjIsjPVEovT62FLUb7khkBGU72V+MHrl4CnhvLXbyUpZhxOrwd7SQG3Q0zdAyGLqfRxE4nUR+D0dvLH3Rto1WHkr99KSmwC7u4u7CUF3Gh8KMfUgEym5k2cDkB5zTXUShW71m7uM5RbUiirIZC4oO2lo+vpN7RwUhKz4m3Yxlrw+Lr5qHSPZEXrYIhWyudySzLoT9cuUtPSgEmrxzbWQmd3F9t+3CNJtRCM/rpFK+X3eEGC485G1xOy9+9kTsIUUuNtlN++wq1mR8jjDkSPU1xrikx56xvQWMySTOQXBM7UVXOmrlqS8QajyyGuRETbr/N2newC5KC/bpGpR6cvKQQh6DnWiEUQBB6dviQ6TAtI6a7Km8OnSAKC6Q0wdWdfmcLvlf4PRjnwe7u4s68s4Mgz6I9vU2k5gn9kb0PBL9BUWh40FtSU42ylovV4hayiQqX1eAWOs5VBD6YHrCieHecL5iWZI+8eRfm5V7tH0UvsnFmC5b2FqEbAjZcet4emsnIazv/96jdenicxe7lgzEh5fXeTzl+h9sBhae4m9Sfu7XRBN802fLfIqut4dOrCyNn/o4wyyv+DfwD5Mw+VEXarYwAAAABJRU5ErkJggg==")!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:32px 33px!important;
   box-shadow:none!important;
-  padding:7px 4px!important;
+  color:transparent!important;
+  cursor:pointer!important;
 }
-body.hdlforge-ide-active .ide-page .ide-brand-icon{
+body.hdlforge-ide-active .ide-page .ide-brand:hover{
+  background-color:transparent!important;
+  filter:brightness(1.06);
+}
+body.hdlforge-ide-active .ide-page .ide-brand-icon,
+body.hdlforge-ide-active .ide-page .ide-brand strong{
   display:none!important;
 }
-body.hdlforge-ide-active .ide-page .ide-brand strong{
-  font-size:20px!important;
-  font-weight:800!important;
-  letter-spacing:-.03em!important;
-  background:none!important;
-  -webkit-background-clip:border-box!important;
-  background-clip:border-box!important;
-  color:#f3f3f3!important;
-  -webkit-text-fill-color:#f3f3f3!important;
-  text-shadow:none!important;
-}
 
-/* Keep the task-page problem title prominent without a bold/heavy weight. */
+/* The problem name should read like a normal title, not heavy/bold display text. */
 body.hdlforge-ide-active .ide-page .problem-heading h1{
   font-weight:500!important;
 }
