@@ -20,7 +20,7 @@ test.describe('redesigned IDE shell',()=>{
   expect(workspaceRadius).not.toBe('0px')
  })
 
- test('keeps equal outer gutters and no persistent blue divider',async({page})=>{
+ test('keeps equal outer gutters and shows only a neutral splitter handle',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await page.goto('/app/problems/rtl-fifo/')
 
@@ -40,13 +40,57 @@ test.describe('redesigned IDE shell',()=>{
   expect(overflow.bodyWidth).toBeLessThanOrEqual(overflow.innerWidth)
 
   const divider=page.locator('.ide-panel-resizer')
+  const handle=divider.locator('span')
   await expect(divider).toBeVisible()
+  await expect(handle).toBeVisible()
   const dividerStyle=await divider.evaluate(el=>{
    const pseudo=getComputedStyle(el,'::before')
-   return{opacity:pseudo.opacity,background:pseudo.backgroundColor}
+   return{display:pseudo.display,opacity:pseudo.opacity}
   })
+  expect(dividerStyle.display).toBe('none')
   expect(dividerStyle.opacity).toBe('0')
-  expect(dividerStyle.background).toBe('rgb(74, 74, 74)')
+
+  const handleStyle=await handle.evaluate(el=>{const s=getComputedStyle(el);return{background:s.backgroundColor,opacity:s.opacity,width:s.width,height:s.height}})
+  expect(handleStyle.background).toBe('rgb(91, 91, 91)')
+  expect(Number.parseFloat(handleStyle.opacity)).toBeGreaterThan(.8)
+  expect(handleStyle.width).toBe('4px')
+  expect(handleStyle.height).toBe('34px')
+ })
+
+ test('fits the desktop IDE inside the viewport and exposes a console resize handle',async({page})=>{
+  await page.setViewportSize({width:1440,height:900})
+  await page.goto('/app/problems/rtl-fifo/')
+
+  const ide=page.locator('.ide-page')
+  const frame=page.locator('.ide-body')
+  const problem=page.locator('.ide-problem')
+  const workspace=page.locator('.ide-workspace')
+  const consolePanel=page.locator('.ide-bottom')
+  await expect(consolePanel).toBeVisible()
+
+  for(const locator of[ide,frame,problem,workspace,consolePanel]){
+   const box=await locator.boundingBox()
+   expect(box).toBeTruthy()
+   expect(box.y).toBeGreaterThanOrEqual(-1)
+   expect(box.y+box.height).toBeLessThanOrEqual(901)
+  }
+
+  const documentSize=await page.evaluate(()=>({innerHeight:window.innerHeight,rootHeight:document.documentElement.scrollHeight,bodyHeight:document.body.scrollHeight}))
+  expect(documentSize.rootHeight).toBeLessThanOrEqual(documentSize.innerHeight)
+  expect(documentSize.bodyHeight).toBeLessThanOrEqual(documentSize.innerHeight)
+
+  const consoleHandle=await consolePanel.evaluate(el=>{
+   const s=getComputedStyle(el,'::before')
+   return{content:s.content,width:s.width,height:s.height,background:s.backgroundColor}
+  })
+  expect(consoleHandle.content).not.toBe('none')
+  expect(consoleHandle.width).toBe('34px')
+  expect(consoleHandle.height).toBe('4px')
+  expect(consoleHandle.background).toBe('rgb(91, 91, 91)')
+
+  const before=await consolePanel.boundingBox()
+  await page.mouse.dblclick(before.x+before.width/2,before.y+6)
+  await expect(consolePanel).toHaveClass(/collapsed/)
  })
 
  test('opens, searches and closes the problem drawer',async({page})=>{
@@ -94,7 +138,7 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
- test('hides tab-strip scrollbars and matches the statement scrollbar to the neutral palette',async({page})=>{
+ test('hides tab-strip scrollbars and keeps a visible neutral statement scrollbar',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
 
   const tabs=page.locator('.ide-problem>.problem-tabs')
@@ -112,11 +156,12 @@ test.describe('redesigned IDE shell',()=>{
 
   const statementStyles=await statement.evaluate(el=>{
    const style=getComputedStyle(el)
-   return{overflowX:style.overflowX,overflowY:style.overflowY,scrollbarColor:style.scrollbarColor}
+   return{overflowX:style.overflowX,overflowY:style.overflowY,scrollbarColor:style.scrollbarColor,scrollbarWidth:style.scrollbarWidth}
   })
   expect(statementStyles.overflowX).toBe('hidden')
-  expect(statementStyles.overflowY).toBe('auto')
-  expect(statementStyles.scrollbarColor).toContain('rgb(85, 85, 85)')
+  expect(statementStyles.overflowY).toBe('scroll')
+  expect(statementStyles.scrollbarWidth).not.toBe('none')
+  expect(statementStyles.scrollbarColor).toContain('rgb(102, 102, 102)')
   expect(statementStyles.scrollbarColor).toContain('rgb(38, 38, 38)')
  })
 
@@ -193,7 +238,7 @@ test.describe('redesigned IDE shell',()=>{
   expect(runBox.y).toBeGreaterThanOrEqual(before.y-2)
   expect(runBox.y+runBox.height).toBeLessThanOrEqual(before.y+42)
 
-  await page.mouse.move(before.x+before.width/2,before.y+4)
+  await page.mouse.move(before.x+before.width/2,before.y+6)
   await page.mouse.down()
   await page.mouse.move(before.x+before.width/2,before.y-60,{steps:6})
   await page.mouse.up()
