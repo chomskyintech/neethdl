@@ -23,6 +23,14 @@ async function replaceEditorContents(page, source) {
   await expect.poll(() => codeText(page)).toContain(source.split('\n')[1].trim())
 }
 
+function expectSameBox(before, after, tolerance = 2) {
+  expect(before).toBeTruthy()
+  expect(after).toBeTruthy()
+  for (const key of ['x', 'y', 'width', 'height']) {
+    expect(Math.abs(after[key] - before[key])).toBeLessThanOrEqual(tolerance)
+  }
+}
+
 test.describe('HDLForge Monaco problem editor', () => {
   test.beforeEach(async ({ page }) => {
     await openFirstProblem(page)
@@ -89,18 +97,25 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect(page.locator('.test-case')).toHaveCount(4)
     await expect(page.locator('.test-case.pass')).toHaveCount(4)
+
+    const bottomPanel = page.locator('.ide-bottom')
+    const stage = page.locator('.waveform-editor-stage')
+    const editor = page.locator('.monaco-editor-wrap')
+    const beforeConsole = await bottomPanel.boundingBox()
+    const beforeStage = await stage.boundingBox()
+    expect(beforeConsole && beforeStage).toBeTruthy()
+
     await page.getByRole('button', { name: /Waveform/i }).click()
 
+    const window = page.locator('.waveform-window')
     const waveform = page.locator('.waveform-v2')
     const svg = page.locator('svg.wave-svg')
     const signalPanel = page.locator('.sim-v2-signal-panel')
     const toolbar = page.locator('.sim-v2-wave-toolbar')
     const radix = page.getByRole('combobox', { name: 'Waveform radix' })
-    const bottomPanel = page.locator('.ide-bottom')
-    const workspace = page.locator('.ide-workspace')
-    const fileTabs = page.locator('.file-tabs')
     const fit = page.getByRole('button', { name: 'Fit' })
 
+    await expect(window).toBeVisible()
     await expect(waveform).toBeVisible()
     await expect(svg).toBeVisible()
     await expect(toolbar).toBeVisible()
@@ -110,13 +125,13 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(page.getByRole('button', { name: 'Full screen' })).toBeVisible()
     await expect(radix).toHaveValue('hex')
 
-    await expect.poll(async () => {
-      const bottom = await bottomPanel.boundingBox()
-      const work = await workspace.boundingBox()
-      const tabs = await fileTabs.boundingBox()
-      if (!bottom || !work || !tabs) return 999
-      return Math.abs(bottom.height - (work.height - tabs.height - 2))
-    }).toBeLessThanOrEqual(4)
+    // Opening Waveform must affect only the editor stage. Console geometry and
+    // state remain unchanged, while Monaco stays mounted underneath the overlay.
+    expectSameBox(beforeConsole, await bottomPanel.boundingBox())
+    expectSameBox(beforeStage, await window.boundingBox())
+    await expect(page.getByRole('button', { name: 'Console', exact: true })).toHaveClass(/active/)
+    await expect(bottomPanel).not.toHaveClass(/collapsed/)
+    await expect(editor).toBeVisible()
 
     // The mux VCD mirrors DUT ports in the testbench. The UI must show each
     // logical signal once, not duplicate a/b/sel/y rows as the raw VCD does.
