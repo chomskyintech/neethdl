@@ -2,10 +2,15 @@ const DEFAULT_CONSOLE_HEIGHT = 188
 const MIN_CONSOLE_HEIGHT = 120
 const MAX_CONSOLE_RATIO = 0.7
 const CONSOLE_HANDLE_HEIGHT = 14
+const DRAG_ACTIVATION_PX = 3
 
 let activePanel = null
 let dragging = false
 let runProxy = null
+let dragStartedCollapsed = false
+let expansionRequested = false
+let dragStartY = 0
+let latestPointerY = 0
 
 function applyExpandedHeight(panel, height) {
   const workspace = panel.closest('.ide-workspace')
@@ -112,19 +117,16 @@ document.addEventListener('pointerdown', event => {
   if (!panel || !isOnConsoleHandle(panel, event.clientY)) return
 
   const rect = panel.getBoundingClientRect()
-  const wasCollapsed = panel.classList.contains('collapsed')
   activePanel = panel
   dragging = true
+  dragStartedCollapsed = panel.classList.contains('collapsed')
+  expansionRequested = false
+  dragStartY = event.clientY
+  latestPointerY = event.clientY
 
-  if (wasCollapsed) {
+  if (dragStartedCollapsed) {
     const saved = Number.parseFloat(panel.dataset.expandedHeight)
     if (!Number.isFinite(saved)) panel.dataset.expandedHeight = String(DEFAULT_CONSOLE_HEIGHT)
-    panel.querySelector('.bottom-collapse')?.click()
-    requestAnimationFrame(() => {
-      if (!dragging || activePanel !== panel) return
-      const expanded = Number.parseFloat(panel.dataset.expandedHeight)
-      applyExpandedHeight(panel, Number.isFinite(expanded) ? expanded : DEFAULT_CONSOLE_HEIGHT)
-    })
   } else {
     panel.dataset.expandedHeight = String(rect.height)
   }
@@ -138,6 +140,27 @@ document.addEventListener('pointermove', event => {
   const workspace = activePanel.closest('.ide-workspace')
   if (!workspace) return
 
+  latestPointerY = event.clientY
+
+  if (dragStartedCollapsed && activePanel.classList.contains('collapsed')) {
+    if (Math.abs(event.clientY - dragStartY) < DRAG_ACTIVATION_PX) return
+
+    if (!expansionRequested) {
+      expansionRequested = true
+      activePanel.querySelector('.bottom-collapse')?.click()
+      requestAnimationFrame(() => {
+        if (!dragging || !activePanel) return
+        const rect = activePanel.closest('.ide-workspace')?.getBoundingClientRect()
+        if (!rect) return
+        dragStartedCollapsed = false
+        applyExpandedHeight(activePanel, rect.bottom - latestPointerY)
+      })
+    }
+
+    event.preventDefault()
+    return
+  }
+
   const rect = workspace.getBoundingClientRect()
   applyExpandedHeight(activePanel, rect.bottom - event.clientY)
   event.preventDefault()
@@ -146,6 +169,8 @@ document.addEventListener('pointermove', event => {
 function stopDragging() {
   if (!dragging) return
   dragging = false
+  dragStartedCollapsed = false
+  expansionRequested = false
   document.body.classList.remove('ide-console-resizing')
   positionRunProxy()
 }
