@@ -1,0 +1,90 @@
+/* Waveform workspace expansion and pop-out controls. */
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-open-tab{
+  width:auto;
+  min-width:72px;
+  height:28px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:0 9px;
+  border:1px solid #3b3b3b;
+  border-radius:6px;
+  background:#292929;
+  color:#c7c7c7;
+  font-size:10px;
+  font-weight:650;
+  cursor:pointer;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-open-tab:hover{
+  border-color:#555;
+  background:#333;
+  color:#fff;
+}
+
+/* Standalone waveform tab uses the same neutral graphite palette. */
+body.waveform-popout-body{
+  min-height:100vh;
+  margin:0;
+  overflow:hidden;
+  background:#0f0f0f!important;
+  color:#ddd;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.waveform-popout-header{
+  height:46px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  border-bottom:1px solid #333;
+  background:#141414;
+}
+.waveform-popout-header strong{
+  color:#ededed;
+  font-size:13px;
+  font-weight:650;
+}
+.waveform-popout-header span{
+  color:#858585;
+  font-size:11px;
+}
+.waveform-popout-root{
+  height:calc(100vh - 46px);
+  padding:8px;
+  box-sizing:border-box;
+}
+body.waveform-popout-body .waveform.waveform-enhanced{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  border:1px solid #333;
+  border-radius:10px;
+  background:#171717;
+}
+body.waveform-popout-body .waveform.waveform-enhanced .wave-head{
+  flex:0 0 auto;
+}
+body.waveform-popout-body .waveform.waveform-enhanced .wave-scroll{
+  flex:1 1 0;
+  min-height:0;
+  max-height:none;
+  overflow:auto;
+  scrollbar-color:#666 #262626!important;
+}
+body.waveform-popout-body .waveform.waveform-enhanced .wave-live-panel{
+  transform:translateX(0)!important;
+}
+body.waveform-popout-body *::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+body.waveform-popout-body *::-webkit-scrollbar-track{
+  background:#262626;
+}
+body.waveform-popout-body *::-webkit-scrollbar-thumb{
+  background:#666;
+  border:2px solid #262626;
+  border-radius:999px;
+}
