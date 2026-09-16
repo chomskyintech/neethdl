@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 const editorRoot = page => page.locator('.monaco-editor-wrap')
 const codeText = async page => (await page.locator('.monaco-editor .view-lines').innerText()).replace(/\u00a0/g, ' ')
 const muxSolution = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a;\nendmodule'
+const brokenMux = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a\nendmodule'
 
 async function openFirstProblem(page) {
   await page.goto('/')
@@ -80,7 +81,7 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await codeText(page)).toContain('Your RTL here')
   })
 
-  test('runs valid RTL and renders the redesigned inspection waveform', async ({ page }) => {
+  test('runs valid RTL and renders the redesigned inspection waveform correctly', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, muxSolution)
     await page.getByRole('button', { name: /Run tests/i }).first().click()
@@ -98,14 +99,14 @@ test.describe('HDLForge Monaco problem editor', () => {
     const bottomPanel = page.locator('.ide-bottom')
     const workspace = page.locator('.ide-workspace')
     const fileTabs = page.locator('.file-tabs')
+    const fit = page.getByRole('button', { name: 'Fit' })
 
     await expect(waveform).toBeVisible()
     await expect(svg).toBeVisible()
     await expect(toolbar).toBeVisible()
     await expect(signalPanel).toBeVisible()
-    expect(await signalPanel.locator('.sim-v2-signal-row').count()).toBeGreaterThan(0)
     await expect(page.getByRole('searchbox', { name: 'Find waveform signal' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Fit' })).toBeVisible()
+    await expect(fit).toBeVisible()
     await expect(page.getByRole('button', { name: 'Full screen' })).toBeVisible()
     await expect(radix).toHaveValue('hex')
 
@@ -117,6 +118,68 @@ test.describe('HDLForge Monaco problem editor', () => {
       return Math.abs(bottom.height - (work.height - tabs.height - 2))
     }).toBeLessThanOrEqual(4)
 
+    // The mux VCD mirrors DUT ports in the testbench. The UI must show each
+    // logical signal once, not duplicate a/b/sel/y rows as the raw VCD does.
+    const visibleSignalRows = signalPanel.locator('.sim-v2-signal-row[data-sim-quality-kept="true"]')
+    await expect(visibleSignalRows).toHaveCount(4)
+    const names = await visibleSignalRows.locator('.sim-v2-signal-name').allTextContents()
+    expect([...names].sort()).toEqual(['a', 'b', 'sel', 'y'])
+    expect(new Set(names).size).toBe(names.length)
+    await expect(svg.locator('g[data-sim-quality-kept="true"]')).toHaveCount(4)
+    await expect(svg.locator('g[data-sim-quality-duplicate="true"]:visible')).toHaveCount(0)
+
+    // Name/value rows and their traces must stay on the same vertical rows.
+    const maxAlignmentError = await page.evaluate(() => {
+      const labels = [...document.querySelectorAll('.sim-v2-signal-row[data-sim-quality-kept="true"]')]
+      const traces = [...document.querySelectorAll('svg.wave-svg g[data-sim-quality-kept="true"]')]
+      if (labels.length !== traces.length || !labels.length) return 999
+      return Math.max(...labels.map((label, index) => {
+        const a = label.getBoundingClientRect()
+        const b = traces[index].getBoundingClientRect()
+        return Math.abs((a.top + a.height / 2) - (b.top + b.height / 2))
+      }))
+    })
+    expect(maxAlignmentError).toBeLessThanOrEqual(6)
+
+    // Fit must be a true fit: no horizontal overflow and both endpoint labels
+    // must remain inside the visible waveform viewport.
+    await fit.click()
+    await expect.poll(() => page.evaluate(() => {
+      const scroll = document.querySelector('.waveform-v2 .wave-scroll')
+      return scroll ? Math.max(0, scroll.scrollWidth - scroll.clientWidth) : 999
+    })).toBeLessThanOrEqual(2)
+
+    await expect(page.locator('.sim-v2-tick.first')).toContainText('0 ns')
+    const tickBounds = await page.evaluate(() => {
+      const scroll = document.querySelector('.waveform-v2 .wave-scroll')?.getBoundingClientRect()
+      const first = document.querySelector('.sim-v2-tick.first')?.getBoundingClientRect()
+      const last = document.querySelector('.sim-v2-tick.last')?.getBoundingClientRect()
+      if (!scroll || !first || !last) return null
+      return { firstLeft: first.left, lastRight: last.right, viewportLeft: scroll.left, viewportRight: scroll.right }
+    })
+    expect(tickBounds).toBeTruthy()
+    expect(tickBounds.firstLeft).toBeGreaterThanOrEqual(tickBounds.viewportLeft - 1)
+    expect(tickBounds.lastRight).toBeLessThanOrEqual(tickBounds.viewportRight + 1)
+
+    // Resizing the signal pane must actually give more width to the waveform,
+    // and Fit must remain correct afterwards.
+    const signalResizer = page.locator('.sim-v2-signal-resizer')
+    await expect(signalResizer).toBeVisible()
+    const beforeWidth = (await signalPanel.boundingBox()).width
+    const resizeBox = await signalResizer.boundingBox()
+    expect(resizeBox).toBeTruthy()
+    await page.mouse.move(resizeBox.x + resizeBox.width / 2, resizeBox.y + 80)
+    await page.mouse.down()
+    await page.mouse.move(resizeBox.x - 50, resizeBox.y + 80, { steps: 4 })
+    await page.mouse.up()
+    const afterWidth = (await signalPanel.boundingBox()).width
+    expect(afterWidth).toBeLessThan(beforeWidth - 20)
+    await fit.click()
+    await expect.poll(() => page.evaluate(() => {
+      const scroll = document.querySelector('.waveform-v2 .wave-scroll')
+      return scroll ? Math.max(0, scroll.scrollWidth - scroll.clientWidth) : 999
+    })).toBeLessThanOrEqual(2)
+
     const svgBox = await svg.boundingBox()
     expect(svgBox).toBeTruthy()
     await page.mouse.click(svgBox.x + svgBox.width * 0.62, svgBox.y + Math.min(70, svgBox.height / 2))
@@ -126,16 +189,24 @@ test.describe('HDLForge Monaco problem editor', () => {
     await page.keyboard.up('Shift')
     await expect(page.locator('[data-wave-readout="b"]')).toContainText('ns')
     await expect(page.locator('[data-wave-readout="delta"]')).toContainText('ns')
-    await expect(page.locator('.wave-cursor-line-a')).toBeVisible()
-    await expect(page.locator('.wave-cursor-line-b')).toBeVisible()
+    await expect(page.locator('.sim-v2-cursor:not(.b)')).toBeVisible()
+    await expect(page.locator('.sim-v2-cursor.b')).toBeVisible()
 
     await radix.selectOption('bin')
     await expect(radix).toHaveValue('bin')
-    await page.getByRole('button', { name: 'Fit' }).click()
-    await expect(waveform).toHaveClass(/waveform-enhanced/)
-    await expect(page.locator('.sim-v2-signal-resizer')).toBeVisible()
     await expect(page.locator('.sim-v2-name-value-resizer')).toBeVisible()
-    await expect(page.locator('.sim-v2-tick.first')).toContainText('0 ns')
+  })
+
+  test('shows a compilation error instead of testcase results for invalid syntax', async ({ page }) => {
+    test.setTimeout(90_000)
+    await replaceEditorContents(page, brokenMux)
+    await page.getByRole('button', { name: /Run tests/i }).first().click()
+
+    await expect(page.getByText('Compilation Error', { exact: true })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByText('Simulation did not run', { exact: true })).toBeVisible()
+    await expect(page.locator('.sim-v2-compile')).toBeVisible()
+    await expect(page.locator('.sim-v2-compiler-output')).toContainText(/error|syntax/i)
+    await expect(page.locator('.sim-v2-case')).toHaveCount(0)
   })
 
   test('preserves an edited draft when navigating away and back', async ({ page }) => {
