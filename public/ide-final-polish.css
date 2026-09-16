@@ -242,13 +242,19 @@ body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-lang
   pointer-events:none!important;
 }
 
-/* Reset belongs at the far right of the language bar. The flexible language wrapper fills the gap. */
+/* Reset and search live together at the far right of the language bar. */
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn{
   position:static!important;
   order:2!important;
   flex:0 0 32px!important;
-  margin:auto 10px auto 8px!important;
   inset:auto!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn:not(.editor-find-btn){
+  margin:auto 4px auto 8px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
+  order:3!important;
+  margin:auto 10px auto 0!important;
 }
 
 @media(max-width:720px){
