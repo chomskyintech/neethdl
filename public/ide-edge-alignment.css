@@ -132,8 +132,12 @@ body.hdlforge-ide-active .ide-page .ide-panel-resizer::before{
   opacity:0!important;
 }
 body.hdlforge-ide-active .ide-page .ide-panel-resizer span{
+  display:block!important;
+  visibility:visible!important;
   width:4px!important;
   height:34px!important;
+  min-width:4px!important;
+  min-height:34px!important;
   border:0!important;
   border-radius:999px!important;
   background:#5b5b5b!important;
@@ -145,6 +149,7 @@ body.hdlforge-ide-active .ide-page .ide-panel-resizer span{
 body.hdlforge-ide-active .ide-page .ide-panel-resizer:hover span,
 body.hdlforge-ide-active .ide-page .ide-panel-resizer.dragging span{
   width:5px!important;
+  min-width:5px!important;
   background:#777!important;
   color:transparent!important;
   opacity:1!important;
