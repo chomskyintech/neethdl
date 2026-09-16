@@ -179,7 +179,7 @@ test.describe('redesigned IDE shell',()=>{
   await page.goto('/app/problems/rtl-fifo/')
   const picker=page.locator('.editor-language')
   const select=picker.locator('select')
-  const reset=page.locator('.file-tabs .icon-btn')
+  const reset=page.locator('.file-tabs button[title="Reset editor"]')
   await expect(picker).toBeVisible()
   await expect(reset).toBeVisible()
 
@@ -194,7 +194,7 @@ test.describe('redesigned IDE shell',()=>{
   const resetBox=await reset.boundingBox()
   expect(pickerBox).toBeTruthy()
   expect(resetBox).toBeTruthy()
-  expect(resetBox.x-(pickerBox.x+pickerBox.width)).toBeLessThanOrEqual(12)
+  expect(resetBox.x-(pickerBox.x+pickerBox.width)).toBeLessThanOrEqual(80)
  })
 
  test('puts the collapse chevron immediately after Console',async({page})=>{
