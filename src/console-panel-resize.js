@@ -1,6 +1,7 @@
 const DEFAULT_CONSOLE_HEIGHT = 188
 const MIN_CONSOLE_HEIGHT = 120
 const MAX_CONSOLE_RATIO = 0.7
+const CONSOLE_HANDLE_HEIGHT = 14
 
 let activePanel = null
 let dragging = false
@@ -101,13 +102,16 @@ function syncCurrentPanel() {
   ensureRunProxy()
 }
 
+function isOnConsoleHandle(panel, clientY) {
+  const rect = panel.getBoundingClientRect()
+  return clientY >= rect.top && clientY <= rect.top + CONSOLE_HANDLE_HEIGHT
+}
+
 document.addEventListener('pointerdown', event => {
   const panel = event.target.closest?.('.ide-bottom')
-  if (!panel || panel.classList.contains('collapsed')) return
+  if (!panel || panel.classList.contains('collapsed') || !isOnConsoleHandle(panel, event.clientY)) return
 
   const rect = panel.getBoundingClientRect()
-  if (event.clientY < rect.top || event.clientY > rect.top + 9) return
-
   activePanel = panel
   dragging = true
   panel.dataset.expandedHeight = String(rect.height)
@@ -134,6 +138,15 @@ function stopDragging() {
 
 document.addEventListener('pointerup', stopDragging)
 document.addEventListener('pointercancel', stopDragging)
+
+// Double-clicking the visible top-edge handle gives the same quick collapse/restore
+// behaviour as the Console chevron without adding DOM inside React-owned markup.
+document.addEventListener('dblclick', event => {
+  const panel = event.target.closest?.('.ide-bottom')
+  if (!panel || !isOnConsoleHandle(panel, event.clientY)) return
+  panel.querySelector('.bottom-collapse')?.click()
+  event.preventDefault()
+})
 
 new MutationObserver(mutations => {
   for (const mutation of mutations) {
