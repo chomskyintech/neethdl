@@ -1,0 +1,71 @@
+/* Keep the IDE frame symmetric and remove the stray outer/resizer blue line. */
+body.hdlforge-ide-active{
+  width:100%!important;
+  height:100vh!important;
+  margin:0!important;
+  overflow:hidden!important;
+  scrollbar-width:none!important;
+}
+body.hdlforge-ide-active::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+body.hdlforge-ide-active>.app,
+body.hdlforge-ide-active .layout:has(.ide-page),
+body.hdlforge-ide-active .layout:has(.ide-page) .main{
+  width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active .ide-page{
+  width:100%!important;
+  max-width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  padding-left:8px!important;
+  padding-right:8px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active .ide-page .ide-body{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem,
+body.hdlforge-ide-active .ide-page .ide-workspace{
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+
+/* The resize hit-area stays usable, but there is no persistent blue divider. */
+body.hdlforge-ide-active .ide-page .ide-panel-resizer::before{
+  width:1px!important;
+  left:4.5px!important;
+  background:#4a4a4a!important;
+  opacity:0!important;
+}
+body.hdlforge-ide-active .ide-page .ide-panel-resizer:hover::before,
+body.hdlforge-ide-active .ide-page .ide-panel-resizer.dragging::before{
+  width:1px!important;
+  left:4.5px!important;
+  background:#626262!important;
+  opacity:.7!important;
+}
+body.hdlforge-ide-active .ide-page .ide-panel-resizer span{
+  border-color:#4a4a4a!important;
+  background:#242424!important;
+  color:#a0a0a0!important;
+}
+body.hdlforge-ide-active .ide-page .ide-panel-resizer:hover span,
+body.hdlforge-ide-active .ide-page .ide-panel-resizer.dragging span{
+  border-color:#626262!important;
+  color:#d8d8d8!important;
+}
