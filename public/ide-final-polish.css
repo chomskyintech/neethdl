@@ -88,7 +88,12 @@ body.hdlforge-ide-active .ide-topbar-signin svg{
 }
 
 /* Language control: no underline or click/focus border. */
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language){
+  justify-content:flex-start!important;
+}
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language{
+  margin-left:0!important;
+  flex:0 0 205px!important;
   box-shadow:none!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select,
@@ -101,8 +106,11 @@ body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-lang
 }
 
 /* Keep reset beside the language control instead of isolating it on the far right. */
-body.hdlforge-ide-active .ide-page .file-tabs .icon-btn{
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn{
+  position:static!important;
+  flex:0 0 32px!important;
   margin:auto 0 auto 4px!important;
+  inset:auto!important;
 }
 
 /* Put the collapse chevron immediately after Console instead of floating on its left. */
