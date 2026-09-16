@@ -1,0 +1,65 @@
+/* Keep the IDE on the neutral graphite palette and prevent native blue scrollbars. */
+body.hdlforge-ide-active,
+body.hdlforge-ide-active .ide-page{
+  background:#0f0f0f!important;
+}
+body.hdlforge-ide-active .ide-page .ide-topbar{
+  background:#141414!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem,
+body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs,
+body.hdlforge-ide-active .ide-page .ide-problem-content,
+body.hdlforge-ide-active .ide-page .file-tabs,
+body.hdlforge-ide-active .ide-page .ide-bottom,
+body.hdlforge-ide-active .ide-page .bottom-tabs{
+  background:#262626!important;
+}
+body.hdlforge-ide-active .ide-page .ide-workspace{
+  background:#1f1f1f!important;
+}
+body.hdlforge-ide-active .ide-page .editor-wrap,
+body.hdlforge-ide-active .ide-page .editor-stage,
+body.hdlforge-ide-active .ide-page .monaco-editor-stage{
+  background:#1e1e1e!important;
+}
+body.hdlforge-ide-active .ide-page .console{
+  background:#232323!important;
+}
+
+/* Neutral scrollbars everywhere inside the IDE. */
+body.hdlforge-ide-active .ide-page *,
+body.hdlforge-ide-active .ide-problems-drawer *{
+  scrollbar-color:#666 #262626!important;
+}
+body.hdlforge-ide-active .ide-page *::-webkit-scrollbar,
+body.hdlforge-ide-active .ide-problems-drawer *::-webkit-scrollbar{
+  width:10px!important;
+  height:10px!important;
+}
+body.hdlforge-ide-active .ide-page *::-webkit-scrollbar-track,
+body.hdlforge-ide-active .ide-problems-drawer *::-webkit-scrollbar-track{
+  background:#262626!important;
+}
+body.hdlforge-ide-active .ide-page *::-webkit-scrollbar-thumb,
+body.hdlforge-ide-active .ide-problems-drawer *::-webkit-scrollbar-thumb{
+  background:#666!important;
+  border:2px solid #262626!important;
+  border-radius:999px!important;
+}
+body.hdlforge-ide-active .ide-page *::-webkit-scrollbar-thumb:hover,
+body.hdlforge-ide-active .ide-problems-drawer *::-webkit-scrollbar-thumb:hover{
+  background:#7a7a7a!important;
+}
+body.hdlforge-ide-active .ide-page *::-webkit-scrollbar-corner,
+body.hdlforge-ide-active .ide-problems-drawer *::-webkit-scrollbar-corner{
+  background:#262626!important;
+}
+
+/* Preserve intentionally hidden scrollbars on compact tab strips. */
+body.hdlforge-ide-active .ide-page .problem-tabs::-webkit-scrollbar,
+body.hdlforge-ide-active .ide-page .file-tabs::-webkit-scrollbar,
+body.hdlforge-ide-active .ide-page .bottom-tabs::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
