@@ -68,6 +68,13 @@ body.hdlforge-ide-active .ide-drawer-difficulty{
   font-size:10px!important;
 }
 
+/* Keep the main IDE header compact. */
+body.hdlforge-ide-active .ide-page .ide-topbar{
+  height:48px!important;
+  min-height:48px!important;
+  flex-basis:48px!important;
+}
+
 /* Account control is icon-only. */
 body.hdlforge-ide-active .ide-topbar-signin{
   width:34px!important;
@@ -159,18 +166,21 @@ body.hdlforge-ide-active .ide-page .monaco-editor .overflow-guard{
 
 /* Slightly denser statement and language headers. */
 body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs{
-  height:46px!important;
-  flex-basis:46px!important;
+  height:45px!important;
+  flex-basis:45px!important;
 }
 body.hdlforge-ide-active .ide-page .problem-tabs button{
   font-size:14px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs{
-  height:44px!important;
-  flex-basis:44px!important;
+  height:43px!important;
+  flex-basis:43px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs .icon-btn{
+  height:43px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
-  font-size:14px!important;
+  font-size:13px!important;
 }
 body.hdlforge-ide-active .ide-page .problem-heading h1{
   font-size:29px!important;
