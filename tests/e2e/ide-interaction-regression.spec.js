@@ -50,17 +50,44 @@ test.describe('IDE interaction regressions', () => {
     const search = fileTabs.getByRole('button', { name: 'Find in source' })
 
     expect(await topbar.evaluate(el => getComputedStyle(el).height)).toBe('46px')
-    expect(await problemTabs.evaluate(el => getComputedStyle(el).height)).toBe('43px')
+    expect(await problemTabs.evaluate(el => getComputedStyle(el).height)).toBe('41px')
     expect(await problemTabButton.evaluate(el => getComputedStyle(el).fontSize)).toBe('14px')
-    expect(await fileTabs.evaluate(el => getComputedStyle(el).height)).toBe('41px')
+    expect(await fileTabs.evaluate(el => getComputedStyle(el).height)).toBe('39px')
     expect(await language.evaluate(el => getComputedStyle(el).fontSize)).toBe('13px')
 
     for (const control of [reset, search]) {
       const box = await control.boundingBox()
       expect(box).toBeTruthy()
-      expect(box.width).toBe(30)
-      expect(box.height).toBe(30)
+      expect(box.width).toBe(28)
+      expect(box.height).toBe(28)
     }
+  })
+
+  test('keeps difficulty and discovery tags below the problem title', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/app/problems/rtl-mux/')
+
+    const heading = page.locator('.problem-heading')
+    const title = heading.locator('h1')
+    const difficulty = heading.locator('.difficulty')
+    const projectTag = heading.locator('.problem-category')
+
+    await expect(title).toContainText('2:1 Multiplexer')
+    await expect(difficulty).toContainText('Easy')
+    await expect(projectTag).toBeVisible()
+
+    const company = await heading.evaluate(el => getComputedStyle(el, '::before').content.replaceAll('"', ''))
+    const course = await heading.evaluate(el => getComputedStyle(el, '::after').content.replaceAll('"', ''))
+    const project = await projectTag.evaluate(el => getComputedStyle(el, '::before').content.replaceAll('"', ''))
+    expect(company).toBe('Company')
+    expect(course).toBe('Course')
+    expect(project).toBe('Project')
+
+    const titleBox = await title.boundingBox()
+    const difficultyBox = await difficulty.boundingBox()
+    expect(titleBox).toBeTruthy()
+    expect(difficultyBox).toBeTruthy()
+    expect(difficultyBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height)
   })
 
   test('keeps the task-to-examples spacing compact', async ({ page }) => {
