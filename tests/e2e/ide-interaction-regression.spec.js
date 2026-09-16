@@ -71,13 +71,9 @@ test.describe('IDE interaction regressions', () => {
     const task = firstSection.locator('p')
     const examplesHeading = page.locator('.problem-section.first + .problem-section h2')
 
-    const firstStyles = await firstSection.evaluate(el => getComputedStyle(el))
-    const taskStyles = await task.evaluate(el => getComputedStyle(el))
-    const headingStyles = await examplesHeading.evaluate(el => getComputedStyle(el))
-
-    expect(firstStyles.paddingBottom).toBe('0px')
-    expect(taskStyles.paddingBottom).toBe('12px')
-    expect(headingStyles.paddingTop).toBe('18px')
+    expect(await firstSection.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('0px')
+    expect(await task.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('12px')
+    expect(await examplesHeading.evaluate(el => getComputedStyle(el).paddingTop)).toBe('18px')
   })
 
   test('removes the editor info row and keeps search beside reset', async ({ page }) => {
