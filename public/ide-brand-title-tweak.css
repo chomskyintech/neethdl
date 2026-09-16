@@ -31,3 +31,13 @@ body.hdlforge-ide-active .ide-page .ide-brand strong{
 body.hdlforge-ide-active .ide-page .problem-heading h1{
   font-weight:500!important;
 }
+
+/* Keep the statement clean: category is already shown in the top section selector. */
+body.hdlforge-ide-active .ide-page .problem-heading .problem-category{
+  display:none!important;
+}
+
+/* The opening paragraph is self-explanatory, so remove the redundant Task heading only. */
+body.hdlforge-ide-active .ide-page .problem-section.first > h2{
+  display:none!important;
+}
