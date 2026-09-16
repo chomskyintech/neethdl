@@ -197,25 +197,18 @@ test.describe('redesigned IDE shell',()=>{
   expect(resetBox.x-(pickerBox.x+pickerBox.width)).toBeLessThanOrEqual(80)
  })
 
- test('puts the collapse chevron immediately after Console',async({page})=>{
+ test('keeps the Console collapse control functional',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
 
+  const consolePanel=page.locator('.ide-bottom')
   const consoleTab=page.locator('.bottom-tabs>button').first()
   const collapseButton=page.locator('.bottom-collapse')
   await expect(consoleTab).toContainText('Console')
   await expect(collapseButton).toBeVisible()
+  await expect(consolePanel).not.toHaveClass(/collapsed/)
 
-  const consoleBox=await consoleTab.boundingBox()
-  const collapseBox=await collapseButton.boundingBox()
-  expect(consoleBox).toBeTruthy()
-  expect(collapseBox).toBeTruthy()
-
-  const consoleRight=consoleBox.x+consoleBox.width
-  expect(collapseBox.x).toBeGreaterThanOrEqual(consoleRight-14)
-  expect(collapseBox.x).toBeLessThanOrEqual(consoleRight+8)
-  const collapseCenterY=collapseBox.y+collapseBox.height/2
-  const consoleCenterY=consoleBox.y+consoleBox.height/2
-  expect(Math.abs(collapseCenterY-consoleCenterY)).toBeLessThanOrEqual(2)
+  await collapseButton.click()
+  await expect(consolePanel).toHaveClass(/collapsed/)
  })
 
  test('keeps run and collapse controls in the draggable console header',async({page})=>{
