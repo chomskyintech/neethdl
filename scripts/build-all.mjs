@@ -35,6 +35,11 @@ try{
  await runGenerator('generate-accelerator-seo.mjs')
  await runGenerator('generate-intent-guides.mjs')
 
+ // Rebuild the sitemap only after every crawlable page generator has finished.
+ // This avoids individual generators accidentally leaving new URLs out of sitemap.xml.
+ await runGenerator('generate-sitemap.mjs')
+ await runGenerator('validate-sitemap.mjs')
+
  fs.writeFileSync(problemFile,originalProblems)
  fs.writeFileSync(acceleratorFile,originalAccelerators)
 
