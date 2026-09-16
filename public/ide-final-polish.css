@@ -176,7 +176,8 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   height:43px!important;
   flex-basis:43px!important;
 }
-body.hdlforge-ide-active .ide-page .file-tabs .icon-btn{
+body.hdlforge-ide-active .ide-page .file-tabs .icon-btn,
+body.hdlforge-ide-active .ide-page .file-tabs .editor-find-btn{
   height:43px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
@@ -253,18 +254,33 @@ body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-lang
 }
 
 /* Reset and search live together at the far right of the language bar. */
-body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn{
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn,
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
   position:static!important;
-  order:2!important;
   flex:0 0 32px!important;
   inset:auto!important;
 }
-body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn:not(.editor-find-btn){
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn{
+  order:2!important;
   margin:auto 4px auto 8px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
   order:3!important;
+  width:32px!important;
+  min-width:32px!important;
   margin:auto 10px auto 0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  border:0!important;
+  border-radius:8px!important;
+  background:transparent!important;
+  color:#aaa!important;
+  cursor:pointer!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn:hover{
+  background:#303030!important;
+  color:#fff!important;
 }
 
 @media(max-width:720px){
