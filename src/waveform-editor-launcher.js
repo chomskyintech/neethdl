@@ -15,12 +15,16 @@ function injectStyles() {
       display:none!important;
     }
     .file-tabs .sim-editor-waveform-launch{
+      position:static!important;
+      order:3!important;
       display:inline-grid!important;
       place-items:center!important;
       width:28px!important;
       height:28px!important;
       min-width:28px!important;
       padding:0!important;
+      margin:auto 4px!important;
+      inset:auto!important;
       border:1px solid transparent!important;
       border-radius:6px!important;
       background:transparent!important;
@@ -36,6 +40,9 @@ function injectStyles() {
       color:#8ee7a2!important;
       background:rgba(71,190,101,.12)!important;
       border-color:rgba(71,190,101,.28)!important;
+    }
+    body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
+      order:4!important;
     }
   `
   document.head.appendChild(style)
@@ -67,8 +74,9 @@ function syncWorkspace(workspace) {
     launcher.setAttribute('aria-pressed', 'false')
     launcher.innerHTML = WAVE_ICON
 
-    // The requested order is Reset -> Waveform -> Find. Keep the new control
-    // in normal toolbar flow so it never overlaps the language selector.
+    // Requested order: Reset -> Waveform -> Find.
+    // Explicit flex order keeps the control beside Reset even though the
+    // language bar styles give Reset/Search their own ordering rules.
     reset.insertAdjacentElement('afterend', launcher)
 
     launcher.addEventListener('click', () => {
@@ -76,16 +84,13 @@ function syncWorkspace(workspace) {
       const currentSource = waveformTab(currentPanel)
       if (!currentPanel || !currentSource) return
 
-      // Reuse the existing waveform renderer and its styling unchanged. The
-      // behavior module expands the lower panel to the editor workspace size
-      // and hides Monaco while the waveform is open.
+      // Reuse the existing waveform renderer and styling unchanged. The
+      // behavior module expands it to the editor-workspace footprint.
       currentSource.click()
       requestAnimationFrame(() => requestAnimationFrame(syncAll))
     })
   }
 
-  // Other toolbar enhancers may rearrange controls after this script runs.
-  // Reassert the requested adjacency without recreating anything.
   if (reset.nextElementSibling !== launcher) reset.insertAdjacentElement('afterend', launcher)
 
   const active = source.classList.contains('active') && !panel.classList.contains('collapsed')
