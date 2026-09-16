@@ -152,8 +152,8 @@ body.hdlforge-ide-active .ide-page .bottom-tabs .bottom-collapse:hover{
   background:transparent!important;
   color:#fff!important;
 }
-body.hdlforge-ide-active .ide-page .bottom-tabs>button:nth-child(2){order:3!important}
-body.hdlforge-ide-active .ide-page .bottom-tabs>button:nth-child(3){order:4!important}
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:nth-child(2):not(.bottom-collapse){order:3!important}
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:nth-child(3):not(.bottom-collapse){order:4!important}
 
 /* Let the editor surface use the full workspace cleanly. */
 body.hdlforge-ide-active .ide-page .editor-wrap,
