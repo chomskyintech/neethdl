@@ -1,0 +1,125 @@
+.waveform-editor-stage{
+  position:relative;
+  display:flex;
+  flex:1 1 auto;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  background:#111;
+}
+
+.waveform-editor-stage>.editor-wrap,
+.waveform-editor-stage>.editor-shell,
+.waveform-editor-stage>.monaco-editor-wrap{
+  flex:1 1 auto;
+  min-width:0;
+  min-height:0;
+}
+
+.waveform-window{
+  position:absolute;
+  inset:0;
+  z-index:24;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  background:#111;
+  border:0;
+}
+
+.waveform-window-head{
+  flex:0 0 34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 7px 0 11px;
+  background:#202020;
+  border-bottom:1px solid #3a3a3a;
+}
+
+.waveform-window-head>div{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.waveform-window-head strong{
+  color:#e6e6e6;
+  font-size:11px;
+  font-weight:750;
+}
+
+.waveform-window-head span{
+  color:#7f858c;
+  font-size:9px;
+}
+
+.waveform-window-close{
+  margin-left:auto;
+  width:27px;
+  height:27px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:4px;
+  background:transparent;
+  color:#a8adb3;
+  font:18px/1 Arial,sans-serif;
+  cursor:pointer;
+}
+
+.waveform-window-close:hover{
+  background:#343434;
+  color:#fff;
+}
+
+.waveform-window-body{
+  flex:1 1 auto;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
+  background:#111;
+}
+
+.waveform-window-body>.waveform,
+.waveform-window-body>.waveform-v2{
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  margin:0!important;
+  display:flex;
+  flex-direction:column;
+  border-radius:0!important;
+}
+
+.waveform-window-body .wave-scroll{
+  flex:1 1 auto;
+  min-height:0;
+}
+
+.waveform-window-empty{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#737b84;
+  background:#111;
+  font-size:11px;
+}
+
+.file-tabs .waveform-launch-button{
+  flex:0 0 28px;
+}
+
+.file-tabs .waveform-launch-button.active{
+  color:#8ee7a2;
+  background:rgba(71,190,101,.12);
+  border-color:rgba(71,190,101,.28);
+}
