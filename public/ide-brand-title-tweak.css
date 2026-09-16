@@ -1,0 +1,26 @@
+/* Final IDE-only brand/title refinements. */
+body.hdlforge-ide-active .ide-page .ide-brand{
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  padding:7px 4px!important;
+}
+body.hdlforge-ide-active .ide-page .ide-brand-icon{
+  display:none!important;
+}
+body.hdlforge-ide-active .ide-page .ide-brand strong{
+  font-size:20px!important;
+  font-weight:800!important;
+  letter-spacing:-.03em!important;
+  background:none!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  color:#f3f3f3!important;
+  -webkit-text-fill-color:#f3f3f3!important;
+  text-shadow:none!important;
+}
+
+/* Keep the task-page problem title prominent without a bold/heavy weight. */
+body.hdlforge-ide-active .ide-page .problem-heading h1{
+  font-weight:500!important;
+}
