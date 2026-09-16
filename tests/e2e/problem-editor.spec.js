@@ -80,7 +80,7 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await codeText(page)).toContain('Your RTL here')
   })
 
-  test('runs valid RTL and renders detailed tests plus a waveform', async ({ page }) => {
+  test('runs valid RTL and renders an interactive inspection waveform', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, muxSolution)
     await page.getByRole('button', { name: /Run tests/i }).first().click()
@@ -88,8 +88,38 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(page.locator('.test-case')).toHaveCount(4)
     await expect(page.locator('.test-case.pass')).toHaveCount(4)
     await page.getByRole('button', { name: /Waveform/i }).click()
-    await expect(page.locator('.waveform')).toBeVisible()
-    await expect(page.locator('svg.wave-svg')).toBeVisible()
+
+    const waveform = page.locator('.waveform')
+    const svg = page.locator('svg.wave-svg')
+    const livePanel = page.locator('.wave-live-panel')
+    const toolbar = page.locator('.wave-enhance-toolbar')
+    const radix = page.getByRole('combobox', { name: 'Waveform radix' })
+
+    await expect(waveform).toBeVisible()
+    await expect(svg).toBeVisible()
+    await expect(toolbar).toBeVisible()
+    await expect(livePanel).toBeVisible()
+    expect(await livePanel.locator('.wave-live-row').count()).toBeGreaterThan(0)
+    await expect(page.getByRole('searchbox', { name: 'Find waveform signal' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Fit' })).toBeVisible()
+    await expect(radix).toHaveValue('hex')
+
+    const svgBox = await svg.boundingBox()
+    expect(svgBox).toBeTruthy()
+    await page.mouse.click(svgBox.x + svgBox.width * 0.62, svgBox.y + Math.min(70, svgBox.height / 2))
+    await expect(page.locator('[data-wave-readout="a"]')).toContainText('ns')
+    await page.keyboard.down('Shift')
+    await page.mouse.click(svgBox.x + svgBox.width * 0.74, svgBox.y + Math.min(70, svgBox.height / 2))
+    await page.keyboard.up('Shift')
+    await expect(page.locator('[data-wave-readout="b"]')).toContainText('ns')
+    await expect(page.locator('[data-wave-readout="delta"]')).toContainText('ns')
+    await expect(page.locator('.wave-cursor-line-a')).toBeVisible()
+    await expect(page.locator('.wave-cursor-line-b')).toBeVisible()
+
+    await radix.selectOption('bin')
+    await expect(radix).toHaveValue('bin')
+    await page.getByRole('button', { name: 'Fit' }).click()
+    await expect(waveform).toHaveClass(/waveform-enhanced/)
   })
 
   test('preserves an edited draft when navigating away and back', async ({ page }) => {
