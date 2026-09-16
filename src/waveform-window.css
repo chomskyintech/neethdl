@@ -29,37 +29,34 @@
   border:0;
 }
 
+/* The standalone waveform no longer needs its own title strip. Keep only the
+   close action and float it over the right side of the waveform toolbar. */
 .waveform-window-head{
-  flex:0 0 34px;
-  height:34px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:0 7px 0 11px;
-  background:#202020;
-  border-bottom:1px solid #3a3a3a;
+  position:absolute!important;
+  z-index:40!important;
+  top:0!important;
+  right:0!important;
+  width:42px!important;
+  height:38px!important;
+  min-height:38px!important;
+  flex:0 0 38px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:0!important;
+  padding:0 7px 0 0!important;
+  background:transparent!important;
+  border:0!important;
+  pointer-events:none!important;
 }
 
 .waveform-window-head>div{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.waveform-window-head strong{
-  color:#e6e6e6;
-  font-size:11px;
-  font-weight:750;
-}
-
-.waveform-window-head span{
-  color:#7f858c;
-  font-size:9px;
+  display:none!important;
 }
 
 .waveform-window-close{
-  margin-left:auto;
+  pointer-events:auto!important;
+  margin:0!important;
   width:27px;
   height:27px;
   display:grid;
@@ -78,7 +75,10 @@
 }
 
 .waveform-window-body{
+  position:relative;
   flex:1 1 auto;
+  width:100%;
+  height:100%;
   min-width:0;
   min-height:0;
   overflow:hidden;
@@ -95,6 +95,11 @@
   display:flex;
   flex-direction:column;
   border-radius:0!important;
+}
+
+/* Reserve the far-right toolbar cell for the close control above it. */
+.waveform-window-body .sim-v2-wave-toolbar{
+  padding-right:45px!important;
 }
 
 .waveform-window-body .wave-scroll{
