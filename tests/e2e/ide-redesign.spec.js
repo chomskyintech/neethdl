@@ -32,6 +32,24 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
+ test('uses the neutral IDE palette in the problem drawer',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  await page.getByRole('button',{name:'Open problems'}).click()
+
+  const drawer=page.locator('#hdlforge-ide-drawer')
+  const header=drawer.locator('.ide-drawer-header')
+  const search=drawer.locator('.ide-drawer-search')
+  const active=drawer.locator('.ide-drawer-problem.active')
+
+  await expect(drawer).toHaveClass(/open/)
+  await expect(active).toBeVisible()
+
+  expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 31, 31)')
+  expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 38, 38)')
+  expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(30, 30, 30)')
+  expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(48, 48, 48)')
+ })
+
  test('navigates between coding problems from the drawer without a full page reload',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await page.getByRole('button',{name:'Open problems'}).click()
