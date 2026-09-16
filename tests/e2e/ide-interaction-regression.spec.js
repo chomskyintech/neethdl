@@ -8,7 +8,7 @@ test.describe('IDE interaction regressions', () => {
     const fileTabs = page.locator('.file-tabs')
     const picker = page.locator('.editor-language')
     const select = picker.locator('select')
-    const reset = fileTabs.locator('.icon-btn')
+    const reset = fileTabs.locator('button[title="Reset editor"]')
 
     await expect(select).toBeVisible()
     await expect(reset).toBeVisible()
@@ -28,7 +28,6 @@ test.describe('IDE interaction regressions', () => {
     expect(pickerBox).toBeTruthy()
     expect(resetBox).toBeTruthy()
 
-    expect(tabsBox.x + tabsBox.width - (resetBox.x + resetBox.width)).toBeLessThanOrEqual(16)
     expect(resetBox.x).toBeGreaterThan(tabsBox.x + tabsBox.width * 0.75)
 
     const hitTag = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.tagName, {
@@ -36,6 +35,35 @@ test.describe('IDE interaction regressions', () => {
       y: pickerBox.y + pickerBox.height / 2
     })
     expect(hitTag).toBe('SELECT')
+  })
+
+  test('removes the editor info row and keeps search beside reset', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/app/problems/rtl-fifo/')
+
+    const fileTabs = page.locator('.file-tabs')
+    const reset = fileTabs.locator('button[title="Reset editor"]')
+    const search = fileTabs.getByRole('button', { name: 'Find in source' })
+
+    await expect(page.locator('.editor-toolbar')).toHaveCount(0)
+    await expect(reset).toBeVisible()
+    await expect(search).toBeVisible()
+
+    const tabsBox = await fileTabs.boundingBox()
+    const resetBox = await reset.boundingBox()
+    const searchBox = await search.boundingBox()
+    expect(tabsBox).toBeTruthy()
+    expect(resetBox).toBeTruthy()
+    expect(searchBox).toBeTruthy()
+
+    const gap = searchBox.x - (resetBox.x + resetBox.width)
+    expect(gap).toBeGreaterThanOrEqual(0)
+    expect(gap).toBeLessThanOrEqual(8)
+    expect(Math.abs((resetBox.y + resetBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
+    expect(tabsBox.x + tabsBox.width - (searchBox.x + searchBox.width)).toBeLessThanOrEqual(16)
+
+    await search.click()
+    await expect(page.locator('.monaco-editor .find-widget')).toBeVisible()
   })
 
   test('lets the console resize handle expand a collapsed console directly', async ({ page }) => {
