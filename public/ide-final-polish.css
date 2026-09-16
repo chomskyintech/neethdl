@@ -157,6 +157,33 @@ body.hdlforge-ide-active .ide-page .monaco-editor .overflow-guard{
   max-width:none!important;
 }
 
+/* Slightly denser statement and language headers. */
+body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs{
+  height:48px!important;
+  flex-basis:48px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-tabs button{
+  font-size:14px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs{
+  height:46px!important;
+  flex-basis:46px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
+  font-size:14px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading h1{
+  font-size:29px!important;
+}
+
+/* Remove the divider lines immediately above and below the task description. */
+body.hdlforge-ide-active .ide-page .problem-heading{
+  border-bottom:0!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section.first p{
+  border-bottom:0!important;
+}
+
 @media(max-width:720px){
   body.hdlforge-ide-active .ide-problem-drawer{
     width:calc(100vw - 20px)!important;
