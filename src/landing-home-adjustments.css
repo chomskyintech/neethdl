@@ -1,0 +1,54 @@
+/* Final homepage refinements: keep the hero clear of the portrait and restore crawlable SEO links. */
+.landing-hero-copy{max-width:900px}
+
+.landing-hero h1{
+ max-width:900px;
+ font-size:clamp(46px,4.15vw,64px);
+ line-height:1.07;
+}
+
+.landing-resource-links{
+ display:flex;
+ flex-wrap:wrap;
+ gap:8px 10px;
+ margin-top:24px;
+ max-width:760px;
+}
+
+.landing-resource-links a{
+ display:inline-flex;
+ align-items:center;
+ min-height:34px;
+ padding:0 11px;
+ border:1px solid rgba(255,255,255,.10);
+ border-radius:9px;
+ background:rgba(255,255,255,.035);
+ color:#aeb4b0;
+ font-size:12px;
+ font-weight:650;
+ text-decoration:none;
+ transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease;
+}
+
+.landing-resource-links a:hover{
+ color:#fff;
+ border-color:rgba(98,199,170,.34);
+ background:rgba(82,190,160,.08);
+ transform:translateY(-1px);
+}
+
+@media(max-width:1180px){
+ .landing-hero-copy{max-width:760px}
+ .landing-hero h1{max-width:760px;font-size:clamp(44px,4.9vw,58px)}
+}
+
+@media(max-width:1000px){
+ .landing-hero-copy{max-width:680px}
+ .landing-hero h1{max-width:680px;font-size:clamp(40px,7vw,52px)}
+}
+
+@media(max-width:620px){
+ .landing-hero h1{font-size:38px}
+ .landing-resource-links{margin-top:20px;gap:7px}
+ .landing-resource-links a{font-size:11px;min-height:32px;padding:0 9px}
+}
