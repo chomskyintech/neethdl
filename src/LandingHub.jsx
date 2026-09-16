@@ -2,7 +2,21 @@ import React from 'react'
 import './landing-redesign.css'
 import './landing-home-adjustments.css'
 
+const resources=[
+ {label:'Problems',href:'/problems/',page:'problems'},
+ {label:'Learning',href:'/learn/',page:'courses'},
+ {label:'Verilog guide',href:'/learn/verilog-interview/',page:'courses'},
+ {label:'Companies',href:'/companies/',page:'tracks'},
+ {label:'Projects',href:'/projects/',page:'projects'},
+]
+
 export default function LandingHub({go}){
+ const openResource=(event,page)=>{
+  if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+  event.preventDefault()
+  go(page)
+ }
+
  return <div className="landing-hub">
   <section className="hero landing-hero">
    <div className="landing-hero-copy">
@@ -10,11 +24,7 @@ export default function LandingHub({go}){
     <p>Practice digital design, verification, FPGA and VLSI skills through focused problems and hands-on hardware projects.</p>
     <button className="landing-start" type="button" onClick={()=>go('problems')}>Start practice</button>
     <nav className="landing-resource-links" aria-label="Explore HDLForge resources">
-     <a href="/problems/">Problems</a>
-     <a href="/learn/">Learning</a>
-     <a href="/learn/verilog-interview/">Verilog guide</a>
-     <a href="/companies/">Companies</a>
-     <a href="/projects/">Projects</a>
+     {resources.map(resource=><a key={resource.href} href={resource.href} onClick={event=>openResource(event,resource.page)}>{resource.label}</a>)}
     </nav>
    </div>
   </section>
