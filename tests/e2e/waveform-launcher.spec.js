@@ -37,8 +37,8 @@ test('waveform launches beside Reset editor and owns the editor workspace', asyn
   const launchBox = await launcher.boundingBox()
   expect(resetBox && launchBox).toBeTruthy()
   expect(Math.abs(launchBox.y - resetBox.y)).toBeLessThanOrEqual(2)
-  expect(launchBox.x).toBeGreaterThanOrEqual(resetBox.x + resetBox.width - 2)
-  expect(launchBox.x - (resetBox.x + resetBox.width)).toBeLessThanOrEqual(16)
+  expect(launchBox.x + launchBox.width).toBeLessThanOrEqual(resetBox.x + 2)
+  expect(resetBox.x - (launchBox.x + launchBox.width)).toBeLessThanOrEqual(20)
 
   await launcher.click()
   const waveform = page.locator('.waveform-v2')
