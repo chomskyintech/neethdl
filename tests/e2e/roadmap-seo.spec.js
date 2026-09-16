@@ -20,6 +20,36 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page).toHaveURL(/\/app\/problems\/$/)
   })
 
+  test('homepage SEO links remain crawlable and normal clicks open working app sections', async ({ page }) => {
+    await page.goto('/')
+    const problems = page.locator('.landing-resource-links a[href="/problems/"]')
+    const learning = page.locator('.landing-resource-links a[href="/learn/"]')
+    const companies = page.locator('.landing-resource-links a[href="/companies/"]')
+    const projects = page.locator('.landing-resource-links a[href="/projects/"]')
+    await expect(problems).toBeVisible()
+    await expect(learning).toBeVisible()
+    await expect(companies).toBeVisible()
+    await expect(projects).toBeVisible()
+
+    await problems.click()
+    await expect(page).toHaveURL(/\/app\/problems\/$/)
+    await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
+
+    await page.goto('/')
+    await page.locator('.landing-resource-links a[href="/learn/"]').click()
+    await expect(page).toHaveURL(/\/app\/courses\/$/)
+    await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible()
+
+    await page.goto('/')
+    await page.locator('.landing-resource-links a[href="/companies/"]').click()
+    await expect(page).toHaveURL(/\/app\/tracks\/$/)
+
+    await page.goto('/')
+    await page.locator('.landing-resource-links a[href="/projects/"]').click()
+    await expect(page).toHaveURL(/\/app\/projects\/$/)
+    await expect(page.getByRole('heading', { name: 'Hardware design projects' })).toBeVisible()
+  })
+
   test('Problems page owns problem sections and problem rows', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
