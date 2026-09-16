@@ -43,10 +43,9 @@ function syncPanel(panel) {
     return
   }
 
-  // Waveform mode intentionally owns the full workspace height. Do not let the
-  // normal console resize synchronizer clamp it back to MAX_CONSOLE_RATIO when
-  // React or the waveform enhancer mutates descendant DOM nodes.
-  if (panel.dataset.waveformMaximized === 'true') {
+  // Waveform mode and the intentionally preserved full-height Console mode own
+  // the workspace height. Do not clamp either one back to MAX_CONSOLE_RATIO.
+  if (panel.dataset.waveformMaximized === 'true' || panel.dataset.simBehaviorKeepExpanded === 'true') {
     requestAnimationFrame(positionRunProxy)
     return
   }
