@@ -8,29 +8,88 @@ body.hdlforge-ide-active .ide-page .ide-topbar{
 
 /* Reduce the tab bars without changing the Problem/Approach/Solution/Discussion text size. */
 body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs{
-  height:43px!important;
-  min-height:43px!important;
-  flex:0 0 43px!important;
+  height:41px!important;
+  min-height:41px!important;
+  flex:0 0 41px!important;
 }
 body.hdlforge-ide-active .ide-page .problem-tabs button{
   font-size:14px!important;
 }
 
 body.hdlforge-ide-active .ide-page .file-tabs{
-  height:41px!important;
-  min-height:41px!important;
-  flex:0 0 41px!important;
+  height:39px!important;
+  min-height:39px!important;
+  flex:0 0 39px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
   font-size:13px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn,
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
-  width:30px!important;
-  min-width:30px!important;
-  height:30px!important;
-  min-height:30px!important;
-  flex:0 0 30px!important;
+  width:28px!important;
+  min-width:28px!important;
+  height:28px!important;
+  min-height:28px!important;
+  flex:0 0 28px!important;
+}
+
+/* Put difficulty and the new discovery tags directly below the task title. */
+body.hdlforge-ide-active .ide-page .problem-heading{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:6px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading>div{
+  display:contents!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading h1{
+  order:0!important;
+  flex:0 0 100%!important;
+  margin:0 0 8px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading .difficulty{
+  order:1!important;
+  position:static!important;
+  margin:0!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading::before,
+body.hdlforge-ide-active .ide-page .problem-heading::after,
+body.hdlforge-ide-active .ide-page .problem-heading .problem-category{
+  height:26px!important;
+  box-sizing:border-box!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:0 10px!important;
+  border:1px solid #3a3a3a!important;
+  border-radius:999px!important;
+  background:#303030!important;
+  color:#bdbdbd!important;
+  font-size:11px!important;
+  line-height:1!important;
+  font-weight:600!important;
+  letter-spacing:0!important;
+  text-transform:none!important;
+  white-space:nowrap!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading::before{
+  content:"Company"!important;
+  order:2!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading::after{
+  content:"Course"!important;
+  order:3!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading .problem-category{
+  order:4!important;
+  font-size:0!important;
+}
+body.hdlforge-ide-active .ide-page .problem-heading .problem-category::before{
+  content:"Project"!important;
+  font-size:11px!important;
 }
 
 /* Remove the oversized vertical gap between the task text and Examples. */
