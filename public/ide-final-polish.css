@@ -184,6 +184,73 @@ body.hdlforge-ide-active .ide-page .problem-section.first p{
   border-bottom:0!important;
 }
 
+/* Keep the language chevron attached to the selected label, even for short labels such as VHDL. */
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language{
+  position:relative!important;
+  flex:1 1 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:100%!important;
+  padding:0 0 0 18px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  overflow:visible!important;
+  box-shadow:none!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language::before{
+  position:static!important;
+  flex:0 0 auto!important;
+  left:auto!important;
+  top:auto!important;
+  margin:0!important;
+  transform:none!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
+  position:static!important;
+  inset:auto!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  field-sizing:content!important;
+  border:0!important;
+  border-radius:0!important;
+  outline:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  appearance:none!important;
+  -webkit-appearance:none!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language::after{
+  position:static!important;
+  flex:0 0 7px!important;
+  right:auto!important;
+  top:auto!important;
+  width:7px!important;
+  height:7px!important;
+  margin:0 0 4px 0!important;
+  border:0!important;
+  border-right:1.5px solid #999!important;
+  border-bottom:1.5px solid #999!important;
+  transform:rotate(45deg)!important;
+  pointer-events:none!important;
+}
+
+/* Reset belongs at the far right of the language bar. The flexible language wrapper fills the gap. */
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn{
+  position:static!important;
+  order:2!important;
+  flex:0 0 32px!important;
+  margin:auto 10px auto 8px!important;
+  inset:auto!important;
+}
+
 @media(max-width:720px){
   body.hdlforge-ide-active .ide-problem-drawer{
     width:calc(100vw - 20px)!important;
