@@ -143,3 +143,13 @@ body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>button[title
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
   order:4!important;
 }
+
+/* The Console chevron is independent of the waveform and stays directly after
+   the Console tab. This final selector intentionally wins over older nth-child
+   ordering rules in the legacy polish stylesheet. */
+body.hdlforge-ide-active .ide-page .bottom-tabs>.bottom-collapse{
+  order:2!important;
+}
+body.hdlforge-ide-active .ide-page .bottom-tabs>button:not(.bottom-collapse):nth-child(2){
+  order:3!important;
+}
