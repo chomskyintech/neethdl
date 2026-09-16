@@ -109,12 +109,26 @@ function isOnConsoleHandle(panel, clientY) {
 
 document.addEventListener('pointerdown', event => {
   const panel = event.target.closest?.('.ide-bottom')
-  if (!panel || panel.classList.contains('collapsed') || !isOnConsoleHandle(panel, event.clientY)) return
+  if (!panel || !isOnConsoleHandle(panel, event.clientY)) return
 
   const rect = panel.getBoundingClientRect()
+  const wasCollapsed = panel.classList.contains('collapsed')
   activePanel = panel
   dragging = true
-  panel.dataset.expandedHeight = String(rect.height)
+
+  if (wasCollapsed) {
+    const saved = Number.parseFloat(panel.dataset.expandedHeight)
+    if (!Number.isFinite(saved)) panel.dataset.expandedHeight = String(DEFAULT_CONSOLE_HEIGHT)
+    panel.querySelector('.bottom-collapse')?.click()
+    requestAnimationFrame(() => {
+      if (!dragging || activePanel !== panel) return
+      const expanded = Number.parseFloat(panel.dataset.expandedHeight)
+      applyExpandedHeight(panel, Number.isFinite(expanded) ? expanded : DEFAULT_CONSOLE_HEIGHT)
+    })
+  } else {
+    panel.dataset.expandedHeight = String(rect.height)
+  }
+
   document.body.classList.add('ide-console-resizing')
   event.preventDefault()
 })
