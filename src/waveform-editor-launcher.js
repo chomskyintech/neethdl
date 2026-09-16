@@ -15,9 +15,7 @@ function injectStyles() {
       display:none!important;
     }
     .file-tabs .sim-editor-waveform-launch{
-      position:absolute!important;
-      z-index:4!important;
-      display:grid!important;
+      display:inline-grid!important;
       place-items:center!important;
       width:28px!important;
       height:28px!important;
@@ -25,9 +23,10 @@ function injectStyles() {
       padding:0!important;
       border:1px solid transparent!important;
       border-radius:6px!important;
-      background:#1f1f1f!important;
+      background:transparent!important;
       color:#9ca3ad!important;
       cursor:pointer!important;
+      flex:0 0 28px!important;
     }
     .file-tabs .sim-editor-waveform-launch:hover{
       color:#e4e7eb!important;
@@ -44,17 +43,6 @@ function injectStyles() {
 
 function waveformTab(panel) {
   return qa(panel, '.bottom-tabs > button').find(button => /^Waveform$/i.test(button.textContent?.trim() || '')) || null
-}
-
-function positionLauncher(fileTabs, reset, launcher) {
-  const tabsStyle = getComputedStyle(fileTabs)
-  if (tabsStyle.position === 'static') fileTabs.style.position = 'relative'
-
-  // Because the launcher is absolutely positioned, it does not disturb the
-  // existing Reset -> Find spacing. Keep it 8 px to the left of Reset.
-  const left = Math.max(0, reset.offsetLeft - launcher.offsetWidth - 8)
-  launcher.style.left = `${left}px`
-  launcher.style.top = `${reset.offsetTop}px`
 }
 
 function syncWorkspace(workspace) {
@@ -78,22 +66,27 @@ function syncWorkspace(workspace) {
     launcher.setAttribute('aria-label', 'Waveform')
     launcher.setAttribute('aria-pressed', 'false')
     launcher.innerHTML = WAVE_ICON
-    fileTabs.appendChild(launcher)
+
+    // The requested order is Reset -> Waveform -> Find. Keep the new control
+    // in normal toolbar flow so it never overlaps the language selector.
+    reset.insertAdjacentElement('afterend', launcher)
 
     launcher.addEventListener('click', () => {
       const currentPanel = q(workspace, '.ide-bottom')
       const currentSource = waveformTab(currentPanel)
       if (!currentPanel || !currentSource) return
 
-      // Keep the React-owned waveform renderer and all of its current formatting.
-      // The existing waveform behavior module expands the panel to the editor
-      // workspace footprint and hides Monaco while the waveform is open.
+      // Reuse the existing waveform renderer and its styling unchanged. The
+      // behavior module expands the lower panel to the editor workspace size
+      // and hides Monaco while the waveform is open.
       currentSource.click()
       requestAnimationFrame(() => requestAnimationFrame(syncAll))
     })
   }
 
-  positionLauncher(fileTabs, reset, launcher)
+  // Other toolbar enhancers may rearrange controls after this script runs.
+  // Reassert the requested adjacency without recreating anything.
+  if (reset.nextElementSibling !== launcher) reset.insertAdjacentElement('afterend', launcher)
 
   const active = source.classList.contains('active') && !panel.classList.contains('collapsed')
   if (launcher.classList.contains('active') !== active) launcher.classList.toggle('active', active)
@@ -107,18 +100,10 @@ function syncAll() {
 
 injectStyles()
 syncAll()
-
-// Initialization only needs DOM insertion/removal observation. Watching every
-// class change in Monaco made the launcher run on thousands of unrelated editor
-// mutations and slowed browser interactions significantly.
 new MutationObserver(syncAll).observe(document.documentElement, {
   childList: true,
   subtree: true,
 })
-
-// React changes active/collapsed state in response to clicks; resync after those
-// events instead of globally observing all class mutations.
 document.addEventListener('click', () => {
   requestAnimationFrame(() => requestAnimationFrame(syncAll))
 })
-window.addEventListener('resize', syncAll)
