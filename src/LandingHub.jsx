@@ -1,5 +1,6 @@
 import React from 'react'
 import './landing-redesign.css'
+import './landing-home-adjustments.css'
 
 export default function LandingHub({go}){
  return <div className="landing-hub">
