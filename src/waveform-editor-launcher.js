@@ -1,0 +1,87 @@
+const q = (root, selector) => root?.querySelector(selector)
+const qa = (root, selector) => [...(root?.querySelectorAll(selector) || [])]
+
+const WAVE_ICON = `
+  <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 12h3l2.2-5 3.6 10 2.4-7 2 2H21" />
+  </svg>`
+
+function injectStyles() {
+  if (document.getElementById('waveform-editor-launcher-styles')) return
+  const style = document.createElement('style')
+  style.id = 'waveform-editor-launcher-styles'
+  style.textContent = `
+    .bottom-tabs > .sim-bottom-waveform-trigger{
+      display:none!important;
+    }
+    .file-tabs .sim-editor-waveform-launch{
+      display:inline-grid!important;
+      place-items:center!important;
+      flex:0 0 auto!important;
+    }
+    .file-tabs .sim-editor-waveform-launch.active{
+      color:#8ee7a2!important;
+      background:rgba(71,190,101,.12)!important;
+      border-color:rgba(71,190,101,.28)!important;
+    }
+  `
+  document.head.appendChild(style)
+}
+
+function waveformTab(panel) {
+  return qa(panel, '.bottom-tabs > button').find(button => /^Waveform$/i.test(button.textContent?.trim() || '')) || null
+}
+
+function syncWorkspace(workspace) {
+  const fileTabs = q(workspace, '.file-tabs')
+  const panel = q(workspace, '.ide-bottom')
+  const reset = q(fileTabs, 'button[title="Reset editor"]')
+  if (!fileTabs || !panel || !reset) return
+
+  const source = waveformTab(panel)
+  if (!source) return
+  source.classList.add('sim-bottom-waveform-trigger')
+  source.setAttribute('aria-hidden', 'true')
+  source.tabIndex = -1
+
+  let launcher = q(fileTabs, '.sim-editor-waveform-launch')
+  if (!launcher) {
+    launcher = document.createElement('button')
+    launcher.type = 'button'
+    launcher.className = 'icon-btn sim-editor-waveform-launch'
+    launcher.title = 'Waveform'
+    launcher.setAttribute('aria-label', 'Waveform')
+    launcher.setAttribute('aria-pressed', 'false')
+    launcher.innerHTML = WAVE_ICON
+    reset.insertAdjacentElement('afterend', launcher)
+
+    launcher.addEventListener('click', () => {
+      const currentPanel = q(workspace, '.ide-bottom')
+      const currentSource = waveformTab(currentPanel)
+      if (!currentPanel || !currentSource) return
+
+      // Keep the React-owned waveform renderer and all of its current formatting.
+      // The existing waveform behavior module expands the lower panel to the same
+      // editor-workspace footprint and hides the Monaco editor when this tab opens.
+      currentSource.click()
+      requestAnimationFrame(() => requestAnimationFrame(syncAll))
+    })
+  }
+
+  const active = source.classList.contains('active') && !panel.classList.contains('collapsed')
+  launcher.classList.toggle('active', active)
+  launcher.setAttribute('aria-pressed', String(active))
+}
+
+function syncAll() {
+  qa(document, '.ide-workspace').forEach(syncWorkspace)
+}
+
+injectStyles()
+syncAll()
+new MutationObserver(syncAll).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: ['class'],
+})
