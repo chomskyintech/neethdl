@@ -58,6 +58,24 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(editorRoot(page)).toContainText('HDL source · SystemVerilog')
   })
 
+  test('changes language by clicking the visible language control', async ({ page }) => {
+    const picker = page.locator('.editor-language')
+    const language = picker.locator('select')
+
+    await expect(picker).toBeVisible()
+    await expect(language).toHaveValue('SystemVerilog')
+
+    const pickerBox = await picker.boundingBox()
+    expect(pickerBox).toBeTruthy()
+    await picker.click({ position: { x: pickerBox.width - 24, y: pickerBox.height / 2 } })
+    await expect(language).toBeFocused()
+
+    await page.keyboard.press('ArrowUp')
+    await expect(language).toHaveValue('Verilog')
+    await expect(editorRoot(page)).toContainText('HDL source · Verilog')
+    expect(await codeText(page)).toContain('Your RTL here')
+  })
+
   test('runs valid RTL and renders detailed tests plus a waveform', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, muxSolution)
