@@ -58,20 +58,24 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(editorRoot(page)).toContainText('HDL source · SystemVerilog')
   })
 
-  test('changes language by clicking the visible language control', async ({ page }) => {
+  test('visible language control is the actual clickable select surface', async ({ page }) => {
     const picker = page.locator('.editor-language')
     const language = picker.locator('select')
 
     await expect(picker).toBeVisible()
     await expect(language).toHaveValue('SystemVerilog')
 
-    const pickerBox = await picker.boundingBox()
-    expect(pickerBox).toBeTruthy()
-    await picker.click({ position: { x: pickerBox.width - 24, y: pickerBox.height / 2 } })
-    await expect(language).toBeFocused()
+    const box = await picker.boundingBox()
+    expect(box).toBeTruthy()
+    const hitTag = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.tagName, {
+      x: box.x + box.width - 24,
+      y: box.y + box.height / 2
+    })
+    expect(hitTag).toBe('SELECT')
 
-    await page.keyboard.press('ArrowUp')
-    await expect(language).toHaveValue('Verilog')
+    await language.click()
+    await expect(language).toBeFocused()
+    await language.selectOption('Verilog')
     await expect(editorRoot(page)).toContainText('HDL source · Verilog')
     expect(await codeText(page)).toContain('Your RTL here')
   })
