@@ -62,6 +62,32 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
+ test('hides tab-strip scrollbars and matches the statement scrollbar to the neutral palette',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+
+  const tabs=page.locator('.ide-problem>.problem-tabs')
+  const statement=page.locator('.ide-problem-content')
+  await expect(tabs).toBeVisible()
+  await expect(statement).toBeVisible()
+
+  const tabStyles=await tabs.evaluate(el=>{
+   const style=getComputedStyle(el)
+   return{overflowX:style.overflowX,overflowY:style.overflowY,scrollbarWidth:style.scrollbarWidth}
+  })
+  expect(tabStyles.overflowX).toBe('hidden')
+  expect(tabStyles.overflowY).toBe('hidden')
+  expect(tabStyles.scrollbarWidth).toBe('none')
+
+  const statementStyles=await statement.evaluate(el=>{
+   const style=getComputedStyle(el)
+   return{overflowX:style.overflowX,overflowY:style.overflowY,scrollbarColor:style.scrollbarColor}
+  })
+  expect(statementStyles.overflowX).toBe('hidden')
+  expect(statementStyles.overflowY).toBe('auto')
+  expect(statementStyles.scrollbarColor).toContain('rgb(85, 85, 85)')
+  expect(statementStyles.scrollbarColor).toContain('rgb(38, 38, 38)')
+ })
+
  test('keeps the collapse chevron visually attached to Console',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
 
