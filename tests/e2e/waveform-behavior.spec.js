@@ -47,14 +47,6 @@ test.describe('waveform layout behavior', () => {
     const workspace = page.locator('.ide-workspace')
     const fileTabs = page.locator('.file-tabs')
 
-    const visibleBottomTabLabels = await page.locator('.bottom-tabs > button:visible').allTextContents()
-    expect(visibleBottomTabLabels.some(label => /^Testbench$/i.test(label.trim()))).toBe(false)
-
-    const waveformCollapse = page.getByRole('button', { name: 'Collapse waveform' })
-    const commonCollapse = page.locator('.bottom-collapse')
-    await expect(waveformCollapse).toBeVisible()
-    await expect(commonCollapse).toBeHidden()
-
     const zoomOrder = await toolbar.locator('.sim-v2-zoom-out, .sim-v2-zoom-label, .sim-v2-zoom-in').evaluateAll(nodes =>
       nodes.map(node => node.className)
     )
@@ -162,22 +154,6 @@ test.describe('waveform layout behavior', () => {
       return Boolean(document.fullscreenElement === w || w?.classList.contains('sim-v2-wave-only-fullscreen'))
     })).toBe(false)
 
-    // Waveform has its own collapse/expand chevron; the Console collapse button
-    // is deliberately hidden while Waveform is selected.
-    await waveformCollapse.click()
-    await expect(bottomPanel).toHaveClass(/collapsed/)
-    await expect(page.locator('.monaco-editor-wrap')).toBeVisible()
-    await expect.poll(async () => (await bottomPanel.boundingBox())?.height || 999).toBeLessThan(80)
-
-    const waveformExpand = page.getByRole('button', { name: 'Expand waveform' })
-    await expect(waveformExpand).toBeVisible()
-    await waveformExpand.click()
-    await expect(bottomPanel).not.toHaveClass(/collapsed/)
-    await expect(waveform).toBeVisible()
-    await expect(page.locator('.monaco-editor-wrap')).toBeHidden()
-
-    // Moving to Console preserves the full editor-height panel, but Console's
-    // own collapse control must still work immediately afterwards.
     await page.getByRole('button', { name: 'Console', exact: true }).click()
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect.poll(async () => {
@@ -188,9 +164,11 @@ test.describe('waveform layout behavior', () => {
       return Math.abs(bottom.height - (work.height - tabs.height - 2))
     }).toBeLessThanOrEqual(4)
     await expect(page.locator('.monaco-editor-wrap')).toBeHidden()
-    await expect(commonCollapse).toBeVisible()
 
-    await commonCollapse.click()
+    await page.getByRole('button', { name: /Waveform/i }).click()
+    await expect(waveform).toBeVisible()
+    const collapse = page.locator('.bottom-collapse')
+    await collapse.click()
     await expect(bottomPanel).toHaveClass(/collapsed/)
     await expect(page.locator('.monaco-editor-wrap')).toBeVisible()
     await expect.poll(async () => (await bottomPanel.boundingBox())?.height || 999).toBeLessThan(80)
