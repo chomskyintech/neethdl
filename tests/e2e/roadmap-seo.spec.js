@@ -1,16 +1,14 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('HDLForge navigation and SEO content', () => {
-  test('landing page is a clean hub without problem rows', async ({ page }) => {
+  test('landing page keeps only the primary hero content', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: /Hardware design practice for RTL, FPGA & verification roles/i })).toBeVisible()
-    const destinations = page.locator('.destination-card')
-    await expect(destinations).toHaveCount(4)
-    await expect(destinations.getByText('Problems', { exact: true })).toBeVisible()
-    await expect(destinations.getByText('Tracks', { exact: true })).toBeVisible()
-    await expect(destinations.getByText('Interview', { exact: true })).toHaveCount(0)
-    await expect(destinations.getByText('Projects', { exact: true })).toBeVisible()
-    await expect(destinations.getByText('Courses', { exact: true })).toBeVisible()
+    await expect(page.locator('.landing-stats')).toHaveCount(0)
+    await expect(page.locator('.destination-card')).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Choose your workspace' })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Hardware design practice resources' })).toHaveCount(0)
+    await expect(page.locator('.topic-card')).toHaveCount(0)
     await expect(page.locator('.problem-row')).toHaveCount(0)
   })
 
