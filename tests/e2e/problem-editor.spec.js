@@ -80,19 +80,20 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await codeText(page)).toContain('Your RTL here')
   })
 
-  test('runs valid RTL and renders an interactive inspection waveform', async ({ page }) => {
+  test('runs valid RTL and renders the redesigned inspection waveform', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, muxSolution)
     await page.getByRole('button', { name: /Run tests/i }).first().click()
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect(page.locator('.test-case')).toHaveCount(4)
     await expect(page.locator('.test-case.pass')).toHaveCount(4)
     await page.getByRole('button', { name: /Waveform/i }).click()
 
-    const waveform = page.locator('.waveform')
+    const waveform = page.locator('.waveform-v2')
     const svg = page.locator('svg.wave-svg')
-    const livePanel = page.locator('.wave-live-panel')
-    const toolbar = page.locator('.wave-enhance-toolbar')
+    const signalPanel = page.locator('.sim-v2-signal-panel')
+    const toolbar = page.locator('.sim-v2-wave-toolbar')
     const radix = page.getByRole('combobox', { name: 'Waveform radix' })
     const bottomPanel = page.locator('.ide-bottom')
     const workspace = page.locator('.ide-workspace')
@@ -101,10 +102,11 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(waveform).toBeVisible()
     await expect(svg).toBeVisible()
     await expect(toolbar).toBeVisible()
-    await expect(livePanel).toBeVisible()
-    expect(await livePanel.locator('.wave-live-row').count()).toBeGreaterThan(0)
+    await expect(signalPanel).toBeVisible()
+    expect(await signalPanel.locator('.sim-v2-signal-row').count()).toBeGreaterThan(0)
     await expect(page.getByRole('searchbox', { name: 'Find waveform signal' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Fit' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Full screen' })).toBeVisible()
     await expect(radix).toHaveValue('hex')
 
     await expect.poll(async () => {
@@ -131,17 +133,9 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(radix).toHaveValue('bin')
     await page.getByRole('button', { name: 'Fit' }).click()
     await expect(waveform).toHaveClass(/waveform-enhanced/)
-
-    const openWaveform = page.getByRole('button', { name: 'Open waveform in new tab' })
-    await expect(openWaveform).toBeVisible()
-    const popupPromise = page.context().waitForEvent('page')
-    await openWaveform.click()
-    const popup = await popupPromise
-    await expect(popup).toHaveTitle('HDLForge Waveform')
-    await expect(popup.locator('.waveform-popout-header')).toContainText('HDLForge Waveform')
-    await expect(popup.locator('svg.wave-svg')).toBeVisible()
-    await expect(popup.locator('.wave-live-panel')).toBeVisible()
-    await popup.close()
+    await expect(page.locator('.sim-v2-signal-resizer')).toBeVisible()
+    await expect(page.locator('.sim-v2-name-value-resizer')).toBeVisible()
+    await expect(page.locator('.sim-v2-tick.first')).toContainText('0 ns')
   })
 
   test('preserves an edited draft when navigating away and back', async ({ page }) => {

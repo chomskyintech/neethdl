@@ -1,0 +1,166 @@
+/* HDLForge simulation UI v2: LeetCode-inspired results + Vivado-inspired waveform viewer */
+
+/* Bottom navigation stays in the compact HDLForge format. */
+.hdlforge-ide-active .bottom-tabs{
+  background:#1f1f20!important;
+  border-bottom:1px solid #343438!important;
+  padding:0 10px!important;
+  gap:2px!important;
+}
+.hdlforge-ide-active .bottom-tabs>button:not(.bottom-collapse){
+  height:34px!important;
+  padding:0 11px!important;
+  color:#777b82!important;
+  border-bottom:2px solid transparent!important;
+  font-size:10px!important;
+  font-weight:800!important;
+}
+.hdlforge-ide-active .bottom-tabs>button:not(.bottom-collapse):hover{color:#cfd2d6!important}
+.hdlforge-ide-active .bottom-tabs>button.active:not(.bottom-collapse){color:#e7ebef!important;border-bottom-color:#6fc8ef!important}
+
+/* Console/result area */
+.hdlforge-ide-active .console{padding:0!important;background:#181818!important;color:#d7d7d7!important}
+.hdlforge-ide-active .console-empty{background:#181818!important;color:#777f89!important}
+.hdlforge-ide-active .run-result.sim-v2-result{
+  margin:0!important;
+  min-height:100%;
+  padding:16px 18px 24px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#181818!important;
+  color:#d7d7d7!important;
+}
+.sim-v2-result-head{display:flex;align-items:baseline;gap:11px;margin-bottom:15px;flex-wrap:wrap}
+.sim-v2-status{font-size:18px!important;font-weight:750!important;letter-spacing:-.01em}
+.sim-v2-status.pass{color:#2db55d!important}
+.sim-v2-status.fail{color:#e45b5b!important}
+.sim-v2-result-head>span{color:#777!important;font-size:11px!important}
+.sim-v2-case-strip{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.sim-v2-case.test-case{
+  display:inline-flex!important;align-items:center!important;gap:6px!important;
+  min-width:0!important;height:30px!important;padding:0 12px!important;
+  border:1px solid transparent!important;border-radius:7px!important;
+  background:#262626!important;color:#aaa!important;font-size:11px!important;cursor:pointer!important
+}
+.sim-v2-case.test-case.pass>span{color:#2db55d!important}
+.sim-v2-case.test-case.fail>span{color:#e45b5b!important}
+.sim-v2-case.test-case.active{background:#3a3a3a!important;color:#fff!important}
+.sim-v2-case.test-case.fail.active{background:#4a2626!important}
+.sim-v2-case-detail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:860px;margin-bottom:14px}
+.sim-v2-detail-card{padding:10px 12px;border-radius:8px;background:#242424;min-width:0}
+.sim-v2-detail-label{display:block;margin-bottom:5px;color:#777;font-size:10px}
+.sim-v2-detail-card code{display:block;overflow:hidden;text-overflow:ellipsis;color:#ddd;font:12px Consolas,"Courier New",monospace;white-space:nowrap}
+.sim-v2-detail-card code.pass-text{color:#91d9a7}
+.sim-v2-detail-card code.fail-text{color:#ffadad}
+.sim-v2-output-label{margin:4px 0 7px;color:#8e8e8e;font-size:10px;font-weight:700}
+.sim-v2-raw-output,.sim-v2-compiler-output{
+  max-width:100%!important;margin:0!important;padding:11px 12px!important;
+  overflow:auto!important;border:1px solid #292929!important;border-radius:8px!important;
+  background:#111!important;color:#cfcfcf!important;font:11px/1.6 Consolas,"Courier New",monospace!important;
+  white-space:pre-wrap!important
+}
+.sim-v2-compile{max-width:920px}
+.sim-v2-location{display:inline-flex;align-items:center;margin:0 0 10px;padding:0;border:0;background:transparent;color:#7db8e8;font:11px Consolas,monospace;cursor:pointer}
+.sim-v2-location:hover{text-decoration:underline}
+.sim-v2-code-frame{overflow:hidden;margin-bottom:12px;border:1px solid #593131;border-radius:8px;background:#1c1717}
+.sim-v2-code-line{display:grid;grid-template-columns:48px minmax(0,1fr);min-height:30px;border-bottom:1px solid #342424;font:12px/1.55 Consolas,"Courier New",monospace}
+.sim-v2-code-line:last-child{border-bottom:0}
+.sim-v2-code-line .ln{padding:6px 10px 6px 0;text-align:right;color:#666;background:#181515;border-right:1px solid #342424;user-select:none}
+.sim-v2-code-line code{padding:6px 10px;color:#d8d8d8;white-space:pre;overflow:auto}
+.sim-v2-code-line.error-line{background:#342020}
+.sim-v2-code-line.error-line .ln{color:#e27979;background:#2b1b1b}
+.sim-v2-code-line.error-line code{color:#ffd0d0}
+.error-caret{color:#e45b5b;font-weight:700}
+
+/* Vivado-inspired waveform */
+.hdlforge-ide-active .waveform-v2{
+  --sim-signal-width:220px;
+  --sim-value-width:56px;
+  min-width:0!important;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#111;
+  color:#e6e6e6;
+}
+.hdlforge-ide-active .waveform-v2 .sim-v2-hidden-original-head{display:none!important}
+.hdlforge-ide-active .waveform-v2 .wave-tools,.hdlforge-ide-active .waveform-v2 .wave-enhance-toolbar,.hdlforge-ide-active .waveform-v2 .wave-live-panel{display:none!important}
+.sim-v2-wave-toolbar{
+  flex:0 0 38px;height:38px;display:flex;align-items:center;gap:4px;padding:3px 8px;
+  border-bottom:1px solid #3b3b3b;background:#242424
+}
+.sim-v2-icon,.sim-v2-fit{
+  height:28px;min-width:28px;display:inline-flex;align-items:center;justify-content:center;
+  padding:0 7px;border:1px solid transparent;border-radius:2px;background:transparent;color:#c8c8c8;
+  font-size:11px;line-height:1;cursor:pointer
+}
+.sim-v2-icon{width:28px;padding:0;font-size:14px}
+.sim-v2-icon:hover,.sim-v2-fit:hover{border-color:#555;background:#333}
+.sim-v2-icon svg{width:14px;height:14px;display:block;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sim-v2-sep{width:1px;height:22px;background:#444;margin:0 4px}
+.sim-v2-search{height:27px;width:165px;display:flex;align-items:center;border:1px solid #4a4a4a;background:#171717}
+.sim-v2-search>span{padding:0 5px;color:#888;font-size:12px}
+.sim-v2-search input{flex:1;min-width:0;height:25px;padding:0 6px 0 0;border:0;outline:0;background:transparent;color:#ddd;font-size:11px}
+.sim-v2-radix{height:27px;border:1px solid #4a4a4a;background:#171717;color:#ddd;font-size:11px;padding:0 7px}
+.sim-v2-toolbar-spacer{flex:1}
+.sim-v2-readouts{display:flex;align-items:center;gap:6px}
+.sim-v2-readouts span{min-width:58px;padding:0 7px;color:#b9bdc3;font:10px Consolas,monospace;white-space:nowrap}
+.sim-v2-zoom-label{min-width:42px;text-align:right;color:#8c9198;font:10px Consolas,monospace}
+
+.hdlforge-ide-active .waveform-v2 .wave-scroll{
+  position:relative!important;flex:1 1 auto!important;min-height:0!important;max-width:none!important;
+  overflow:auto!important;border:0!important;border-radius:0!important;background:#050505!important
+}
+.hdlforge-ide-active .waveform-v2 .wave-svg{display:block!important;min-height:100%;background:#050505}
+.hdlforge-ide-active .waveform-v2 .wave-label-bg,.hdlforge-ide-active .waveform-v2 .wave-name,.hdlforge-ide-active .waveform-v2 .wave-width,.hdlforge-ide-active .waveform-v2 .wave-time{opacity:0!important;pointer-events:none!important}
+.hdlforge-ide-active .waveform-v2 .wave-transition{opacity:0!important;pointer-events:none!important}
+.hdlforge-ide-active .waveform-v2 .wave-grid{stroke:#242424!important;stroke-width:1!important;stroke-dasharray:none!important}
+.hdlforge-ide-active .waveform-v2 .wave-row{stroke:#1f1f1f!important;stroke-width:1!important}
+.hdlforge-ide-active .waveform-v2 .wave-axis-line{stroke:#4b4b4b!important;stroke-width:1!important}
+.hdlforge-ide-active .waveform-v2 .wave-digital{fill:none!important;stroke:#78e08f!important;stroke-width:1.35!important;stroke-linejoin:miter!important;vector-effect:non-scaling-stroke!important;shape-rendering:crispEdges}
+.hdlforge-ide-active .waveform-v2 .wave-bus{fill:#102417!important;stroke:#78e08f!important;stroke-width:1!important}
+.hdlforge-ide-active .waveform-v2 .wave-bus-text{fill:#b7e9c0!important;font:9px Consolas,monospace!important}
+.sim-v2-high-fill{fill:#9af0ac;opacity:.14;pointer-events:none}
+
+.sim-v2-signal-panel{
+  position:absolute;z-index:20;top:0;left:0;width:var(--sim-signal-width);bottom:0;
+  display:flex;flex-direction:column;background:#202020;border-right:1px solid #4b4b4b
+}
+.sim-v2-signal-head{height:30px;flex:0 0 30px;display:grid;grid-template-columns:minmax(0,1fr) var(--sim-value-width);align-items:center;background:#313131;border-bottom:1px solid #4a4a4a;color:#d0d0d0;font-size:11px;font-weight:600}
+.sim-v2-signal-head span{height:100%;display:flex;align-items:center;padding:0 8px;border-right:1px solid #454545}
+.sim-v2-signal-head span:last-child{justify-content:flex-end;border-right:0}
+.sim-v2-signal-list{flex:1 1 auto;min-height:0;overflow:hidden}
+.sim-v2-signal-row{width:100%;height:42px;display:grid;grid-template-columns:minmax(0,1fr) var(--sim-value-width);align-items:center;padding:0;border:0;border-bottom:1px solid #2b2b2b;background:#202020;color:#ddd;cursor:default;text-align:left}
+.sim-v2-signal-row:hover{background:#292929}
+.sim-v2-signal-row.selected{background:#21486a}
+.sim-v2-signal-row.dimmed{opacity:.3}
+.sim-v2-signal-name{min-width:0;overflow:hidden;text-overflow:ellipsis;padding:0 8px 0 10px;color:#e1e1e1;font:11px Consolas,monospace;white-space:nowrap}
+.sim-v2-signal-value{height:100%;display:flex;align-items:center;justify-content:flex-end;padding:0 6px;border-left:1px solid #333;color:#f0f0f0;font:11px Consolas,monospace}
+.sim-v2-signal-row.selected .sim-v2-signal-value{background:#173751}
+.sim-v2-signal-resizer{position:absolute;z-index:35;top:0;bottom:0;right:-5px;width:10px;cursor:col-resize;touch-action:none}
+.sim-v2-signal-resizer::after{content:"";position:absolute;left:5px;top:0;bottom:0;width:1px;background:#4b4b4b}
+.sim-v2-signal-resizer:hover::after{left:4px;width:3px;background:#6d9fc5}
+.sim-v2-name-value-resizer{position:absolute;z-index:36;top:0;bottom:0;right:var(--sim-value-width);width:7px;transform:translateX(3px);cursor:col-resize;touch-action:none}
+.sim-v2-name-value-resizer::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:#454545}
+.sim-v2-name-value-resizer:hover::after{left:2px;width:2px;background:#7aa6c8}
+
+.sim-v2-ruler{position:absolute;z-index:18;top:0;left:0;right:0;height:30px;background:#1a1a1a;border-bottom:1px solid #4b4b4b;pointer-events:none}
+.sim-v2-tick{position:absolute;top:5px;transform:translateX(-50%);color:#c5c5c5;font:10px Consolas,monospace;white-space:nowrap}
+.sim-v2-tick::after{content:"";position:absolute;left:50%;top:15px;width:1px;height:9px;background:#6a6a6a}
+.sim-v2-tick.first{transform:none;margin-left:3px}
+.sim-v2-tick.last{transform:translateX(-100%);margin-left:-3px}
+.sim-v2-cursor{position:absolute!important;z-index:25!important;top:30px!important;bottom:0!important;width:1px!important;height:auto!important;background:#ffd84a!important;pointer-events:none!important}
+.sim-v2-cursor.b{background:#d18bf0!important}
+.sim-v2-cursor>span{position:absolute;top:2px;left:4px;padding:1px 5px;border:1px solid #cfae24;border-radius:2px;background:#3b3516;color:#ffe67a;font:9px Consolas,monospace;white-space:nowrap}
+.sim-v2-cursor.b>span{border-color:#8c559d;background:#3e214a;color:#efc7fa}
+
+.ide-bottom:fullscreen,.ide-bottom.sim-v2-browser-fullscreen{width:100vw!important;height:100vh!important;max-height:none!important;flex-basis:100vh!important;background:#111!important}
+.ide-bottom:fullscreen .bottom-tabs,.ide-bottom.sim-v2-browser-fullscreen .bottom-tabs{flex:0 0 34px}
+.ide-bottom:fullscreen .console,.ide-bottom.sim-v2-browser-fullscreen .console{flex:1 1 auto;min-height:0}
+
+@media(max-width:800px){
+  .sim-v2-case-detail{grid-template-columns:1fr}
+  .sim-v2-readouts{display:none}
+  .sim-v2-search{width:130px}
+  .hdlforge-ide-active .waveform-v2{--sim-signal-width:170px}
+}
