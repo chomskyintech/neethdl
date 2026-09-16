@@ -94,6 +94,9 @@ test.describe('HDLForge Monaco problem editor', () => {
     const livePanel = page.locator('.wave-live-panel')
     const toolbar = page.locator('.wave-enhance-toolbar')
     const radix = page.getByRole('combobox', { name: 'Waveform radix' })
+    const bottomPanel = page.locator('.ide-bottom')
+    const workspace = page.locator('.ide-workspace')
+    const fileTabs = page.locator('.file-tabs')
 
     await expect(waveform).toBeVisible()
     await expect(svg).toBeVisible()
@@ -103,6 +106,14 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(page.getByRole('searchbox', { name: 'Find waveform signal' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Fit' })).toBeVisible()
     await expect(radix).toHaveValue('hex')
+
+    await expect.poll(async () => {
+      const bottom = await bottomPanel.boundingBox()
+      const work = await workspace.boundingBox()
+      const tabs = await fileTabs.boundingBox()
+      if (!bottom || !work || !tabs) return 999
+      return Math.abs(bottom.height - (work.height - tabs.height - 2))
+    }).toBeLessThanOrEqual(4)
 
     const svgBox = await svg.boundingBox()
     expect(svgBox).toBeTruthy()
@@ -120,6 +131,17 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(radix).toHaveValue('bin')
     await page.getByRole('button', { name: 'Fit' }).click()
     await expect(waveform).toHaveClass(/waveform-enhanced/)
+
+    const openWaveform = page.getByRole('button', { name: 'Open waveform in new tab' })
+    await expect(openWaveform).toBeVisible()
+    const popupPromise = page.context().waitForEvent('page')
+    await openWaveform.click()
+    const popup = await popupPromise
+    await expect(popup).toHaveTitle('HDLForge Waveform')
+    await expect(popup.locator('.waveform-popout-header')).toContainText('HDLForge Waveform')
+    await expect(popup.locator('svg.wave-svg')).toBeVisible()
+    await expect(popup.locator('.wave-live-panel')).toBeVisible()
+    await popup.close()
   })
 
   test('preserves an edited draft when navigating away and back', async ({ page }) => {
