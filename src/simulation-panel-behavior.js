@@ -87,6 +87,7 @@ function forcePanelExpanded(panel) {
 function forcePanelCollapsed(panel) {
   if (!panel) return
   panel.dataset.waveformMaximized = 'false'
+  panel.dataset.simBehaviorKeepExpanded = 'false'
   panel.style.removeProperty('height')
   panel.style.removeProperty('flex-basis')
   panel.style.removeProperty('max-height')
@@ -125,9 +126,9 @@ function stabilizeHorizontalScroll(waveform) {
     const x = scroll.scrollLeft
     signalPanel.style.transform = `translate3d(${x}px,0,0)`
 
-    // The signal panel stays fixed, but the timeline must scroll with the
-    // traces. The old implementation translated the ruler by +scrollLeft,
-    // which made the timeline detach from the waveform when panning.
+    // The signal panel stays fixed, while the ruler remains part of the same
+    // scrolling coordinate system as the traces. The previous +scrollLeft
+    // transform caused the ruler and waveform to separate during panning.
     ruler.style.setProperty('transform', 'none', 'important')
     ruler.style.left = '0px'
     ruler.style.right = 'auto'
@@ -139,7 +140,8 @@ function stabilizeHorizontalScroll(waveform) {
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(sync)
     observer.observe(scroll)
-    observer.observe(q(waveform, 'svg.wave-svg'))
+    const svg = q(waveform, 'svg.wave-svg')
+    if (svg) observer.observe(svg)
   }
   sync()
 }
@@ -220,19 +222,30 @@ document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) cleanupFullscreen(activeWaveformFullscreen)
 })
 
+// Capture which tab was active before React and the older enhancer process the
+// click. This is deliberately recorded in capture phase because by document
+// bubble phase React may already have changed the active class.
+document.addEventListener('click', event => {
+  const tab = event.target.closest?.('.bottom-tabs > button')
+  if (!tab) return
+  const panel = tab.closest('.ide-bottom')
+  if (!panel) return
+  panel.dataset.simBehaviorActiveBefore = activeBottomTab(panel)?.textContent?.trim() || ''
+}, true)
+
 // Preserve the large panel when moving from Waveform to Console, but let the
-// collapse control genuinely collapse the panel and restore the editor.
+// common collapse control genuinely collapse it and restore the editor.
 document.addEventListener('click', event => {
   const tab = event.target.closest?.('.bottom-tabs > button')
   if (!tab) return
   const panel = tab.closest('.ide-bottom')
   if (!panel) return
 
-  const activeBefore = activeBottomTab(panel)?.textContent?.trim() || ''
+  const activeBefore = panel.dataset.simBehaviorActiveBefore || ''
   const clickedLabel = tab.textContent?.trim() || ''
   const isCollapse = tab.classList.contains('bottom-collapse')
 
-  requestAnimationFrame(() => requestAnimationFrame(() => {
+  const settle = () => requestAnimationFrame(() => requestAnimationFrame(() => {
     if (isCollapse) {
       if (panel.classList.contains('collapsed')) {
         forcePanelCollapsed(panel)
@@ -242,7 +255,12 @@ document.addEventListener('click', event => {
       return
     }
 
-    if (/^Console$/i.test(clickedLabel) && /Waveform/i.test(activeBefore)) {
+    // Once Waveform has expanded the lower workspace, switching to Console
+    // should preserve exactly that height. Do not depend solely on the active
+    // class because React can update it before document bubble phase.
+    if (/^Console$/i.test(clickedLabel) && (
+      /Waveform/i.test(activeBefore) || panel.dataset.simBehaviorKeepExpanded === 'true'
+    )) {
       forcePanelExpanded(panel)
       return
     }
@@ -252,6 +270,12 @@ document.addEventListener('click', event => {
       forcePanelExpanded(panel)
     }
   }))
+
+  settle()
+  // The old waveform enhancer restores Console on the next animation frame.
+  // One macrotask reinforcement makes this invariant independent of listener
+  // ordering without continually fighting user-initiated resizing/collapse.
+  if (/^Console$/i.test(clickedLabel)) setTimeout(settle, 0)
 })
 
 window.addEventListener('resize', () => {
