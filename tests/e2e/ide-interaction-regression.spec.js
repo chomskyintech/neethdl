@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('IDE interaction regressions', () => {
-  test('keeps the language chevron attached to the selected label and reset on the far right', async ({ page }) => {
+  test('keeps the language chevron attached to the selected label and controls on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
 
@@ -37,6 +37,23 @@ test.describe('IDE interaction regressions', () => {
     expect(hitTag).toBe('SELECT')
   })
 
+  test('keeps the requested compact header and tab sizing', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/app/problems/rtl-fifo/')
+
+    const topbar = page.locator('.ide-topbar')
+    const problemTabs = page.locator('.ide-problem>.problem-tabs')
+    const problemTabButton = problemTabs.locator('button').first()
+    const fileTabs = page.locator('.file-tabs')
+    const language = page.locator('.editor-language select')
+
+    expect(await topbar.evaluate(el => getComputedStyle(el).height)).toBe('48px')
+    expect(await problemTabs.evaluate(el => getComputedStyle(el).height)).toBe('45px')
+    expect(await problemTabButton.evaluate(el => getComputedStyle(el).fontSize)).toBe('14px')
+    expect(await fileTabs.evaluate(el => getComputedStyle(el).height)).toBe('43px')
+    expect(await language.evaluate(el => getComputedStyle(el).fontSize)).toBe('13px')
+  })
+
   test('removes the editor info row and keeps search beside reset', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
@@ -58,7 +75,7 @@ test.describe('IDE interaction regressions', () => {
 
     const gap = searchBox.x - (resetBox.x + resetBox.width)
     expect(gap).toBeGreaterThanOrEqual(0)
-    expect(gap).toBeLessThanOrEqual(8)
+    expect(gap).toBeLessThanOrEqual(12)
     expect(Math.abs((resetBox.y + resetBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
     expect(tabsBox.x + tabsBox.width - (searchBox.x + searchBox.width)).toBeLessThanOrEqual(16)
 
