@@ -159,15 +159,15 @@ body.hdlforge-ide-active .ide-page .monaco-editor .overflow-guard{
 
 /* Slightly denser statement and language headers. */
 body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs{
-  height:48px!important;
-  flex-basis:48px!important;
+  height:46px!important;
+  flex-basis:46px!important;
 }
 body.hdlforge-ide-active .ide-page .problem-tabs button{
   font-size:14px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs{
-  height:46px!important;
-  flex-basis:46px!important;
+  height:44px!important;
+  flex-basis:44px!important;
 }
 body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
   font-size:14px!important;
