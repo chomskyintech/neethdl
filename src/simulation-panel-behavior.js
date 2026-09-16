@@ -4,6 +4,9 @@ const qa = (root, selector) => [...(root?.querySelectorAll(selector) || [])]
 const initialized = new WeakSet()
 let activeWaveformFullscreen = null
 
+const CHEVRON_DOWN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+const CHEVRON_UP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>'
+
 function injectStyles() {
   if (document.getElementById('sim-v2-behavior-styles')) return
   const style = document.createElement('style')
@@ -15,6 +18,34 @@ function injectStyles() {
       text-align:center!important;
       color:#aeb5bd!important;
       font:10px Consolas,monospace!important;
+    }
+    .bottom-tabs>.sim-waveform-collapse{
+      width:28px!important;
+      min-width:28px!important;
+      height:28px!important;
+      padding:0!important;
+      margin:0 2px 0 -4px!important;
+      border:0!important;
+      border-radius:5px!important;
+      background:transparent!important;
+      color:#8f98a3!important;
+      display:grid;
+      place-items:center;
+      cursor:pointer!important;
+    }
+    .bottom-tabs>.sim-waveform-collapse:hover{
+      background:rgba(255,255,255,.06)!important;
+      color:#d8dee6!important;
+    }
+    .bottom-tabs>.sim-waveform-collapse svg{
+      width:15px!important;
+      height:15px!important;
+      fill:none!important;
+      stroke:currentColor!important;
+      stroke-width:2!important;
+      stroke-linecap:round!important;
+      stroke-linejoin:round!important;
+      pointer-events:none!important;
     }
     .waveform-v2.sim-v2-wave-only-fullscreen,
     .waveform-v2:fullscreen{
@@ -43,7 +74,9 @@ function injectStyles() {
 }
 
 function activeBottomTab(panel) {
-  return qa(panel, '.bottom-tabs > button.active').find(button => !button.classList.contains('bottom-collapse'))
+  return qa(panel, '.bottom-tabs > button.active').find(button =>
+    !button.classList.contains('bottom-collapse') && !button.classList.contains('sim-waveform-collapse')
+  )
 }
 
 function editorForPanel(panel) {
@@ -70,13 +103,14 @@ function expandedHeight(panel) {
   return Math.max(180, workspace.getBoundingClientRect().height - fileTabs.getBoundingClientRect().height - 2)
 }
 
-function forcePanelExpanded(panel) {
+function forcePanelExpanded(panel, mode = 'waveform') {
   if (!panel || panel.classList.contains('collapsed')) return
   const height = expandedHeight(panel)
   if (!height) return
 
-  panel.dataset.waveformMaximized = 'true'
   panel.dataset.simBehaviorKeepExpanded = 'true'
+  panel.dataset.simBehaviorMode = mode
+  panel.dataset.waveformMaximized = mode === 'waveform' ? 'true' : 'false'
   panel.dataset.expandedHeight = String(height)
   panel.style.setProperty('height', `${height}px`, 'important')
   panel.style.setProperty('flex-basis', `${height}px`, 'important')
@@ -88,6 +122,7 @@ function forcePanelCollapsed(panel) {
   if (!panel) return
   panel.dataset.waveformMaximized = 'false'
   panel.dataset.simBehaviorKeepExpanded = 'false'
+  panel.dataset.simBehaviorMode = ''
   panel.style.removeProperty('height')
   panel.style.removeProperty('flex-basis')
   panel.style.removeProperty('max-height')
@@ -125,10 +160,6 @@ function stabilizeHorizontalScroll(waveform) {
   const sync = () => {
     const x = scroll.scrollLeft
     signalPanel.style.transform = `translate3d(${x}px,0,0)`
-
-    // The signal panel stays fixed, while the ruler remains part of the same
-    // scrolling coordinate system as the traces. The previous +scrollLeft
-    // transform caused the ruler and waveform to separate during panning.
     ruler.style.setProperty('transform', 'none', 'important')
     ruler.style.left = '0px'
     ruler.style.right = 'auto'
@@ -184,6 +215,64 @@ async function toggleWaveformFullscreen(waveform) {
   requestAnimationFrame(() => q(waveform, '.sim-v2-fit')?.click())
 }
 
+function updateWaveformCollapseButton(panel, button) {
+  const collapsed = panel.classList.contains('collapsed')
+  button.innerHTML = collapsed ? CHEVRON_UP : CHEVRON_DOWN
+  button.setAttribute('aria-label', collapsed ? 'Expand waveform' : 'Collapse waveform')
+  button.title = collapsed ? 'Expand waveform' : 'Collapse waveform'
+}
+
+function ensureBottomControls(panel) {
+  const tabs = q(panel, '.bottom-tabs')
+  if (!tabs) return
+
+  const buttons = qa(tabs, ':scope > button')
+  const waveformTab = buttons.find(button => /Waveform/i.test(button.textContent || ''))
+  const testbenchTab = buttons.find(button => /^Testbench$/i.test((button.textContent || '').trim()))
+  const commonCollapse = q(tabs, '.bottom-collapse')
+
+  if (testbenchTab) {
+    testbenchTab.hidden = true
+    testbenchTab.setAttribute('aria-hidden', 'true')
+    testbenchTab.tabIndex = -1
+    testbenchTab.style.setProperty('display', 'none', 'important')
+  }
+
+  if (!waveformTab) {
+    commonCollapse?.style.removeProperty('display')
+    return
+  }
+
+  let waveformCollapse = q(tabs, '.sim-waveform-collapse')
+  if (!waveformCollapse) {
+    waveformCollapse = document.createElement('button')
+    waveformCollapse.type = 'button'
+    waveformCollapse.className = 'sim-waveform-collapse'
+    waveformTab.after(waveformCollapse)
+    waveformCollapse.addEventListener('click', event => {
+      event.preventDefault()
+      event.stopPropagation()
+      const generic = q(panel, '.bottom-collapse')
+      if (!generic) return
+      generic.click()
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (panel.classList.contains('collapsed')) forcePanelCollapsed(panel)
+        else forcePanelExpanded(panel, 'waveform')
+        ensureBottomControls(panel)
+      }))
+    })
+  }
+
+  const waveformActive = waveformTab.classList.contains('active')
+  waveformCollapse.style.setProperty('display', waveformActive ? 'grid' : 'none', 'important')
+  updateWaveformCollapseButton(panel, waveformCollapse)
+
+  if (commonCollapse) {
+    if (waveformActive) commonCollapse.style.setProperty('display', 'none', 'important')
+    else commonCollapse.style.removeProperty('display')
+  }
+}
+
 function initializeWaveform(waveform) {
   if (!waveform || initialized.has(waveform)) return
   const toolbar = q(waveform, '.sim-v2-wave-toolbar')
@@ -193,20 +282,19 @@ function initializeWaveform(waveform) {
 
   initialized.add(waveform)
   arrangeZoomControls(waveform)
-
-  // Attach after the v2 listeners so our final layout values win each scroll.
   requestAnimationFrame(() => stabilizeHorizontalScroll(waveform))
 }
 
 function initializeAll() {
   qa(document, '.waveform-v2').forEach(initializeWaveform)
+  qa(document, '.ide-bottom').forEach(ensureBottomControls)
 }
 
 injectStyles()
 initializeAll()
 new MutationObserver(initializeAll).observe(document.documentElement, { childList: true, subtree: true })
 
-// Override the previous fullscreen handler before the event reaches it.
+// Override the earlier fullscreen listener so fullscreen owns only the waveform.
 document.addEventListener('click', event => {
   const button = event.target.closest?.('.sim-v2-fullscreen')
   if (!button) return
@@ -222,22 +310,28 @@ document.addEventListener('fullscreenchange', () => {
   if (!document.fullscreenElement) cleanupFullscreen(activeWaveformFullscreen)
 })
 
-// Capture which tab was active before React and the older enhancer process the
-// click. This is deliberately recorded in capture phase because by document
-// bubble phase React may already have changed the active class.
+// Capture the pre-click mode. For the common Console collapse control, clear
+// waveform/full-height ownership immediately so the resize synchronizer cannot
+// re-expand the panel after React marks it collapsed.
 document.addEventListener('click', event => {
   const tab = event.target.closest?.('.bottom-tabs > button')
-  if (!tab) return
+  if (!tab || tab.classList.contains('sim-waveform-collapse')) return
   const panel = tab.closest('.ide-bottom')
   if (!panel) return
+
   panel.dataset.simBehaviorActiveBefore = activeBottomTab(panel)?.textContent?.trim() || ''
+  if (tab.classList.contains('bottom-collapse')) {
+    panel.dataset.simBehaviorKeepExpanded = 'false'
+    panel.dataset.waveformMaximized = 'false'
+  }
 }, true)
 
-// Preserve the large panel when moving from Waveform to Console, but let the
-// common collapse control genuinely collapse it and restore the editor.
+// Waveform owns a dedicated chevron. Console keeps the standard collapse
+// control, including after the user switches to Console from a full-height
+// waveform view.
 document.addEventListener('click', event => {
   const tab = event.target.closest?.('.bottom-tabs > button')
-  if (!tab) return
+  if (!tab || tab.classList.contains('sim-waveform-collapse')) return
   const panel = tab.closest('.ide-bottom')
   if (!panel) return
 
@@ -249,36 +343,38 @@ document.addEventListener('click', event => {
     if (isCollapse) {
       if (panel.classList.contains('collapsed')) {
         forcePanelCollapsed(panel)
-      } else if (panel.dataset.simBehaviorKeepExpanded === 'true') {
-        forcePanelExpanded(panel)
+      } else if (/Waveform/i.test(activeBefore)) {
+        forcePanelExpanded(panel, 'waveform')
       }
+      ensureBottomControls(panel)
       return
     }
 
-    // Once Waveform has expanded the lower workspace, switching to Console
-    // should preserve exactly that height. Do not depend solely on the active
-    // class because React can update it before document bubble phase.
     if (/^Console$/i.test(clickedLabel) && (
       /Waveform/i.test(activeBefore) || panel.dataset.simBehaviorKeepExpanded === 'true'
     )) {
-      forcePanelExpanded(panel)
+      forcePanelExpanded(panel, 'console')
+      ensureBottomControls(panel)
       return
     }
 
     if (/Waveform/i.test(clickedLabel) && !panel.classList.contains('collapsed')) {
-      panel.dataset.simBehaviorKeepExpanded = 'true'
-      forcePanelExpanded(panel)
+      forcePanelExpanded(panel, 'waveform')
+      ensureBottomControls(panel)
+      return
     }
+
+    ensureBottomControls(panel)
   }))
 
   settle()
-  // The old waveform enhancer restores Console on the next animation frame.
-  // One macrotask reinforcement makes this invariant independent of listener
-  // ordering without continually fighting user-initiated resizing/collapse.
   if (/^Console$/i.test(clickedLabel)) setTimeout(settle, 0)
 })
 
 window.addEventListener('resize', () => {
   initializeAll()
-  qa(document, '.ide-bottom[data-sim-behavior-keep-expanded="true"]:not(.collapsed)').forEach(forcePanelExpanded)
+  qa(document, '.ide-bottom[data-sim-behavior-keep-expanded="true"]:not(.collapsed)').forEach(panel => {
+    const mode = /Waveform/i.test(activeBottomTab(panel)?.textContent || '') ? 'waveform' : 'console'
+    forcePanelExpanded(panel, mode)
+  })
 })
