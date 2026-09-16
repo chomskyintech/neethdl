@@ -123,3 +123,23 @@
   background:rgba(71,190,101,.12);
   border-color:rgba(71,190,101,.28);
 }
+
+/* Keep the editor controls in the approved order: Waveform -> Reset -> Find.
+   The waveform button remains a normal editor-toolbar control; opening it only
+   overlays .waveform-editor-stage and never changes the console panel below. */
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.waveform-launch-button{
+  order:2!important;
+  width:28px!important;
+  min-width:28px!important;
+  height:28px!important;
+  min-height:28px!important;
+  flex:0 0 28px!important;
+  margin:auto 2px auto 4px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>button[title="Reset editor"]{
+  order:3!important;
+  margin:auto 2px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
+  order:4!important;
+}
