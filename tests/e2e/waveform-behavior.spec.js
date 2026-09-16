@@ -41,16 +41,12 @@ test.describe('waveform layout behavior', () => {
     const zoomOut = toolbar.locator('.sim-v2-zoom-out')
     const zoomLabel = toolbar.locator('.sim-v2-zoom-label')
     const zoomIn = toolbar.locator('.sim-v2-zoom-in')
-    const scroll = waveform.locator('.wave-scroll')
     const svg = waveform.locator('svg.wave-svg')
     const signalPanel = waveform.locator('.sim-v2-signal-panel')
-    const ruler = waveform.locator('.sim-v2-ruler')
     const bottomPanel = page.locator('.ide-bottom')
     const workspace = page.locator('.ide-workspace')
     const fileTabs = page.locator('.file-tabs')
 
-    // The zoom percentage belongs between minus and plus, both in DOM order
-    // and visually on screen.
     const zoomOrder = await toolbar.locator('.sim-v2-zoom-out, .sim-v2-zoom-label, .sim-v2-zoom-in').evaluateAll(nodes =>
       nodes.map(node => node.className)
     )
@@ -58,10 +54,9 @@ test.describe('waveform layout behavior', () => {
 
     const zoomBoxes = await Promise.all([zoomOut.boundingBox(), zoomLabel.boundingBox(), zoomIn.boundingBox()])
     expect(zoomBoxes.every(Boolean)).toBeTruthy()
-    expect(zoomBoxes[0].right).toBeLessThanOrEqual(zoomBoxes[1].x + 1)
+    expect(zoomBoxes[0].x + zoomBoxes[0].width).toBeLessThanOrEqual(zoomBoxes[1].x + 1)
     expect(zoomBoxes[1].x + zoomBoxes[1].width).toBeLessThanOrEqual(zoomBoxes[2].x + 1)
 
-    // Zoom in enough to create a real horizontal pan region.
     await zoomIn.click()
     await zoomIn.click()
     await zoomIn.click()
@@ -116,7 +111,6 @@ test.describe('waveform layout behavior', () => {
     expect(afterPan.rulerTransform).toBe('none')
     expect(Math.abs((afterPan.viewportLeft - afterPan.scrollLeft) - afterPan.rulerLeft)).toBeLessThanOrEqual(3)
 
-    // Vertical signal/trace alignment must survive horizontal scrolling.
     const maxAlignmentError = await page.evaluate(() => {
       const labels = [...document.querySelectorAll('.sim-v2-signal-row[data-sim-quality-kept="true"]')]
       const traces = [...document.querySelectorAll('svg.wave-svg g[data-sim-quality-kept="true"]')]
@@ -129,7 +123,6 @@ test.describe('waveform layout behavior', () => {
     })
     expect(maxAlignmentError).toBeLessThanOrEqual(6)
 
-    // Fullscreen must target the waveform itself, never the entire bottom panel.
     const fullscreenButton = page.getByRole('button', { name: 'Full screen' })
     await fullscreenButton.click()
     await expect.poll(() => page.evaluate(() => {
@@ -161,8 +154,6 @@ test.describe('waveform layout behavior', () => {
       return Boolean(document.fullscreenElement === w || w?.classList.contains('sim-v2-wave-only-fullscreen'))
     })).toBe(false)
 
-    // Switching from Waveform to Console must keep the bottom area at the same
-    // editor-height expansion rather than shrinking it back to a console strip.
     await page.getByRole('button', { name: 'Console', exact: true }).click()
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect.poll(async () => {
@@ -174,8 +165,6 @@ test.describe('waveform layout behavior', () => {
     }).toBeLessThanOrEqual(4)
     await expect(page.locator('.monaco-editor-wrap')).toBeHidden()
 
-    // Reopen Waveform, then the common collapse control must genuinely collapse
-    // it and give the editor its space back.
     await page.getByRole('button', { name: /Waveform/i }).click()
     await expect(waveform).toBeVisible()
     const collapse = page.locator('.bottom-collapse')
