@@ -13,6 +13,14 @@ const files = [
 
 let scheduled = false
 
+function setText(node, text) {
+  if (node && node.textContent !== text) node.textContent = text
+}
+
+function setHTML(node, html) {
+  if (node && node.innerHTML !== html) node.innerHTML = html
+}
+
 function activeIndex(lab) {
   const buttons = [...lab.querySelectorAll('.lab-steps > button')]
   const index = buttons.findIndex(button => button.classList.contains('active'))
@@ -49,10 +57,8 @@ function ensureTopbar(lab) {
     back.insertAdjacentElement('afterend', menu)
   }
 
-  const strong = title.querySelector('strong')
-  const subtitle = title.querySelector('span')
-  if (strong && strong.textContent !== '32-bit RISC-V CPU') strong.textContent = '32-bit RISC-V CPU'
-  if (subtitle) subtitle.textContent = `${files.length} files · RV32I`
+  setText(title.querySelector('strong'), '32-bit RISC-V CPU')
+  setText(title.querySelector('span'), `${files.length} files · RV32I`)
 }
 
 function ensureDrawer(lab) {
@@ -70,6 +76,14 @@ function ensureDrawer(lab) {
     drawer.setAttribute('aria-label', 'Project files')
     drawer.innerHTML = '<div class="project-file-drawer-head"><div><strong>Project files</strong><span>Build in order</span></div><button type="button" class="project-file-drawer-close" aria-label="Close project files">×</button></div><div class="project-file-list"></div>'
     drawer.querySelector('.project-file-drawer-close').addEventListener('click', () => toggleDrawer(lab, false))
+    drawer.querySelector('.project-file-list').addEventListener('click', event => {
+      const item = event.target.closest('.project-file-item[data-index]')
+      if (!item || item.disabled) return
+      const original = lab.querySelectorAll('.lab-steps > button')[Number(item.dataset.index)]
+      if (!original || original.disabled) return
+      original.click()
+      toggleDrawer(lab, false)
+    })
     lab.appendChild(drawer)
   }
   renderDrawer(lab)
@@ -87,21 +101,21 @@ function renderDrawer(lab) {
   const current = activeIndex(lab)
   const complete = completeCount(lab)
   const unlocked = unlockedCount(lab)
+  const renderKey = `${current}:${complete}:${unlocked}:${sourceButtons.map(button => `${button.classList.contains('done') ? 1 : 0}${button.disabled ? 1 : 0}`).join('')}`
+  if (list.dataset.renderKey === renderKey) return
+  list.dataset.renderKey = renderKey
 
-  list.replaceChildren()
   const sections = [
     ['Completed', files.map((_, i) => i).filter(i => i < complete)],
     ['Current', [current]],
     ['Next to build', files.map((_, i) => i).filter(i => i > current && i >= complete)],
   ]
   const used = new Set()
+  let html = ''
   for (const [label, indices] of sections) {
     const unique = indices.filter(index => index >= 0 && index < files.length && !used.has(index))
     if (!unique.length) continue
-    const heading = document.createElement('div')
-    heading.className = 'project-file-section'
-    heading.textContent = label
-    list.appendChild(heading)
+    html += `<div class="project-file-section">${label}</div>`
     for (const index of unique) {
       used.add(index)
       const meta = files[index]
@@ -109,19 +123,10 @@ function renderDrawer(lab) {
       const done = original.classList.contains('done')
       const isCurrent = index === current
       const enabled = index < unlocked
-      const item = document.createElement('button')
-      item.type = 'button'
-      item.className = `project-file-item${done ? ' done' : ''}${isCurrent ? ' current' : ''}`
-      item.disabled = !enabled
-      item.innerHTML = `<span class="project-file-state">${done ? '✓' : index + 1}</span><span class="project-file-copy"><small>FILE ${index + 1}</small><strong>${meta.file}</strong></span><span class="project-file-status">${done ? 'done' : isCurrent ? 'editing' : enabled ? 'next' : 'locked'}</span>`
-      item.addEventListener('click', () => {
-        if (original.disabled) return
-        original.click()
-        toggleDrawer(lab, false)
-      })
-      list.appendChild(item)
+      html += `<button type="button" data-index="${index}" class="project-file-item${done ? ' done' : ''}${isCurrent ? ' current' : ''}" ${enabled ? '' : 'disabled'}><span class="project-file-state">${done ? '✓' : index + 1}</span><span class="project-file-copy"><small>FILE ${index + 1}</small><strong>${meta.file}</strong></span><span class="project-file-status">${done ? 'done' : isCurrent ? 'editing' : enabled ? 'next' : 'locked'}</span></button>`
     }
   }
+  list.innerHTML = html
 }
 
 function ensureTabs(lab) {
@@ -179,7 +184,10 @@ function ensureSolutionAvailable(lab) {
   if (!button || button.dataset.projectOpening === 'true') return
   button.dataset.projectOpening = 'true'
   button.click()
-  requestAnimationFrame(() => { button.dataset.projectOpening = 'false'; schedule() })
+  requestAnimationFrame(() => {
+    button.dataset.projectOpening = 'false'
+    schedule()
+  })
 }
 
 function updateLesson(lab) {
@@ -195,7 +203,7 @@ function updateLesson(lab) {
     lab.dataset.projectTab = 'task'
   }
 
-  title.textContent = meta.block
+  setText(title, meta.block)
 
   let tags = scroll.querySelector('.project-block-tags')
   if (!tags) {
@@ -203,7 +211,7 @@ function updateLesson(lab) {
     tags.className = 'project-block-tags'
     title.insertAdjacentElement('afterend', tags)
   }
-  tags.innerHTML = `<span class="project-badge ${difficultyClass(meta.difficulty)}">${meta.difficulty}</span><span class="project-badge course">Course</span>`
+  setHTML(tags, `<span class="project-badge ${difficultyClass(meta.difficulty)}">${meta.difficulty}</span><span class="project-badge course">Course</span>`)
 
   let fileMeta = scroll.querySelector('.project-file-meta')
   if (!fileMeta) {
@@ -212,10 +220,9 @@ function updateLesson(lab) {
     concept.insertAdjacentElement('afterend', fileMeta)
   }
   const time = lab.querySelector('.lesson-meta span:last-child')?.textContent?.trim() || ''
-  fileMeta.innerHTML = `<span class="project-badge meta">File ${index + 1} of ${files.length}</span><span class="project-badge meta">SystemVerilog</span>${time ? `<span class="project-badge meta">${time}</span>` : ''}`
+  setHTML(fileMeta, `<span class="project-badge meta">File ${index + 1} of ${files.length}</span><span class="project-badge meta">SystemVerilog</span>${time ? `<span class="project-badge meta">${time}</span>` : ''}`)
 
-  const codeFile = lab.querySelector('.code-heading strong')
-  if (codeFile) codeFile.textContent = meta.file
+  setText(lab.querySelector('.code-heading strong'), meta.file)
   renderProjectTab(lab)
 }
 
@@ -225,20 +232,19 @@ function updateCustomPanels(lab) {
   if (!meta) return
 
   const approach = lab.querySelector('[data-project-panel="approach"]')
-  if (approach) {
-    approach.innerHTML = `<h2>Approach</h2><p>Build the ${meta.block} in small, testable steps.</p><ol class="project-approach-list">${meta.approach.map(item => `<li>${item}</li>`).join('')}</ol>`
-  }
+  if (approach) setHTML(approach, `<h2>Approach</h2><p>Build the ${meta.block} in small, testable steps.</p><ol class="project-approach-list">${meta.approach.map(item => `<li>${item}</li>`).join('')}</ol>`)
 
   const solution = lab.querySelector('[data-project-panel="solution"]')
   if (solution) {
     const code = lab.querySelector('.reference-code')?.textContent || ''
-    solution.innerHTML = `<h2>Solution</h2><p>Reference implementation for the ${meta.block} block.</p>${code ? `<pre class="project-solution-code"></pre>` : '<div class="project-discussion-card">Open this tab again if the reference solution is still loading.</div>'}`
+    const solutionHtml = `<h2>Solution</h2><p>Reference implementation for the ${meta.block} block.</p>${code ? '<pre class="project-solution-code"></pre>' : '<div class="project-discussion-card">Open this tab again if the reference solution is still loading.</div>'}`
+    setHTML(solution, solutionHtml)
     const pre = solution.querySelector('pre')
-    if (pre) pre.textContent = code
+    if (pre && pre.textContent !== code) pre.textContent = code
   }
 
   const discussion = lab.querySelector('[data-project-panel="discussion"]')
-  if (discussion) discussion.innerHTML = `<h2>Discussion</h2><p>Questions and implementation notes for ${meta.block}.</p><div class="project-discussion-card">Use this space to compare RTL approaches, ask about edge cases, or note design decisions for this block.</div>`
+  if (discussion) setHTML(discussion, `<h2>Discussion</h2><p>Questions and implementation notes for ${meta.block}.</p><div class="project-discussion-card">Use this space to compare RTL approaches, ask about edge cases, or note design decisions for this block.</div>`)
 }
 
 function enhanceLab(lab) {
