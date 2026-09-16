@@ -104,7 +104,7 @@ test.describe('IDE interaction regressions', () => {
     expect(await examplesHeading.evaluate(el => getComputedStyle(el).paddingTop)).toBe('18px')
   })
 
-  test('keeps waveform and search controls beside reset', async ({ page }) => {
+  test('keeps waveform, reset and search controls together on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
 
@@ -127,14 +127,14 @@ test.describe('IDE interaction regressions', () => {
     expect(waveformBox).toBeTruthy()
     expect(searchBox).toBeTruthy()
 
-    const resetToWaveform = waveformBox.x - (resetBox.x + resetBox.width)
-    const waveformToSearch = searchBox.x - (waveformBox.x + waveformBox.width)
-    expect(resetToWaveform).toBeGreaterThanOrEqual(0)
-    expect(resetToWaveform).toBeLessThanOrEqual(20)
-    expect(waveformToSearch).toBeGreaterThanOrEqual(0)
-    expect(waveformToSearch).toBeLessThanOrEqual(20)
+    const waveformToReset = resetBox.x - (waveformBox.x + waveformBox.width)
+    const resetToSearch = searchBox.x - (resetBox.x + resetBox.width)
+    expect(waveformToReset).toBeGreaterThanOrEqual(0)
+    expect(waveformToReset).toBeLessThanOrEqual(20)
+    expect(resetToSearch).toBeGreaterThanOrEqual(0)
+    expect(resetToSearch).toBeLessThanOrEqual(20)
     expect(Math.abs((resetBox.y + resetBox.height / 2) - (waveformBox.y + waveformBox.height / 2))).toBeLessThanOrEqual(1)
-    expect(Math.abs((waveformBox.y + waveformBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
+    expect(Math.abs((resetBox.y + resetBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
     expect(tabsBox.x + tabsBox.width - (searchBox.x + searchBox.width)).toBeLessThanOrEqual(16)
 
     await search.click()
