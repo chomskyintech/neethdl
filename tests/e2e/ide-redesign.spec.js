@@ -20,6 +20,35 @@ test.describe('redesigned IDE shell',()=>{
   expect(workspaceRadius).not.toBe('0px')
  })
 
+ test('keeps equal outer gutters and no persistent blue divider',async({page})=>{
+  await page.setViewportSize({width:1440,height:900})
+  await page.goto('/app/problems/rtl-fifo/')
+
+  const frame=page.locator('.ide-body')
+  const frameBox=await frame.boundingBox()
+  expect(frameBox).toBeTruthy()
+  const leftGap=frameBox.x
+  const rightGap=1440-(frameBox.x+frameBox.width)
+  expect(Math.abs(leftGap-rightGap)).toBeLessThanOrEqual(1)
+
+  const overflow=await page.evaluate(()=>({
+   innerWidth:window.innerWidth,
+   rootWidth:document.documentElement.scrollWidth,
+   bodyWidth:document.body.scrollWidth
+  }))
+  expect(overflow.rootWidth).toBeLessThanOrEqual(overflow.innerWidth)
+  expect(overflow.bodyWidth).toBeLessThanOrEqual(overflow.innerWidth)
+
+  const divider=page.locator('.ide-panel-resizer')
+  await expect(divider).toBeVisible()
+  const dividerStyle=await divider.evaluate(el=>{
+   const pseudo=getComputedStyle(el,'::before')
+   return{opacity:pseudo.opacity,background:pseudo.backgroundColor}
+  })
+  expect(dividerStyle.opacity).toBe('0')
+  expect(dividerStyle.background).toBe('rgb(74, 74, 74)')
+ })
+
  test('opens, searches and closes the problem drawer',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await page.getByRole('button',{name:'Open problems'}).click()
