@@ -1,0 +1,14 @@
+/* Keep Monaco on the same neutral charcoal surface as the approved IDE mockup. */
+body.hdlforge-ide-active .ide-page .monaco-editor,
+body.hdlforge-ide-active .ide-page .monaco-editor .margin,
+body.hdlforge-ide-active .ide-page .monaco-editor-background,
+body.hdlforge-ide-active .ide-page .monaco-editor .inputarea.ime-input{
+  background-color:#1e1e1e!important;
+}
+body.hdlforge-ide-active .ide-page .monaco-editor .line-numbers{
+  color:#777!important;
+}
+body.hdlforge-ide-active .ide-page .monaco-editor .current-line ~ .line-numbers,
+body.hdlforge-ide-active .ide-page .monaco-editor .line-numbers.active-line-number{
+  color:#aaa!important;
+}
