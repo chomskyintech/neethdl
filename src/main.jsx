@@ -18,15 +18,14 @@ const Tracks=lazy(()=>import('./Tracks'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
 const Courses=lazy(()=>import('./Courses'))
-const InterviewMode=lazy(()=>import('./InterviewMode'))
 const RiscvCoreLab=lazy(()=>import('./RiscvCoreLab'))
 
 const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
-const appPaths={home:'/',problems:'/app/problems/',tracks:'/app/tracks/',interview:'/app/interview/',projects:'/app/projects/','riscv-project':'/app/projects/riscv-core/',courses:'/app/courses/',progress:'/app/progress/'}
-const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',tracks:'Tracks | HDLForge',interview:'Interview Mode | HDLForge',projects:'Projects | HDLForge','riscv-project':'RISC-V Core Project | HDLForge',courses:'Courses | HDLForge',progress:'Progress | HDLForge'}
+const appPaths={home:'/',problems:'/app/problems/',tracks:'/app/tracks/',projects:'/app/projects/','riscv-project':'/app/projects/riscv-core/',courses:'/app/courses/',progress:'/app/progress/'}
+const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',tracks:'Tracks | HDLForge',projects:'Projects | HDLForge','riscv-project':'RISC-V Core Project | HDLForge',courses:'Courses | HDLForge',progress:'Progress | HDLForge'}
 
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
@@ -122,13 +121,11 @@ function App(){
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
- const profileLabel=user?(user.name||user.email||'Account').trim().slice(0,2).toUpperCase():'Sign in'
- return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='interview'?'active':''} onClick={()=>go('interview')}>Interview</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'}><UserCircle size={20}/><span>{profileLabel}</span></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
+ return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>} 
  {page==='tracks'&&<Tracks problems={problems} solved={solved} onOpen={openProblem}/>} 
- {page==='interview'&&<InterviewMode onExit={()=>go('home')}/>} 
  {page==='projects'&&<Projects onStartRiscv={()=>go('riscv-project')}/>}
  {page==='riscv-project'&&<RiscvCoreLab onExit={()=>go('projects')}/>}
  {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
