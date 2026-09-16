@@ -7,9 +7,9 @@ import './waveform-discussion.css'
 import './account-tracks.css'
 import './home-projects.css'
 import './courses.css'
-import './riscv-lab.css'
 import './lockedEditor.js'
 import problems from './data/activeProblems'
+import {riscvProject} from './data/riscvProject'
 import LandingHub from './LandingHub'
 import {addActivityDay,calculatePoints,calculateStreak,topicProgress} from './progressTracking'
 
@@ -18,14 +18,13 @@ const Tracks=lazy(()=>import('./Tracks'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
 const Courses=lazy(()=>import('./Courses'))
-const RiscvCoreLab=lazy(()=>import('./RiscvCoreLab'))
 
 const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
-const appPaths={home:'/',problems:'/app/problems/',tracks:'/app/tracks/',projects:'/app/projects/','riscv-project':'/app/projects/riscv-core/',courses:'/app/courses/',progress:'/app/progress/'}
-const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',tracks:'Tracks | HDLForge',projects:'Projects | HDLForge','riscv-project':'RISC-V Core Project | HDLForge',courses:'Courses | HDLForge',progress:'Progress | HDLForge'}
+const appPaths={home:'/',problems:'/app/problems/',tracks:'/app/tracks/',projects:'/app/projects/',courses:'/app/courses/',progress:'/app/progress/'}
+const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',tracks:'Tracks | HDLForge',projects:'Projects | HDLForge',courses:'Courses | HDLForge',progress:'Progress | HDLForge'}
 
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
@@ -36,49 +35,69 @@ function problemLanguages(p){
 }
 function problemLanguageLabel(p){const ls=problemLanguages(p);return ls.length?ls.join(' / '):'Conceptual'}
 function normalizePath(path){return path==='/'?'/':path.replace(/\/+$/,'')}
-function appPath(page,problem){return page==='problem'&&problem?`/app/problems/${encodeURIComponent(problem.id)}/`:(appPaths[page]||'/')}
+function appPath(page,problem,projectId=null){
+ if(page==='problem'&&problem){
+  if(projectId===riscvProject.id)return `/app/projects/${riscvProject.slug}/${encodeURIComponent(problem.id)}/`
+  return `/app/problems/${encodeURIComponent(problem.id)}/`
+ }
+ return appPaths[page]||'/'
+}
 function routeFromLocation(){
  const path=normalizePath(window.location.pathname)
+ const projectMatch=path.match(/^\/app\/projects\/riscv-core\/([^/]+)$/)
+ if(projectMatch){
+  const id=decodeURIComponent(projectMatch[1])
+  const problem=problems.find(p=>p.id===id&&riscvProject.problemIds.includes(p.id))
+  if(problem)return {page:'problem',problem,projectId:riscvProject.id}
+ }
  const problemMatch=path.match(/^\/app\/problems\/([^/]+)$/)
  if(problemMatch){
   const id=decodeURIComponent(problemMatch[1])
   const problem=problems.find(p=>p.id===id)
-  if(problem)return {page:'problem',problem}
+  if(problem)return {page:'problem',problem,projectId:null}
  }
  const legacyId=new URLSearchParams(window.location.search).get('problem')
- if(legacyId){const problem=problems.find(p=>p.id===legacyId);if(problem)return {page:'problem',problem,legacy:true}}
- for(const [page,target] of Object.entries(appPaths))if(normalizePath(target)===path)return {page,problem:null}
- return {page:'home',problem:null}
+ if(legacyId){const problem=problems.find(p=>p.id===legacyId);if(problem)return {page:'problem',problem,legacy:true,projectId:null}}
+ for(const [page,target] of Object.entries(appPaths))if(normalizePath(target)===path)return {page,problem:null,projectId:null}
+ return {page:'home',problem:null,projectId:null}
 }
 function RouteLoading(){return <div role="status" aria-live="polite" style={{padding:'48px 24px',color:'var(--muted)'}}>Loading HDLForge…</div>}
 
 function App(){
  const initialRoute=useRef(routeFromLocation()).current
- const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
+ const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[projectId,setProjectId]=useState(initialRoute.projectId||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
  const syncTimer=useRef(null)
  const markSolved=id=>{if(solved.includes(id))return;const n=[...solved,id];setSolved(n);localStorage.setItem('hdlforge-solved',JSON.stringify(n));const days=addActivityDay(activityDays);setActivityDays(days);localStorage.setItem('hdlforge-activity-days',JSON.stringify(days))}
  const saveDraft=(id,code)=>{const n={...drafts,[id]:code},updated={...draftUpdatedAt,[id]:new Date().toISOString()};setDrafts(n);setDraftUpdatedAt(updated);localStorage.setItem('hdlforge-drafts',JSON.stringify(n));localStorage.setItem('hdlforge-draft-updated-at',JSON.stringify(updated))}
  const filtered=useMemo(()=>problems.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.category===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))}),[category,difficulty,language,status,query,solved])
  const points=useMemo(()=>calculatePoints(problems,solved),[solved]),streak=useMemo(()=>calculateStreak(activityDays),[activityDays]),topicStats=useMemo(()=>topicProgress(problems,solved),[solved])
- const navigate=(nextPage,problem=null,{replace=false}={})=>{
+ const navigate=(nextPage,problem=null,{replace=false,project=null}={})=>{
+  const nextProject=nextPage==='problem'?project:null
   if(nextPage==='problem'&&problem)setSelected(problem)
+  setProjectId(nextProject)
   setPage(nextPage)
-  const target=appPath(nextPage,problem)
+  const target=appPath(nextPage,problem,nextProject)
   const current=`${window.location.pathname}${window.location.search}`
-  if(current!==target)window.history[replace?'replaceState':'pushState']({page:nextPage,problemId:problem?.id||null},'',target)
+  if(current!==target)window.history[replace?'replaceState':'pushState']({page:nextPage,problemId:problem?.id||null,projectId:nextProject},'',target)
   window.scrollTo({top:0,behavior:'auto'})
  }
  const openProblem=p=>navigate('problem',p)
  const go=p=>navigate(p)
+ const projectProblems=useMemo(()=>riscvProject.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean),[])
+ const startRiscvProject=()=>{
+  const next=projectProblems.find(problem=>!solved.includes(problem.id))||projectProblems[0]
+  if(next)navigate('problem',next,{project:riscvProject.id})
+ }
  const selectedIndex=selected?problems.findIndex(p=>p.id===selected.id):-1
- const previousProblem=selectedIndex>0?problems[selectedIndex-1]:null
- const nextProblem=selectedIndex>=0&&selectedIndex<problems.length-1?problems[selectedIndex+1]:null
- const openPrevious=()=>previousProblem&&openProblem(previousProblem)
- const openNext=()=>nextProblem&&openProblem(nextProblem)
+ const projectIndex=projectId===riscvProject.id&&selected?riscvProject.problemIds.indexOf(selected.id):-1
+ const previousProblem=projectIndex>=0?(projectIndex>0?projectProblems[projectIndex-1]:null):(selectedIndex>0?problems[selectedIndex-1]:null)
+ const nextProblem=projectIndex>=0?(projectIndex<projectProblems.length-1?projectProblems[projectIndex+1]:null):(selectedIndex>=0&&selectedIndex<problems.length-1?problems[selectedIndex+1]:null)
+ const openPrevious=()=>previousProblem&&navigate('problem',previousProblem,{project:projectId})
+ const openNext=()=>nextProblem&&navigate('problem',nextProblem,{project:projectId})
 
  useEffect(()=>{
-  if(initialRoute.legacy&&initialRoute.problem)window.history.replaceState({page:'problem',problemId:initialRoute.problem.id},'',appPath('problem',initialRoute.problem))
-  const onPopState=()=>{const route=routeFromLocation();setPage(route.page);if(route.problem)setSelected(route.problem)}
+  if(initialRoute.legacy&&initialRoute.problem)window.history.replaceState({page:'problem',problemId:initialRoute.problem.id,projectId:null},'',appPath('problem',initialRoute.problem))
+  const onPopState=()=>{const route=routeFromLocation();setPage(route.page);setProjectId(route.projectId||null);if(route.problem)setSelected(route.problem)}
   window.addEventListener('popstate',onPopState)
   return()=>window.removeEventListener('popstate',onPopState)
  },[])
@@ -121,13 +140,12 @@ function App(){
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
- return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||page==='problem'?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='projects'||page==='riscv-project'?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
+ return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='tracks'?'active':''} onClick={()=>go('tracks')}>Tracks</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button><button className={page==='progress'?'active':''} onClick={()=>go('progress')}>Progress</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem}/>} 
- {page==='problem'&&selected&&<ProblemIDE key={selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go('problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)}/>} 
+ {page==='problem'&&selected&&<ProblemIDE key={`${projectId||'problem'}-${selected.id}`} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!projectId||solved.includes(selected.id))}/>} 
  {page==='tracks'&&<Tracks problems={problems} solved={solved} onOpen={openProblem}/>} 
- {page==='projects'&&<Projects onStartRiscv={()=>go('riscv-project')}/>}
- {page==='riscv-project'&&<RiscvCoreLab onExit={()=>go('projects')}/>}
+ {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved}/>} 
  {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
  {page==='progress'&&<Progress problems={problems} solved={solved} onOpen={openProblem} points={points} streak={streak} topicStats={topicStats}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
