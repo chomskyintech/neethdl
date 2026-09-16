@@ -1,0 +1,334 @@
+/* Interactive waveform viewer layered on top of the existing HDLForge trace. */
+body.hdlforge-ide-active .waveform.waveform-enhanced{
+  position:relative;
+  margin-top:0;
+  border:0;
+  border-radius:0;
+  background:#171717;
+  overflow:hidden;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-head{
+  min-height:42px;
+  padding:7px 10px;
+  gap:10px;
+  border-bottom:1px solid #343434;
+  background:#202020;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-head>div:first-child{
+  flex:0 0 auto;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-head strong{
+  color:#ededed;
+  font-size:12px;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-head>div:first-child>span{
+  color:#8b8b8b;
+  font-size:10px;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-tools{
+  flex:0 0 auto!important;
+  margin-left:0!important;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-tools button,
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-fit{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid #3b3b3b;
+  border-radius:6px;
+  background:#292929;
+  color:#c7c7c7;
+  font-size:11px;
+  cursor:pointer;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-fit{
+  width:auto;
+  min-width:36px;
+  padding:0 9px;
+  font-weight:650;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-tools button:hover,
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-fit:hover{
+  border-color:#555;
+  background:#333;
+  color:#fff;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-tools>span{
+  min-width:40px;
+  color:#999!important;
+  font-size:10px!important;
+  text-align:center;
+}
+
+body.hdlforge-ide-active .wave-enhance-toolbar{
+  min-width:0;
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+}
+body.hdlforge-ide-active .wave-search,
+body.hdlforge-ide-active .wave-radix{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  color:#777;
+  font-size:9px;
+  font-weight:650;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+body.hdlforge-ide-active .wave-search input,
+body.hdlforge-ide-active .wave-radix select{
+  height:28px;
+  box-sizing:border-box;
+  border:1px solid #3a3a3a;
+  border-radius:6px;
+  outline:0;
+  background:#181818;
+  color:#d6d6d6;
+  font-size:10px;
+}
+body.hdlforge-ide-active .wave-search input{
+  width:92px;
+  padding:0 8px;
+}
+body.hdlforge-ide-active .wave-radix select{
+  width:78px;
+  padding:0 6px;
+}
+body.hdlforge-ide-active .wave-search input:focus,
+body.hdlforge-ide-active .wave-radix select:focus{
+  border-color:#666;
+}
+body.hdlforge-ide-active .wave-readouts{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+body.hdlforge-ide-active .wave-readouts span{
+  min-width:54px;
+  height:24px;
+  box-sizing:border-box;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  margin:0!important;
+  padding:0 6px;
+  border:1px solid #363636;
+  border-radius:5px;
+  background:#181818;
+  color:#aaa!important;
+  font:9px/1 ui-monospace,SFMono-Regular,Consolas,monospace!important;
+}
+
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-scroll{
+  position:relative;
+  min-height:190px;
+  max-height:100%;
+  border:0;
+  border-radius:0;
+  background:#181818;
+  scrollbar-color:#555 #222;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-svg{
+  margin-left:70px;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-label-bg,
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-name,
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-width{
+  opacity:0;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-grid{
+  stroke:#303030;
+  stroke-dasharray:2 5;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-row{
+  stroke:#2b2b2b;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-axis-line{
+  stroke:#464646;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-time{
+  fill:#8a8a8a;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-digital{
+  stroke:#62cfa9;
+  stroke-width:2;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-transition{
+  fill:#62cfa9;
+  stroke:#171717;
+  stroke-width:1.5;
+  cursor:crosshair;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-bus{
+  fill:#24332e;
+  stroke:#4c8f79;
+  stroke-width:1;
+}
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-bus-text{
+  fill:#b9ddd0;
+  font-size:9px;
+}
+
+body.hdlforge-ide-active .wave-live-panel{
+  position:absolute;
+  z-index:7;
+  top:0;
+  left:0;
+  width:190px;
+  min-width:190px;
+  box-sizing:border-box;
+  border-right:1px solid #373737;
+  background:#202020;
+  box-shadow:7px 0 14px rgba(0,0,0,.16);
+  will-change:transform;
+}
+body.hdlforge-ide-active .wave-live-header{
+  height:30px;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 72px;
+  align-items:center;
+  padding:0 8px 0 10px;
+  border-bottom:1px solid #393939;
+  color:#838383;
+  font-size:9px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+body.hdlforge-ide-active .wave-live-header span:last-child{
+  text-align:right;
+}
+body.hdlforge-ide-active .wave-live-list{
+  display:block;
+}
+body.hdlforge-ide-active .wave-live-row{
+  width:100%;
+  height:42px;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 72px;
+  align-items:center;
+  gap:6px;
+  padding:0 8px 0 10px;
+  border:0;
+  border-bottom:1px solid #2f2f2f;
+  background:#202020;
+  color:#c9c9c9;
+  text-align:left;
+  cursor:pointer;
+}
+body.hdlforge-ide-active .wave-live-row:hover,
+body.hdlforge-ide-active .wave-live-row.selected{
+  background:#292929;
+}
+body.hdlforge-ide-active .wave-live-row.dimmed{
+  opacity:.32;
+}
+body.hdlforge-ide-active .wave-live-signal{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+body.hdlforge-ide-active .wave-live-name{
+  overflow:hidden;
+  color:#d2d2d2;
+  font:10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+body.hdlforge-ide-active .wave-live-signal small{
+  color:#747474;
+  font:8px/1.1 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+body.hdlforge-ide-active .wave-live-value{
+  overflow:hidden;
+  color:#8fd6bd;
+  font:9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  text-align:right;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.hdlforge-ide-active .wave-cursor-line{
+  position:absolute;
+  z-index:5;
+  top:0;
+  width:1px;
+  min-height:100%;
+  pointer-events:none;
+}
+body.hdlforge-ide-active .wave-cursor-line span{
+  position:absolute;
+  top:4px;
+  left:3px;
+  min-width:16px;
+  height:16px;
+  display:grid;
+  place-items:center;
+  border-radius:4px;
+  color:#111;
+  font:700 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+body.hdlforge-ide-active .wave-cursor-line-a{
+  background:#d8d8d8;
+}
+body.hdlforge-ide-active .wave-cursor-line-a span{
+  background:#d8d8d8;
+}
+body.hdlforge-ide-active .wave-cursor-line-b{
+  background:#d4b86d;
+}
+body.hdlforge-ide-active .wave-cursor-line-b span{
+  background:#d4b86d;
+}
+
+body.hdlforge-ide-active .wave-failure-marker{
+  position:absolute;
+  z-index:6;
+  top:0;
+  width:2px;
+  min-width:2px;
+  padding:0;
+  border:0;
+  background:#d95f5f;
+  cursor:pointer;
+}
+body.hdlforge-ide-active .wave-failure-marker span{
+  position:absolute;
+  top:5px;
+  left:4px;
+  width:17px;
+  height:17px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#d95f5f;
+  color:#fff;
+  font:700 10px/1 sans-serif;
+  box-shadow:0 0 0 2px #181818;
+}
+
+body.hdlforge-ide-active .waveform.waveform-enhanced .wave-cursor{
+  display:none!important;
+}
+
+@media(max-width:1000px){
+  body.hdlforge-ide-active .wave-search span,
+  body.hdlforge-ide-active .wave-radix span,
+  body.hdlforge-ide-active .wave-readouts{
+    display:none!important;
+  }
+  body.hdlforge-ide-active .wave-search input{width:72px}
+  body.hdlforge-ide-active .wave-live-panel{width:160px;min-width:160px}
+  body.hdlforge-ide-active .wave-live-header,
+  body.hdlforge-ide-active .wave-live-row{grid-template-columns:minmax(0,1fr) 60px}
+  body.hdlforge-ide-active .waveform.waveform-enhanced .wave-svg{margin-left:40px}
+}
