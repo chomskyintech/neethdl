@@ -32,7 +32,7 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
- test('uses the neutral IDE palette in the problem drawer',async({page})=>{
+ test('uses the larger neutral IDE palette in the problem drawer',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await page.getByRole('button',{name:'Open problems'}).click()
 
@@ -44,6 +44,9 @@ test.describe('redesigned IDE shell',()=>{
   await expect(drawer).toHaveClass(/open/)
   await expect(active).toBeVisible()
 
+  const drawerBox=await drawer.boundingBox()
+  expect(drawerBox).toBeTruthy()
+  expect(drawerBox.width).toBeGreaterThanOrEqual(420)
   expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 31, 31)')
   expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 38, 38)')
   expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(30, 30, 30)')
@@ -88,27 +91,54 @@ test.describe('redesigned IDE shell',()=>{
   expect(statementStyles.scrollbarColor).toContain('rgb(38, 38, 38)')
  })
 
- test('keeps the collapse chevron visually attached to Console',async({page})=>{
+ test('keeps the account control icon-only',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  const signIn=page.locator('#hdlforge-ide-signin')
+  await expect(signIn).toBeVisible()
+  await expect(signIn.locator('span')).toBeHidden()
+  const box=await signIn.boundingBox()
+  expect(box).toBeTruthy()
+  expect(box.width).toBeLessThanOrEqual(40)
+ })
+
+ test('keeps language control borderless and reset beside it',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  const picker=page.locator('.editor-language')
+  const select=picker.locator('select')
+  const reset=page.locator('.file-tabs .icon-btn')
+  await expect(picker).toBeVisible()
+  await expect(reset).toBeVisible()
+
+  expect(await picker.evaluate(el=>getComputedStyle(el).boxShadow)).toBe('none')
+  await select.focus()
+  const focused=await select.evaluate(el=>{const s=getComputedStyle(el);return{outline:s.outlineStyle,border:s.borderTopWidth,shadow:s.boxShadow}})
+  expect(focused.outline).toBe('none')
+  expect(focused.border).toBe('0px')
+  expect(focused.shadow).toBe('none')
+
+  const pickerBox=await picker.boundingBox()
+  const resetBox=await reset.boundingBox()
+  expect(pickerBox).toBeTruthy()
+  expect(resetBox).toBeTruthy()
+  expect(resetBox.x-(pickerBox.x+pickerBox.width)).toBeLessThanOrEqual(12)
+ })
+
+ test('puts the collapse chevron immediately after Console',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
 
-  const tabs=page.locator('.bottom-tabs')
   const consoleTab=page.locator('.bottom-tabs>button').first()
   const collapseButton=page.locator('.bottom-collapse')
-
-  await expect(tabs).toBeVisible()
   await expect(consoleTab).toContainText('Console')
   await expect(collapseButton).toBeVisible()
 
-  const tabsBox=await tabs.boundingBox()
   const consoleBox=await consoleTab.boundingBox()
   const collapseBox=await collapseButton.boundingBox()
-  expect(tabsBox).toBeTruthy()
   expect(consoleBox).toBeTruthy()
   expect(collapseBox).toBeTruthy()
 
-  expect(collapseBox.x).toBeGreaterThanOrEqual(consoleBox.x)
-  expect(collapseBox.x+collapseBox.width).toBeLessThanOrEqual(consoleBox.x+40)
-  expect(collapseBox.x-tabsBox.x).toBeLessThan(36)
+  const consoleRight=consoleBox.x+consoleBox.width
+  expect(collapseBox.x).toBeGreaterThanOrEqual(consoleRight-14)
+  expect(collapseBox.x).toBeLessThanOrEqual(consoleRight+8)
   const collapseCenterY=collapseBox.y+collapseBox.height/2
   const consoleCenterY=consoleBox.y+consoleBox.height/2
   expect(Math.abs(collapseCenterY-consoleCenterY)).toBeLessThanOrEqual(2)
