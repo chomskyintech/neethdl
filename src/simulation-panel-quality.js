@@ -70,7 +70,7 @@ function compactDuplicateSignals(waveform) {
   const viewBox = String(svg.getAttribute('viewBox') || '').trim().split(/\s+/).map(Number)
   const viewWidth = Number(svg.dataset.simV2ViewWidth) || viewBox[2] || Number(svg.getAttribute('width')) || 760
   svg.dataset.simQualityViewHeight = String(compactHeight)
-  svg.setAttribute('height', String(compactHeight))
+  if (svg.getAttribute('height') !== String(compactHeight)) svg.setAttribute('height', String(compactHeight))
   svg.setAttribute('viewBox', `0 0 ${viewWidth} ${compactHeight}`)
   svg.style.height = `${compactHeight}px`
   return true
@@ -165,6 +165,6 @@ document.addEventListener('pointerup', event => {
   if (waveform) fitIfAtHundredPercent(waveform)
 }, true)
 
-new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['width', 'height', 'class'] })
+new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true })
 window.addEventListener('resize', schedule)
 schedule()
