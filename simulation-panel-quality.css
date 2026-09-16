@@ -1,0 +1,9 @@
+/* Quality guard for the redesigned waveform viewer. */
+.hdlforge-ide-active .waveform-v2 .wave-svg{
+  min-height:0!important;
+  max-height:none!important;
+}
+.hdlforge-ide-active .waveform-v2 g[data-sim-quality-duplicate="true"],
+.hdlforge-ide-active .waveform-v2 .sim-v2-signal-row[data-sim-quality-duplicate="true"]{
+  display:none!important;
+}
