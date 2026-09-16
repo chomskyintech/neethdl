@@ -217,9 +217,18 @@ async function toggleWaveformFullscreen(waveform) {
 
 function updateWaveformCollapseButton(panel, button) {
   const collapsed = panel.classList.contains('collapsed')
-  button.innerHTML = collapsed ? CHEVRON_UP : CHEVRON_DOWN
-  button.setAttribute('aria-label', collapsed ? 'Expand waveform' : 'Collapse waveform')
-  button.title = collapsed ? 'Expand waveform' : 'Collapse waveform'
+  const state = collapsed ? 'collapsed' : 'expanded'
+  const label = collapsed ? 'Expand waveform' : 'Collapse waveform'
+
+  // Avoid rewriting the SVG on every MutationObserver pass. Replacing
+  // innerHTML creates another child-list mutation, which can otherwise feed
+  // the observer indefinitely and stall the page/browser tests.
+  if (button.dataset.simWaveState !== state) {
+    button.innerHTML = collapsed ? CHEVRON_UP : CHEVRON_DOWN
+    button.dataset.simWaveState = state
+  }
+  if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label)
+  if (button.title !== label) button.title = label
 }
 
 function ensureBottomControls(panel) {
