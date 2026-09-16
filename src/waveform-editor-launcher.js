@@ -17,7 +17,20 @@ function injectStyles() {
     .file-tabs .sim-editor-waveform-launch{
       display:inline-grid!important;
       place-items:center!important;
-      flex:0 0 auto!important;
+      width:28px!important;
+      height:28px!important;
+      min-width:28px!important;
+      padding:0!important;
+      border:1px solid transparent!important;
+      border-radius:6px!important;
+      background:transparent!important;
+      color:#9ca3ad!important;
+      cursor:pointer!important;
+      flex:0 0 28px!important;
+    }
+    .file-tabs .sim-editor-waveform-launch:hover{
+      color:#e4e7eb!important;
+      background:rgba(255,255,255,.05)!important;
     }
     .file-tabs .sim-editor-waveform-launch.active{
       color:#8ee7a2!important;
@@ -48,12 +61,15 @@ function syncWorkspace(workspace) {
   if (!launcher) {
     launcher = document.createElement('button')
     launcher.type = 'button'
-    launcher.className = 'icon-btn sim-editor-waveform-launch'
+    launcher.className = 'sim-editor-waveform-launch'
     launcher.title = 'Waveform'
     launcher.setAttribute('aria-label', 'Waveform')
     launcher.setAttribute('aria-pressed', 'false')
     launcher.innerHTML = WAVE_ICON
-    reset.insertAdjacentElement('afterend', launcher)
+
+    // Keep Reset immediately beside the existing Find control, while placing
+    // Waveform directly beside Reset on its left.
+    reset.insertAdjacentElement('beforebegin', launcher)
 
     launcher.addEventListener('click', () => {
       const currentPanel = q(workspace, '.ide-bottom')
