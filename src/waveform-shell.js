@@ -10,10 +10,28 @@ function positionRunProxy(panel) {
   proxy.style.top = `${rect.top + Math.max(0, (rect.height - size) / 2)}px`
 }
 
+function setEditorHiddenForWaveform(workspace, hidden) {
+  const editor = workspace?.querySelector('.editor-wrap') || workspace?.querySelector('.editor-shell')
+  if (!editor) return
+
+  if (hidden) {
+    editor.dataset.waveformHidden = 'true'
+    editor.style.setProperty('display', 'none', 'important')
+    return
+  }
+
+  if (editor.dataset.waveformHidden === 'true') {
+    editor.style.removeProperty('display')
+    delete editor.dataset.waveformHidden
+  }
+}
+
 function maximizeWaveformPanel(panel) {
   const workspace = panel?.closest('.ide-workspace')
   const fileTabs = workspace?.querySelector('.file-tabs')
   if (!panel || !workspace || !fileTabs || panel.classList.contains('collapsed')) return
+
+  setEditorHiddenForWaveform(workspace, true)
 
   const workspaceHeight = workspace.getBoundingClientRect().height
   const fileTabsHeight = fileTabs.getBoundingClientRect().height
@@ -44,6 +62,7 @@ function restorePanelAfterWaveform(panel) {
   panel.style.setProperty('height', `${restored}px`, 'important')
   panel.style.setProperty('flex-basis', `${restored}px`, 'important')
   panel.style.setProperty('max-height', `${restored}px`, 'important')
+  setEditorHiddenForWaveform(workspace, false)
   requestAnimationFrame(() => positionRunProxy(panel))
 }
 
