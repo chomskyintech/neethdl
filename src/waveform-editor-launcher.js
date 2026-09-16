@@ -15,7 +15,9 @@ function injectStyles() {
       display:none!important;
     }
     .file-tabs .sim-editor-waveform-launch{
-      display:inline-grid!important;
+      position:absolute!important;
+      z-index:4!important;
+      display:grid!important;
       place-items:center!important;
       width:28px!important;
       height:28px!important;
@@ -23,14 +25,13 @@ function injectStyles() {
       padding:0!important;
       border:1px solid transparent!important;
       border-radius:6px!important;
-      background:transparent!important;
+      background:#1f1f1f!important;
       color:#9ca3ad!important;
       cursor:pointer!important;
-      flex:0 0 28px!important;
     }
     .file-tabs .sim-editor-waveform-launch:hover{
       color:#e4e7eb!important;
-      background:rgba(255,255,255,.05)!important;
+      background:#292929!important;
     }
     .file-tabs .sim-editor-waveform-launch.active{
       color:#8ee7a2!important;
@@ -43,6 +44,17 @@ function injectStyles() {
 
 function waveformTab(panel) {
   return qa(panel, '.bottom-tabs > button').find(button => /^Waveform$/i.test(button.textContent?.trim() || '')) || null
+}
+
+function positionLauncher(fileTabs, reset, launcher) {
+  const tabsStyle = getComputedStyle(fileTabs)
+  if (tabsStyle.position === 'static') fileTabs.style.position = 'relative'
+
+  // Because the launcher is absolutely positioned, it does not disturb the
+  // existing Reset -> Find spacing. Keep it 8 px to the left of Reset.
+  const left = Math.max(0, reset.offsetLeft - launcher.offsetWidth - 8)
+  launcher.style.left = `${left}px`
+  launcher.style.top = `${reset.offsetTop}px`
 }
 
 function syncWorkspace(workspace) {
@@ -66,10 +78,7 @@ function syncWorkspace(workspace) {
     launcher.setAttribute('aria-label', 'Waveform')
     launcher.setAttribute('aria-pressed', 'false')
     launcher.innerHTML = WAVE_ICON
-
-    // Keep Reset immediately beside the existing Find control, while placing
-    // Waveform directly beside Reset on its left.
-    reset.insertAdjacentElement('beforebegin', launcher)
+    fileTabs.appendChild(launcher)
 
     launcher.addEventListener('click', () => {
       const currentPanel = q(workspace, '.ide-bottom')
@@ -83,6 +92,8 @@ function syncWorkspace(workspace) {
       requestAnimationFrame(() => requestAnimationFrame(syncAll))
     })
   }
+
+  positionLauncher(fileTabs, reset, launcher)
 
   const active = source.classList.contains('active') && !panel.classList.contains('collapsed')
   if (launcher.classList.contains('active') !== active) launcher.classList.toggle('active', active)
@@ -110,3 +121,4 @@ new MutationObserver(syncAll).observe(document.documentElement, {
 document.addEventListener('click', () => {
   requestAnimationFrame(() => requestAnimationFrame(syncAll))
 })
+window.addEventListener('resize', syncAll)
