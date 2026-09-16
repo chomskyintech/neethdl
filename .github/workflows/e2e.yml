@@ -32,6 +32,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: hdlforge-playwright-report
@@ -40,6 +41,7 @@ jobs:
 
       - name: Upload browser diagnostics
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: hdlforge-browser-diagnostics
