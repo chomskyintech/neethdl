@@ -1,0 +1,45 @@
+/* Final compact layout overrides. Keep these last in the stylesheet order. */
+body.hdlforge-ide-active .ide-page .ide-topbar{
+  box-sizing:border-box!important;
+  height:46px!important;
+  min-height:46px!important;
+  flex:0 0 46px!important;
+}
+
+/* Reduce the tab bars without changing the Problem/Approach/Solution/Discussion text size. */
+body.hdlforge-ide-active .ide-page .ide-problem>.problem-tabs{
+  height:43px!important;
+  min-height:43px!important;
+  flex:0 0 43px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-tabs button{
+  font-size:14px!important;
+}
+
+body.hdlforge-ide-active .ide-page .file-tabs{
+  height:41px!important;
+  min-height:41px!important;
+  flex:0 0 41px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language) .editor-language select{
+  font-size:13px!important;
+}
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.icon-btn,
+body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
+  width:30px!important;
+  min-width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  flex:0 0 30px!important;
+}
+
+/* Remove the oversized vertical gap between the task text and Examples. */
+body.hdlforge-ide-active .ide-page .problem-section.first{
+  padding-bottom:0!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section.first p{
+  padding:18px 0 12px!important;
+}
+body.hdlforge-ide-active .ide-page .problem-section.first + .problem-section h2{
+  padding-top:18px!important;
+}
