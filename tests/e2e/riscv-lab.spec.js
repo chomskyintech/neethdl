@@ -19,7 +19,7 @@ async function openLab(page){
  await page.getByRole('button',{name:/Start building/i}).click()
  await expect(page.getByTestId('riscv-lab')).toBeVisible()
  await expect(page.locator('.monaco-editor')).toBeVisible({timeout:15_000})
- await expect(page.getByRole('button',{name:'Project files'})).toBeVisible()
+ await expect(page.getByRole('button',{name:'Project files',exact:true})).toBeVisible()
 }
 
 async function replaceCode(page,source){
@@ -45,7 +45,7 @@ test.describe('guided RV32I project',()=>{
   await expect(tabs.nth(2)).toHaveText('Solution')
   await expect(tabs.nth(3)).toHaveText('Discussion')
 
-  await page.getByRole('button',{name:'Project files'}).click()
+  await page.getByRole('button',{name:'Project files',exact:true}).click()
   await expect(page.locator('.project-file-drawer')).toHaveClass(/open/)
   await expect(page.locator('.project-file-item').first()).toContainText('rv32_pc.sv')
   await expect(page.locator('.project-file-item').nth(1)).toBeDisabled()
@@ -76,7 +76,7 @@ test.describe('guided RV32I project',()=>{
   await expect(page.getByRole('heading',{name:'Instruction Decoder'})).toBeVisible()
   await expect(page.locator('.code-heading strong')).toHaveText('rv32_decode.sv')
 
-  await page.getByRole('button',{name:'Project files'}).click()
+  await page.getByRole('button',{name:'Project files',exact:true}).click()
   await expect(page.locator('.project-file-item').filter({hasText:'rv32_decode.sv'})).toBeEnabled()
 
   await page.reload()
