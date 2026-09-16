@@ -1,24 +1,28 @@
 import problems from './data/activeProblems'
+import {riscvProject} from './data/riscvProject'
 
-function currentProblem(){
+function currentContext(){
+  const projectMatch=window.location.pathname.match(/^\/app\/projects\/riscv-core\/([^/]+)\/?$/)
+  if(projectMatch){
+    const id=decodeURIComponent(projectMatch[1])
+    return {problem:problems.find(problem=>problem.id===id)||null,label:riscvProject.title}
+  }
   const match=window.location.pathname.match(/^\/app\/problems\/([^/]+)\/?$/)
-  if(!match)return null
+  if(!match)return {problem:null,label:null}
   const id=decodeURIComponent(match[1])
-  return problems.find(problem=>problem.id===id)||null
+  const problem=problems.find(problem=>problem.id===id)||null
+  return {problem,label:problem?.category||null}
 }
 
 function syncSectionLabel(){
-  const problem=currentProblem()
+  const {problem,label:nextLabel}=currentContext()
   const button=document.querySelector('#hdlforge-ide-problems-button')
-  if(!problem||!button)return
+  if(!problem||!button||!nextLabel)return
 
   const label=button.querySelector('.ide-topbar-problems-label')
   const count=button.querySelector('.ide-topbar-problems-count')
-  const nextLabel=problem.category
   const totalCount=String(problems.length)
 
-  // Keep the visible label section-specific, but preserve the stable
-  // accessible name and total problem count used by the IDE contract.
   if(label&&label.textContent!==nextLabel)label.textContent=nextLabel
   if(count&&count.textContent!==totalCount)count.textContent=totalCount
   if(button.getAttribute('aria-label')!=='Open problems')button.setAttribute('aria-label','Open problems')
