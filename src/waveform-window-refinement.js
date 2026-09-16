@@ -35,8 +35,22 @@ function ensureWaveformEndMarker(windowNode) {
   requestAnimationFrame(() => q(waveform, '.sim-v2-fit')?.click())
 }
 
+function keepConsoleCollapseBesideConsole() {
+  qa(document, '.bottom-tabs').forEach(tabs => {
+    const collapse = q(tabs, '.bottom-collapse')
+    const buttons = qa(tabs, ':scope > button:not(.bottom-collapse)')
+    const consoleButton = buttons.find(button => /console/i.test(button.textContent || ''))
+    if (!collapse || !consoleButton) return
+
+    // Do not rely on CSS order here. Physically keep the chevron immediately
+    // after Console so later stylesheet overrides cannot move it beside Testbench.
+    if (consoleButton.nextElementSibling !== collapse) consoleButton.after(collapse)
+  })
+}
+
 function refineWaveformWindows() {
   qa(document, '.waveform-window').forEach(ensureWaveformEndMarker)
+  keepConsoleCollapseBesideConsole()
 }
 
 function scheduleRefine() {
