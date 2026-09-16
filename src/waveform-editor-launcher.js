@@ -40,9 +40,9 @@ function syncWorkspace(workspace) {
 
   const source = waveformTab(panel)
   if (!source) return
-  source.classList.add('sim-bottom-waveform-trigger')
-  source.setAttribute('aria-hidden', 'true')
-  source.tabIndex = -1
+  if (!source.classList.contains('sim-bottom-waveform-trigger')) source.classList.add('sim-bottom-waveform-trigger')
+  if (source.getAttribute('aria-hidden') !== 'true') source.setAttribute('aria-hidden', 'true')
+  if (source.tabIndex !== -1) source.tabIndex = -1
 
   let launcher = q(fileTabs, '.sim-editor-waveform-launch')
   if (!launcher) {
@@ -61,16 +61,17 @@ function syncWorkspace(workspace) {
       if (!currentPanel || !currentSource) return
 
       // Keep the React-owned waveform renderer and all of its current formatting.
-      // The existing waveform behavior module expands the lower panel to the same
-      // editor-workspace footprint and hides the Monaco editor when this tab opens.
+      // The existing waveform behavior module expands the panel to the editor
+      // workspace footprint and hides Monaco while the waveform is open.
       currentSource.click()
       requestAnimationFrame(() => requestAnimationFrame(syncAll))
     })
   }
 
   const active = source.classList.contains('active') && !panel.classList.contains('collapsed')
-  launcher.classList.toggle('active', active)
-  launcher.setAttribute('aria-pressed', String(active))
+  if (launcher.classList.contains('active') !== active) launcher.classList.toggle('active', active)
+  const pressed = String(active)
+  if (launcher.getAttribute('aria-pressed') !== pressed) launcher.setAttribute('aria-pressed', pressed)
 }
 
 function syncAll() {
@@ -79,9 +80,17 @@ function syncAll() {
 
 injectStyles()
 syncAll()
+
+// Initialization only needs DOM insertion/removal observation. Watching every
+// class change in Monaco made the launcher run on thousands of unrelated editor
+// mutations and slowed browser interactions significantly.
 new MutationObserver(syncAll).observe(document.documentElement, {
   childList: true,
   subtree: true,
-  attributes: true,
-  attributeFilter: ['class'],
+})
+
+// React changes active/collapsed state in response to clicks; resync after those
+// events instead of globally observing all class mutations.
+document.addEventListener('click', () => {
+  requestAnimationFrame(() => requestAnimationFrame(syncAll))
 })
