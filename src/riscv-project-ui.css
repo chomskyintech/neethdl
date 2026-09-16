@@ -1,0 +1,93 @@
+.riscv-lab{position:relative}
+
+/* Keep the existing project Monaco editor untouched. This layer only reshapes
+   the guided-project shell around it. */
+.riscv-lab.project-ui-ready .lab-shell{grid-template-columns:1fr}
+.riscv-lab.project-ui-ready .lab-steps{display:none!important}
+.riscv-lab.project-ui-ready .lab-work{grid-template-columns:minmax(430px,38%) minmax(0,62%)}
+.riscv-lab.project-ui-ready .lesson-pane{display:flex;flex-direction:column;overflow:hidden}
+.riscv-lab.project-ui-ready .lesson-scroll{flex:1;min-height:0;padding:28px 32px 46px}
+.riscv-lab.project-ui-ready .lesson-meta{display:none}
+.riscv-lab.project-ui-ready .lesson-scroll h1{font:700 28px/1.12 Consolas,"Courier New",monospace;margin:10px 0 12px;letter-spacing:-.03em}
+.riscv-lab.project-ui-ready .lesson-concept{font-size:13px;line-height:1.7;color:#b8bfba;margin:0 0 13px}
+.riscv-lab.project-ui-ready .lesson-scroll h3 svg{display:none}
+.riscv-lab.project-ui-ready .solution-button,
+.riscv-lab.project-ui-ready .reference-code{display:none!important}
+
+.riscv-lab.project-ui-ready .lab-topbar{grid-template-columns:minmax(360px,1fr) auto 210px;gap:12px;padding:0 18px}
+.riscv-lab.project-ui-ready .lab-back{width:34px;height:34px;padding:0;justify-content:center;border-radius:7px}
+.riscv-lab.project-ui-ready .lab-back svg{margin:0}
+.riscv-lab.project-ui-ready .lab-back{font-size:0}
+.riscv-lab.project-ui-ready .lab-title{justify-content:flex-start;min-width:0}
+.riscv-lab.project-ui-ready .lab-title>svg{display:none}
+.riscv-lab.project-ui-ready .lab-title strong{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.riscv-lab.project-ui-ready .lab-title span{font-size:9px;white-space:nowrap}
+.riscv-lab.project-ui-ready .lab-progress{justify-self:end}
+
+.project-top-left{display:flex;align-items:center;gap:9px;min-width:0}
+.project-file-menu{width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:7px;background:transparent;color:#b6bcb8;font-size:20px;line-height:1}
+.project-file-menu:hover{background:#202320;color:#fff}
+.project-file-menu-lines{width:17px;height:12px;position:relative;display:block;border-top:2px solid currentColor;border-bottom:2px solid currentColor}
+.project-file-menu-lines:after{content:"";position:absolute;left:0;right:0;top:4px;border-top:2px solid currentColor}
+
+.project-task-tabs{height:50px;flex:0 0 50px;display:flex;align-items:stretch;gap:6px;padding:0 15px;background:#111211;border-bottom:1px solid #292c29}
+.project-task-tabs button{position:relative;border:0;background:transparent;color:#8d948f;padding:0 14px;font-size:11px;font-weight:700}
+.project-task-tabs button.active{color:#f0f3f1}
+.project-task-tabs button.active:after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:2px;background:#f0f3f1}
+
+.project-block-tags,.project-file-meta{display:flex;gap:7px;flex-wrap:wrap}
+.project-block-tags{margin:0 0 15px}
+.project-file-meta{margin:0 0 24px}
+.project-badge{height:27px;display:inline-flex;align-items:center;padding:0 10px;border:1px solid #343834;border-radius:14px;background:#1b1d1b;color:#9da49f;font-size:9px;font-weight:750;letter-spacing:.02em}
+.project-badge.difficulty-easy{background:#14372f;border-color:#20483c;color:#55d2b0}
+.project-badge.difficulty-medium{background:#3a3117;border-color:#574a23;color:#e0bc64}
+.project-badge.difficulty-hard{background:#3b2020;border-color:#593030;color:#e08c87}
+.project-badge.course{color:#c3c9c5}
+.project-badge.meta{height:24px;font-weight:600;color:#858c87;background:#161816}
+
+.project-tab-panel{display:none;flex:1;min-height:0;overflow:auto;padding:28px 32px 46px;background:#121312}
+.project-tab-panel.active{display:block}
+.project-tab-panel h2{margin:0 0 11px;font-size:22px;letter-spacing:-.02em}
+.project-tab-panel>p{margin:0 0 18px;color:#a8afa9;font-size:12px;line-height:1.65}
+.project-approach-list{margin:0;padding:0 0 0 19px;color:#adb4af}
+.project-approach-list li{padding:6px 0;font-size:12px;line-height:1.55}
+.project-solution-code{margin:14px 0 0;padding:14px;border:1px solid #303330;border-radius:8px;background:#0d0e0d;color:#bac2bd;font:10px/1.6 Consolas,"Courier New",monospace;white-space:pre-wrap;overflow:auto}
+.project-discussion-card{border:1px solid #303330;border-radius:9px;background:#171917;padding:15px;color:#aeb5b0;font-size:12px;line-height:1.6}
+
+.project-file-drawer-backdrop{display:none;position:absolute;z-index:70;top:58px;left:0;right:0;bottom:0;background:rgba(0,0,0,.46)}
+.project-file-drawer-backdrop.open{display:block}
+.project-file-drawer{position:absolute;z-index:71;top:58px;left:0;bottom:0;width:320px;display:flex;flex-direction:column;background:#111311;border-right:1px solid #303330;transform:translateX(-100%);transition:transform .16s ease;box-shadow:12px 0 28px rgba(0,0,0,.28)}
+.project-file-drawer.open{transform:translateX(0)}
+.project-file-drawer-head{height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;padding:0 15px;border-bottom:1px solid #2a2d2a}
+.project-file-drawer-head strong,.project-file-drawer-head span{display:block}
+.project-file-drawer-head strong{font-size:13px}
+.project-file-drawer-head span{margin-top:2px;color:#717873;font-size:8px;letter-spacing:.08em;text-transform:uppercase}
+.project-file-drawer-close{width:29px;height:29px;border:0;border-radius:5px;background:transparent;color:#909792;font-size:20px}
+.project-file-drawer-close:hover{background:#242724;color:#fff}
+.project-file-list{padding:11px;overflow:auto}
+.project-file-section{padding:8px 8px 6px;color:#666d68;font-size:8px;letter-spacing:.08em;text-transform:uppercase}
+.project-file-item{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px 8px;margin:0 0 4px;border:1px solid transparent;border-radius:7px;background:transparent;color:#828984;text-align:left}
+.project-file-item:hover:not(:disabled){background:#1b1e1b}
+.project-file-item.current{background:#19251f;border-color:#30453b;color:#eef2ef}
+.project-file-item.done{color:#aab7b0}
+.project-file-item:disabled{opacity:.4;cursor:not-allowed}
+.project-file-state{width:22px;height:22px;display:grid;place-items:center;border:1px solid #3b413d;border-radius:50%;font-size:8px}
+.project-file-item.done .project-file-state{background:#214035;border-color:#3e6656;color:#8fd0b5}
+.project-file-copy small,.project-file-copy strong{display:block}
+.project-file-copy small{color:#646b66;font-size:7px;letter-spacing:.07em}
+.project-file-copy strong{margin-top:2px;font:10px Consolas,"Courier New",monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.project-file-status{font-size:8px;color:#656c67}
+
+.riscv-lab.project-ui-ready .code-heading div strong{font-family:Consolas,"Courier New",monospace}
+
+@media(max-width:1050px){
+ .riscv-lab.project-ui-ready .lab-work{grid-template-columns:minmax(330px,42%) minmax(0,58%)}
+ .project-task-tabs button{padding:0 9px}
+}
+@media(max-width:900px){
+ .riscv-lab.project-ui-ready .lab-topbar{grid-template-columns:1fr auto}
+ .riscv-lab.project-ui-ready .lab-progress{display:none}
+ .riscv-lab.project-ui-ready .lab-work{grid-template-columns:1fr}
+ .riscv-lab.project-ui-ready .lesson-pane{max-height:none;border-right:0}
+ .project-file-drawer{width:min(320px,88vw)}
+}
