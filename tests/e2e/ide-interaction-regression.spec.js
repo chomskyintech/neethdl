@@ -47,6 +47,7 @@ test.describe('IDE interaction regressions', () => {
     const fileTabs = page.locator('.file-tabs')
     const language = page.locator('.editor-language select')
     const reset = fileTabs.locator('button[title="Reset editor"]')
+    const waveform = fileTabs.getByRole('button', { name: 'Waveform', exact: true })
     const search = fileTabs.getByRole('button', { name: 'Find in source' })
 
     expect(await topbar.evaluate(el => getComputedStyle(el).height)).toBe('46px')
@@ -55,7 +56,7 @@ test.describe('IDE interaction regressions', () => {
     expect(await fileTabs.evaluate(el => getComputedStyle(el).height)).toBe('39px')
     expect(await language.evaluate(el => getComputedStyle(el).fontSize)).toBe('13px')
 
-    for (const control of [reset, search]) {
+    for (const control of [reset, waveform, search]) {
       const box = await control.boundingBox()
       expect(box).toBeTruthy()
       expect(box.width).toBe(28)
@@ -103,29 +104,37 @@ test.describe('IDE interaction regressions', () => {
     expect(await examplesHeading.evaluate(el => getComputedStyle(el).paddingTop)).toBe('18px')
   })
 
-  test('removes the editor info row and keeps search beside reset', async ({ page }) => {
+  test('keeps waveform and search controls beside reset', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
 
     const fileTabs = page.locator('.file-tabs')
     const reset = fileTabs.locator('button[title="Reset editor"]')
+    const waveform = fileTabs.getByRole('button', { name: 'Waveform', exact: true })
     const search = fileTabs.getByRole('button', { name: 'Find in source' })
 
     await expect(page.locator('.editor-toolbar')).toHaveCount(0)
     await expect(reset).toBeVisible()
+    await expect(waveform).toBeVisible()
     await expect(search).toBeVisible()
 
     const tabsBox = await fileTabs.boundingBox()
     const resetBox = await reset.boundingBox()
+    const waveformBox = await waveform.boundingBox()
     const searchBox = await search.boundingBox()
     expect(tabsBox).toBeTruthy()
     expect(resetBox).toBeTruthy()
+    expect(waveformBox).toBeTruthy()
     expect(searchBox).toBeTruthy()
 
-    const gap = searchBox.x - (resetBox.x + resetBox.width)
-    expect(gap).toBeGreaterThanOrEqual(0)
-    expect(gap).toBeLessThanOrEqual(12)
-    expect(Math.abs((resetBox.y + resetBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
+    const resetToWaveform = waveformBox.x - (resetBox.x + resetBox.width)
+    const waveformToSearch = searchBox.x - (waveformBox.x + waveformBox.width)
+    expect(resetToWaveform).toBeGreaterThanOrEqual(0)
+    expect(resetToWaveform).toBeLessThanOrEqual(20)
+    expect(waveformToSearch).toBeGreaterThanOrEqual(0)
+    expect(waveformToSearch).toBeLessThanOrEqual(20)
+    expect(Math.abs((resetBox.y + resetBox.height / 2) - (waveformBox.y + waveformBox.height / 2))).toBeLessThanOrEqual(1)
+    expect(Math.abs((waveformBox.y + waveformBox.height / 2) - (searchBox.y + searchBox.height / 2))).toBeLessThanOrEqual(1)
     expect(tabsBox.x + tabsBox.width - (searchBox.x + searchBox.width)).toBeLessThanOrEqual(16)
 
     await search.click()
