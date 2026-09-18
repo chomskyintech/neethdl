@@ -76,5 +76,5 @@ test('problem rows stay dark and problem names use a softer neutral color',async
  expect(bg).not.toBe('rgb(255, 255, 255)')
  expect(bg).not.toBe('rgba(255, 255, 255, 1)')
  const title=row.locator('.problem-main strong')
- expect(await title.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(222, 221, 225)')
+ expect(await title.evaluate(el=>getComputedStyle(el).color)).toBe('rgb(201, 201, 201)')
 })
