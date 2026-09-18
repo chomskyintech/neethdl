@@ -337,8 +337,8 @@
   transform:none!important;
   width:calc(100% - 48px)!important;
   max-width:1680px!important;
-  height:82px!important;
-  margin:20px auto 0!important;
+  height:66px!important;
+  margin:14px auto 0!important;
   border:1px solid rgba(255,255,255,.08)!important;
   border-radius:22px!important;
   background:linear-gradient(90deg,rgba(14,15,14,.52) 0%,rgba(14,15,14,.42) 48%,rgba(14,15,14,.28) 76%,rgba(14,15,14,.16) 100%)!important;
@@ -350,16 +350,16 @@
 }
 .app>.nav.app-section-nav .nav-inner{
   max-width:none;
-  padding:0 24px;
+  padding:0 22px;
 }
 .app>.nav.app-section-nav .brand{
   min-width:220px;
-  font-size:27px;
-  gap:12px;
+  font-size:25px;
+  gap:11px;
 }
 .app>.nav.app-section-nav .brand-icon{
-  width:46px;
-  height:46px;
+  width:38px;
+  height:38px;
   border-radius:12px;
   background:#3aa78f!important;
 }
@@ -368,7 +368,7 @@
   gap:28px;
 }
 .app>.nav.app-section-nav .desktop-nav button{
-  padding:8px 0;
+  padding:6px 0;
   border-radius:0;
   background:transparent!important;
   color:#959a97!important;
@@ -385,7 +385,7 @@
 }
 .top-signin{
   min-width:105px;
-  height:42px;
+  height:38px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -721,10 +721,10 @@
     width:calc(100% - 32px)!important;
     top:12px!important;
     margin-top:12px!important;
-    height:74px!important;
+    height:62px!important;
   }
   .app>.nav.app-section-nav .brand{min-width:auto;font-size:23px}
-  .app>.nav.app-section-nav .brand-icon{width:40px;height:40px}
+  .app>.nav.app-section-nav .brand-icon{width:36px;height:36px}
   .problems-workspace{
     grid-template-columns:minmax(0,1fr) 280px;
   }
