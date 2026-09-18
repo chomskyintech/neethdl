@@ -1,0 +1,132 @@
+/* Graphite neutral palette: white/grey accents, green only for brand/success states. */
+:root{
+  --bg:#0f0f0f!important;
+  --panel:#151515!important;
+  --panel-2:#1b1b1b!important;
+  --line:#2a2a2a!important;
+  --line-soft:#222!important;
+  --text:#f3f3f3!important;
+  --muted:#a3a3a3!important;
+  --dim:#737373!important;
+  --accent:#f4f4f5!important;
+  --accent-2:#d4d4d8!important;
+  --green:#3a9b7d!important;
+  --ide-border:#2a2a2a!important;
+  --ide-border-soft:#222!important;
+  --ide-panel:#151515!important;
+  --ide-editor:#101010!important;
+  --ide-text:#f1f1f1!important;
+  --ide-muted:#a3a3a3!important;
+  --ide-accent:#f4f4f5!important;
+  --forge-bg:#0f0f0f!important;
+  --forge-surface:#151515!important;
+  --forge-surface-2:#1b1b1b!important;
+  --forge-surface-3:#202020!important;
+  --forge-border:#2a2a2a!important;
+  --forge-border-bright:#3a3a3a!important;
+  --forge-text:#f3f3f3!important;
+  --forge-muted:#a3a3a3!important;
+  --forge-dim:#737373!important;
+  --forge-cyan:#f4f4f5!important;
+  --forge-blue:#f4f4f5!important;
+  --forge-indigo:#d4d4d8!important;
+  --forge-violet:#e4e4e7!important;
+  --forge-green:#3a9b7d!important;
+}
+html,body,.app{background:#0f0f0f!important;color:#f3f3f3!important}
+body{background-image:none!important}
+.app{background-image:none!important}
+.nav{background:rgba(15,15,15,.96)!important;border-bottom-color:#262626!important;box-shadow:none!important}
+.brand-icon{background:#36a487!important;box-shadow:none!important}
+.brand-accent,.nav-stat svg,.eyebrow,.chevron,.text-btn,.side-nav.active svg,.workspace-nav-item.active svg,.workspace-link.selected span:last-child,.dirty,.ide-title .eyebrow{color:#f4f4f5!important;text-shadow:none!important}
+.desktop-nav .active,.side-nav.active,.side-link.selected,.language-strip button.active,.workspace-nav-item.active,.workspace-link.selected{background:#242426!important;border-color:#414145!important;color:#f3f3f3!important;box-shadow:inset 2px 0 #f4f4f5!important}
+.side-nav:hover,.side-link:hover,.workspace-nav-item:hover,.workspace-link:hover,.problem-row:hover{background:#1a1a1a!important}
+.hero:before{display:none!important}
+.hero h1 span{background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important;color:#f3f3f3!important}
+.primary{background:#f4f4f5!important;border-color:#f4f4f5!important;box-shadow:none!important;color:#161616!important}
+.primary:hover{background:#fff!important;border-color:#fff!important;filter:none!important}
+.success{background:#2f8f78!important;border-color:#397d6d!important;box-shadow:none!important;color:#fff!important}
+.success:hover{filter:brightness(1.06)!important}
+.primary:after{display:none!important}
+.secondary,.profile,.toolbar-btn,.bottom-collapse,.editor-shortcuts button,.wave-tools button,.solve-status,.file-tab.active{background:#1b1b1b!important;border-color:#303030!important;color:#d9d9d9!important}
+.stats,.problem-list,.content-card,.progress-hero,.topic-card,.interview-card{background:#151515!important;border-color:#292929!important;box-shadow:none!important}
+.topic-card:hover{border-color:#3a3a3a!important;box-shadow:none!important}
+.topic-card:before{display:none!important}
+.toolbar .search,.filters select,.language-strip,.discussion-form input,.discussion-form textarea{background:#171717!important;border-color:#303030!important;color:#e7e7e7!important}
+.search:focus-within,.filters select:focus,.discussion-form input:focus,.discussion-form textarea:focus{border-color:#d4d4d8!important;box-shadow:0 0 0 2px rgba(255,255,255,.08)!important}
+.problem-row{width:100%!important;background:transparent!important;color:inherit!important;border:0!important;border-bottom:1px solid #222!important;border-radius:0!important;cursor:pointer!important;text-align:left!important;appearance:none!important;-webkit-appearance:none!important}
+.problem-row:last-child{border-bottom:0!important}
+.problem-main strong{color:#c9c9c9!important}
+.problem-main small{color:#8f8f8f!important}
+.problem-index,.row-chevron{color:#777!important}
+.problem-main:hover strong,.problem-row:hover .problem-main strong,.back:hover{color:#fff!important}
+.problem-tabs button.active,.bottom-tabs button.active{color:#f0f0f0!important;border-bottom-color:#f4f4f5!important;box-shadow:inset 0 -2px 0 #f4f4f5!important}
+.examples div,.discussion-post,.discussion-empty{background:#141414!important;border-color:#2b2b2b!important}
+.editor-card,.ide-workspace,.editor-shell,.editor-wrap,.editor-stage,.wave-panel,.wave-scroll{background:#101010!important;border-color:#292929!important;box-shadow:none!important}
+.editor-head,.editor-foot,.ide-topbar,.file-tabs,.bottom-tabs,.ide-discussion,.ide-problem>.problem-tabs{background:#161616!important;border-color:#292929!important;box-shadow:none!important}
+.ide-problem{background:#151515!important;border-color:#292929!important}
+.file-tab,.editor-language select,.icon-btn,.editor-toolbar,.editor-search,.ide-bottom,.console{background:#141414!important;border-color:#292929!important;color:#d0d0d0!important}
+.file-tab.active{box-shadow:inset 0 -2px 0 #f4f4f5!important}
+.ide-problem>.problem-tabs button.active{color:#fff!important;background:#2b2b2e!important;border-color:#55555a!important;box-shadow:inset 0 -2px 0 #f4f4f5!important}
+.editor-card textarea,.ide-editor{background:#101010!important;color:#ededed!important;caret-color:#d7e4df!important;-webkit-text-fill-color:#ededed!important}
+.ide-editor::selection{background:rgba(255,255,255,.14)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.ide-editor:focus{box-shadow:inset 2px 0 0 #f4f4f5!important}
+.editor-gutter{background:#121212!important;border-color:#242424!important;color:#5f5f5f!important}
+.wave-digital{stroke:#d4d4d8!important}
+.wave-event{border-color:#73737a!important;box-shadow:none!important}
+.wave-event span{color:#e4e4e7!important}
+.progress-track{background:#242424!important}
+.progress-track div{background:#2f8f78!important;box-shadow:none!important}
+.ring{border-color:#303030!important;outline-color:#393939!important;background:#171717!important;box-shadow:none!important}
+.interview-icon,.post-avatar{background:#29292c!important;color:#f4f4f5!important;border-color:#454549!important}
+.check.done{background:#2f8f78!important;border-color:#2f8f78!important;box-shadow:none!important}
+.difficulty.easy{color:#7fc3aa!important;background:#17201d!important;border-color:#263b34!important}
+.difficulty.medium{color:#d2b76f!important;background:#211e16!important;border-color:#3a3325!important}
+.difficulty.hard{color:#d98d8d!important;background:#211717!important;border-color:#3a2727!important}
+
+
+/* Integrated page scrollbar: keep the browser scroll affordance inside the graphite/emerald palette. */
+html{
+  scrollbar-width:thin;
+  scrollbar-color:#5b5b5f #0f0f0f;
+}
+html::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+html::-webkit-scrollbar-track{
+  background:#0f0f0f;
+}
+html::-webkit-scrollbar-thumb{
+  min-height:44px;
+  border:2px solid #0f0f0f;
+  border-radius:999px;
+  background:#5b5b5f;
+}
+html::-webkit-scrollbar-thumb:hover{
+  background:#77777d;
+}
+html::-webkit-scrollbar-corner{
+  background:#0f0f0f;
+}
+html::-webkit-scrollbar-button{
+  display:none;
+  width:0;
+  height:0;
+}
+
+
+/* Homepage floating navigation stays translucent so the hero portrait remains visible beneath it. */
+.app:has(.landing-hub)>.nav{
+  background:linear-gradient(
+    90deg,
+    rgba(15,15,15,.42) 0%,
+    rgba(15,15,15,.32) 44%,
+    rgba(15,15,15,.18) 74%,
+    rgba(15,15,15,.08) 100%
+  )!important;
+  border-color:rgba(255,255,255,.08)!important;
+  box-shadow:0 10px 34px rgba(0,0,0,.12)!important;
+  backdrop-filter:blur(9px)!important;
+  -webkit-backdrop-filter:blur(9px)!important;
+}
