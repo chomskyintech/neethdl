@@ -152,15 +152,22 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
   })
 
-  test('Projects page groups portfolio projects by hardware role', async ({ page }) => {
+  test('Projects page uses guided roadmap, project activity and compact project cards', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Projects', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Hardware design projects' })).toBeVisible()
+    await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Project activity' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Connect to GitHub', exact: true })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Company tracks' })).toHaveCount(0)
+    await expect(page.locator('.project-category-chip')).toHaveCount(6)
     await expect(page.getByRole('heading', { name: 'Design Verification' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'RTL / Digital Design' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'FPGA', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'SoC / Embedded Hardware' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Low-Latency / HFT Hardware' })).toBeVisible()
+    await expect(page.locator('.project-card-modern .project-build')).toHaveCount(0)
+    await expect(page.locator('.project-card-modern .project-why')).toHaveCount(0)
   })
 
   test('Courses page provides skill paths with problem and project links', async ({ page }) => {
