@@ -6,7 +6,7 @@ const resources=[
  {label:'Problems',href:'/problems/',page:'problems'},
  {label:'Learning',href:'/learn/',page:'courses'},
  {label:'Verilog guide',href:'/learn/verilog-interview/',page:'courses'},
- {label:'Companies',href:'/companies/',page:'tracks'},
+ {label:'Companies',href:'/companies/',page:'problems'},
  {label:'Projects',href:'/projects/',page:'projects'},
 ]
 
