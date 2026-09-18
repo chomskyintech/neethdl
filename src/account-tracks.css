@@ -809,3 +809,20 @@
   .problems-content .toolbar .filters{grid-template-columns:1fr}
   .sidebar-company-list{grid-template-columns:1fr}
 }
+
+
+/* Preserve text-only roadmap items at responsive widths. */
+@media(max-width:1040px){
+  .guided-roadmap-item{
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .guided-roadmap-item.active{
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#72c3ad!important;
+  }
+}
