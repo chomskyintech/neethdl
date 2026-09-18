@@ -177,3 +177,153 @@
   .company-track-label{padding-top:0}
   .company-track-banner{align-items:flex-start}
 }
+
+
+/* Compact NeetCode-inspired progress summary embedded in Problems. */
+.problem-progress-panel{
+  margin:0 0 24px;
+  padding:18px 20px;
+  display:grid;
+  grid-template-columns:210px minmax(0,1fr) auto;
+  gap:22px;
+  align-items:center;
+  border:1px solid #2c302d;
+  border-radius:16px;
+  background:rgba(21,22,21,.72);
+}
+.problem-progress-summary{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+.problem-progress-ring{
+  width:78px;
+  height:78px;
+  flex:0 0 78px;
+  display:grid;
+  place-items:center;
+  position:relative;
+  border-radius:50%;
+  background:conic-gradient(#52b89e calc(var(--progress,0)*1%),#222624 0);
+}
+.problem-progress-ring::after{
+  content:"";
+  position:absolute;
+  inset:7px;
+  border:1px solid #2a2e2b;
+  border-radius:50%;
+  background:#131513;
+}
+.problem-progress-ring>div{
+  position:relative;
+  z-index:1;
+  text-align:center;
+  line-height:1.05;
+}
+.problem-progress-ring strong{
+  display:block;
+  color:#f3f5f3;
+  font-size:18px;
+}
+.problem-progress-ring span{
+  display:block;
+  margin-top:3px;
+  color:#78817b;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+.problem-progress-copy{
+  min-width:0;
+  display:grid;
+  gap:5px;
+}
+.problem-progress-copy strong{
+  color:#ecefed;
+  font-size:13px;
+}
+.problem-progress-copy span{
+  color:#818a84;
+  font-size:10px;
+  line-height:1.45;
+}
+.problem-progress-breakdown{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(100px,1fr));
+  gap:10px;
+}
+.problem-progress-stat{
+  min-height:64px;
+  padding:11px 12px;
+  border:1px solid #2d312f;
+  border-radius:11px;
+  background:#151715;
+}
+.problem-progress-stat>div:first-child{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+.problem-progress-stat span{
+  font-size:10px;
+  font-weight:800;
+}
+.problem-progress-stat strong{
+  color:#d9ddda;
+  font-size:11px;
+}
+.problem-progress-stat.easy span{color:#73c4aa}
+.problem-progress-stat.medium span{color:#d2b66d}
+.problem-progress-stat.hard span{color:#cf7c78}
+.problem-progress-track{
+  height:6px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#232624;
+}
+.problem-progress-track i{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:#52625d;
+}
+.problem-progress-stat.easy .problem-progress-track i{background:#3e9e85}
+.problem-progress-stat.medium .problem-progress-track i{background:#a78f50}
+.problem-progress-stat.hard .problem-progress-track i{background:#985b57}
+.problem-progress-meta{
+  min-width:145px;
+  padding-left:20px;
+  border-left:1px solid #292d2a;
+}
+.problem-progress-meta>div{
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  color:#818984;
+  font-size:9px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.problem-progress-meta strong{
+  color:#e3e6e4;
+  font-size:12px;
+  letter-spacing:0;
+  text-transform:none;
+}
+@media(max-width:900px){
+  .problem-progress-panel{grid-template-columns:1fr}
+  .problem-progress-meta{
+    padding-left:0;
+    padding-top:10px;
+    border-left:0;
+    border-top:1px solid #292d2a;
+  }
+}
+@media(max-width:600px){
+  .problem-progress-breakdown{grid-template-columns:1fr}
+}
