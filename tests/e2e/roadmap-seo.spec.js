@@ -13,6 +13,33 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.problem-row')).toHaveCount(0)
   })
 
+
+  test('uses an integrated graphite scrollbar instead of the browser default rail', async ({ page }) => {
+    await page.goto('/')
+    const scrollbar = await page.evaluate(() => {
+      const root = document.documentElement
+      const base = getComputedStyle(root)
+      const track = getComputedStyle(root, '::-webkit-scrollbar-track')
+      const thumb = getComputedStyle(root, '::-webkit-scrollbar-thumb')
+      const button = getComputedStyle(root, '::-webkit-scrollbar-button')
+      return {
+        width: base.scrollbarWidth,
+        colors: base.scrollbarColor,
+        track: track.backgroundColor,
+        thumb: thumb.backgroundColor,
+        radius: thumb.borderRadius,
+        buttonDisplay: button.display,
+      }
+    })
+    expect(scrollbar.width).toBe('thin')
+    expect(scrollbar.colors).toContain('rgb(70, 83, 79)')
+    expect(scrollbar.colors).toContain('rgb(15, 15, 15)')
+    expect(scrollbar.track).toBe('rgb(15, 15, 15)')
+    expect(scrollbar.thumb).toBe('rgb(70, 83, 79)')
+    expect(scrollbar.radius).toBe('999px')
+    expect(scrollbar.buttonDisplay).toBe('none')
+  })
+
   test('Start practice opens the Problems workspace', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start practice', exact: true }).click()
