@@ -40,6 +40,24 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(scrollbar.buttonDisplay).toBe('none')
   })
 
+
+  test('homepage floating nav remains visibly translucent over the hero', async ({ page }) => {
+    await page.goto('/')
+    const nav = page.locator('.app>.nav')
+    await expect(nav).toBeVisible()
+    const style = await nav.evaluate(el => {
+      const s = getComputedStyle(el)
+      return {
+        backgroundImage: s.backgroundImage,
+        backdropFilter: s.backdropFilter,
+      }
+    })
+    expect(style.backgroundImage).toContain('linear-gradient')
+    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.42)')
+    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.08)')
+    expect(style.backdropFilter).toContain('blur(9px)')
+  })
+
   test('Start practice opens the Problems workspace', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start practice', exact: true }).click()
