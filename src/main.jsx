@@ -1,5 +1,5 @@
 import React,{lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
-import {ChevronRight,Filter,Flame,Sparkles,Search,Target,UserCircle,Zap}from'lucide-react'
+import {ChevronRight,Filter,Search,Target,UserCircle,Zap}from'lucide-react'
 import {createRoot} from 'react-dom/client'
 import './styles.css'
 import './language-ui.css'
@@ -22,6 +22,14 @@ const Courses=lazy(()=>import('./Courses'))
 const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
 const companyTrackIds=['jane-street','amd','arm','nvidia','qualcomm','apple']
+const careerRoadmaps=[
+ {id:'rtl-digital',label:'RTL Design Engineer'},
+ {id:'verification',label:'Design Verification'},
+ {id:'hft-fpga',label:'FPGA Engineer'},
+ {id:'cpu-gpu',label:'CPU / GPU Hardware'},
+ {id:'accelerators',label:'Hardware Accelerator'}
+]
+const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||track?.name||''
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
 const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/',courses:'/app/courses/'}
@@ -172,34 +180,53 @@ function App(){
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
- return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='home'?'active':''} onClick={()=>go('home')}>Home</button><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
+ return <div className="app"><header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={18}/><span>{user?'Account':'Sign in'}</span></button></div></header><div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
- {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} points={points} streak={streak} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack}/>} 
- {page==='problem'&&selected&&<ProblemIDE key={`${projectId||trackId||'problem'}-${selected.id}`} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!(projectId||trackId)||solved.includes(selected.id))} navigationLabel={projectId?riscvProject.name:activeTrack?`${activeTrack.name} Track`:selected.category}/>} 
+ {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack}/>} 
+ {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!(projectId||trackId)||solved.includes(selected.id))} navigationLabel={projectId?riscvProject.name:activeTrack?trackLabel(activeTrack)+' Track':selected.category}/>} 
  {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved}/>} 
  {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
-function Problems({problems,allProblems,solved,points,streak,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack}){
+function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack}){
  const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
- const roleTracks=tracks.filter(track=>!companyTrackIds.includes(track.id))
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
  const difficultyStats=['Easy','Medium','Hard'].map(name=>{
   const items=allProblems.filter(problem=>problem.difficulty===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
  })
- const completion=allProblems.length?Math.round(solved.length/allProblems.length*100):0
- return <div><div className="page-head"><div className="eyebrow">PROBLEM SET</div><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Choose a section, company track or use the filters below.</p></div><div className="problem-sections"><button className={category==='All'?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory('All')}>All · {allProblems.length}</button>{categories.slice(1).map(c=><button key={c} className={category===c?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory(c)}>{c} · {allProblems.filter(p=>p.category===c).length}</button>)}</div>
- <section className="problem-progress-panel" aria-label="Problem progress">
-  <div className="problem-progress-summary">
-   <div className="problem-progress-ring" style={{'--progress':completion}}><div><strong>{solved.length}/{allProblems.length}</strong><span>Solved</span></div></div>
-   <div className="problem-progress-copy"><strong>Your progress</strong><span>Keep building your hardware problem streak.</span></div>
-  </div>
-  <div className="problem-progress-breakdown">{difficultyStats.map(stat=><div className={`problem-progress-stat ${stat.name.toLowerCase()}`} key={stat.name}><div><span>{stat.name}</span><strong>{stat.solved} / {stat.total}</strong></div><div className="problem-progress-track"><i style={{width:`${stat.total?Math.round(stat.solved/stat.total*100):0}%`}}/></div></div>)}</div>
-  <div className="problem-progress-meta"><div><span>Streak</span><strong>{streak} days</strong></div><div><span>Points</span><strong>{points}</strong></div><div><span>Completion</span><strong>{completion}%</strong></div></div>
- </section>
- <section className="company-tracks" aria-label="Company tracks"><div className="company-tracks-head"><div className="company-tracks-title"><span className="company-tracks-icon"><Target size={17}/></span><span><strong>Company Tracks</strong><small>Solve company-focused problem sets in sequence using the same HDLForge problems.</small></span></div>{activeTrack&&<button className="company-track-exit" onClick={()=>onSelectTrack(null)}>Exit track</button>}</div><div className="company-track-group"><span className="company-track-label">Companies</span><div className="company-track-chips">{companyTracks.map(track=><button key={track.id} className={activeTrack?.id===track.id?'company-track-chip active':'company-track-chip'} onClick={()=>onSelectTrack(track.id)}>{track.name}<em>{track.problemIds.length}</em></button>)}</div></div><div className="company-track-group role-track-group"><span className="company-track-label">Role tracks</span><div className="company-track-chips">{roleTracks.map(track=><button key={track.id} className={activeTrack?.id===track.id?'company-track-chip active':'company-track-chip'} onClick={()=>onSelectTrack(track.id)}>{track.name}<em>{track.problemIds.length}</em></button>)}</div></div>{activeTrack&&<div className="company-track-banner"><div><strong>{activeTrack.name} Track</strong><span>{activeTrack.description}</span></div><div className="company-track-progress"><strong>{solvedInTrack}/{activeTrack.problemIds.length}</strong><span>solved</span></div></div>}</section>
- <div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div><div className={activeTrack?'problem-list company-track-mode':'problem-list'}>{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen} trackMode={Boolean(activeTrack)} trackTotal={activeTrack?.problemIds.length||0}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div></div>}
+ return <div className="problems-workspace">
+  <aside className="guided-roadmap" aria-label="Guided Roadmap">
+   <section className="guided-roadmap-card">
+    <h2>Guided Roadmap</h2>
+    <div className="guided-roadmap-list">{careerRoadmaps.map(item=><button key={item.id} className={activeTrack?.id===item.id?'guided-roadmap-item active':'guided-roadmap-item'} onClick={()=>onSelectTrack(item.id)}>{item.label}<ChevronRight size={15}/></button>)}</div>
+   </section>
+  </aside>
+
+  <section className="problems-content">
+   <div className="page-head problems-page-head"><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Choose a section, company track or use the filters below.</p></div>
+   <div className="problem-sections"><button className={category==='All'?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory('All')}>All · {allProblems.length}</button>{categories.slice(1).map(c=><button key={c} className={category===c?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory(c)}>{c} · {allProblems.filter(p=>p.category===c).length}</button>)}</div>
+   {activeTrack&&<div className="company-track-banner"><div><strong>{trackLabel(activeTrack)} Track</strong><span>{activeTrack.description}</span></div><div className="company-track-progress"><strong>{solvedInTrack}/{activeTrack.problemIds.length}</strong><span>solved</span></div><button className="company-track-exit" onClick={()=>onSelectTrack(null)}>Exit track</button></div>}
+   <div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div>
+   <div className={activeTrack?'problem-list company-track-mode':'problem-list'}>{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen} trackMode={Boolean(activeTrack)} trackTotal={activeTrack?.problemIds.length||0}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div>
+  </section>
+
+  <aside className="problems-side-rail">
+   <section className="problem-progress-panel" aria-label="Problem progress">
+    <div className="problem-progress-title"><strong>HDLForge {allProblems.length}</strong></div>
+    <div className="problem-progress-body">
+     <div className="problem-progress-difficulty-list">{difficultyStats.map(stat=><div className={'problem-progress-difficulty '+stat.name.toLowerCase()} key={stat.name}><span>{stat.name}</span><strong>{stat.solved} / {stat.total}</strong></div>)}</div>
+     <div className="problem-progress-donut-wrap"><div className="problem-progress-donut"><div><strong>{solved.length}</strong><span>/ {allProblems.length}</span><small>Solved</small></div></div></div>
+    </div>
+   </section>
+
+   <section className="company-tracks sidebar-company-tracks" aria-label="Company tracks">
+    <div className="company-tracks-head"><div className="company-tracks-title"><span className="company-tracks-icon"><Target size={17}/></span><span><strong>Company Tracks</strong><small>Practice company-focused problem sequences.</small></span></div></div>
+    <div className="sidebar-company-list">{companyTracks.map(track=><button key={track.id} className={activeTrack?.id===track.id?'company-track-chip active':'company-track-chip'} onClick={()=>onSelectTrack(track.id)}><span>{track.name}</span><em>{track.problemIds.length}</em></button>)}</div>
+   </section>
+  </aside>
+ </div>
+}
 function ProblemRow({p,index,solved,onOpen,trackMode=false,trackTotal=0}){return <button className="problem-row" onClick={()=>onOpen(p)}><span className={solved?'check done':'check'} aria-label={solved?'Solved':'Unsolved'}>{solved&&<span>✓</span>}</span><span className="problem-main"><span className="problem-index">{String(index+1).padStart(2,'0')}</span><span>{trackMode&&<span className="company-track-step">Step {index+1} of {trackTotal}</span>}<strong>{p.title}</strong><small>{p.category} · {problemLanguageLabel(p)} · {p.tags.slice(0,2).join(' · ')}</small></span></span><span className={`difficulty ${p.difficulty.toLowerCase()}`}>{p.difficulty}</span><ChevronRight className="row-chevron" size={17}/></button>}
 createRoot(document.getElementById('root')).render(<App/>)
