@@ -94,7 +94,7 @@ for(const [index,p] of problems.entries()){
   const nav=`<h2>Continue practising</h2><div class="next-links">${prev?`<a href="/problems/${esc(prev.id)}/">← ${esc(prev.title)}</a>`:''}${next?`<a href="/problems/${esc(next.id)}/">${esc(next.title)} →</a>`:''}</div>`
   html=html.replace('</main>',`${nav}</main>`)
  }
- html=html.replace('</style>','.callout{border-left:4px solid #615fff;background:#262527;padding:14px 16px;margin:20px 0}.next-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.next-links a{border:1px solid #3a393d;background:#262527;border-radius:9px;padding:12px;text-decoration:none}</style>')
+ html=html.replace('</style>','.callout{border-left:4px solid #222;background:#f7f7f7;padding:14px 16px;margin:20px 0}.next-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.next-links a{border:1px solid #ddd;border-radius:9px;padding:12px;text-decoration:none}</style>')
  fs.writeFileSync(file,html)
  enriched++
 }
