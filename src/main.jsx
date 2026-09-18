@@ -190,10 +190,25 @@ function App(){
 function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack}){
  const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
+ const [expandedTopics,setExpandedTopics]=useState([])
  const difficultyStats=['Easy','Medium','Hard'].map(name=>{
   const items=allProblems.filter(problem=>problem.difficulty===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
  })
+ const topicStats=useMemo(()=>problemTopics.map(name=>{
+  const items=allProblems.filter(problem=>problem.topic===name)
+  return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
+ }),[allProblems,solved])
+ const visibleTopicNames=category==='All'?problemTopics:problemTopics.filter(name=>name===category)
+ const groupedProblems=visibleTopicNames.map(name=>({
+  name,
+  problems:problems.filter(problem=>problem.topic===name),
+ })).filter(group=>group.problems.length>0)
+ const toggleTopic=name=>setExpandedTopics(current=>current.includes(name)?current.filter(item=>item!==name):[...current,name])
+ const chooseTopic=name=>{
+  setCategory(name)
+  if(name!=='All')setExpandedTopics(current=>current.includes(name)?current:[...current,name])
+ }
  return <div className="problems-workspace">
   <aside className="guided-roadmap" aria-label="Guided Roadmap">
    <section className="guided-roadmap-card">
@@ -203,11 +218,38 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   </aside>
 
   <section className="problems-content">
-   <div className="page-head problems-page-head"><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Choose a topic, company track or use the filters below.</p></div>
-   <div className="problem-sections"><button className={category==='All'?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory('All')}>All · {allProblems.length}</button>{categories.slice(1).map(c=><button key={c} className={category===c?'problem-section-btn active':'problem-section-btn'} onClick={()=>setCategory(c)}>{c} · {allProblems.filter(p=>p.topic===c).length}</button>)}</div>
+   <div className="page-head problems-page-head"><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Browse by topic, company track or use the filters below.</p></div>
+
+   {!activeTrack&&<div className="topic-cloud" aria-label="Problem topics">
+    <button className={category==='All'?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic('All')}><span>All</span><em>{allProblems.length}</em></button>
+    {topicStats.map(topic=><button key={topic.name} className={category===topic.name?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic(topic.name)}><span>{topic.name}</span><em>{topic.total}</em></button>)}
+   </div>}
+
    {activeTrack&&<div className="company-track-banner"><div><strong>{trackLabel(activeTrack)} Track</strong><span>{activeTrack.description}</span></div><div className="company-track-progress"><strong>{solvedInTrack}/{activeTrack.problemIds.length}</strong><span>solved</span></div><button className="company-track-exit" onClick={()=>onSelectTrack(null)}>Exit track</button></div>}
-   <div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>setCategory(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div>
-   <div className={activeTrack?'problem-list company-track-mode':'problem-list'}>{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen} trackMode={Boolean(activeTrack)} trackTotal={activeTrack?.problemIds.length||0}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div>
+
+   <div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>chooseTopic(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div>
+
+   {activeTrack?
+    <div className="problem-list company-track-mode">{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen} trackMode trackTotal={activeTrack.problemIds.length}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div>
+    :
+    <div className="topic-groups">
+     {groupedProblems.map(group=>{
+      const stat=topicStats.find(item=>item.name===group.name)
+      const expanded=expandedTopics.includes(group.name)
+      const percent=stat?.total?Math.round((stat.solved/stat.total)*100):0
+      return <section key={group.name} className={expanded?'topic-group expanded':'topic-group'}>
+       <button className="topic-group-head" onClick={()=>toggleTopic(group.name)} aria-expanded={expanded}>
+        <ChevronRight className="topic-group-chevron" size={18}/>
+        <strong>{group.name}</strong>
+        <span className="topic-group-count">{stat?.solved||0}/{stat?.total||0}</span>
+        <span className="topic-group-progress" aria-label={`${stat?.solved||0} of ${stat?.total||0} solved`}><i style={{width:`${percent}%`}}/></span>
+       </button>
+       {expanded&&<div className="topic-group-problems">{group.problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}</div>}
+      </section>
+     })}
+     {!groupedProblems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}
+    </div>
+   }
   </section>
 
   <aside className="problems-side-rail">
