@@ -5,9 +5,9 @@ test.describe('coding-only problem catalog and accelerators', () => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
 
-    await expect(page.getByRole('button', { name: /^Accelerators ·/ })).toHaveCount(0)
-    await expect(page.getByRole('button', { name: /^Arithmetic & Datapaths · 9$/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Pipelining & Streaming · 3$/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Accelerators/ })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^Arithmetic & Datapaths\s*9$/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Pipelining & Streaming\s*3$/ })).toBeVisible()
 
     await page.getByPlaceholder('Search problems...').fill('accelerator')
     await expect(page.locator('.problem-row')).toHaveCount(12)
