@@ -43,7 +43,7 @@ test.describe('guided RV32I project',()=>{
   await expect(row).toBeVisible()
   await row.click()
   await expect(page).toHaveURL(/\/app\/problems\/rv32-pc\/$/)
-  await expect(page.locator('#hdlforge-ide-problems-button')).toContainText('RTL Design')
+  await expect(page.locator('#hdlforge-ide-problems-button')).toContainText('CPU / RISC-V')
  })
 
  test('project ordering follows the eight CPU blocks',async({page})=>{
