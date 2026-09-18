@@ -6,7 +6,6 @@ import './language-ui.css'
 import './waveform-discussion.css'
 import './account-tracks.css'
 import './home-projects.css'
-import './courses.css'
 import './lockedEditor.js'
 import problems from './data/activeProblems'
 import {riscvProject} from './data/riscvProject'
@@ -17,7 +16,6 @@ import {addActivityDay,calculatePoints,calculateStreak} from './progressTracking
 const ProblemIDE=lazy(()=>import('./ProblemIDE'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
-const Courses=lazy(()=>import('./Courses'))
 
 const categories=['All','RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
 const difficulties=['All','Easy','Medium','Hard']
@@ -32,8 +30,8 @@ const careerRoadmaps=[
 const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||track?.name||''
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
-const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/',courses:'/app/courses/'}
-const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge',courses:'Courses | HDLForge'}
+const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/'}
+const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge'}
 
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
@@ -55,7 +53,7 @@ function appPath(page,problem,projectId=null,trackId=null){
 }
 function routeFromLocation(){
  const path=normalizePath(window.location.pathname)
- if(path==='/app/tracks'||path==='/app/progress')return {page:'problems',problem:null,projectId:null,trackId:null,legacySection:true}
+ if(path==='/app/tracks'||path==='/app/progress'||path==='/app/courses')return {page:'problems',problem:null,projectId:null,trackId:null,legacySection:true}
  const companyMatch=path.match(/^\/app\/problems\/company\/([^/]+)\/([^/]+)$/)
  if(companyMatch){
   const trackId=decodeURIComponent(companyMatch[1]),id=decodeURIComponent(companyMatch[2])
@@ -180,12 +178,11 @@ function App(){
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
- return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button><button onClick={()=>go('courses')}>Courses</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button><button className={page==='courses'?'active':''} onClick={()=>go('courses')}>Courses</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={18}/><span>{user?'Account':'Sign in'}</span></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
+ return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={18}/><span>{user?'Account':'Sign in'}</span></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!(projectId||trackId)||solved.includes(selected.id))} navigationLabel={projectId?riscvProject.name:activeTrack?trackLabel(activeTrack)+' Track':selected.category}/>} 
  {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved} drafts={drafts}/>} 
- {page==='courses'&&<Courses problems={problems} onOpen={openProblem} go={go}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
