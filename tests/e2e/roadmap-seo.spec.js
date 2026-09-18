@@ -87,7 +87,8 @@ test.describe('HDLForge navigation and SEO content', () => {
 
     await page.goto('/')
     await page.locator('.landing-resource-links a[href="/companies/"]').click()
-    await expect(page).toHaveURL(/\/app\/tracks\/$/)
+    await expect(page).toHaveURL(/\/app\/problems\/$/)
+    await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
 
     await page.goto('/')
     await page.locator('.landing-resource-links a[href="/projects/"]').click()
@@ -101,6 +102,38 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
     await expect(page.locator('.problem-section-btn')).toHaveCount(8)
     await expect(page.locator('.problem-row').first()).toBeVisible()
+  })
+
+  test('moves company and role tracks into Problems and removes the Tracks nav page', async ({ page }) => {
+    await page.goto('/app/problems/')
+    await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Tracks', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /AMD/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Arm/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Qualcomm/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /NVIDIA/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Jane Street/ })).toBeVisible()
+  })
+
+  test('company track filters and orders its existing Problems, then opens a guided sequence', async ({ page }) => {
+    await page.goto('/app/problems/')
+    await page.getByRole('button', { name: /AMD/ }).click()
+
+    const rows = page.locator('.problem-list .problem-row')
+    await expect(rows).toHaveCount(10)
+    await expect(rows.first()).toContainText(/FIFO/i)
+    await expect(page.locator('.company-track-banner')).toContainText('AMD Track')
+
+    await rows.first().click()
+    await expect(page).toHaveURL(/\/app\/problems\/company\/amd\/rtl-fifo\/$/)
+    await expect(page.locator('.section-navigation')).toHaveText('AMD Track')
+    await expect(page.getByRole('button', { name: 'Next →' })).toBeDisabled()
+  })
+
+  test('legacy Tracks URL redirects into Problems', async ({ page }) => {
+    await page.goto('/app/tracks/')
+    await expect(page).toHaveURL(/\/app\/problems\/$/)
+    await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
   })
 
   test('Projects page groups portfolio projects by hardware role', async ({ page }) => {
