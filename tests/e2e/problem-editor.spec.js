@@ -42,6 +42,31 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await codeText(page)).toContain('assign y = sel ? b : a;')
   })
 
+  test('renders the rich hardware Solution guide and can load a reference implementation', async ({ page }) => {
+    await page.getByRole('button', { name: 'Solution', exact: true }).click()
+
+    const guide = page.locator('.solution-guide')
+    await expect(guide).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Prerequisites' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Intuition' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Implementation' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Hardware behavior' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Common mistakes' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Reference implementation' })).toBeVisible()
+
+    const languageTabs = guide.locator('.solution-language-tabs')
+    await expect(languageTabs.getByRole('button', { name: 'Verilog', exact: true })).toBeVisible()
+    await expect(languageTabs.getByRole('button', { name: 'SystemVerilog', exact: true })).toBeVisible()
+    await expect(languageTabs.getByRole('button', { name: 'VHDL', exact: true })).toBeVisible()
+
+    await languageTabs.getByRole('button', { name: 'Verilog', exact: true }).click()
+    await expect(guide.locator('.solution-code')).toContainText('always @(*)')
+
+    await guide.getByRole('button', { name: 'Load into editor', exact: true }).click()
+    await expect(page.locator('.editor-language select')).toHaveValue('Verilog')
+    await expect.poll(() => codeText(page)).toContain('always @(*)')
+  })
+
   test('opens Monaco native find with Ctrl+F', async ({ page }) => {
     await page.locator('.monaco-editor .view-lines').click()
     await page.keyboard.press('Control+F')
