@@ -19,9 +19,7 @@ test.describe('HDLForge application routing',()=>{
   await page.getByRole('button',{name:'Projects',exact:true}).click()
   await expect(page).toHaveURL(/\/app\/projects\/$/)
 
-  await page.getByRole('button',{name:'Courses',exact:true}).click()
-  await expect(page).toHaveURL(/\/app\/courses\/$/)
-
+  await expect(page.getByRole('button',{name:'Courses',exact:true})).toHaveCount(0)
   await expect(page.getByRole('button',{name:'Progress',exact:true})).toHaveCount(0)
 
   await page.getByRole('button',{name:'HDLForge home',exact:true}).click()
@@ -33,6 +31,12 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveURL(/\/app\/problems\/$/)
   await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
   await expect(page.getByRole('region',{name:'Problem progress'})).toBeVisible()
+ })
+
+ test('legacy Courses URL redirects into Problems',async({page})=>{
+  await page.goto('/app/courses/')
+  await expect(page).toHaveURL(/\/app\/problems\/$/)
+  await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
  })
 
  test('direct interactive problem URLs restore the correct problem',async({page})=>{
