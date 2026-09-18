@@ -104,30 +104,31 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.problem-row').first()).toBeVisible()
   })
 
-  test('embeds progress in Problems and removes the standalone Progress navigation', async ({ page }) => {
+  test('renders compact progress inside Problems and removes standalone Progress navigation', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Progress', exact: true })).toHaveCount(0)
 
     const progress = page.getByRole('region', { name: 'Problem progress' })
     await expect(progress).toBeVisible()
-    await expect(progress).toContainText('Your progress')
+    await expect(progress).toContainText('HDLForge')
     await expect(progress).toContainText('Easy')
     await expect(progress).toContainText('Medium')
     await expect(progress).toContainText('Hard')
-    await expect(progress).toContainText('Streak')
-    await expect(progress).toContainText('Points')
-    await expect(progress).toContainText('Completion')
+    await expect(progress).toContainText('Solved')
   })
 
-  test('moves company and role tracks into Problems and removes the Tracks nav page', async ({ page }) => {
+  test('shows company tracks and guided role roadmaps inside Problems', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Tracks', exact: true })).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
+    await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
     await expect(page.getByRole('button', { name: /AMD/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Arm/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Qualcomm/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /NVIDIA/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Jane Street/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'CPU / GPU Hardware', exact: true })).toBeVisible()
   })
 
   test('company track filters and orders its existing Problems, then opens a guided sequence', async ({ page }) => {
