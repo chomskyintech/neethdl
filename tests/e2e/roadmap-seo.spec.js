@@ -104,6 +104,21 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.problem-row').first()).toBeVisible()
   })
 
+  test('embeds progress in Problems and removes the standalone Progress navigation', async ({ page }) => {
+    await page.goto('/app/problems/')
+    await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Progress', exact: true })).toHaveCount(0)
+
+    const progress = page.getByRole('region', { name: 'Problem progress' })
+    await expect(progress).toBeVisible()
+    await expect(progress).toContainText('Your progress')
+    await expect(progress).toContainText('Easy')
+    await expect(progress).toContainText('Medium')
+    await expect(progress).toContainText('Hard')
+    await expect(progress).toContainText('Streak')
+    await expect(progress).toContainText('Points')
+    await expect(progress).toContainText('Completion')
+  })
+
   test('moves company and role tracks into Problems and removes the Tracks nav page', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Tracks', exact: true })).toHaveCount(0)
