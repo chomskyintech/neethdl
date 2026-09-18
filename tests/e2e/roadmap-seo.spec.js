@@ -53,8 +53,8 @@ test.describe('HDLForge navigation and SEO content', () => {
       }
     })
     expect(style.backgroundImage).toContain('linear-gradient')
-    expect(style.backgroundImage).toContain('rgba(14, 15, 14, 0.42)')
-    expect(style.backgroundImage).toContain('rgba(14, 15, 14, 0.16)')
+    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.42)')
+    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.08)')
     expect(style.backdropFilter).toContain('blur(9px)')
   })
 
@@ -175,12 +175,12 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('button', { name: 'Open Projects' }).first()).toBeVisible()
   })
 
-  test('removes Interview navigation and keeps sign in in the top navigation', async ({ page }) => {
+  test('removes Interview navigation and keeps sign in as an icon-only account control', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Interview', exact: true })).toHaveCount(0)
     const accountButton = page.getByRole('button', { name: 'Sign in', exact: true })
     await expect(accountButton).toBeVisible()
-    await expect(accountButton).toContainText('Sign in')
+    await expect(accountButton).toHaveText('')
   })
 
   test('serves SEO learn page metadata and canonical route', async ({ page }) => {
