@@ -18,6 +18,17 @@ export const problemTopics=[
   'Verification',
 ]
 
+export const verificationTopics=[
+  'Testbenches',
+  'Interfaces',
+  'SVA',
+  'Constrained Random',
+  'Functional Coverage',
+  'UVM',
+  'Scoreboards',
+  'Formal Verification',
+]
+
 const topicById={
   'rtl-mux':'Combinational Logic',
   'rtl-priority':'Combinational Logic',
@@ -84,6 +95,15 @@ const topicById={
   'uvm-scoreboard':'Verification',
 }
 
+const verificationTopicById={
+  'sv-always':'Testbenches',
+  'sv-interface':'Interfaces',
+  'sva-handshake':'SVA',
+  'sva-reset':'SVA',
+  'uvm-driver':'UVM',
+  'uvm-scoreboard':'Scoreboards',
+}
+
 const catalog=[
   ...baseProblems.filter(problem=>problem.evaluation?.type!=='answer'),
   ...acceleratorProblems,
@@ -102,4 +122,5 @@ riscvProjectProblems.forEach((problem,index)=>{
 export default activeProblems.map(problem=>({
   ...problem,
   topic:topicById[problem.id]||'Other',
+  verificationTopic:verificationTopicById[problem.id]||null,
 }))
