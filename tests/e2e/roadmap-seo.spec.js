@@ -32,10 +32,10 @@ test.describe('HDLForge navigation and SEO content', () => {
       }
     })
     expect(scrollbar.width).toBe('thin')
-    expect(scrollbar.colors).toContain('rgb(70, 83, 79)')
+    expect(scrollbar.colors).toContain('rgb(91, 91, 95)')
     expect(scrollbar.colors).toContain('rgb(15, 15, 15)')
     expect(scrollbar.track).toBe('rgb(15, 15, 15)')
-    expect(['rgb(70, 83, 79)','rgb(95, 129, 119)']).toContain(scrollbar.thumb)
+    expect(['rgb(91, 91, 95)','rgb(119, 119, 125)']).toContain(scrollbar.thumb)
     expect(scrollbar.radius).toBe('999px')
     expect(scrollbar.buttonDisplay).toBe('none')
   })
