@@ -15,10 +15,6 @@ export const problemTopics=[
   'Protocols & Handshakes',
   'Arithmetic & Datapaths',
   'CPU / RISC-V',
-  'Verification',
-]
-
-export const verificationTopics=[
   'Testbenches',
   'Interfaces',
   'SVA',
@@ -87,15 +83,6 @@ const topicById={
   'rv32-memory-control':'CPU / RISC-V',
   'rv32-core-integration':'CPU / RISC-V',
 
-  'sv-always':'Verification',
-  'sv-interface':'Verification',
-  'sva-handshake':'Verification',
-  'sva-reset':'Verification',
-  'uvm-driver':'Verification',
-  'uvm-scoreboard':'Verification',
-}
-
-const verificationTopicById={
   'sv-always':'Testbenches',
   'sv-interface':'Interfaces',
   'sva-handshake':'SVA',
@@ -122,5 +109,4 @@ riscvProjectProblems.forEach((problem,index)=>{
 export default activeProblems.map(problem=>({
   ...problem,
   topic:topicById[problem.id]||'Other',
-  verificationTopic:verificationTopicById[problem.id]||null,
 }))
