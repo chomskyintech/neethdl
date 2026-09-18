@@ -82,8 +82,8 @@ test.describe('HDLForge navigation and SEO content', () => {
 
     await page.goto('/')
     await page.locator('.landing-resource-links a[href="/learn/"]').click()
-    await expect(page).toHaveURL(/\/app\/courses\/$/)
-    await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible()
+    await expect(page).toHaveURL(/\/learn\/$/)
+    await expect(page.locator('h1').first()).toBeVisible()
 
     await page.goto('/')
     await page.locator('.landing-resource-links a[href="/companies/"]').click()
@@ -170,21 +170,18 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.project-card-modern .project-why')).toHaveCount(0)
   })
 
-  test('Courses page provides skill paths with problem and project links', async ({ page }) => {
+  test('Courses workspace is removed while learning resources remain available', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Courses', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Courses' })).toBeVisible()
-    await expect(page.locator('.course-card')).toHaveCount(9)
-    await expect(page.getByRole('heading', { name: 'Verilog / RTL Fundamentals' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'UVM Fundamentals' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Low-Latency FPGA / HFT' })).toBeVisible()
-    await expect(page.locator('.course-links button').first()).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Open Projects' }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Courses', exact: true })).toHaveCount(0)
+    await page.goto('/app/courses/')
+    await expect(page).toHaveURL(/\/app\/problems\/$/)
+    await expect(page.getByRole('heading', { name: 'Problems', exact: true })).toBeVisible()
   })
 
   test('removes Interview navigation and keeps sign in as an icon-only account control', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Interview', exact: true })).toHaveCount(0)
+    await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Courses', exact: true })).toHaveCount(0)
     const accountButton = page.getByRole('button', { name: 'Sign in', exact: true })
     await expect(accountButton).toBeVisible()
     await expect(accountButton).toHaveText('')
