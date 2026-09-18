@@ -151,10 +151,10 @@ test.describe('redesigned IDE shell',()=>{
   const drawerBox=await drawer.boundingBox()
   expect(drawerBox).toBeTruthy()
   expect(drawerBox.width).toBeGreaterThanOrEqual(420)
-  expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(34, 33, 35)')
-  expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 37, 39)')
-  expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 30, 32)')
-  expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(52, 51, 56)')
+  expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 31, 31)')
+  expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 38, 38)')
+  expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(30, 30, 30)')
+  expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(48, 48, 48)')
  })
 
  test('navigates between coding problems from the drawer without a full page reload',async({page})=>{
@@ -192,8 +192,8 @@ test.describe('redesigned IDE shell',()=>{
   expect(statementStyles.overflowX).toBe('hidden')
   expect(statementStyles.overflowY).toBe('scroll')
   expect(statementStyles.scrollbarWidth).not.toBe('none')
-  expect(statementStyles.scrollbarColor).toContain('rgb(91, 89, 97)')
-  expect(statementStyles.scrollbarColor).toContain('rgb(38, 37, 39)')
+  expect(statementStyles.scrollbarColor).toContain('rgb(102, 102, 102)')
+  expect(statementStyles.scrollbarColor).toContain('rgb(38, 38, 38)')
  })
 
  test('keeps the account control icon-only',async({page})=>{
