@@ -191,7 +191,7 @@ function App(){
 function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack}){
  const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
- const [expandedTopics,setExpandedTopics]=useState([])
+ const [expandedTopics,setExpandedTopics]=useState(['Combinational Logic'])
  const difficultyStats=['Easy','Medium','Hard'].map(name=>{
   const items=allProblems.filter(problem=>problem.difficulty===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
@@ -205,6 +205,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   name,
   problems:problems.filter(problem=>problem.topic===name),
  })).filter(group=>group.problems.length>0)
+ const revealFiltered=Boolean(query)||difficulty!=='All'||language!=='All'||status!=='All'||category!=='All'
  const toggleTopic=name=>setExpandedTopics(current=>current.includes(name)?current.filter(item=>item!==name):[...current,name])
  const chooseTopic=name=>{
   setCategory(name)
@@ -236,7 +237,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
     <div className="topic-groups">
      {groupedProblems.map(group=>{
       const stat=topicStats.find(item=>item.name===group.name)
-      const expanded=expandedTopics.includes(group.name)
+      const expanded=revealFiltered||expandedTopics.includes(group.name)
       const percent=stat?.total?Math.round((stat.solved/stat.total)*100):0
       return <section key={group.name} className={expanded?'topic-group expanded':'topic-group'}>
        <button className="topic-group-head" onClick={()=>toggleTopic(group.name)} aria-expanded={expanded}>
