@@ -1,12 +1,15 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('coding-only problem catalog and accelerators', () => {
-  test('removes theory-only problems and exposes expanded accelerator category', async ({ page }) => {
+  test('removes theory-only problems and exposes accelerator exercises through topic filters', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
 
-    await expect(page.getByRole('button', { name: /^Accelerators · 12$/ })).toBeVisible()
-    await page.getByRole('button', { name: /^Accelerators · 12$/ }).click()
+    await expect(page.getByRole('button', { name: /^Accelerators ·/ })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^Arithmetic & Datapaths · 9$/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Pipelining & Streaming · 3$/ })).toBeVisible()
+
+    await page.getByPlaceholder('Search problems...').fill('accelerator')
     await expect(page.locator('.problem-row')).toHaveCount(12)
     await expect(page.getByText('Signed INT8 Multiply-Accumulate', { exact: true })).toBeVisible()
     await expect(page.getByText('2x2 Matrix Multiply Datapath', { exact: true })).toBeVisible()
