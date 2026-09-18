@@ -32,10 +32,10 @@ test.describe('HDLForge navigation and SEO content', () => {
       }
     })
     expect(scrollbar.width).toBe('thin')
-    expect(scrollbar.colors).toContain('rgb(70, 83, 79)')
-    expect(scrollbar.colors).toContain('rgb(15, 15, 15)')
-    expect(scrollbar.track).toBe('rgb(15, 15, 15)')
-    expect(['rgb(70, 83, 79)','rgb(95, 129, 119)']).toContain(scrollbar.thumb)
+    expect(scrollbar.colors).toContain('rgb(91, 89, 97)')
+    expect(scrollbar.colors).toContain('rgb(29, 28, 30)')
+    expect(scrollbar.track).toBe('rgb(29, 28, 30)')
+    expect(['rgb(91, 89, 97)','rgb(119, 116, 125)']).toContain(scrollbar.thumb)
     expect(scrollbar.radius).toBe('999px')
     expect(scrollbar.buttonDisplay).toBe('none')
   })
@@ -53,8 +53,8 @@ test.describe('HDLForge navigation and SEO content', () => {
       }
     })
     expect(style.backgroundImage).toContain('linear-gradient')
-    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.42)')
-    expect(style.backgroundImage).toContain('rgba(15, 15, 15, 0.08)')
+    expect(style.backgroundImage).toContain('rgba(29, 28, 30, 0.88)')
+    expect(style.backgroundImage).toContain('rgba(29, 28, 30, 0.74)')
     expect(style.backdropFilter).toContain('blur(9px)')
   })
 
