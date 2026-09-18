@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Activity, CheckCircle2, Code2, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
+import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
 import MonacoHDLEditor from './MonacoHDLEditor'
@@ -63,6 +63,162 @@ function Discussion({ problem }) {
   const submit = event => { event.preventDefault(); if (!draft.trim()) return; const next = [...posts, { id: Date.now(), name: 'You', text: draft.trim(), time: new Date().toLocaleString() }]; setPosts(next); localStorage.setItem(key, JSON.stringify(next)); setDraft('') }
   return <div className="discussion discussion-in-tab"><div className="discussion-head"><div><h2>Discussion</h2><p>Ask questions, compare implementations and discuss edge cases.</p></div><span><MessageSquare size={15} /> {posts.length} posts</span></div><form className="discussion-form" onSubmit={submit}><textarea value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ask a question or share an approach…" /><button className="primary">Post discussion</button></form><div className="discussion-list">{posts.length ? posts.map(post => <article className="discussion-post" key={post.id}><div className="post-avatar">Y</div><div><strong>{post.name}</strong><small>{post.time}</small><p>{post.text}</p></div></article>) : <div className="discussion-empty"><MessageSquare size={22} /><strong>Start the discussion</strong><p>Be the first to ask a question about this problem.</p></div>}</div></div>
 }
+function solutionPrerequisites(problem) {
+  const topic = problem.topic || ''
+  const common = []
+  if (/Combinational|Arithmetic|Datapath/.test(topic)) common.push(['Combinational logic','Understand how outputs are derived directly from current inputs.'])
+  if (/Sequential|Counter|FSM|FIFO|Memor|Pipeline|CDC|CPU|UVM|Scoreboard/.test(topic)) common.push(['Clocked logic','Be comfortable with edge-triggered state updates and reset behavior.'])
+  if (/FSM/.test(topic)) common.push(['Finite-state machines','Know state encoding, next-state logic and output logic.'])
+  if (/FIFO|Buffer/.test(topic)) common.push(['Pointers and occupancy','Understand read/write pointers plus full and empty conditions.'])
+  if (/CDC/.test(topic)) common.push(['Metastability and synchronization','Know why asynchronous signals need dedicated crossing structures.'])
+  if (/Protocol|Handshake/.test(topic)) common.push(['Ready/valid handshakes','Understand transfer conditions, stalls and backpressure.'])
+  if (/SVA/.test(topic)) common.push(['SystemVerilog Assertions','Know sequences, properties and temporal implication.'])
+  if (/Testbenches|Interfaces|Constrained Random|Functional Coverage|UVM|Scoreboards|Formal/.test(topic)) common.push(['SystemVerilog verification','Be comfortable separating stimulus, observation and checking.'])
+  if (!common.length) common.push(['Synthesizable RTL','Understand combinational versus sequential hardware and basic HDL syntax.'])
+  common.push(['Bit widths and signedness','Track widths carefully so truncation, overflow and sign extension are intentional.'])
+  return common.slice(0,3)
+}
+
+function solutionSteps(problem) {
+  const topic = problem.topic || ''
+  if (problem.id === 'rtl-mux') return [
+    'Treat the circuit as purely combinational; no clock or stored state is required.',
+    'Use sel as the selector between input a and input b.',
+    'Drive y for both selector values so no latch can be inferred.',
+  ]
+  if (/FSM/.test(topic)) return [
+    'Define the legal states and reset state.',
+    'Describe the state transitions from the inputs.',
+    'Register the state on the active clock edge and keep output behavior complete.',
+  ]
+  if (/FIFO|Buffer/.test(topic)) return [
+    'Store data in an array or register entry and track read/write position.',
+    'Allow reads and writes only when the corresponding empty/full condition permits them.',
+    'Update occupancy correctly for write-only, read-only and simultaneous transfers.',
+  ]
+  if (/Protocol|Handshake/.test(topic)) return [
+    'Identify exactly when a transfer is accepted by the protocol.',
+    'Hold payload and control state stable while the receiver is stalled.',
+    'Advance state only after the required handshake completes.',
+  ]
+  if (/SVA/.test(topic)) return [
+    'Translate the English requirement into a temporal relationship.',
+    'Choose the correct sampling edge and implication operator.',
+    'Check reset/disable behavior so the property is not evaluated in invalid cycles.',
+  ]
+  if (/UVM/.test(topic)) return [
+    'Define the transaction-level behavior the component owns.',
+    'Use the UVM phase and TLM interfaces appropriate to that component.',
+    'Keep protocol driving, monitoring and checking responsibilities separated.',
+  ]
+  if (/Scoreboards/.test(topic)) return [
+    'Maintain an independent expected-value or reference model.',
+    'Receive observed transactions through analysis connections.',
+    'Compare expected and actual behavior and report mismatches with useful context.',
+  ]
+  if (/Formal/.test(topic)) return [
+    'State the design assumptions explicitly.',
+    'Write assertions for the required invariant or temporal behavior.',
+    'Add cover properties where useful to prove the interesting scenario is reachable.',
+  ]
+  if (/Sequential|Counter|Memor|Pipeline|CPU|CDC/.test(topic)) return [
+    'Identify which values are state and when they are allowed to change.',
+    'Implement reset and normal state updates in clocked logic.',
+    'Check hold behavior, boundary conditions and cycle-to-cycle alignment.',
+  ]
+  return [
+    'Translate the specification into input/output behavior before writing RTL.',
+    'Implement the minimum synthesizable logic needed for that behavior.',
+    'Check boundary cases, widths and whether every output is assigned when required.',
+  ]
+}
+
+function inferredHardware(problem) {
+  if (problem.id === 'rtl-mux') return ['Purely combinational','2:1 multiplexer','No registers inferred']
+  const topic = problem.topic || ''
+  if (/Counter/.test(topic)) return ['Registers','Adder/incrementer','Reset/control logic']
+  if (/FSM/.test(topic)) return ['State register','Next-state logic','Decode/output logic']
+  if (/FIFO|Buffer/.test(topic)) return ['Storage array','Read/write pointers','Full/empty control']
+  if (/CDC/.test(topic)) return ['Synchronizer flops','CDC control logic','No combinational path across domains']
+  if (/Protocol|Handshake/.test(topic)) return ['Control state','Handshake logic','Payload holding registers as needed']
+  if (/Arithmetic|Datapath/.test(topic)) return ['Arithmetic operators','Combinational datapath','Width/sign-extension logic']
+  if (/Pipeline/.test(topic)) return ['Pipeline registers','Valid/control alignment','Combinational stage logic']
+  if (/SVA|Testbenches|Interfaces|Constrained Random|Functional Coverage|UVM|Scoreboards|Formal/.test(topic)) return ['Verification-only construct','No synthesizable datapath implied','Checks design behavior rather than implementing it']
+  return ['Synthesizable RTL','Control/data logic from the specification','Implementation depends on target technology']
+}
+
+function commonMistakes(problem) {
+  const topic = problem.topic || ''
+  if (problem.id === 'rtl-mux') return [
+    'Reversing which input is selected for sel=0 versus sel=1.',
+    'Using clocked logic for a circuit that should be combinational.',
+    'Leaving an output path unassigned inside combinational logic and inferring a latch.',
+  ]
+  if (/FIFO|Buffer/.test(topic)) return ['Updating occupancy incorrectly on simultaneous read/write.','Reading while empty or writing while full.','Using pointer width/wrap logic that fails at the depth boundary.']
+  if (/CDC/.test(topic)) return ['Synchronizing a multi-bit bus bit-by-bit.','Using only one synchronizer stage.','Ignoring reset-domain behavior or pulse width requirements.']
+  if (/Protocol|Handshake/.test(topic)) return ['Changing data while stalled.','Treating VALID alone as a transfer.','Dropping a response before READY is observed.']
+  if (/SVA/.test(topic)) return ['Using the wrong implication timing.','Forgetting disable iff around reset.','Checking a value in the wrong sampled cycle.']
+  if (/UVM|Scoreboards/.test(topic)) return ['Mixing driver, monitor and checking responsibilities.','Depending on DUT internals instead of observed transactions.','Failing to make transaction ordering and reset behavior explicit.']
+  return ['Incorrect reset or hold behavior.','Width/sign mistakes that only appear at corner values.','Writing behavior that simulates correctly but infers unintended hardware.']
+}
+
+function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad }) {
+  const available = Object.keys(referenceSolutions || {})
+  const [language,setLanguage] = useState(available.includes(initialLanguage) ? initialLanguage : available[0] || initialLanguage)
+  const [copied,setCopied] = useState(false)
+  const code = referenceSolutions?.[language] || problem.solution || ''
+  const prerequisites = solutionPrerequisites(problem)
+  const steps = solutionSteps(problem)
+  const hardware = inferredHardware(problem)
+  const mistakes = commonMistakes(problem)
+  const copy = async () => {
+    if (!code) return
+    try { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
+  }
+  return <article className="solution-guide">
+    <section className="solution-guide-section solution-guide-intro">
+      <h1>Solution</h1>
+      <p>{problem.description || problem.task}</p>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Prerequisites</h2>
+      <p>Before attempting this problem, you should be comfortable with:</p>
+      <ul className="solution-prerequisites">{prerequisites.map(([name,description])=><li key={name}><strong>{name}</strong><span> — {description}</span></li>)}</ul>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Intuition</h2>
+      <p>{problem.approach || problem.description || 'Start from the hardware behavior in the specification, then choose the smallest synthesizable structure that implements it directly.'}</p>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Implementation</h2>
+      <ol className="solution-steps">{steps.map((step,index)=><li key={index}>{step}</li>)}</ol>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Hardware behavior</h2>
+      <div className="solution-hardware-tags">{hardware.map(item=><span key={item}>{item}</span>)}</div>
+      {problem.constraints?.length ? <ul className="solution-constraints">{problem.constraints.slice(0,4).map((item,index)=><li key={index}>{item}</li>)}</ul> : null}
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Common mistakes</h2>
+      <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
+    </section>
+
+    <section className="solution-guide-section solution-reference">
+      <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
+      {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
+      <div className="solution-code-shell">
+        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,code)}>Load into editor</button></div></div>
+        <pre className="solution-code">{code || 'Reference solution will be added for this problem.'}</pre>
+      </div>
+    </section>
+  </article>
+}
+
 function Editor({ code, language, onChange, onRun }) {
   return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} />
 }
@@ -89,9 +245,9 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   }
   const renderProblem = () => <div className="problem-copy"><section className="problem-section first"><div className="problem-heading" style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',gap:'12px',padding:'20px 0 18px',borderBottom:'1px solid var(--ide-border-soft)'}}><div style={{minWidth:0}}><h1 style={{margin:0,color:'#e8eef5',fontSize:'20px',lineHeight:1.25,fontWeight:750,overflowWrap:'anywhere'}}>{problem.title}</h1><span className="problem-category" style={{display:'inline-block',marginTop:'7px',color:'#d4d4d8',fontSize:'9px',fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase'}}>{problem.topic||problem.category}</span></div><span className={`difficulty ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span></div><h2>Task</h2><p>{problem.task}</p></section><section className="problem-section"><h2>Examples</h2><div className="examples">{problem.examples.map((example, index) => <div key={index}><span>Example {index + 1}</span><pre>{example}</pre></div>)}</div></section>{problem.constraints?.length ? <section className="problem-section"><h2>Constraints</h2><ul>{problem.constraints.map((item, index) => <li key={index}>{item}</li>)}</ul></section> : null}</div>
   const resizePanel = e => { if (!draggingPanel) return; const body = e.currentTarget.closest('.ide-body'); if (!body) return; const rect = body.getBoundingClientRect(); setPanelSplit(Math.min(65, Math.max(25, ((e.clientX - rect.left) / rect.width) * 100))) }
-  const solution = solutions[problem.id]?.[editorLanguage] || problem.solution
+  const referenceSolutions = solutions[problem.id] || (problem.solution ? {[editorLanguage]:problem.solution} : {})
   return <div className="ide-page"><header className="ide-topbar"><button className="ide-brand topbar-brand" onClick={onBack} aria-label="Back to HDLForge problems" style={{flex:'0 0 auto',margin:0,padding:'7px 9px',border:'0',background:'transparent',color:'#e8eef5',cursor:'pointer'}}><span className="ide-brand-icon">HDL</span><strong>HDLForge</strong></button><div className="ide-problem-navigation topbar-navigation" style={{position:'absolute',left:'50%',transform:'translateX(-50%)'}}><button onClick={onPrevious} disabled={!hasPrevious}>← Previous</button><button className="section-navigation" onClick={onBack} aria-label={`Back to ${navigationLabel || problem.topic || problem.category}`}>{navigationLabel || problem.topic || problem.category}</button><button onClick={onNext} disabled={!hasNext}>Next →</button></div><div className="ide-actions">{solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div></header>
-    <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><div className="ide-problem-content">{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <div className="content-card"><h2>How to think about it</h2><p>{problem.approach || 'Identify inputs, outputs, timing, reset semantics and required state. Implement the simplest synthesizable solution and check corner cases.'}</p></div>}{statementTab === 'solution' && <div className="content-card"><h2>Reference solution</h2><p>Try the problem first, then inspect the reference implementation.</p><pre className="solution-code">{solution || 'Reference solution will be added for this problem.'}</pre></div>}{statementTab === 'discussion' && <Discussion problem={problem} />}</div></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
+    <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><div className="ide-problem-content">{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <div className="content-card"><h2>How to think about it</h2><p>{problem.approach || 'Identify inputs, outputs, timing, reset semantics and required state. Implement the simplest synthesizable solution and check corner cases.'}</p></div>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage} onLoad={(language,referenceCode)=>{setEditorLanguage(language);setCode(referenceCode);onSave(problem.id,referenceCode);setResult(null);setWaveformOpen(false)}}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</div></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
       <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
       <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
       <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <div className={result.pass ? 'run-result pass' : 'run-result fail'}><strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong>{result.tests?.length ? <div className="test-cases">{result.tests.map((testCase,index)=><div className={`test-case ${testCase.passed?'pass':'fail'}`} key={`${testCase.name}-${index}`}><span className="test-case-status">{testCase.passed?'✓':'×'}</span><span className="test-case-name">Test {index+1}: {testCase.name}</span><span className="test-case-time">t={testCase.time}</span></div>)}</div> : null}<pre>{result.output}</pre></div> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
