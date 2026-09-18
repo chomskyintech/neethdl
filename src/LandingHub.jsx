@@ -4,15 +4,15 @@ import './landing-home-adjustments.css'
 
 const resources=[
  {label:'Problems',href:'/problems/',page:'problems'},
- {label:'Learning',href:'/learn/',page:'courses'},
- {label:'Verilog guide',href:'/learn/verilog-interview/',page:'courses'},
+ {label:'Learning',href:'/learn/'},
+ {label:'Verilog guide',href:'/learn/verilog-interview/'},
  {label:'Companies',href:'/companies/',page:'problems'},
  {label:'Projects',href:'/projects/',page:'projects'},
 ]
 
 export default function LandingHub({go}){
  const openResource=(event,page)=>{
-  if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+  if(!page||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
   event.preventDefault()
   go(page)
  }
