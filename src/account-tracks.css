@@ -333,6 +333,8 @@
 
 /* Floating top navigation from the approved Problems mockup. */
 .app>.nav.app-section-nav{
+  left:auto!important;
+  transform:none!important;
   width:calc(100% - 48px)!important;
   max-width:1680px!important;
   height:82px!important;
