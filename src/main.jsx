@@ -1,5 +1,5 @@
 import React,{lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
-import {ChevronRight,Filter,Flame,Sparkles,Search,Target,UserCircle,Zap}from'lucide-react'
+import {ChevronDown,ChevronRight,Filter,Flame,Sparkles,Search,Target,UserCircle,Zap}from'lucide-react'
 import {createRoot} from 'react-dom/client'
 import './styles.css'
 import './language-ui.css'
@@ -9,7 +9,7 @@ import './home-projects.css'
 import './neutral-accent.css'
 import './topic-browser.css'
 import './lockedEditor.js'
-import problems,{problemTopics} from './data/activeProblems'
+import problems,{problemTopics,verificationTopics} from './data/activeProblems'
 import {riscvProject} from './data/riscvProject'
 import tracks from './data/tracks'
 import LandingHub from './LandingHub'
@@ -97,7 +97,7 @@ function App(){
  const activeTrack=useMemo(()=>tracks.find(track=>track.id===trackId)||null,[trackId])
  const filtered=useMemo(()=>{
   const source=activeTrack?activeTrack.problemIds.map(id=>problems.find(problem=>problem.id===id)).filter(Boolean):problems
-  return source.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.topic===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.topic} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))})
+  return source.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.topic===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.topic} ${p.verificationTopic||''} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))})
  },[activeTrack,category,difficulty,language,status,query,solved])
  const points=useMemo(()=>calculatePoints(problems,solved),[solved]),streak=useMemo(()=>calculateStreak(activityDays),[activityDays])
  const navigate=(nextPage,problem=null,{replace=false,project=null,track=null}={})=>{
@@ -192,6 +192,8 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
  const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
  const [expandedTopics,setExpandedTopics]=useState(['Combinational Logic'])
+ const [topicsExpanded,setTopicsExpanded]=useState(false)
+ const [verificationTopic,setVerificationTopic]=useState('All')
  const difficultyStats=['Easy','Medium','Hard'].map(name=>{
   const items=allProblems.filter(problem=>problem.difficulty===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
@@ -200,6 +202,11 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   const items=allProblems.filter(problem=>problem.topic===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
  }),[allProblems,solved])
+ const verificationStats=useMemo(()=>verificationTopics.map(name=>{
+  const items=allProblems.filter(problem=>problem.verificationTopic===name)
+  return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
+ }),[allProblems,solved])
+ const compactTopicStats=topicsExpanded?topicStats:topicStats.slice(0,3)
  const visibleTopicNames=category==='All'?problemTopics:problemTopics.filter(name=>name===category)
  const groupedProblems=visibleTopicNames.map(name=>({
   name,
@@ -209,7 +216,17 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
  const toggleTopic=name=>setExpandedTopics(current=>current.includes(name)?current.filter(item=>item!==name):[...current,name])
  const chooseTopic=name=>{
   setCategory(name)
-  if(name!=='All')setExpandedTopics(current=>current.includes(name)?current:[...current,name])
+  if(name!=='Verification')setVerificationTopic('All')
+  if(name!=='All'){
+   setExpandedTopics(current=>current.includes(name)?current:[...current,name])
+   if(problemTopics.indexOf(name)>=3)setTopicsExpanded(true)
+  }
+ }
+ const chooseVerificationTopic=name=>{
+  setVerificationTopic(name)
+  setCategory('Verification')
+  setTopicsExpanded(true)
+  setExpandedTopics(current=>current.includes('Verification')?current:[...current,'Verification'])
  }
  return <div className="problems-workspace">
   <aside className="guided-roadmap" aria-label="Guided Roadmap">
@@ -222,14 +239,17 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   <section className="problems-content">
    <div className="page-head problems-page-head"><h1>Problems</h1><p>Build the skills that hardware interviews actually test. Browse by topic, company track or use the filters below.</p></div>
 
-   {!activeTrack&&<div className="topic-cloud" aria-label="Problem topics">
-    <button className={category==='All'?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic('All')}><span>All</span><em>{allProblems.length}</em></button>
-    {topicStats.map(topic=><button key={topic.name} className={category===topic.name?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic(topic.name)}><span>{topic.name}</span><em>{topic.total}</em></button>)}
-   </div>}
-
    {activeTrack&&<div className="company-track-banner"><div><strong>{trackLabel(activeTrack)} Track</strong><span>{activeTrack.description}</span></div><div className="company-track-progress"><strong>{solvedInTrack}/{activeTrack.problemIds.length}</strong><span>solved</span></div><button className="company-track-exit" onClick={()=>onSelectTrack(null)}>Exit track</button></div>}
 
    <div className="toolbar"><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search problems..."/></div><div className="filters"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option>All</option>{languages.slice(1).map(l=><option key={l}>{l}</option>)}</select><select value={category} onChange={e=>chooseTopic(e.target.value)} aria-label="Topic"><option>All</option>{categories.slice(1).map(c=><option key={c}>{c}</option>)}</select><select value={difficulty} onChange={e=>setDifficulty(e.target.value)} aria-label="Difficulty"><option>All</option>{difficulties.slice(1).map(d=><option key={d}>{d}</option>)}</select><select value={status} onChange={e=>setStatus(e.target.value)} aria-label="Status"><option>All</option><option>Unsolved</option><option>Solved</option></select></div></div>
+
+   {!activeTrack&&<div className={topicsExpanded?'topic-cloud-shell expanded':'topic-cloud-shell'}>
+    <div className="topic-cloud" aria-label="Problem topics">
+     <button className={category==='All'?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic('All')}><span>All</span><em>{allProblems.length}</em></button>
+     {compactTopicStats.map(topic=><button key={topic.name} className={category===topic.name?'topic-cloud-item active':'topic-cloud-item'} onClick={()=>chooseTopic(topic.name)}><span>{topic.name}</span><em>{topic.total}</em></button>)}
+    </div>
+    <button className={topicsExpanded?'topic-cloud-toggle expanded':'topic-cloud-toggle'} onClick={()=>setTopicsExpanded(value=>!value)} aria-expanded={topicsExpanded}>{topicsExpanded?'Collapse':'Expand'}<ChevronDown size={18}/></button>
+   </div>}
 
    {activeTrack?
     <div className="problem-list company-track-mode">{problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen} trackMode trackTotal={activeTrack.problemIds.length}/>)}{!problems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}</div>
@@ -239,6 +259,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
       const stat=topicStats.find(item=>item.name===group.name)
       const expanded=revealFiltered||expandedTopics.includes(group.name)
       const percent=stat?.total?Math.round((stat.solved/stat.total)*100):0
+      const groupProblems=group.name==='Verification'&&verificationTopic!=='All'?group.problems.filter(problem=>problem.verificationTopic===verificationTopic):group.problems
       return <section key={group.name} className={expanded?'topic-group expanded':'topic-group'}>
        <button className="topic-group-head" onClick={()=>toggleTopic(group.name)} aria-expanded={expanded}>
         <ChevronRight className="topic-group-chevron" size={18}/>
@@ -246,7 +267,15 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
         <span className="topic-group-count">{stat?.solved||0}/{stat?.total||0}</span>
         <span className="topic-group-progress" aria-label={`${stat?.solved||0} of ${stat?.total||0} solved`}><i style={{width:`${percent}%`}}/></span>
        </button>
-       {expanded&&<div className="topic-group-problems">{group.problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}</div>}
+       {expanded&&<div className="topic-group-body">
+        {group.name==='Verification'&&<div className="verification-subtopics" aria-label="Verification topics">
+         <button className={verificationTopic==='All'?'verification-subtopic active':'verification-subtopic'} onClick={()=>chooseVerificationTopic('All')}><span>All</span><em>{stat?.total||0}</em></button>
+         {verificationStats.map(item=><button key={item.name} className={verificationTopic===item.name?'verification-subtopic active':'verification-subtopic'} onClick={()=>chooseVerificationTopic(item.name)}><span>{item.name}</span><em>{item.total}</em></button>)}
+        </div>}
+        <div className="topic-group-problems">{groupProblems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}
+         {!groupProblems.length&&<div className="verification-empty">No problems in this verification topic yet.</div>}
+        </div>
+       </div>}
       </section>
      })}
      {!groupedProblems.length&&<div className="empty"><Filter size={28}/><h3>No problems found</h3><p>Try changing your filters or search.</p></div>}
