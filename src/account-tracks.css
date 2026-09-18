@@ -548,26 +548,13 @@
   margin:0 0 18px;
 }
 .problems-content .toolbar{
-  display:grid;
-  grid-template-columns:minmax(240px,1fr) minmax(420px,auto);
-  gap:10px;
+  display:block;
   margin-bottom:18px;
 }
 .problems-content .toolbar .search{
-  width:100%;
-  max-width:none;
+  width:min(100%,420px);
+  max-width:420px;
   min-width:0;
-}
-.problems-content .toolbar .filters{
-  min-width:0;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(92px,1fr));
-  gap:8px;
-}
-.problems-content .toolbar .filters select{
-  width:100%;
-  min-width:0;
-  height:44px;
 }
 .problems-content .problem-list{
   width:100%;
