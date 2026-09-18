@@ -14,8 +14,10 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveURL(/\/app\/problems\/$/)
   await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
 
-  await page.getByRole('button',{name:'Tracks',exact:true}).click()
-  await expect(page).toHaveURL(/\/app\/tracks\/$/)
+  await expect(page.getByRole('button',{name:'Tracks',exact:true})).toHaveCount(0)
+
+  await page.getByRole('button',{name:'Projects',exact:true}).click()
+  await expect(page).toHaveURL(/\/app\/projects\/$/)
 
   await page.getByRole('button',{name:'Courses',exact:true}).click()
   await expect(page).toHaveURL(/\/app\/courses\/$/)
