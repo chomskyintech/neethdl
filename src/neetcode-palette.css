@@ -1,0 +1,473 @@
+/* NeetCode-inspired charcoal / violet palette.
+   Colour-only overrides: no sizing, spacing, layout, typography, or behavior changes. */
+
+:root{
+  --bg:#1d1c1e!important;
+  --panel:#262527!important;
+  --panel-2:#29282b!important;
+  --line:#3a393d!important;
+  --line-soft:#302f33!important;
+  --text:#f4f4f5!important;
+  --muted:#b5b3b8!important;
+  --dim:#87858b!important;
+  --accent:#615fff!important;
+  --accent-2:#4f4bcf!important;
+  --green:#00bf83!important;
+  --amber:#f0a500!important;
+  --red:#f04455!important;
+
+  --ide-border:#3a393d!important;
+  --ide-border-soft:#302f33!important;
+  --ide-panel:#262527!important;
+  --ide-editor:#1f1e20!important;
+  --ide-text:#f3f3f4!important;
+  --ide-muted:#aaa8ad!important;
+  --ide-accent:#615fff!important;
+
+  --forge-bg:#1d1c1e!important;
+  --forge-surface:#262527!important;
+  --forge-surface-2:#29282b!important;
+  --forge-surface-3:#313034!important;
+  --forge-border:#3a393d!important;
+  --forge-border-bright:#4a484f!important;
+  --forge-text:#f4f4f5!important;
+  --forge-muted:#b5b3b8!important;
+  --forge-dim:#87858b!important;
+  --forge-cyan:#7772ff!important;
+  --forge-blue:#615fff!important;
+  --forge-indigo:#4f4bcf!important;
+  --forge-violet:#7b76ff!important;
+  --forge-green:#00bf83!important;
+}
+
+html,
+body,
+.app{
+  background-color:#1d1c1e!important;
+  color:#f4f4f5!important;
+}
+
+body{
+  background-image:
+    radial-gradient(circle at 70% -10%,rgba(97,95,255,.08),transparent 34%),
+    radial-gradient(circle at 15% 10%,rgba(97,95,255,.035),transparent 28%)!important;
+}
+
+.app:has(.landing-hub),
+.landing-hub,
+.landing-hero{
+  background-color:#1d1c1e!important;
+}
+
+.landing-hero::before{
+  background:
+    radial-gradient(circle at 79% 48%,rgba(97,95,255,.045),transparent 32%),
+    linear-gradient(90deg,#1d1c1e 0%,#1d1c1e 44%,rgba(29,28,30,.95) 56%,rgba(29,28,30,.70) 72%,rgba(29,28,30,.28) 88%,rgba(29,28,30,.10) 100%)!important;
+}
+
+.app>.nav{
+  background:linear-gradient(90deg,rgba(29,28,30,.94) 0%,rgba(29,28,30,.88) 54%,rgba(29,28,30,.74) 100%)!important;
+  border-color:#353438!important;
+  box-shadow:0 12px 38px rgba(0,0,0,.22)!important;
+}
+.app>.nav.app-section-nav{
+  background:linear-gradient(90deg,rgba(29,28,30,.96) 0%,rgba(29,28,30,.91) 50%,rgba(29,28,30,.80) 100%)!important;
+  border-color:#353438!important;
+}
+.app>.nav.app-section-nav .nav-inner::before,
+.app>.nav.app-section-nav .nav-inner::after{
+  background:#353438!important;
+}
+.app>.nav .brand-icon,
+.app>.nav.app-section-nav .brand-icon{
+  background:#615fff!important;
+  color:#fff!important;
+}
+.app>.nav .brand-accent{
+  color:#8e8aff!important;
+}
+.app>.nav .desktop-nav button{
+  color:#aaa8ad!important;
+}
+.app>.nav .desktop-nav button:hover,
+.app>.nav .desktop-nav button.active{
+  color:#f6f6f7!important;
+}
+.app>.nav .nav-stat svg,
+.app>.nav.app-section-nav .top-signin{
+  color:#8884ff!important;
+}
+.app>.nav.app-section-nav .top-signin:hover{
+  color:#aaa7ff!important;
+}
+
+.landing-hero h1,
+.page-head h1,
+.project-role-head h2,
+.problem-progress-title,
+.guided-roadmap-card h2,
+.project-activity-head h2{
+  color:#f4f4f5!important;
+}
+.landing-hero p,
+.page-head p,
+.project-role-head p{
+  color:#b5b3b8!important;
+}
+.landing-start,
+.primary,
+.success{
+  background:#615fff!important;
+  border-color:#7772ff!important;
+  color:#fff!important;
+  box-shadow:0 10px 30px rgba(97,95,255,.18)!important;
+}
+.landing-start:hover,
+.primary:hover,
+.success:hover{
+  background:#6d69ff!important;
+  border-color:#8884ff!important;
+}
+.landing-resource-links a{
+  background:#262527!important;
+  border-color:#3a393d!important;
+  color:#b9b7bc!important;
+}
+.landing-resource-links a:hover{
+  background:#2e2d31!important;
+  border-color:#5a56c9!important;
+  color:#fff!important;
+}
+
+.guided-roadmap-card,
+.problem-progress-panel,
+.sidebar-company-tracks,
+.project-activity-panel,
+.project-card-modern,
+.project-card,
+.guided-project,
+.featured-project,
+.company-tracks,
+.track-detail,
+.track-card,
+.account-modal,
+.content-card,
+.problem-list,
+.topic-card,
+.stats,
+.progress-hero{
+  background-color:#262527!important;
+  border-color:#3a393d!important;
+}
+.problem-list,
+.project-card-modern,
+.project-card{
+  box-shadow:none!important;
+}
+.guided-roadmap-card,
+.problem-progress-panel,
+.sidebar-company-tracks,
+.project-activity-panel{
+  box-shadow:0 18px 38px rgba(0,0,0,.14)!important;
+}
+.guided-roadmap-card h2,
+.project-activity-panel,
+.github-projects,
+.problem-row,
+.project-card,
+.project-card-modern{
+  border-color:#3a393d!important;
+}
+
+.guided-roadmap-item,
+.project-card-modern,
+.project-card,
+.company-track-chip,
+.project-category-chip,
+.problem-section-btn,
+.project-activity-item,
+.project-github-connect,
+.track-card,
+.track-problem{
+  color:#c9c7cc!important;
+}
+.guided-roadmap-item:hover,
+.project-card-modern:hover,
+.project-card:hover,
+.company-track-chip:hover,
+.project-category-chip:hover,
+.problem-section-btn:hover,
+.track-card:hover,
+.track-problem:hover{
+  color:#f4f4f5!important;
+}
+.guided-roadmap-item.active{
+  color:#8985ff!important;
+}
+.project-section-btn,
+.problem-section-btn,
+.project-category-chip,
+.company-track-chip,
+.project-activity-item,
+.track-card,
+.track-problem{
+  background-color:#222123!important;
+  border-color:#3a393d!important;
+}
+.problem-section-btn.active,
+.project-category-chip.active,
+.company-track-chip.active,
+.track-card.active{
+  background-color:#302f35!important;
+  border-color:#5f5ade!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+
+.toolbar .search,
+.search,
+.filters select,
+.account-form input,
+.discussion-form input,
+.discussion-form textarea{
+  background-color:#262527!important;
+  border-color:#3a393d!important;
+  color:#ececee!important;
+}
+.search:focus-within,
+.filters select:focus,
+.account-form input:focus,
+.discussion-form input:focus,
+.discussion-form textarea:focus{
+  border-color:#615fff!important;
+  box-shadow:0 0 0 2px rgba(97,95,255,.12)!important;
+}
+.search input::placeholder{
+  color:#85838a!important;
+}
+
+.problem-row{
+  background-color:transparent!important;
+  border-bottom-color:#302f33!important;
+}
+.problem-row:hover{
+  background-color:#2b2a2d!important;
+}
+.problem-main strong{
+  color:#dedde1!important;
+}
+.problem-main small,
+.problem-index,
+.row-chevron{
+  color:#8d8b91!important;
+}
+.problem-main:hover strong,
+.problem-row:hover .problem-main strong{
+  color:#f2f2f3!important;
+}
+.check.done{
+  background:#00bf83!important;
+  border-color:#00bf83!important;
+  box-shadow:none!important;
+}
+
+.difficulty.easy,
+.problem-progress-difficulty.easy span{
+  color:#00bf83!important;
+}
+.difficulty.medium,
+.problem-progress-difficulty.medium span{
+  color:#f0a500!important;
+}
+.difficulty.hard,
+.problem-progress-difficulty.hard span{
+  color:#f04455!important;
+}
+.difficulty.easy{background:#1f2d29!important;border-color:#29443a!important}
+.difficulty.medium{background:#30291c!important;border-color:#51411f!important}
+.difficulty.hard{background:#342125!important;border-color:#5a2d35!important}
+
+.problem-progress-donut{
+  background:conic-gradient(from 214deg,#00a978 0deg 79deg,transparent 79deg 88deg,#d18b00 88deg 190deg,transparent 190deg 199deg,#d83748 199deg 274deg,transparent 274deg 360deg)!important;
+}
+.problem-progress-donut::before{
+  background:#262527!important;
+  box-shadow:inset 0 0 0 1px #3a393d!important;
+}
+.problem-progress-donut strong,
+.problem-progress-difficulty strong,
+.problem-progress-title{
+  color:#f4f4f5!important;
+}
+.problem-progress-donut span,
+.problem-progress-donut small{
+  color:#aaa8ad!important;
+}
+
+.company-tracks-icon,
+.project-github-icon,
+.destination-icon,
+.interview-icon,
+.post-avatar,
+.account-icon{
+  background:#302f45!important;
+  border-color:#4d496f!important;
+  color:#8f8aff!important;
+}
+.company-track-banner,
+.featured-project,
+.guided-project{
+  background:linear-gradient(110deg,#292833,#26252b)!important;
+  border-color:#4a466f!important;
+}
+.company-track-step,
+.project-guide-link,
+.project-tags span,
+.project-level,
+.brand-accent,
+.text-btn,
+.chevron,
+.eyebrow{
+  color:#8e8aff!important;
+}
+.project-level,
+.project-tags span{
+  background:#2b2a36!important;
+  border-color:#48455e!important;
+}
+
+.project-github-connect{
+  background:#2b2a36!important;
+  border-color:#4e4a72!important;
+}
+.project-github-connect:hover{
+  background:#302f3f!important;
+  border-color:#625db1!important;
+}
+.project-activity-empty{
+  background:#222123!important;
+  border-color:#3a393d!important;
+}
+.project-activity-item{
+  background:#222123!important;
+}
+.project-activity-item:hover{
+  background:#2b2a2d!important;
+  border-color:#4a484f!important;
+}
+.project-activity-item em{
+  background:#302f45!important;
+  border-color:#4e4a72!important;
+  color:#9b97ff!important;
+}
+.project-activity-item em.complete{
+  background:#1f2d29!important;
+  border-color:#29443a!important;
+  color:#00bf83!important;
+}
+
+.account-overlay{
+  background:rgba(0,0,0,.62)!important;
+}
+.account-tabs{
+  background:#1f1e20!important;
+  border-color:#3a393d!important;
+}
+.account-tabs button{
+  color:#929096!important;
+}
+.account-tabs button.active{
+  background:#343338!important;
+  color:#f4f4f5!important;
+}
+.account-message,
+.account-sync{
+  background:#222123!important;
+  border-color:#3a393d!important;
+}
+.account-sync span{
+  color:#8e8aff!important;
+}
+
+/* IDE surfaces use the same charcoal hierarchy without changing any geometry. */
+.hdlforge-ide-active,
+.ide-page{
+  background-color:#1d1c1e!important;
+}
+.ide-topbar{
+  background-color:#1d1c1e!important;
+  border-color:#343337!important;
+}
+.ide-problem,
+.ide-problem>.problem-tabs,
+.file-tabs,
+.ide-drawer-header{
+  background-color:#262527!important;
+  border-color:#3a393d!important;
+}
+.ide-workspace,
+#hdlforge-ide-drawer{
+  background-color:#222123!important;
+  border-color:#3a393d!important;
+}
+.monaco-editor-stage,
+.editor-stage,
+.ide-drawer-search{
+  background-color:#1f1e20!important;
+  border-color:#343337!important;
+}
+.ide-bottom,
+.console{
+  background-color:#252427!important;
+  border-color:#3a393d!important;
+}
+.ide-drawer-problem{
+  background-color:transparent!important;
+}
+.ide-drawer-problem:hover{
+  background-color:#2c2b2f!important;
+}
+.ide-drawer-problem.active{
+  background-color:#343338!important;
+  border-color:#4a484f!important;
+}
+.problem-tabs button.active,
+.bottom-tabs button.active{
+  color:#fff!important;
+  border-bottom-color:#615fff!important;
+  box-shadow:inset 0 -2px 0 #615fff!important;
+}
+.ide-problem>.problem-tabs button.active{
+  background:#302f35!important;
+  border-color:#4f4bcf!important;
+}
+.editor-language select{
+  color:#f4f4f5!important;
+}
+.file-tab.active{
+  background:#302f35!important;
+  border-color:#4f4bcf!important;
+  box-shadow:inset 0 -2px 0 #615fff!important;
+}
+.ide-problem-content{
+  scrollbar-color:#5b5961 #262527!important;
+}
+#hdlforge-ide-drawer,
+.ide-problem-content,
+.editor-wrap,
+.console{
+  scrollbar-color:#5b5961 #262527!important;
+}
+
+html{
+  scrollbar-color:#5b5961 #1d1c1e!important;
+}
+html::-webkit-scrollbar-track{
+  background:#1d1c1e!important;
+}
+html::-webkit-scrollbar-thumb{
+  background:#5b5961!important;
+}
+html::-webkit-scrollbar-thumb:hover{
+  background:#77747d!important;
+}
