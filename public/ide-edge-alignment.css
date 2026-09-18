@@ -202,3 +202,45 @@ body.ide-console-resizing.hdlforge-ide-active .ide-page .ide-bottom::before{
     overflow:visible!important;
   }
 }
+
+
+/* Route-level IDE viewport lock.
+   The React app lives under #root, so target the real DOM chain directly.
+   This prevents the normal site header height and .main top padding from
+   reserving empty space above the problem editor. */
+body.hdlforge-ide-active #root > .app > .nav{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+body.hdlforge-ide-active #root > .app > .layout{
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  flex:1 1 auto!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active #root > .app > .layout > .main{
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  flex:1 1 auto!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active #root > .app > .layout > .main > .ide-page{
+  width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding-top:0!important;
+  box-sizing:border-box!important;
+}
