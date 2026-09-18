@@ -100,7 +100,11 @@ test.describe('HDLForge navigation and SEO content', () => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
-    await expect(page.locator('.problem-section-btn')).toHaveCount(8)
+    await expect(page.locator('.problem-section-btn')).toHaveCount(13)
+    await expect(page.getByRole('button', { name: /FSMs · 2/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Counters & Timers · 4/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /FIFOs & Buffers · 2/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /CPU \/ RISC-V · 8/ })).toBeVisible()
     await expect(page.locator('.problem-row').first()).toBeVisible()
   })
 
