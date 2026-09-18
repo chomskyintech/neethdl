@@ -11,7 +11,7 @@ function currentContext(){
   if(!match)return {problem:null,label:null}
   const id=decodeURIComponent(match[1])
   const problem=problems.find(problem=>problem.id===id)||null
-  return {problem,label:problem?.category||null}
+  return {problem,label:problem?.topic||problem?.category||null}
 }
 
 function syncSectionLabel(){
