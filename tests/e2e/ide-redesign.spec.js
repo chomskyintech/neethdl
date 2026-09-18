@@ -13,6 +13,36 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('body')).toHaveClass(/hdlforge-ide-active/)
  })
 
+ test('starts the IDE at the top of the viewport without a dead header gap',async({page})=>{
+  await page.setViewportSize({width:1440,height:900})
+  await page.goto('/app/problems/rv32-pc/')
+
+  const nav=page.locator('#root>.app>.nav')
+  const main=page.locator('#root>.app>.layout>.main')
+  const ide=page.locator('.ide-page')
+  const topbar=page.locator('.ide-page .ide-topbar')
+
+  await expect(ide).toBeVisible()
+  await expect(nav).toBeHidden()
+
+  const [mainBox,ideBox,topbarBox]=await Promise.all([
+   main.boundingBox(),
+   ide.boundingBox(),
+   topbar.boundingBox()
+  ])
+  expect(mainBox).toBeTruthy()
+  expect(ideBox).toBeTruthy()
+  expect(topbarBox).toBeTruthy()
+
+  expect(mainBox.y).toBeLessThanOrEqual(1)
+  expect(ideBox.y).toBeLessThanOrEqual(1)
+  expect(topbarBox.y).toBeLessThanOrEqual(2)
+
+  const spacing=await main.evaluate(el=>{const s=getComputedStyle(el);return{paddingTop:s.paddingTop,marginTop:s.marginTop}})
+  expect(spacing.paddingTop).toBe('0px')
+  expect(spacing.marginTop).toBe('0px')
+ })
+
  test('keeps the problem and editor as separate rounded panes',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   const problemRadius=await page.locator('.ide-problem').evaluate(el=>getComputedStyle(el).borderRadius)
