@@ -24,7 +24,7 @@ test.describe('HDLForge application routing',()=>{
 
   await expect(page.getByRole('button',{name:'Progress',exact:true})).toHaveCount(0)
 
-  await page.getByRole('button',{name:'Home',exact:true}).click()
+  await page.getByRole('button',{name:'HDLForge home',exact:true}).click()
   await expect(page).toHaveURL(/\/$/)
  })
 
