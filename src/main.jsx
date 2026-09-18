@@ -205,7 +205,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   name,
   problems:problems.filter(problem=>problem.topic===name),
  })).filter(group=>group.problems.length>0)
- const revealFiltered=Boolean(query)||difficulty!=='All'||language!=='All'||status!=='All'||category!=='All'
+ const revealFiltered=Boolean(query)||difficulty!=='All'||language!=='All'||status!=='All'
  const toggleTopic=name=>setExpandedTopics(current=>current.includes(name)?current.filter(item=>item!==name):[...current,name])
  const chooseTopic=name=>{
   setCategory(name)
