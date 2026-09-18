@@ -54,6 +54,12 @@ const tracks = [
     problemIds: ['rtl-mux','rtl-counter','rtl-priority','rtl-fifo','rtl-shift-register','rtl-edge-detector','rtl-arbiter','rtl-regfile','rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','rtl-reset-synchronizer','rtl-gray-counter','rtl-dual-port-ram','rtl-onehot-fsm']
   },
   {
+    id: 'cpu-gpu',
+    name: 'CPU / GPU Hardware',
+    description: 'Pipelines, register structures, arbitration, memories, streaming interfaces and accelerator datapaths for processor-oriented hardware roles.',
+    problemIds: ['rtl-regfile','rtl-pipeline-register','rtl-skid-buffer','rtl-dual-port-ram','rtl-fifo','rtl-arbiter','proto-ready-valid-source','proto-axi-lite-write','accel-vector-max4','accel-matmul2']
+  },
+  {
     id: 'accelerators',
     name: 'Accelerator Design',
     description: 'MACs, vector reductions, quantized arithmetic, matrix multiply, convolution and throughput-oriented pipelines.',
