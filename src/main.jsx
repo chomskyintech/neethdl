@@ -37,6 +37,7 @@ function problemLanguages(p){
 function problemLanguageLabel(p){const ls=problemLanguages(p);return ls.length?ls.join(' / '):'Conceptual'}
 function normalizePath(path){return path==='/'?'/':path.replace(/\/+$/,'')}
 function appPath(page,problem,projectId=null,trackId=null){
+ if(page==='problems'&&trackId)return `/app/problems/company/${encodeURIComponent(trackId)}/`
  if(page==='problem'&&problem){
   if(projectId===riscvProject.id)return `/app/projects/${riscvProject.slug}/${encodeURIComponent(problem.id)}/`
   if(trackId)return `/app/problems/company/${encodeURIComponent(trackId)}/${encodeURIComponent(problem.id)}/`
@@ -53,6 +54,12 @@ function routeFromLocation(){
   const track=tracks.find(item=>item.id===trackId)
   const problem=problems.find(item=>item.id===id)
   if(track&&problem&&track.problemIds.includes(problem.id))return {page:'problem',problem,projectId:null,trackId:track.id}
+ }
+ const companyOverviewMatch=path.match(/^\/app\/problems\/company\/([^/]+)$/)
+ if(companyOverviewMatch){
+  const trackId=decodeURIComponent(companyOverviewMatch[1])
+  const track=tracks.find(item=>item.id===trackId)
+  if(track)return {page:'problems',problem:null,projectId:null,trackId:track.id}
  }
  const projectMatch=path.match(/^\/app\/projects\/riscv-core\/([^/]+)$/)
  if(projectMatch){
@@ -99,7 +106,12 @@ function App(){
  }
  const openProblem=p=>navigate('problem',p,{track:trackId})
  const go=p=>navigate(p)
- const selectTrack=id=>{setTrackId(id||null);setCategory('All');setDifficulty('All');setLanguage('All');setStatus('All');setQuery('')}
+ const selectTrack=id=>{
+  const next=id||null
+  setTrackId(next);setCategory('All');setDifficulty('All');setLanguage('All');setStatus('All');setQuery('')
+  const target=appPath('problems',null,null,next),current=`${window.location.pathname}${window.location.search}`
+  if(current!==target)window.history.pushState({page:'problems',problemId:null,projectId:null,trackId:next},'',target)
+ }
  const projectProblems=useMemo(()=>riscvProject.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean),[])
  const trackProblems=useMemo(()=>activeTrack?activeTrack.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean):[],[activeTrack])
  const startRiscvProject=()=>{
