@@ -332,7 +332,7 @@
 /* Guided roadmap + three-column Problems workspace */
 
 /* Floating top navigation from the approved Problems mockup. */
-.app>.nav{
+.app>.nav.app-section-nav{
   width:calc(100% - 48px)!important;
   max-width:1680px!important;
   height:82px!important;
@@ -346,26 +346,26 @@
   position:sticky!important;
   top:20px!important;
 }
-.app>.nav .nav-inner{
+.app>.nav.app-section-nav .nav-inner{
   max-width:none;
   padding:0 24px;
 }
-.app>.nav .brand{
+.app>.nav.app-section-nav .brand{
   min-width:220px;
   font-size:27px;
   gap:12px;
 }
-.app>.nav .brand-icon{
+.app>.nav.app-section-nav .brand-icon{
   width:46px;
   height:46px;
   border-radius:12px;
   background:#3aa78f!important;
 }
-.app>.nav .desktop-nav{
+.app>.nav.app-section-nav .desktop-nav{
   margin-left:26px;
   gap:28px;
 }
-.app>.nav .desktop-nav button{
+.app>.nav.app-section-nav .desktop-nav button{
   padding:8px 0;
   border-radius:0;
   background:transparent!important;
@@ -374,8 +374,8 @@
   font-weight:750;
   box-shadow:none!important;
 }
-.app>.nav .desktop-nav button:hover,
-.app>.nav .desktop-nav button.active{
+.app>.nav.app-section-nav .desktop-nav button:hover,
+.app>.nav.app-section-nav .desktop-nav button.active{
   background:transparent!important;
   border-color:transparent!important;
   color:#fff!important;
@@ -402,11 +402,11 @@
   background:#202a26;
 }
 .top-signin svg{color:#70c2ab}
-.layout{
+.app>.nav.app-section-nav + .layout{
   max-width:1740px!important;
   width:100%;
 }
-.main{
+.app>.nav.app-section-nav + .layout .main{
   width:100%;
   padding:24px 24px 90px!important;
 }
@@ -714,14 +714,14 @@
   .sidebar-company-list{grid-template-columns:1fr}
 }
 @media(max-width:1040px){
-  .app>.nav{
+  .app>.nav.app-section-nav{
     width:calc(100% - 32px)!important;
     top:12px!important;
     margin-top:12px!important;
     height:74px!important;
   }
-  .app>.nav .brand{min-width:auto;font-size:23px}
-  .app>.nav .brand-icon{width:40px;height:40px}
+  .app>.nav.app-section-nav .brand{min-width:auto;font-size:23px}
+  .app>.nav.app-section-nav .brand-icon{width:40px;height:40px}
   .problems-workspace{
     grid-template-columns:minmax(0,1fr) 280px;
   }
@@ -749,8 +749,8 @@
   }
 }
 @media(max-width:900px){
-  .app>.nav .desktop-nav{gap:16px;margin-left:18px}
-  .app>.nav .desktop-nav button{font-size:13px}
+  .app>.nav.app-section-nav .desktop-nav{gap:16px;margin-left:18px}
+  .app>.nav.app-section-nav .desktop-nav button{font-size:13px}
   .problems-workspace{
     grid-template-columns:1fr;
   }
@@ -769,21 +769,21 @@
   .problem-progress-difficulty-list{order:initial}
 }
 @media(max-width:700px){
-  .app>.nav{
+  .app>.nav.app-section-nav{
     width:calc(100% - 20px)!important;
     border-radius:16px!important;
   }
-  .app>.nav .nav-inner{padding:0 12px}
-  .app>.nav .brand>span:last-child{display:none}
-  .app>.nav .desktop-nav{margin-left:12px;gap:11px}
-  .app>.nav .desktop-nav button{font-size:12px}
+  .app>.nav.app-section-nav .nav-inner{padding:0 12px}
+  .app>.nav.app-section-nav .brand>span:last-child{display:none}
+  .app>.nav.app-section-nav .desktop-nav{margin-left:12px;gap:11px}
+  .app>.nav.app-section-nav .desktop-nav button{font-size:12px}
   .top-signin{
     min-width:40px;
     width:40px;
     padding:0;
   }
   .top-signin span{display:none}
-  .main{padding:22px 14px 70px!important}
+  .app>.nav.app-section-nav + .layout .main{padding:22px 14px 70px!important}
   .guided-roadmap-list{
     grid-template-columns:1fr 1fr;
   }
