@@ -104,7 +104,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     const expandTopics = page.getByRole('button', { name: 'Expand', exact: true })
     await expect(expandTopics).toBeVisible()
     await expandTopics.click()
-    await expect(page.locator('.topic-cloud-item')).toHaveCount(13)
+    await expect(page.locator('.topic-cloud-item')).toHaveCount(20)
     await expect(page.getByRole('button', { name: /FSMs\s*2/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*2/ })).toBeVisible()
@@ -113,18 +113,24 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.problem-row').first()).toBeVisible()
   })
 
-  test('shows verification subtopics inside the Verification topic', async ({ page }) => {
+  test('shows verification areas as separate top-level topic accordions', async ({ page }) => {
     await page.goto('/app/problems/')
     await page.getByRole('button', { name: 'Expand', exact: true }).click()
-    await page.getByRole('button', { name: /Verification\s*6/ }).click()
-    await expect(page.getByRole('button', { name: /Testbenches\s*1/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Interfaces\s*1/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /SVA\s*2/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Constrained Random\s*0/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Functional Coverage\s*0/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /UVM\s*1/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Scoreboards\s*1/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Formal Verification\s*0/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Verification\s*6/ })).toHaveCount(0)
+
+    const topicRows = page.locator('.topic-group-head')
+    await expect(topicRows.filter({ hasText: 'Testbenches' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'Interfaces' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'SVA' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'UVM' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'Scoreboards' })).toBeVisible()
+    await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
+
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/0')
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/0')
+    await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/0')
   })
 
   test('renders compact progress inside Problems and removes standalone Progress navigation', async ({ page }) => {
