@@ -407,6 +407,7 @@
 .app>.nav.app-section-nav + .layout{
   max-width:1740px!important;
   width:100%;
+  padding-top:0!important;
 }
 .app>.nav.app-section-nav + .layout .main{
   width:100%;
