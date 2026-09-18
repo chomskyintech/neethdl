@@ -9,7 +9,7 @@ import './home-projects.css'
 import './neutral-accent.css'
 import './topic-browser.css'
 import './lockedEditor.js'
-import problems,{problemTopics,verificationTopics} from './data/activeProblems'
+import problems,{problemTopics} from './data/activeProblems'
 import {riscvProject} from './data/riscvProject'
 import tracks from './data/tracks'
 import LandingHub from './LandingHub'
@@ -97,7 +97,7 @@ function App(){
  const activeTrack=useMemo(()=>tracks.find(track=>track.id===trackId)||null,[trackId])
  const filtered=useMemo(()=>{
   const source=activeTrack?activeTrack.problemIds.map(id=>problems.find(problem=>problem.id===id)).filter(Boolean):problems
-  return source.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.topic===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.topic} ${p.verificationTopic||''} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))})
+  return source.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.topic===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.topic} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))})
  },[activeTrack,category,difficulty,language,status,query,solved])
  const points=useMemo(()=>calculatePoints(problems,solved),[solved]),streak=useMemo(()=>calculateStreak(activityDays),[activityDays])
  const navigate=(nextPage,problem=null,{replace=false,project=null,track=null}={})=>{
@@ -193,7 +193,6 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
  const [expandedTopics,setExpandedTopics]=useState(['Combinational Logic'])
  const [topicsExpanded,setTopicsExpanded]=useState(false)
- const [verificationTopic,setVerificationTopic]=useState('All')
  const difficultyStats=['Easy','Medium','Hard'].map(name=>{
   const items=allProblems.filter(problem=>problem.difficulty===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
@@ -202,31 +201,20 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   const items=allProblems.filter(problem=>problem.topic===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
  }),[allProblems,solved])
- const verificationStats=useMemo(()=>verificationTopics.map(name=>{
-  const items=allProblems.filter(problem=>problem.verificationTopic===name)
-  return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
- }),[allProblems,solved])
  const compactTopicStats=topicsExpanded?topicStats:topicStats.slice(0,3)
  const visibleTopicNames=category==='All'?problemTopics:problemTopics.filter(name=>name===category)
  const groupedProblems=visibleTopicNames.map(name=>({
   name,
   problems:problems.filter(problem=>problem.topic===name),
- })).filter(group=>group.problems.length>0)
+ })).filter(group=>!query||group.problems.length>0)
  const revealFiltered=Boolean(query)||difficulty!=='All'||language!=='All'||status!=='All'
  const toggleTopic=name=>setExpandedTopics(current=>current.includes(name)?current.filter(item=>item!==name):[...current,name])
  const chooseTopic=name=>{
   setCategory(name)
-  if(name!=='Verification')setVerificationTopic('All')
   if(name!=='All'){
    setExpandedTopics(current=>current.includes(name)?current:[...current,name])
    if(problemTopics.indexOf(name)>=3)setTopicsExpanded(true)
   }
- }
- const chooseVerificationTopic=name=>{
-  setVerificationTopic(name)
-  setCategory('Verification')
-  setTopicsExpanded(true)
-  setExpandedTopics(current=>current.includes('Verification')?current:[...current,'Verification'])
  }
  return <div className="problems-workspace">
   <aside className="guided-roadmap" aria-label="Guided Roadmap">
@@ -259,7 +247,6 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
       const stat=topicStats.find(item=>item.name===group.name)
       const expanded=revealFiltered||expandedTopics.includes(group.name)
       const percent=stat?.total?Math.round((stat.solved/stat.total)*100):0
-      const groupProblems=group.name==='Verification'&&verificationTopic!=='All'?group.problems.filter(problem=>problem.verificationTopic===verificationTopic):group.problems
       return <section key={group.name} className={expanded?'topic-group expanded':'topic-group'}>
        <button className="topic-group-head" onClick={()=>toggleTopic(group.name)} aria-expanded={expanded}>
         <ChevronRight className="topic-group-chevron" size={18}/>
@@ -268,12 +255,8 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
         <span className="topic-group-progress" aria-label={`${stat?.solved||0} of ${stat?.total||0} solved`}><i style={{width:`${percent}%`}}/></span>
        </button>
        {expanded&&<div className="topic-group-body">
-        {group.name==='Verification'&&<div className="verification-subtopics" aria-label="Verification topics">
-         <button className={verificationTopic==='All'?'verification-subtopic active':'verification-subtopic'} onClick={()=>chooseVerificationTopic('All')}><span>All</span><em>{stat?.total||0}</em></button>
-         {verificationStats.map(item=><button key={item.name} className={verificationTopic===item.name?'verification-subtopic active':'verification-subtopic'} onClick={()=>chooseVerificationTopic(item.name)}><span>{item.name}</span><em>{item.total}</em></button>)}
-        </div>}
-        <div className="topic-group-problems">{groupProblems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}
-         {!groupProblems.length&&<div className="verification-empty">No problems in this verification topic yet.</div>}
+        <div className="topic-group-problems">{group.problems.map((p,i)=><ProblemRow key={p.id} p={p} index={i} solved={solved.includes(p.id)} onOpen={onOpen}/>)}
+         {!group.problems.length&&<div className="topic-empty">No problems in this topic yet.</div>}
         </div>
        </div>}
       </section>
@@ -299,5 +282,5 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   </aside>
  </div>
 }
-function ProblemRow({p,index,solved,onOpen,trackMode=false,trackTotal=0}){return <button className="problem-row" onClick={()=>onOpen(p)}><span className={solved?'check done':'check'} aria-label={solved?'Solved':'Unsolved'}>{solved&&<span>✓</span>}</span><span className="problem-main"><span className="problem-index">{String(index+1).padStart(2,'0')}</span><span>{trackMode&&<span className="company-track-step">Step {index+1} of {trackTotal}</span>}<strong>{p.title}</strong><small>{p.verificationTopic||p.topic} · {problemLanguageLabel(p)} · {p.tags.slice(0,2).join(' · ')}</small></span></span><span className={`difficulty ${p.difficulty.toLowerCase()}`}>{p.difficulty}</span><ChevronRight className="row-chevron" size={17}/></button>}
+function ProblemRow({p,index,solved,onOpen,trackMode=false,trackTotal=0}){return <button className="problem-row" onClick={()=>onOpen(p)}><span className={solved?'check done':'check'} aria-label={solved?'Solved':'Unsolved'}>{solved&&<span>✓</span>}</span><span className="problem-main"><span className="problem-index">{String(index+1).padStart(2,'0')}</span><span>{trackMode&&<span className="company-track-step">Step {index+1} of {trackTotal}</span>}<strong>{p.title}</strong><small>{p.topic} · {problemLanguageLabel(p)} · {p.tags.slice(0,2).join(' · ')}</small></span></span><span className={`difficulty ${p.difficulty.toLowerCase()}`}>{p.difficulty}</span><ChevronRight className="row-chevron" size={17}/></button>}
 createRoot(document.getElementById('root')).render(<App/>)
