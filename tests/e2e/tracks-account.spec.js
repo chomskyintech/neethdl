@@ -7,14 +7,17 @@ test.describe('HDLForge tracks and accounts', () => {
     await page.reload()
   })
 
-  test('opens curated company and role tracks', async ({ page }) => {
-    await page.getByRole('button', { name: 'Tracks', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Company & role tracks' })).toBeVisible()
+  test('opens curated company and role tracks inside Problems', async ({ page }) => {
+    await page.getByRole('button', { name: 'Problems', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
     await expect(page.getByRole('button', { name: /Jane Street/i })).toBeVisible()
     await expect(page.getByRole('button', { name: /HFT \/ FPGA/i })).toBeVisible()
+
     await page.getByRole('button', { name: /Verification/i }).click()
-    await expect(page.getByRole('heading', { name: 'Verification preparation' })).toBeVisible()
-    await expect(page.locator('.track-problem').first()).toBeVisible()
+    await expect(page).toHaveURL(/\/app\/problems\/company\/verification\/$/)
+    await expect(page.locator('.company-track-banner')).toContainText('Verification Track')
+    await expect(page.locator('.problem-list .problem-row').first()).toBeVisible()
   })
 
   test('opens the account sign-in and signup dialog without affecting local mode', async ({ page }) => {
