@@ -230,6 +230,10 @@
   background:#232925;
   color:#79c7b1;
 }
+.project-github-icon svg{
+  width:18px;
+  height:18px;
+}
 .project-github-copy{
   min-width:0;
   display:grid;
