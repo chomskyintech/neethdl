@@ -7,16 +7,17 @@ test.describe('HDLForge tracks and accounts', () => {
     await page.reload()
   })
 
-  test('opens curated company and role tracks inside Problems', async ({ page }) => {
+  test('opens company tracks and guided career roadmaps inside Problems', async ({ page }) => {
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
+    await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
     await expect(page.getByRole('button', { name: /Jane Street/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /HFT \/ FPGA/i })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'FPGA Engineer', exact: true })).toBeVisible()
 
-    await page.getByRole('button', { name: /Verification/i }).click()
+    await page.getByRole('button', { name: 'Design Verification', exact: true }).click()
     await expect(page).toHaveURL(/\/app\/problems\/company\/verification\/$/)
-    await expect(page.locator('.company-track-banner')).toContainText('Verification Track')
+    await expect(page.locator('.company-track-banner')).toContainText('Design Verification Track')
     await expect(page.locator('.problem-list .problem-row').first()).toBeVisible()
   })
 
