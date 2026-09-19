@@ -58,7 +58,7 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(guide).toContainText('latch')
   })
 
-  test('renders the rich hardware Solution guide and can load a reference implementation', async ({ page }) => {
+  test('renders the rich hardware Solution guide with compact reference actions', async ({ page }) => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
 
     const guide = page.locator('.solution-guide')
@@ -80,9 +80,9 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(referenceViewer).toBeVisible()
     await expect(referenceViewer.locator('.view-lines')).toContainText('always @(*)')
 
-    await guide.getByRole('button', { name: 'Load into editor', exact: true }).click()
-    await expect(page.locator('.editor-language select')).toHaveValue('Verilog')
-    await expect.poll(() => codeText(page)).toContain('always @(*)')
+    await expect(guide.getByRole('button', { name: 'Expand reference solution', exact: true })).toBeVisible()
+    await expect(guide.getByRole('button', { name: 'Copy reference solution', exact: true })).toBeVisible()
+    await expect(guide.getByRole('button', { name: 'Load into editor', exact: true })).toHaveCount(0)
   })
 
   test('changes structural formatting mode when the problem/editor splitter is resized', async ({ page }) => {
@@ -104,16 +104,16 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
     await expect(viewer).toHaveAttribute('data-format-mode', 'narrow')
 
-    await expect(guideOrPage(page).getByRole('button', { name: 'Expand', exact: true })).toBeVisible()
+    await expect(guideOrPage(page).getByRole('button', { name: 'Expand reference solution', exact: true })).toBeVisible()
   })
 
   test('expands the reference implementation into a focused large viewer', async ({ page }) => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
     const reference = page.locator('.solution-reference')
-    await reference.getByRole('button', { name: 'Expand', exact: true }).click()
+    await reference.getByRole('button', { name: 'Expand reference solution', exact: true }).click()
     await expect(reference).toHaveClass(/expanded/)
     await expect(reference.locator('.reference-monaco')).toHaveAttribute('data-format-mode', 'expanded')
-    await expect(reference.getByRole('button', { name: 'Collapse', exact: true })).toBeVisible()
+    await expect(reference.getByRole('button', { name: 'Collapse reference solution', exact: true })).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(reference).not.toHaveClass(/expanded/)
   })
