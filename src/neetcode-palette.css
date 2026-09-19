@@ -255,3 +255,109 @@ html,.ide-problem-content,#hdlforge-ide-drawer,.editor-wrap,.console,.project-fi
 html::-webkit-scrollbar-track,.ide-problem-content::-webkit-scrollbar-track,.editor-wrap::-webkit-scrollbar-track{background:var(--nc-bg)!important}
 html::-webkit-scrollbar-thumb,.ide-problem-content::-webkit-scrollbar-thumb,.editor-wrap::-webkit-scrollbar-thumb{background:var(--nc-border)!important}
 html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thumb:hover,.editor-wrap::-webkit-scrollbar-thumb:hover{background:var(--nc-muted)!important}
+
+
+/* Topic browser */
+.topic-cloud-shell,.topic-group,.topic-group-body,.topic-group-problems{
+  background:var(--nc-editor)!important;border-color:var(--nc-border)!important;
+}
+.topic-cloud-item,.topic-cloud-toggle,.topic-group-head{
+  background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-muted)!important;
+}
+.topic-cloud-item:hover,.topic-cloud-toggle:hover,.topic-group-head:hover{
+  background:var(--nc-surface-2)!important;color:var(--nc-text-strong)!important;
+}
+.topic-cloud-item.active,.topic-group.expanded>.topic-group-head{
+  background:var(--nc-surface-2)!important;border-color:var(--nc-teal)!important;color:var(--nc-text-strong)!important;
+}
+.topic-group-chevron,.topic-cloud-item.active span{color:var(--nc-teal)!important}
+.topic-group-count,.topic-empty{color:var(--nc-muted)!important}
+.topic-group-progress{background:var(--nc-surface-3)!important}
+.topic-group-progress i{background:var(--nc-teal)!important}
+
+/* IDE problem copy, examples, discussion, console and resize affordances */
+.ide-topbar .back,.ide-problem-navigation button,.ide-problem-navigation span,.editor-toolbar,
+.editor-shortcuts span,.editor-search,.console-empty,.wave-head span,.wave-tools span,.waveform-empty{
+  color:var(--nc-muted)!important;
+}
+.ide-topbar .back:hover,.ide-problem-navigation button:hover:not(:disabled){
+  background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text-strong)!important;
+}
+.ide-title .eyebrow{color:var(--nc-blue)!important}
+.ide-title strong,.problem-section h2,.content-card h2,.discussion-in-tab .discussion-head h2,
+.discussion-post strong,.wave-head strong,.testbench-info strong{
+  color:var(--nc-text-strong)!important;
+}
+.ide-problem-navigation,.examples>div,.solution-code,.discussion-in-tab .discussion-form textarea,
+.discussion-post,.editor-language select,.icon-btn,.editor-shortcuts button,.editor-search,
+.bottom-collapse,.solve-status,.wave-tools button,.wave-scroll,.wave-transition,.wave-bus,.wave-cursor{
+  background:var(--nc-surface)!important;border-color:var(--nc-border)!important;
+}
+.problem-section p,.content-card p,.problem-section ul,.examples pre,.discussion-in-tab .discussion-head p,
+.discussion-post p,.testbench-info{
+  color:var(--nc-text)!important;
+}
+.examples span,.discussion-in-tab .discussion-head>span,.discussion-post small{
+  color:var(--nc-muted)!important;
+}
+.discussion-in-tab .discussion-form textarea{color:var(--nc-text)!important}
+.discussion-in-tab .discussion-form textarea:focus{
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(76,200,176,.14)!important;
+}
+.post-avatar{background:var(--nc-surface-2)!important;color:var(--nc-blue)!important}
+.icon-btn:hover,.editor-shortcuts button:hover,.bottom-collapse:hover,.wave-tools button:hover{
+  background:var(--nc-surface-2)!important;color:var(--nc-text-strong)!important;
+}
+.run-result.pass,.solve-status.passed{
+  background:var(--nc-surface)!important;border-color:var(--nc-teal)!important;color:var(--nc-teal)!important;
+}
+.run-result.fail{
+  background:var(--nc-surface)!important;border-color:var(--nc-orange)!important;color:var(--nc-orange)!important;
+}
+.ide-panel-resizer::before{background:var(--nc-border)!important}
+.ide-panel-resizer span{background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-muted)!important}
+.ide-panel-resizer:hover::before,.ide-panel-resizer.dragging::before{background:var(--nc-teal)!important}
+.ide-panel-resizer:hover span,.ide-panel-resizer.dragging span{border-color:var(--nc-teal)!important;color:var(--nc-text)!important}
+
+/* Legacy waveform renderer */
+.wave-grid,.wave-row{stroke:var(--nc-border-soft)!important}
+.wave-axis-line{stroke:var(--nc-border)!important}
+.wave-label-bg{fill:var(--nc-editor)!important}
+.wave-time,.wave-width{fill:var(--nc-muted)!important}
+.wave-name{fill:var(--nc-text)!important}
+.wave-digital{stroke:var(--nc-teal)!important}
+.wave-transition{stroke:var(--nc-teal)!important;fill:var(--nc-surface)!important}
+.wave-bus{stroke:var(--nc-border)!important;fill:var(--nc-surface)!important}
+.wave-bus-text,.wave-cursor{color:var(--nc-blue)!important;fill:var(--nc-blue)!important}
+
+/* Company tracks, progress and project-specific panels */
+.track-list,.track-detail,.tracks-layout,.company-track-banner,.problem-progress-panel{
+  color:var(--nc-text)!important;
+}
+.track-card-icon{background:var(--nc-surface-2)!important;color:var(--nc-teal)!important}
+.track-card-copy small,.track-detail-head p,.track-score span,.track-problem-index,.track-problem-copy small,
+.problem-progress-stat span{
+  color:var(--nc-muted)!important;
+}
+.track-detail-head h2,.track-score strong,.track-problem-copy strong{color:var(--nc-text-strong)!important}
+.progress-track,.problem-progress-track{background:var(--nc-surface-3)!important}
+.progress-track div,.problem-progress-track i{background:var(--nc-teal)!important}
+.problem-progress-stat.easy span,.problem-progress-stat.easy .problem-progress-track i{color:var(--nc-teal)!important;background:var(--nc-teal)!important}
+.problem-progress-stat.medium span,.problem-progress-stat.medium .problem-progress-track i{color:var(--nc-yellow)!important;background:var(--nc-yellow)!important}
+.problem-progress-stat.hard span,.problem-progress-stat.hard .problem-progress-track i{color:var(--nc-orange)!important;background:var(--nc-orange)!important}
+
+/* Project discovery cards */
+.destination-card,.guided-project-icon,.project-activity-empty{
+  background:var(--nc-editor)!important;border-color:var(--nc-border)!important;color:var(--nc-text)!important;
+}
+.destination-card:hover{background:var(--nc-surface)!important;border-color:var(--nc-border)!important}
+.destination-icon,.guided-project-icon{background:var(--nc-surface)!important;color:var(--nc-teal)!important}
+.destination-copy small,.guided-time,.guided-project p{color:var(--nc-muted)!important}
+.guided-start{background:var(--nc-teal)!important;color:var(--nc-bg)!important}
+.guided-project-clickable:hover .guided-start,.guided-project-clickable:focus-visible .guided-start{background:var(--nc-blue)!important}
+
+/* Small account/track controls */
+.account-close,.company-track-exit{color:var(--nc-muted)!important}
+.account-close:hover,.company-track-exit:hover{
+  background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text-strong)!important;
+}

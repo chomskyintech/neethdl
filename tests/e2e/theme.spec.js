@@ -42,7 +42,8 @@ test.describe('NeetCode theme regression', () => {
     await page.goto('/app/problems/')
     await expect(page.locator('.guided-roadmap-card')).toBeVisible()
     expect(await page.locator('.guided-roadmap-card').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.editor)
-    expect(await page.locator('.problem-list').evaluate(node => getComputedStyle(node).borderTopColor)).toBe(colours.border)
+    await expect(page.locator('.topic-group').first()).toBeVisible()
+    expect(await page.locator('.topic-group').first().evaluate(node => getComputedStyle(node).borderTopColor)).toBe(colours.border)
 
     await page.goto('/app/projects/')
     await expect(page.locator('.project-card-modern').first()).toBeVisible()
