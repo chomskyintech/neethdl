@@ -69,6 +69,57 @@ function registerLanguages(monaco) {
   })
 }
 
+
+export function ReadOnlyHDLViewer({ code, language }) {
+  const lineCount = Math.max(1, (code || '').split('\n').length)
+  const height = Math.min(640, Math.max(180, lineCount * 22 + 24))
+  return <div className="reference-monaco" style={{ height }} aria-label={`${language} reference implementation`}>
+    <MonacoEditor
+      height="100%"
+      value={code}
+      language={languageIds[language] || 'systemverilog'}
+      theme="hdlforge-dark"
+      beforeMount={registerLanguages}
+      options={{
+        automaticLayout: true,
+        readOnly: true,
+        domReadOnly: true,
+        fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
+        fontSize: 13,
+        lineHeight: 22,
+        lineNumbers: 'on',
+        lineNumbersMinChars: 3,
+        minimap: { enabled: false },
+        glyphMargin: false,
+        folding: false,
+        tabSize: 2,
+        insertSpaces: true,
+        detectIndentation: false,
+        scrollBeyondLastLine: false,
+        smoothScrolling: true,
+        wordWrap: 'off',
+        renderLineHighlight: 'none',
+        renderWhitespace: 'none',
+        bracketPairColorization: { enabled: true },
+        guides: { bracketPairs: true, indentation: true },
+        padding: { top: 12, bottom: 12 },
+        overviewRulerLanes: 0,
+        hideCursorInOverviewRuler: true,
+        contextmenu: false,
+        selectionHighlight: false,
+        occurrencesHighlight: 'off',
+        scrollbar: {
+          horizontal: 'auto',
+          vertical: 'auto',
+          alwaysConsumeMouseWheel: false,
+          horizontalScrollbarSize: 10,
+          verticalScrollbarSize: 10
+        }
+      }}
+    />
+  </div>
+}
+
 export default function MonacoHDLEditor({ code, language, onChange, onRun }) {
   const editorRef = useRef(null)
   const [toolbarTarget, setToolbarTarget] = useState(null)

@@ -155,6 +155,9 @@
   border-bottom-color:#f4f4f5;
 }
 .solution-code-shell{
+  width:100%;
+  max-width:100%;
+  min-width:0;
   overflow:hidden;
   border:1px solid #37373b;
   border-radius:10px;
@@ -211,14 +214,28 @@
   padding:16px;
   border:0;
   border-radius:0;
-  background:#171719;
+  background:#0d0d0d;
   color:#d8d8dc;
-  font:11px/1.72 ui-monospace,SFMono-Regular,Consolas,monospace;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  word-break:normal;
-  overflow-x:hidden;
-  overflow-y:auto;
+  font:12px/1.72 ui-monospace,SFMono-Regular,Consolas,monospace;
+  white-space:pre;
+  overflow:auto;
+}
+.reference-monaco{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  background:#0d0d0d;
+}
+.reference-monaco .monaco-editor,
+.reference-monaco .overflow-guard{
+  border-radius:0 0 9px 9px;
+}
+.solution-code-empty{
+  padding:18px;
+  color:#8f8f95;
+  background:#171719;
+  font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;
 }
 
 @media(max-width:900px){

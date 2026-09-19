@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
-import MonacoHDLEditor from './MonacoHDLEditor'
+import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
 import './ide-overrides.css'
 import './waveform-window.css'
 
@@ -25,6 +25,68 @@ async function requestFormattedReference(language,source){
   referenceFormatCache.set(key,pending)
   try{return await pending}
   catch(error){referenceFormatCache.delete(key);throw error}
+}
+
+const referenceSectionHints = {
+  'rtl-mux': [
+    [/^\s*(always(?:_comb)?\b|y\s*<=)/i, 'Combinational selection logic']
+  ],
+  'rtl-counter': [
+    [/^\s*(always(?:_ff)?\b|process\s*\()/i, 'Counter state update']
+  ],
+  'rtl-priority': [
+    [/^\s*(always(?:_comb)?\b|process\s*\()/i, 'Highest-priority request selection']
+  ],
+  'rtl-fifo': [
+    [/^\s*(logic|reg|type|signal)\b.*\b(mem|mem_t)\b/i, 'Storage and FIFO state'],
+    [/^\s*(always_ff\b|always\s*@|process\s*\()/i, 'Read, write, and occupancy updates'],
+    [/^\s*(assign\s+(full|empty)\b|(full|empty)\s*<=)/i, 'Full and empty status flags']
+  ],
+  'rtl-shift-register': [
+    [/^\s*(always(?:_ff)?\b|process\s*\()/i, 'Shift-register state update']
+  ],
+  'rtl-edge-detector': [
+    [/^\s*(logic|reg|signal)\b.*\bprev\b/i, 'Previous sampled value'],
+    [/^\s*(always(?:_ff)?\b|process\s*\()/i, 'Rising-edge detection']
+  ],
+  'rtl-arbiter': [
+    [/^\s*(always(?:_comb)?\b|process\s*\()/i, 'Fixed-priority grant logic']
+  ],
+  'rtl-regfile': [
+    [/^\s*(logic|reg|type|signal)\b.*\b(regs|reg_array)\b/i, 'Register storage'],
+    [/^\s*(always_ff\b|always\s*@\(posedge|process\s*\()/i, 'Synchronous write path'],
+    [/^\s*(assign\s+rdata|rdata\w*\s*<=|always_comb\b)/i, 'Combinational read ports']
+  ],
+  'rtl-lfsr': [
+    [/^\s*(wire|logic|variable)\b.*\bfeedback\b/i, 'Feedback polynomial'],
+    [/^\s*(always_ff\b|always\s*@\(posedge|process\s*\()/i, 'LFSR state update']
+  ],
+  'rtl-clock-divider': [
+    [/^\s*(integer|logic|reg|signal)\b.*\b(count|q)\b/i, 'Divider state'],
+    [/^\s*(always_ff\b|always\s*@\(posedge|process\s*\()/i, 'Counter and output toggle']
+  ]
+}
+
+function addTeachingComments(problemId, language, source) {
+  const hints = referenceSectionHints[problemId] || []
+  if (!source || !hints.length) return source
+  const prefix = language === 'VHDL' ? '--' : '//'
+  const used = new Set()
+  const output = []
+  for (const line of source.split('\n')) {
+    for (let index = 0; index < hints.length; index += 1) {
+      if (used.has(index)) continue
+      const [pattern,label] = hints[index]
+      if (pattern.test(line)) {
+        if (output.length && output.at(-1).trim() !== '') output.push('')
+        output.push(`${prefix} ${label}`)
+        used.add(index)
+        break
+      }
+    }
+    output.push(line)
+  }
+  return output.join('\n')
 }
 const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback } }
 const vhdlStarters = {
@@ -370,13 +432,14 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       .finally(()=>{if(active)setFormatting(false)})
     return ()=>{active=false}
   },[language,code])
+  const displayCode = addTeachingComments(problem.id, language, formattedCode || code)
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
   const hardware = inferredHardware(problem)
   const mistakes = commonMistakes(problem)
   const copy = async () => {
     if (!code) return
-    try { await navigator.clipboard.writeText(formattedCode || code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
+    try { await navigator.clipboard.writeText(displayCode || code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
   }
   return <article className="solution-guide">
     <section className="solution-guide-section solution-guide-intro">
@@ -415,8 +478,8 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
       <div className="solution-code-shell">
-        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}{formatting?' · formatting…':''}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,formattedCode || code)}>Load into editor</button></div></div>
-        <pre className="solution-code">{formattedCode || code || 'Reference solution will be added for this problem.'}</pre>
+        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}{formatting?' · formatting…':''}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,displayCode || code)}>Load into editor</button></div></div>
+        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
       </div>
     </section>
   </article>

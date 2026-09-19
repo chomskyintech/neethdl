@@ -15,7 +15,7 @@ const BACKEND_PORT=8788
 const MAX_SOURCE=20000
 const TIMEOUT_MS=5000
 const FORMAT_TIMEOUT_MS=5000
-const FORMAT_COLUMN_LIMIT=72
+const FORMAT_COLUMN_LIMIT=52
 const vhdlBenches={
 'rtl-mux':`library ieee; use ieee.std_logic_1164.all; entity tb is end; architecture sim of tb is signal a,b,sel,y: std_logic:='0'; begin dut: entity work.{{DUT}}(rtl) port map(a=>a,b=>b,sel=>sel,y=>y); process begin a<='0';b<='0';sel<='0';wait for 1 ns;assert y='0' report "mux case 1" severity failure; a<='0';b<='1';sel<='0';wait for 1 ns;assert y='0' report "mux case 2" severity failure;sel<='1';wait for 1 ns;assert y='1' report "mux case 3" severity failure;a<='1';b<='0';wait for 1 ns;assert y='0' report "mux case 4" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`,
 'rtl-counter':`library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity tb is end; architecture sim of tb is signal clk,reset: std_logic:='0'; signal count: std_logic_vector(7 downto 0); begin dut: entity work.{{DUT}}(rtl) port map(clk=>clk,reset=>reset,count=>count);clk<=not clk after 1 ns;process begin reset<='1';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"00" report "reset" severity failure;reset<='0';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"01" report "increment 1" severity failure;wait until rising_edge(clk);wait for 0.1 ns;assert count=x"02" report "increment 2" severity failure;reset<='1';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"00" report "second reset" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`,
