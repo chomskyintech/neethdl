@@ -3,7 +3,7 @@ const tracks = [
     id: 'jane-street',
     name: 'Jane Street',
     description: 'Low-latency RTL, arbitration, backpressure, streaming pipelines and deterministic datapaths.',
-    problemIds: ['rtl-round-robin-arbiter','rtl-skid-buffer','rtl-fifo','rtl-pipeline-register','proto-ready-valid-source','rtl-regfile','fpga-pulse-sync','accel-pipelined-mul','accel-stream-accum','rtl-onehot-fsm']
+    problemIds: ['rtl-arbiter','rtl-skid-buffer','rtl-fifo','rtl-pipeline-register','proto-ready-valid-source','rtl-regfile','fpga-pulse-sync','accel-pipelined-mul','accel-stream-accum','rtl-onehot-fsm']
   },
   {
     id: 'amd',
@@ -39,7 +39,7 @@ const tracks = [
     id: 'hft-fpga',
     name: 'HFT / FPGA',
     description: 'Latency-focused RTL, arbitration, streaming handshakes, deterministic pipelines and FPGA-safe clock-domain control.',
-    problemIds: ['rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source','rtl-fifo','rtl-edge-detector','fpga-pulse-sync','fpga-clock-enable','accel-pipelined-mul','accel-stream-accum']
+    problemIds: ['rtl-arbiter','rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source','rtl-fifo','rtl-edge-detector','fpga-pulse-sync','fpga-clock-enable','accel-pipelined-mul','accel-stream-accum']
   },
   {
     id: 'verification',
@@ -51,7 +51,7 @@ const tracks = [
     id: 'rtl-digital',
     name: 'RTL / Digital Design',
     description: 'Core synthesizable RTL, state machines, memories, arbitration, pipelines and clock/reset structures.',
-    problemIds: ['rtl-mux','rtl-counter','rtl-priority','rtl-fifo','rtl-shift-register','rtl-edge-detector','rtl-arbiter','rtl-regfile','rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','rtl-reset-synchronizer','rtl-gray-counter','rtl-dual-port-ram','rtl-onehot-fsm']
+    problemIds: ['rtl-mux','rtl-counter','rtl-priority','rtl-fifo','rtl-shift-register','rtl-edge-detector','rtl-arbiter','rtl-regfile','rtl-clock-divider','rtl-skid-buffer','rtl-pipeline-register','rtl-reset-synchronizer','rtl-gray-counter','rtl-dual-port-ram','rtl-onehot-fsm']
   },
   {
     id: 'cpu-gpu',
