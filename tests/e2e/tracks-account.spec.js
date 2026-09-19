@@ -7,7 +7,7 @@ test.describe('HDLForge tracks and accounts', () => {
     await page.reload()
   })
 
-  test('opens company tracks and guided career roadmaps inside Problems', async ({ page }) => {
+  test('opens company tracks and guided career roadmaps from Problems', async ({ page }) => {
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
@@ -16,9 +16,10 @@ test.describe('HDLForge tracks and accounts', () => {
     await expect(page.getByRole('button', { name: 'FPGA Engineer', exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'Design Verification', exact: true }).click()
-    await expect(page).toHaveURL(/\/app\/problems\/company\/verification\/$/)
-    await expect(page.locator('.company-track-banner')).toContainText('Design Verification Track')
-    await expect(page.locator('.problem-list .problem-row').first()).toBeVisible()
+    await expect(page).toHaveURL(/\/app\/roadmaps\/design-verification\/$/)
+    await expect(page.getByRole('heading', { name: 'Design Verification', exact: true })).toBeVisible()
+    await expect(page.locator('.career-problem').first()).toBeVisible()
+    await expect(page.locator('.career-project-card').first()).toBeVisible()
   })
 
   test('opens the account sign-in and signup dialog without affecting local mode', async ({ page }) => {
