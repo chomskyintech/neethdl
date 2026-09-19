@@ -1,146 +1,554 @@
 [
   {
-    "id":"rtl-skid-buffer","title":"Ready/Valid Skid Buffer","category":"RTL Design","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["ready-valid","pipeline","backpressure","skid-buffer"],
-    "description":"Build a one-entry skid buffer that preserves data when downstream backpressure arrives.",
-    "task":"Accept input transfers using in_valid/in_ready and present them on out_valid/out_ready without losing or duplicating data. Hold output data stable while stalled.",
-    "examples":["in_valid=1 and in_ready=1 captures a word","out_valid=1 and out_ready=0 holds out_data stable"],
-    "constraints":["Single clock domain.","Synchronous active-high reset.","Capacity is one word.","Support back-to-back transfers when downstream is ready."],
-    "starterCode":"module skid_buffer #(parameter WIDTH=8)(input clk, reset, input in_valid, output in_ready, input [WIDTH-1:0] in_data, output reg out_valid, input out_ready, output reg [WIDTH-1:0] out_data);\n  // Your RTL here\nendmodule"
+    "id": "rtl-skid-buffer",
+    "title": "Ready/Valid Skid Buffer",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "ready-valid",
+      "pipeline",
+      "backpressure",
+      "skid-buffer"
+    ],
+    "description": "Build a one-entry skid buffer that preserves data when downstream backpressure arrives.",
+    "task": "Accept input transfers using in_valid/in_ready and present them on out_valid/out_ready without losing or duplicating data. Hold output data stable while stalled.",
+    "examples": [
+      "in_valid=1 and in_ready=1 captures a word",
+      "out_valid=1 and out_ready=0 holds out_data stable"
+    ],
+    "constraints": [
+      "Single clock domain.",
+      "Synchronous active-high reset.",
+      "Capacity is one word.",
+      "Support back-to-back transfers when downstream is ready."
+    ],
+    "starterCode": "module skid_buffer #(\n  parameter WIDTH = 8\n) (\n  input clk,\n  input reset,\n  input in_valid,\n  output in_ready,\n  input [WIDTH-1:0] in_data,\n  output reg out_valid,\n  input out_ready,\n  output reg [WIDTH-1:0] out_data\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"rtl-pipeline-register","title":"Elastic Pipeline Register","category":"RTL Design","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["pipeline","valid","throughput"],
-    "description":"Implement a single-stage pipeline register with an aligned valid bit.",
-    "task":"Capture in_data whenever in_valid is asserted and produce the captured value with out_valid on the next cycle.",
-    "examples":["in_valid with 8'h5A -> out_valid next cycle with 8'h5A","in_valid=0 -> out_valid deasserts next cycle"],
-    "constraints":["Synchronous active-high reset.","Accept a new input every cycle.","Data width is parameterized."],
-    "starterCode":"module pipeline_reg #(parameter WIDTH=8)(input clk, reset, input in_valid, input [WIDTH-1:0] in_data, output reg out_valid, output reg [WIDTH-1:0] out_data);\n  // Your RTL here\nendmodule"
+    "id": "rtl-pipeline-register",
+    "title": "Elastic Pipeline Register",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "pipeline",
+      "valid",
+      "throughput"
+    ],
+    "description": "Implement a single-stage pipeline register with an aligned valid bit.",
+    "task": "Capture in_data whenever in_valid is asserted and produce the captured value with out_valid on the next cycle.",
+    "examples": [
+      "in_valid with 8'h5A -> out_valid next cycle with 8'h5A",
+      "in_valid=0 -> out_valid deasserts next cycle"
+    ],
+    "constraints": [
+      "Synchronous active-high reset.",
+      "Accept a new input every cycle.",
+      "Data width is parameterized."
+    ],
+    "starterCode": "module pipeline_reg #(\n  parameter WIDTH = 8\n) (\n  input clk,\n  input reset,\n  input in_valid,\n  input [WIDTH-1:0] in_data,\n  output reg out_valid,\n  output reg [WIDTH-1:0] out_data\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"rtl-reset-synchronizer","title":"Asynchronous-Assert Reset Synchronizer","category":"RTL Design","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["reset","cdc","synchronizer"],
-    "description":"Create a two-flop reset synchronizer with asynchronous assertion and synchronous deassertion.",
-    "task":"When arst_n falls, rst_n must assert immediately. After arst_n rises, rst_n must remain low for two rising clock edges before deasserting.",
-    "examples":["arst_n=0 -> rst_n=0 immediately","arst_n rises -> rst_n becomes 1 after two clocks"],
-    "constraints":["Use two synchronization stages.","Reset input is active low.","Output reset is active low."],
-    "starterCode":"module reset_sync(input clk, input arst_n, output rst_n);\n  // Your RTL here\nendmodule"
+    "id": "rtl-reset-synchronizer",
+    "title": "Asynchronous-Assert Reset Synchronizer",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "reset",
+      "cdc",
+      "synchronizer"
+    ],
+    "description": "Create a two-flop reset synchronizer with asynchronous assertion and synchronous deassertion.",
+    "task": "When arst_n falls, rst_n must assert immediately. After arst_n rises, rst_n must remain low for two rising clock edges before deasserting.",
+    "examples": [
+      "arst_n=0 -> rst_n=0 immediately",
+      "arst_n rises -> rst_n becomes 1 after two clocks"
+    ],
+    "constraints": [
+      "Use two synchronization stages.",
+      "Reset input is active low.",
+      "Output reset is active low."
+    ],
+    "starterCode": "module reset_sync(input clk, input arst_n, output rst_n);\n  // Your RTL here\nendmodule"
   },
   {
-    "id":"rtl-gray-counter","title":"Binary to Gray Counter","category":"RTL Design","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["gray-code","counter","cdc"],
-    "description":"Build a parameterized binary counter and expose its Gray-code representation.",
-    "task":"Increment the binary state when enable is high and drive gray = binary ^ (binary >> 1).",
-    "examples":["binary=0 -> gray=0","binary=3 (011) -> gray=2 (010)"],
-    "constraints":["Synchronous active-high reset.","Hold state when enable is low.","Width is parameterized."],
-    "starterCode":"module gray_counter #(parameter WIDTH=4)(input clk, reset, enable, output reg [WIDTH-1:0] binary, output [WIDTH-1:0] gray);\n  // Your RTL here\nendmodule"
+    "id": "rtl-gray-counter",
+    "title": "Binary to Gray Counter",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "gray-code",
+      "counter",
+      "cdc"
+    ],
+    "description": "Build a parameterized binary counter and expose its Gray-code representation.",
+    "task": "Increment the binary state when enable is high and drive gray = binary ^ (binary >> 1).",
+    "examples": [
+      "binary=0 -> gray=0",
+      "binary=3 (011) -> gray=2 (010)"
+    ],
+    "constraints": [
+      "Synchronous active-high reset.",
+      "Hold state when enable is low.",
+      "Width is parameterized."
+    ],
+    "starterCode": "module gray_counter #(\n  parameter WIDTH = 4\n) (\n  input clk,\n  input reset,\n  input enable,\n  output reg [WIDTH-1:0] binary,\n  output [WIDTH-1:0] gray\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"rtl-dual-port-ram","title":"Simple Dual-Port RAM","category":"RTL Design","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["memory","ram","bram","dual-port"],
-    "description":"Infer a small synchronous-write, asynchronous-read dual-port memory.",
-    "task":"Write wdata to waddr on a rising clock edge when we is high. Independently expose the location selected by raddr on rdata.",
-    "examples":["write address 3 with 0xA5 -> reading address 3 returns 0xA5"],
-    "constraints":["One write port and one read port.","Parameterized width and depth.","Synthesizable RTL only."],
-    "starterCode":"module simple_dpram #(parameter WIDTH=8, DEPTH=16, ADDR_W=4)(input clk, we, input [ADDR_W-1:0] waddr, raddr, input [WIDTH-1:0] wdata, output [WIDTH-1:0] rdata);\n  // Your RTL here\nendmodule"
+    "id": "rtl-dual-port-ram",
+    "title": "Simple Dual-Port RAM",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "memory",
+      "ram",
+      "bram",
+      "dual-port"
+    ],
+    "description": "Infer a small synchronous-write, asynchronous-read dual-port memory.",
+    "task": "Write wdata to waddr on a rising clock edge when we is high. Independently expose the location selected by raddr on rdata.",
+    "examples": [
+      "write address 3 with 0xA5 -> reading address 3 returns 0xA5"
+    ],
+    "constraints": [
+      "One write port and one read port.",
+      "Parameterized width and depth.",
+      "Synthesizable RTL only."
+    ],
+    "starterCode": "module simple_dpram #(\n  parameter WIDTH = 8,\n  parameter DEPTH = 16,\n  parameter ADDR_W = 4\n) (\n  input clk,\n  input we,\n  input [ADDR_W-1:0] waddr,\n  input [ADDR_W-1:0] raddr,\n  input [WIDTH-1:0] wdata,\n  output [WIDTH-1:0] rdata\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"rtl-onehot-fsm","title":"One-Hot Traffic-Light FSM","category":"RTL Design","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["fsm","one-hot","sequential"],
-    "description":"Implement a three-state one-hot finite-state machine.",
-    "task":"Cycle RED -> GREEN -> YELLOW -> RED whenever advance is high, otherwise hold the current state.",
-    "examples":["reset -> RED","RED + advance -> GREEN","GREEN + advance -> YELLOW"],
-    "constraints":["State output is 3-bit one-hot: RED=001, GREEN=010, YELLOW=100.","Synchronous active-high reset."],
-    "starterCode":"module traffic_fsm(input clk, reset, advance, output reg [2:0] state);\n  // Your RTL here\nendmodule"
+    "id": "rtl-onehot-fsm",
+    "title": "One-Hot Traffic-Light FSM",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "fsm",
+      "one-hot",
+      "sequential"
+    ],
+    "description": "Implement a three-state one-hot finite-state machine.",
+    "task": "Cycle RED -> GREEN -> YELLOW -> RED whenever advance is high, otherwise hold the current state.",
+    "examples": [
+      "reset -> RED",
+      "RED + advance -> GREEN",
+      "GREEN + advance -> YELLOW"
+    ],
+    "constraints": [
+      "State output is 3-bit one-hot: RED=001, GREEN=010, YELLOW=100.",
+      "Synchronous active-high reset."
+    ],
+    "starterCode": "module traffic_fsm(input clk, reset, advance, output reg [2:0] state);\n  // Your RTL here\nendmodule"
   },
   {
-    "id":"proto-ready-valid-source","title":"Backpressure-Safe Ready/Valid Source","category":"Protocols","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["ready-valid","handshake","backpressure"],
-    "description":"Implement a source register that obeys ready/valid protocol semantics.",
-    "task":"When load is asserted while the source can accept a new value, capture load_data and assert valid. Keep valid and data stable until ready completes the transfer.",
-    "examples":["load data while idle -> valid=1","valid=1 and ready=0 -> hold data","valid=1 and ready=1 -> transfer completes"],
-    "constraints":["Single-entry source buffer.","Synchronous active-high reset.","No data changes while stalled."],
-    "starterCode":"module rv_source #(parameter WIDTH=8)(input clk, reset, load, input [WIDTH-1:0] load_data, input ready, output reg valid, output reg [WIDTH-1:0] data, output can_load);\n  // Your RTL here\nendmodule"
+    "id": "proto-ready-valid-source",
+    "title": "Backpressure-Safe Ready/Valid Source",
+    "category": "Protocols",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "ready-valid",
+      "handshake",
+      "backpressure"
+    ],
+    "description": "Implement a source register that obeys ready/valid protocol semantics.",
+    "task": "When load is asserted while the source can accept a new value, capture load_data and assert valid. Keep valid and data stable until ready completes the transfer.",
+    "examples": [
+      "load data while idle -> valid=1",
+      "valid=1 and ready=0 -> hold data",
+      "valid=1 and ready=1 -> transfer completes"
+    ],
+    "constraints": [
+      "Single-entry source buffer.",
+      "Synchronous active-high reset.",
+      "No data changes while stalled."
+    ],
+    "starterCode": "module rv_source #(\n  parameter WIDTH = 8\n) (\n  input clk,\n  input reset,\n  input load,\n  input [WIDTH-1:0] load_data,\n  input ready,\n  output reg valid,\n  output reg [WIDTH-1:0] data,\n  output can_load\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"proto-apb-register","title":"APB Register Peripheral","category":"Protocols","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["apb","amba","register-file","bus"],
-    "description":"Build a minimal APB peripheral exposing one 32-bit read/write register.",
-    "task":"Complete APB accesses in the enable phase. Writes to address 0 update the register; reads from address 0 return it. PREADY may stay high and PSLVERR low.",
-    "examples":["PSEL=1,PENABLE=1,PWRITE=1 writes PWDATA","read address 0 returns stored value"],
-    "constraints":["32-bit data.","Synchronous active-high reset.","PREADY is always 1.","PSLVERR is always 0."],
-    "starterCode":"module apb_reg(input PCLK, PRESET, input PSEL, PENABLE, PWRITE, input [3:0] PADDR, input [31:0] PWDATA, output [31:0] PRDATA, output PREADY, output PSLVERR);\n  // Your RTL here\nendmodule"
+    "id": "proto-apb-register",
+    "title": "APB Register Peripheral",
+    "category": "Protocols",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "apb",
+      "amba",
+      "register-file",
+      "bus"
+    ],
+    "description": "Build a minimal APB peripheral exposing one 32-bit read/write register.",
+    "task": "Complete APB accesses in the enable phase. Writes to address 0 update the register; reads from address 0 return it. PREADY may stay high and PSLVERR low.",
+    "examples": [
+      "PSEL=1,PENABLE=1,PWRITE=1 writes PWDATA",
+      "read address 0 returns stored value"
+    ],
+    "constraints": [
+      "32-bit data.",
+      "Synchronous active-high reset.",
+      "PREADY is always 1.",
+      "PSLVERR is always 0."
+    ],
+    "starterCode": "module apb_reg (\n  input PCLK,\n  input PRESET,\n  input PSEL,\n  input PENABLE,\n  input PWRITE,\n  input [3:0] PADDR,\n  input [31:0] PWDATA,\n  output [31:0] PRDATA,\n  output PREADY,\n  output PSLVERR\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"proto-axi-lite-write","title":"AXI-Lite Write Register Slave","category":"Protocols","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["axi-lite","amba","handshake","register"],
-    "description":"Implement the write side of a single-register AXI-Lite slave.",
-    "task":"Accept AW and W channels independently, update a 32-bit register once both have handshaken, then issue one OKAY write response.",
-    "examples":["AW may arrive before W","W may arrive before AW","BVALID remains asserted until BREADY"],
-    "constraints":["Single outstanding write.","BRESP must be OKAY (2'b00).","Synchronous active-high reset."],
-    "starterCode":"module axi_lite_write_reg(input clk, reset, input awvalid, input [3:0] awaddr, output reg awready, input wvalid, input [31:0] wdata, output reg wready, output reg bvalid, input bready, output [1:0] bresp, output reg [31:0] reg0);\n  // Your RTL here\nendmodule"
+    "id": "proto-axi-lite-write",
+    "title": "AXI-Lite Write Register Slave",
+    "category": "Protocols",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "axi-lite",
+      "amba",
+      "handshake",
+      "register"
+    ],
+    "description": "Implement the write side of a single-register AXI-Lite slave.",
+    "task": "Accept AW and W channels independently, update a 32-bit register once both have handshaken, then issue one OKAY write response.",
+    "examples": [
+      "AW may arrive before W",
+      "W may arrive before AW",
+      "BVALID remains asserted until BREADY"
+    ],
+    "constraints": [
+      "Single outstanding write.",
+      "BRESP must be OKAY (2'b00).",
+      "Synchronous active-high reset."
+    ],
+    "starterCode": "module axi_lite_write_reg (\n  input clk,\n  input reset,\n  input awvalid,\n  input [3:0] awaddr,\n  output reg awready,\n  input wvalid,\n  input [31:0] wdata,\n  output reg wready,\n  output reg bvalid,\n  input bready,\n  output [1:0] bresp,\n  output reg [31:0] reg0\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"fpga-pwm","title":"Parameterized PWM Generator","category":"FPGA","difficulty":"Easy","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["fpga","pwm","counter"],
-    "description":"Generate a PWM waveform from an unsigned duty-cycle input.",
-    "task":"Use a free-running counter and drive pwm high whenever counter is less than duty.",
-    "examples":["duty=0 -> always low","duty=255 on 8-bit counter -> high for 255 of 256 counts"],
-    "constraints":["Parameterized counter width.","Synchronous active-high reset."],
-    "starterCode":"module pwm #(parameter WIDTH=8)(input clk, reset, input [WIDTH-1:0] duty, output pwm_out);\n  // Your RTL here\nendmodule"
+    "id": "fpga-pwm",
+    "title": "Parameterized PWM Generator",
+    "category": "FPGA",
+    "difficulty": "Easy",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "fpga",
+      "pwm",
+      "counter"
+    ],
+    "description": "Generate a PWM waveform from an unsigned duty-cycle input.",
+    "task": "Use a free-running counter and drive pwm high whenever counter is less than duty.",
+    "examples": [
+      "duty=0 -> always low",
+      "duty=255 on 8-bit counter -> high for 255 of 256 counts"
+    ],
+    "constraints": [
+      "Parameterized counter width.",
+      "Synchronous active-high reset."
+    ],
+    "starterCode": "module pwm #(\n  parameter WIDTH = 8\n) (\n  input clk,\n  input reset,\n  input [WIDTH-1:0] duty,\n  output pwm_out\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"fpga-pulse-sync","title":"Toggle-Based Pulse Synchronizer","category":"FPGA","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["cdc","pulse","synchronizer","fpga"],
-    "description":"Transfer a one-cycle pulse between unrelated clock domains using a toggle synchronizer.",
-    "task":"Toggle a source-domain bit on each src_pulse, synchronize it through two destination flops, and generate one dst_pulse when the synchronized toggle changes.",
-    "examples":["one src pulse -> one dst pulse","dst pulse width is exactly one dst clock"],
-    "constraints":["Use two destination synchronizer stages.","Active-high resets in both domains.","Assume source pulses are spaced far enough apart to be observed."],
-    "starterCode":"module pulse_sync(input src_clk, src_reset, src_pulse, input dst_clk, dst_reset, output reg dst_pulse);\n  // Your RTL here\nendmodule"
+    "id": "fpga-pulse-sync",
+    "title": "Toggle-Based Pulse Synchronizer",
+    "category": "FPGA",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "cdc",
+      "pulse",
+      "synchronizer",
+      "fpga"
+    ],
+    "description": "Transfer a one-cycle pulse between unrelated clock domains using a toggle synchronizer.",
+    "task": "Toggle a source-domain bit on each src_pulse, synchronize it through two destination flops, and generate one dst_pulse when the synchronized toggle changes.",
+    "examples": [
+      "one src pulse -> one dst pulse",
+      "dst pulse width is exactly one dst clock"
+    ],
+    "constraints": [
+      "Use two destination synchronizer stages.",
+      "Active-high resets in both domains.",
+      "Assume source pulses are spaced far enough apart to be observed."
+    ],
+    "starterCode": "module pulse_sync (\n  input src_clk,\n  input src_reset,\n  input src_pulse,\n  input dst_clk,\n  input dst_reset,\n  output reg dst_pulse\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"fpga-clock-enable","title":"Clock-Enable Data Register","category":"FPGA","difficulty":"Easy","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["clock-enable","fpga","sequential"],
-    "description":"Model the FPGA-friendly alternative to fabric clock gating: a register controlled by clock enable.",
-    "task":"Capture d on each rising edge only when ce is high; otherwise hold q.",
-    "examples":["ce=1 -> q captures d","ce=0 -> q holds its previous value"],
-    "constraints":["Synchronous active-high reset.","Parameterized width.","Do not gate the clock."],
-    "starterCode":"module ce_reg #(parameter WIDTH=8)(input clk, reset, ce, input [WIDTH-1:0] d, output reg [WIDTH-1:0] q);\n  // Your RTL here\nendmodule"
+    "id": "fpga-clock-enable",
+    "title": "Clock-Enable Data Register",
+    "category": "FPGA",
+    "difficulty": "Easy",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "clock-enable",
+      "fpga",
+      "sequential"
+    ],
+    "description": "Model the FPGA-friendly alternative to fabric clock gating: a register controlled by clock enable.",
+    "task": "Capture d on each rising edge only when ce is high; otherwise hold q.",
+    "examples": [
+      "ce=1 -> q captures d",
+      "ce=0 -> q holds its previous value"
+    ],
+    "constraints": [
+      "Synchronous active-high reset.",
+      "Parameterized width.",
+      "Do not gate the clock."
+    ],
+    "starterCode": "module ce_reg #(\n  parameter WIDTH = 8\n) (\n  input clk,\n  input reset,\n  input ce,\n  input [WIDTH-1:0] d,\n  output reg [WIDTH-1:0] q\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"accel-popcount32","title":"32-bit Population Count","category":"Accelerators","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","popcount","reduction","bit-manipulation"],
-    "description":"Build a combinational population-count unit that returns the number of set bits in a 32-bit word.",
-    "task":"Count all one bits in x and return a value from 0 to 32.",
-    "examples":["x=0 -> count=0","x=32'hFFFFFFFF -> count=32","x=32'hF0F0F0F0 -> count=16"],
-    "constraints":["Combinational and synthesizable.","Output width must represent 32."],
-    "starterCode":"module popcount32(input [31:0] x, output reg [5:0] count);\n  // Your RTL here\nendmodule"
+    "id": "accel-popcount32",
+    "title": "32-bit Population Count",
+    "category": "Accelerators",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "popcount",
+      "reduction",
+      "bit-manipulation"
+    ],
+    "description": "Build a combinational population-count unit that returns the number of set bits in a 32-bit word.",
+    "task": "Count all one bits in x and return a value from 0 to 32.",
+    "examples": [
+      "x=0 -> count=0",
+      "x=32'hFFFFFFFF -> count=32",
+      "x=32'hF0F0F0F0 -> count=16"
+    ],
+    "constraints": [
+      "Combinational and synthesizable.",
+      "Output width must represent 32."
+    ],
+    "starterCode": "module popcount32(input [31:0] x, output reg [5:0] count);\n  // Your RTL here\nendmodule"
   },
   {
-    "id":"accel-vector-max4","title":"Four-Lane Signed Vector Maximum","category":"Accelerators","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","vector","reduction","signed"],
-    "description":"Implement a four-lane signed max-reduction datapath.",
-    "task":"Return the greatest signed 16-bit value among x0, x1, x2 and x3.",
-    "examples":["[1,9,3,4] -> 9","[-7,-2,-9,-4] -> -2"],
-    "constraints":["Inputs and output are signed 16-bit.","Purely combinational RTL."],
-    "starterCode":"module vector_max4(input signed [15:0] x0,x1,x2,x3, output reg signed [15:0] max_value);\n  // Your RTL here\nendmodule"
+    "id": "accel-vector-max4",
+    "title": "Four-Lane Signed Vector Maximum",
+    "category": "Accelerators",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "vector",
+      "reduction",
+      "signed"
+    ],
+    "description": "Implement a four-lane signed max-reduction datapath.",
+    "task": "Return the greatest signed 16-bit value among x0, x1, x2 and x3.",
+    "examples": [
+      "[1,9,3,4] -> 9",
+      "[-7,-2,-9,-4] -> -2"
+    ],
+    "constraints": [
+      "Inputs and output are signed 16-bit.",
+      "Purely combinational RTL."
+    ],
+    "starterCode": "module vector_max4 (\n  input signed [15:0] x0,\n  input signed [15:0] x1,\n  input signed [15:0] x2,\n  input signed [15:0] x3,\n  output reg signed [15:0] max_value\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"accel-fixed-mul","title":"Q1.7 Fixed-Point Multiplier","category":"Accelerators","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","fixed-point","multiplier","quantization"],
-    "description":"Multiply two signed Q1.7 fixed-point values and return a truncated Q1.7 result.",
-    "task":"Compute the signed 8x8 product, arithmetic-shift the Q2.14 result right by 7 fractional bits, and return the low signed 8-bit Q1.7 value.",
-    "examples":["0.5 (64) * 0.5 (64) -> 0.25 (32)","-0.5 (-64) * 0.5 (64) -> -0.25 (-32)"],
-    "constraints":["Inputs and output are signed 8-bit two's-complement.","No saturation is required.","Combinational RTL."],
-    "starterCode":"module q17_mul(input signed [7:0] a,b, output reg signed [7:0] y);\n  // Your RTL here\nendmodule"
+    "id": "accel-fixed-mul",
+    "title": "Q1.7 Fixed-Point Multiplier",
+    "category": "Accelerators",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "fixed-point",
+      "multiplier",
+      "quantization"
+    ],
+    "description": "Multiply two signed Q1.7 fixed-point values and return a truncated Q1.7 result.",
+    "task": "Compute the signed 8x8 product, arithmetic-shift the Q2.14 result right by 7 fractional bits, and return the low signed 8-bit Q1.7 value.",
+    "examples": [
+      "0.5 (64) * 0.5 (64) -> 0.25 (32)",
+      "-0.5 (-64) * 0.5 (64) -> -0.25 (-32)"
+    ],
+    "constraints": [
+      "Inputs and output are signed 8-bit two's-complement.",
+      "No saturation is required.",
+      "Combinational RTL."
+    ],
+    "starterCode": "module q17_mul(input signed [7:0] a,b, output reg signed [7:0] y);\n  // Your RTL here\nendmodule"
   },
   {
-    "id":"accel-stream-accum","title":"Valid-Ready Streaming Accumulator","category":"Accelerators","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","streaming","ready-valid","accumulator"],
-    "description":"Build a streaming accumulator that updates only on successful ready/valid transfers.",
-    "task":"Whenever in_valid && in_ready is true, add signed in_data to acc. clear synchronously resets the accumulator. This sink is always ready when not in reset.",
-    "examples":["valid sample 3 then -1 -> acc=2","in_valid=0 -> accumulator holds"],
-    "constraints":["16-bit signed input and 32-bit signed accumulator.","Synchronous active-high reset.","in_ready is deasserted during reset."],
-    "starterCode":"module stream_accum(input clk, reset, clear, input in_valid, output in_ready, input signed [15:0] in_data, output reg signed [31:0] acc);\n  // Your RTL here\nendmodule"
+    "id": "accel-stream-accum",
+    "title": "Valid-Ready Streaming Accumulator",
+    "category": "Accelerators",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "streaming",
+      "ready-valid",
+      "accumulator"
+    ],
+    "description": "Build a streaming accumulator that updates only on successful ready/valid transfers.",
+    "task": "Whenever in_valid && in_ready is true, add signed in_data to acc. clear synchronously resets the accumulator. This sink is always ready when not in reset.",
+    "examples": [
+      "valid sample 3 then -1 -> acc=2",
+      "in_valid=0 -> accumulator holds"
+    ],
+    "constraints": [
+      "16-bit signed input and 32-bit signed accumulator.",
+      "Synchronous active-high reset.",
+      "in_ready is deasserted during reset."
+    ],
+    "starterCode": "module stream_accum (\n  input clk,\n  input reset,\n  input clear,\n  input in_valid,\n  output in_ready,\n  input signed [15:0] in_data,\n  output reg signed [31:0] acc\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"accel-matmul2","title":"2x2 Matrix Multiply Datapath","category":"Accelerators","difficulty":"Hard","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","matrix-multiply","mac","parallelism"],
-    "description":"Implement a small combinational 2x2 signed matrix-multiply datapath.",
-    "task":"Given signed 8-bit matrices A and B, compute C=A*B with four signed 18-bit outputs.",
-    "examples":["identity A -> C equals B","all-ones matrices -> every output equals 2"],
-    "constraints":["All inputs are signed 8-bit.","Outputs are signed 18-bit.","Combinational RTL only."],
-    "starterCode":"module matmul2(input signed [7:0] a00,a01,a10,a11,b00,b01,b10,b11, output reg signed [17:0] c00,c01,c10,c11);\n  // Your RTL here\nendmodule"
+    "id": "accel-matmul2",
+    "title": "2x2 Matrix Multiply Datapath",
+    "category": "Accelerators",
+    "difficulty": "Hard",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "matrix-multiply",
+      "mac",
+      "parallelism"
+    ],
+    "description": "Implement a small combinational 2x2 signed matrix-multiply datapath.",
+    "task": "Given signed 8-bit matrices A and B, compute C=A*B with four signed 18-bit outputs.",
+    "examples": [
+      "identity A -> C equals B",
+      "all-ones matrices -> every output equals 2"
+    ],
+    "constraints": [
+      "All inputs are signed 8-bit.",
+      "Outputs are signed 18-bit.",
+      "Combinational RTL only."
+    ],
+    "starterCode": "module matmul2 (\n  input signed [7:0] a00,\n  input signed [7:0] a01,\n  input signed [7:0] a10,\n  input signed [7:0] a11,\n  input signed [7:0] b00,\n  input signed [7:0] b01,\n  input signed [7:0] b10,\n  input signed [7:0] b11,\n  output reg signed [17:0] c00,\n  output reg signed [17:0] c01,\n  output reg signed [17:0] c10,\n  output reg signed [17:0] c11\n);\n\n  // Your RTL here\n\nendmodule"
   },
   {
-    "id":"accel-conv3","title":"Three-Tap INT8 Convolution","category":"Accelerators","difficulty":"Medium","languages":["Verilog","SystemVerilog"],"evaluation":{"type":"simulation"},"tags":["accelerator","convolution","dot-product","int8"],
-    "description":"Create the arithmetic core of a small 1D convolution engine.",
-    "task":"Compute signed x0*k0 + x1*k1 + x2*k2 combinationally using signed INT8 operands.",
-    "examples":["[1,2,3] with [1,1,1] -> 6","[-1,2,-3] with [2,3,4] -> -8"],
-    "constraints":["All operands are signed 8-bit.","Use a signed 18-bit output.","Combinational RTL."],
-    "starterCode":"module conv3_int8(input signed [7:0] x0,x1,x2,k0,k1,k2, output reg signed [17:0] y);\n  // Your RTL here\nendmodule"
+    "id": "accel-conv3",
+    "title": "Three-Tap INT8 Convolution",
+    "category": "Accelerators",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "accelerator",
+      "convolution",
+      "dot-product",
+      "int8"
+    ],
+    "description": "Create the arithmetic core of a small 1D convolution engine.",
+    "task": "Compute signed x0*k0 + x1*k1 + x2*k2 combinationally using signed INT8 operands.",
+    "examples": [
+      "[1,2,3] with [1,1,1] -> 6",
+      "[-1,2,-3] with [2,3,4] -> -8"
+    ],
+    "constraints": [
+      "All operands are signed 8-bit.",
+      "Use a signed 18-bit output.",
+      "Combinational RTL."
+    ],
+    "starterCode": "module conv3_int8 (\n  input signed [7:0] x0,\n  input signed [7:0] x1,\n  input signed [7:0] x2,\n  input signed [7:0] k0,\n  input signed [7:0] k1,\n  input signed [7:0] k2,\n  output reg signed [17:0] y\n);\n\n  // Your RTL here\n\nendmodule"
   }
 ]

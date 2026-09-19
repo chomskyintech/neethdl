@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
+import { languageStarter, resolveInitialStarterDraft } from './data/starterScaffolds'
 import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
 import './ide-overrides.css'
 import './waveform-window.css'
@@ -89,23 +90,6 @@ function addTeachingComments(problemId, language, source) {
   return output.join('\n')
 }
 const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback } }
-const vhdlStarters = {
-  'rtl-mux': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity mux2 is\n  port(a, b, sel : in std_logic; y : out std_logic);\nend entity mux2;\n\narchitecture rtl of mux2 is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-counter': `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity counter is\n  generic(WIDTH : positive := 8);\n  port(clk, reset : in std_logic; count : out std_logic_vector(WIDTH-1 downto 0));\nend entity counter;\n\narchitecture rtl of counter is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-priority': `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity priority_encoder is\n  port(inp : in std_logic_vector(7 downto 0); index : out std_logic_vector(2 downto 0); valid : out std_logic);\nend entity priority_encoder;\n\narchitecture rtl of priority_encoder is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-fifo': `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity fifo is\n  generic(WIDTH : positive := 8; DEPTH : positive := 4);\n  port(clk, reset, wr_en, rd_en : in std_logic;\n       din : in std_logic_vector(WIDTH-1 downto 0);\n       dout : out std_logic_vector(WIDTH-1 downto 0);\n       full, empty : out std_logic);\nend entity fifo;\n\narchitecture rtl of fifo is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-shift-register': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity shift_reg is\n  generic(WIDTH : positive := 8);\n  port(clk, reset, shift_en, din : in std_logic;\n       dout : out std_logic_vector(WIDTH-1 downto 0));\nend entity shift_reg;\n\narchitecture rtl of shift_reg is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-edge-detector': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity edge_detector is\n  port(clk, reset, signal_in : in std_logic; rise : out std_logic);\nend entity edge_detector;\n\narchitecture rtl of edge_detector is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-arbiter': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity arbiter4 is\n  port(req : in std_logic_vector(3 downto 0); grant : out std_logic_vector(3 downto 0));\nend entity arbiter4;\n\narchitecture rtl of arbiter4 is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-regfile': `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity regfile4 is\n  port(clk, reset, we : in std_logic;\n       waddr, raddr1, raddr2 : in std_logic_vector(1 downto 0);\n       wdata : in std_logic_vector(7 downto 0);\n       rdata1, rdata2 : out std_logic_vector(7 downto 0));\nend entity regfile4;\n\narchitecture rtl of regfile4 is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-lfsr': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity lfsr8 is\n  port(clk, reset, enable : in std_logic; state : out std_logic_vector(7 downto 0));\nend entity lfsr8;\n\narchitecture rtl of lfsr8 is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
-  'rtl-clock-divider': `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity clk_div is\n  generic(DIV : positive := 2);\n  port(clk, reset, enable : in std_logic; clk_out : out std_logic);\nend entity clk_div;\n\narchitecture rtl of clk_div is\nbegin\n  -- Your RTL here\nend architecture rtl;`
-}
-function languageStarter(problem, language) {
-  if (language === 'SystemVerilog') return problem.starterCode
-  if (language === 'Verilog') return problem.starterCode.replace(/\blogic\b/g, 'reg').replace(/\binput reg\b/g, 'input').replace(/\boutput reg\b/g, 'output')
-  return vhdlStarters[problem.id] || `library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity ${problem.id.replace(/-/g, '_')} is\nend entity;\n\narchitecture rtl of ${problem.id.replace(/-/g, '_')} is\nbegin\n  -- Your RTL here\nend architecture rtl;`
-}
 function vcdParse(vcd) {
   if (!vcd) return { signals: [], end: 0 }
   const lines = vcd.split(/\r?\n/), vars = [], values = {}, times = []
@@ -519,12 +503,17 @@ function Editor({ code, language, onChange, onRun, onFormat, onLayoutColumnChang
   return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} onFormat={onFormat} onLayoutColumnChange={onLayoutColumnChange} />
 }
 export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onSolved, onToggle, onPrevious, onNext, hasPrevious, hasNext, navigationLabel }) {
-  const supported = problem.languages?.length ? problem.languages : languages, evaluationType = problem.evaluation?.type || 'simulation', isConceptual = evaluationType === 'answer', initialLanguage = supported.includes('SystemVerilog') ? 'SystemVerilog' : supported[0] || 'SystemVerilog'
-  const [code, setCode] = useState(draft ?? languageStarter(problem, initialLanguage)), [editorLanguage, setEditorLanguage] = useState(initialLanguage), [bottomTab, setBottomTab] = useState('console'), [result, setResult] = useState(null), [running, setRunning] = useState(false), [statementTab, setStatementTab] = useState('problem'), [bottomCollapsed, setBottomCollapsed] = useState(false), [panelSplit, setPanelSplit] = useState(38), [draggingPanel, setDraggingPanel] = useState(false), [waveformOpen, setWaveformOpen] = useState(false)
+  const supported = problem.languages?.length ? problem.languages : languages, evaluationType = problem.evaluation?.type || 'simulation', isConceptual = evaluationType === 'answer', defaultLanguage = supported.includes('SystemVerilog') ? 'SystemVerilog' : supported[0] || 'SystemVerilog'
+  const initialDraftState = useMemo(() => resolveInitialStarterDraft(problem, draft, defaultLanguage), [problem.id])
+  const [code, setCode] = useState(initialDraftState.code), [editorLanguage, setEditorLanguage] = useState(initialDraftState.language), [bottomTab, setBottomTab] = useState('console'), [result, setResult] = useState(null), [running, setRunning] = useState(false), [statementTab, setStatementTab] = useState('problem'), [bottomCollapsed, setBottomCollapsed] = useState(false), [panelSplit, setPanelSplit] = useState(38), [draggingPanel, setDraggingPanel] = useState(false), [waveformOpen, setWaveformOpen] = useState(false)
   const [editorFormatColumn,setEditorFormatColumn] = useState(84)
-  const [editorDirty,setEditorDirty] = useState(Boolean(draft))
-  const editorDirtyRef = useRef(Boolean(draft))
+  const [editorDirty,setEditorDirty] = useState(!initialDraftState.isStarter)
+  const editorDirtyRef = useRef(!initialDraftState.isStarter)
   const editorFormatRequest = useRef(0)
+
+  useEffect(()=>{
+    if(initialDraftState.migrated) onSave(problem.id, initialDraftState.code)
+  },[])
 
   const update = value => {
     editorFormatRequest.current += 1

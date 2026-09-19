@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Validate starter scaffolds
+        run: npm run test:starters
+
       - name: Build production bundle
         run: npm run build

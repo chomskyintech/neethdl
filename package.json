@@ -11,7 +11,8 @@
     "build": "node scripts/build-all.mjs",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "test:problem-solutions": "node tests/problem-solution-regression.mjs"
+    "test:problem-solutions": "node tests/problem-solution-regression.mjs",
+    "test:starters": "node tests/starter-scaffold-regression.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

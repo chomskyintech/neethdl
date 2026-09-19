@@ -37,6 +37,30 @@ test.describe('HDLForge Monaco problem editor', () => {
     await openFirstProblem(page)
   })
 
+  test('loads a multiline shift-register scaffold and migrates the old one-line scaffold', async ({ page }) => {
+    const legacy = "module shift_reg #(parameter WIDTH=8) (input logic clk, reset, shift_en, din, output logic [WIDTH-1:0] dout);\n  // Your RTL here\nendmodule"
+    await page.evaluate(value => {
+      localStorage.setItem('hdlforge-drafts', JSON.stringify({'rtl-shift-register': value}))
+    }, legacy)
+    await page.goto('/app/problems/rtl-shift-register/')
+    await expect(page.locator('.monaco-editor-wrap')).toBeVisible()
+
+    await expect.poll(() => codeText(page)).toContain('module shift_reg #(')
+    await expect.poll(() => codeText(page)).toContain('input logic clk,')
+    await expect.poll(() => codeText(page)).toContain('output logic [WIDTH-1:0] dout')
+    expect(await codeText(page)).not.toContain('module shift_reg #(parameter WIDTH=8) (input logic')
+  })
+
+  test('does not replace a user-edited legacy scaffold during migration', async ({ page }) => {
+    const edited = "module shift_reg #(parameter WIDTH=8) (input logic clk, reset, shift_en, din, output logic [WIDTH-1:0] dout);\n  // Your RTL here\nendmodule\\n// user-added logic"
+    await page.evaluate(value => {
+      localStorage.setItem('hdlforge-drafts', JSON.stringify({'rtl-shift-register': value}))
+    }, edited)
+    await page.goto('/app/problems/rtl-shift-register/')
+    await expect(page.locator('.monaco-editor-wrap')).toBeVisible()
+    await expect.poll(() => codeText(page)).toContain('user-added logic')
+  })
+
   test('loads the scaffold and accepts a complete HDL edit', async ({ page }) => {
     expect(await codeText(page)).toContain('Your RTL here')
     await replaceEditorContents(page, muxSolution)
