@@ -160,6 +160,42 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('button', { name: 'CPU / GPU Hardware', exact: true })).toBeVisible()
   })
 
+  test('RTL Design roadmap opens a dedicated career page with related problems and projects', async ({ page }) => {
+    await page.goto('/app/problems/')
+    await page.getByRole('button', { name: 'RTL Design Engineer', exact: true }).click()
+
+    await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
+    await expect(page.getByRole('heading', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
+    await expect(page.locator('.career-problem')).toHaveCount(15)
+    await expect(page.locator('.career-project-card')).toHaveCount(7)
+    await expect(page.getByText('1. RTL fundamentals', { exact: true })).toBeVisible()
+    await expect(page.getByText('3. Storage and flow control', { exact: true })).toBeVisible()
+    await expect(page.getByText('CDC-Safe Asynchronous FIFO', { exact: true })).toBeVisible()
+
+    await page.locator('.career-problem').first().click()
+    await expect(page).toHaveURL(/\/app\/problems\/rtl-mux\/$/)
+    await expect(page.locator('.section-navigation')).toHaveText('RTL Design Engineer')
+    await page.locator('.section-navigation').click()
+    await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
+  })
+
+  test('Projects roadmap links to the same RTL Design career page', async ({ page }) => {
+    await page.goto('/app/projects/')
+    await page.getByRole('button', { name: 'RTL Design Engineer', exact: true }).click()
+    await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
+    await expect(page.getByRole('heading', { name: 'Projects for this path', exact: true })).toBeVisible()
+  })
+
+  test('serves crawlable RTL Design career index metadata', async ({ page }) => {
+    await page.goto('/careers/rtl-design/index.html')
+    await expect(page).toHaveTitle('RTL Design Engineer Roadmap | HDLForge')
+    await expect(page.getByRole('heading', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hdlforge.netlify.app/careers/rtl-design/')
+    await expect(page.locator('a[href="/app/roadmaps/rtl-design/"]')).toBeVisible()
+    await expect(page.locator('a[href="/problems/rtl-fifo/"]')).toBeVisible()
+    await expect(page.locator('a[href="/projects/asynchronous-fifo/"]')).toBeVisible()
+  })
+
   test('company track filters and orders its existing Problems, then opens a guided sequence', async ({ page }) => {
     await page.goto('/app/problems/')
     await page.getByRole('button', { name: /AMD/ }).click()
