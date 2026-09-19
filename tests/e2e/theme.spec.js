@@ -4,7 +4,7 @@ const colours = {
   bg: 'rgb(31, 31, 32)',
   editor: 'rgb(38, 37, 39)',
   border: 'rgb(57, 57, 59)',
-  teal: 'rgb(74, 184, 165)',
+  teal: 'rgb(65, 151, 137)',
 }
 
 test.describe('NeetCode theme regression', () => {
@@ -31,11 +31,11 @@ test.describe('NeetCode theme regression', () => {
         editor:'#262527',
         surface:'#29282a',
         border:'#39393b',
-        text:'#d4d4d4',
-        blue:'#549cd4',
-        teal:'#4ab8a5',
-        yellow:'#cdc98f',
-        active:'#ececec',
+        text:'#c2c2c4',
+        blue:'#4b82ac',
+        teal:'#419789',
+        yellow:'#aaa672',
+        active:'#d7d7d9',
       })
     }
   })
@@ -61,15 +61,29 @@ test.describe('NeetCode theme regression', () => {
     expect(await page.locator('.file-tabs').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.editor)
   })
 
-  test('uses neutral white for active navigation underlines', async ({ page }) => {
+  test('keeps Monaco syntax deliberately muted', async ({ page }) => {
+    await page.goto('/app/problems/rtl-shift-register/')
+    await expect(page.locator('.monaco-editor-wrap .view-lines')).toBeVisible()
+
+    const coloursSeen = await page.locator('.monaco-editor-wrap .view-lines span').evaluateAll(nodes =>
+      [...new Set(nodes.filter(node => (node.textContent || '').trim()).map(node => getComputedStyle(node).color))]
+    )
+
+    expect(coloursSeen).toContain('rgb(194, 194, 196)')
+    expect(coloursSeen).toContain('rgb(65, 151, 137)')
+    expect(coloursSeen).not.toContain('rgb(76, 200, 176)')
+    expect(coloursSeen).not.toContain('rgb(220, 220, 168)')
+  })
+
+  test('uses muted neutral white for active navigation underlines', async ({ page }) => {
     await page.goto('/app/problems/rtl-shift-register/')
     const active = page.locator('.problem-tabs button.active')
     await expect(active).toBeVisible()
-    expect(await active.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(236, 236, 236)')
+    expect(await active.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(215, 215, 217)')
 
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
     const solutionTab = page.locator('.solution-language-tabs button.active')
     await expect(solutionTab).toBeVisible()
-    expect(await solutionTab.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(236, 236, 236)')
+    expect(await solutionTab.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(215, 215, 217)')
   })
 })

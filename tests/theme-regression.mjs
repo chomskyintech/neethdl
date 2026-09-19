@@ -15,16 +15,16 @@ const expected = {
   '--nc-surface-3':'#302f31',
   '--nc-border':'#39393b',
   '--nc-border-soft':'#302f32',
-  '--nc-text':'#d4d4d4',
+  '--nc-text':'#c2c2c4',
   '--nc-text-strong':'#ececec',
-  '--nc-active':'#ececec',
-  '--nc-muted':'#848484',
+  '--nc-active':'#d7d7d9',
+  '--nc-muted':'#76767a',
   '--nc-dim':'#66666b',
-  '--nc-blue':'#549cd4',
-  '--nc-teal':'#4ab8a5',
-  '--nc-yellow':'#cdc98f',
-  '--nc-orange':'#c58c74',
-  '--nc-comment':'#628a55',
+  '--nc-blue':'#4b82ac',
+  '--nc-teal':'#419789',
+  '--nc-yellow':'#aaa672',
+  '--nc-orange':'#a37261',
+  '--nc-comment':'#526f49',
 }
 
 for (const [name,value] of Object.entries(expected)) {
@@ -39,7 +39,7 @@ assert.ok(paletteImport < sideEffectImport, 'NeetCode palette must remain in sty
 
 const banned = [
   '#615fff','#4f4bcf','#7772ff','#7b76ff','#8884ff','#8e8aff','#9b97ff',
-  '#0d0d0d','#569cd6','#4ec9b0','#4cc8b0','#dcdca8','#ce9178','#6a9955','#c586c0','#ffd700','#da70d6','#179fff'
+  '#0d0d0d','#569cd6','#4ec9b0','#4cc8b0','#4ab8a5','#549cd4','#dcdca8','#cdc98f','#ce9178','#c58c74','#6a9955','#628a55','#c586c0','#ffd700','#da70d6','#179fff'
 ]
 for (const colour of banned) {
   for (const [name,source] of [['palette',palette],['Monaco',monaco],['waveform launcher',launcher]]) {
@@ -48,17 +48,22 @@ for (const colour of banned) {
 }
 
 const monacoChecks = [
-  ['keyword.control','549CD4'],
-  ['keyword.declaration','4AB8A5'],
-  ['type.identifier','4AB8A5'],
-  ['entity.name.module','CDC98F'],
-  ['comment','628A55'],
-  ['string','C58C74'],
+  ['keyword.control','4B82AC'],
+  ['keyword.declaration','419789'],
+  ['type.identifier','419789'],
+  ['entity.name.module','AAA672'],
+  ['comment','526F49'],
+  ['string','A37261'],
   ['editor.background',"'#262527'"],
-  ['editor.foreground',"'#D4D4D4'"],
+  ['editor.foreground',"'#C2C2C4'"],
 ]
 for (const [token,colour] of monacoChecks) {
   assert.ok(monaco.includes(token) && monaco.includes(colour), 'Monaco NeetCode token missing: '+token+' / '+colour)
+}
+assert.ok(!/entity\.name\.module[^\n]*fontStyle:\s*'bold'/.test(monaco), 'module/entity names must not be bold')
+assert.ok(monaco.includes("{ token: 'operator', foreground: '9A9A9C' }"), 'operators must stay neutral')
+for (const key of ['editorBracketHighlight.foreground1','editorBracketHighlight.foreground2','editorBracketHighlight.foreground3']) {
+  assert.ok(monaco.includes(key) && monaco.includes("'#9A9A9C'"), 'brackets must stay neutral')
 }
 
 console.log('NeetCode theme regression passed: canonical site and Monaco colours are locked.')

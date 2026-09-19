@@ -10,16 +10,16 @@
   --nc-surface-3:#302f31;
   --nc-border:#39393b;
   --nc-border-soft:#302f32;
-  --nc-text:#d4d4d4;
+  --nc-text:#c2c2c4;
   --nc-text-strong:#ececec;
-  --nc-active:#ececec;
-  --nc-muted:#848484;
+  --nc-active:#d7d7d9;
+  --nc-muted:#76767a;
   --nc-dim:#66666b;
-  --nc-blue:#549cd4;
-  --nc-teal:#4ab8a5;
-  --nc-yellow:#cdc98f;
-  --nc-orange:#c58c74;
-  --nc-comment:#628a55;
+  --nc-blue:#4b82ac;
+  --nc-teal:#419789;
+  --nc-yellow:#aaa672;
+  --nc-orange:#a37261;
+  --nc-comment:#526f49;
 
   --bg:var(--nc-bg)!important;
   --panel:var(--nc-editor)!important;
@@ -64,7 +64,7 @@ html,body,.app,.layout,.main{
   color:var(--nc-text)!important;
 }
 body{background-image:none!important}
-::selection{background:rgba(84,156,212,.28)!important;color:var(--nc-text-strong)!important}
+::selection{background:rgba(75,130,172,.22)!important;color:var(--nc-text-strong)!important}
 
 a,.text-btn,.chevron,.eyebrow,.brand-accent,.project-guide-link,.company-track-step,.career-eyebrow{
   color:var(--nc-blue)!important;
@@ -136,7 +136,7 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text)!important;
 }
 .search:focus-within,.filters select:focus,.account-form input:focus,.discussion-form input:focus,.discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(74,184,165,.14)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(65,151,137,.12)!important;
 }
 .search input::placeholder,input::placeholder,textarea::placeholder{color:var(--nc-muted)!important}
 
@@ -315,7 +315,7 @@ html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thum
 }
 .discussion-in-tab .discussion-form textarea{color:var(--nc-text)!important}
 .discussion-in-tab .discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(74,184,165,.14)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(65,151,137,.12)!important;
 }
 .post-avatar{background:var(--nc-surface-2)!important;color:var(--nc-blue)!important}
 .icon-btn:hover,.editor-shortcuts button:hover,.bottom-collapse:hover,.wave-tools button:hover{
