@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
@@ -9,14 +9,14 @@ import './waveform-window.css'
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || '').replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
 const referenceFormatCache = new Map()
-async function requestFormattedReference(language,source){
+async function requestFormattedReference(language,source,columnLimit=52){
   if(!RUNNER_URL||!source) return source
-  const key=`${language}\u0000${source}`
+  const key=`${language}\u0000${columnLimit}\u0000${source}`
   if(referenceFormatCache.has(key)) return referenceFormatCache.get(key)
   const pending=fetch(`${RUNNER_URL}/format`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({language,source}),
+    body:JSON.stringify({language,source,columnLimit}),
   }).then(async response=>{
     const data=await response.json().catch(()=>({}))
     if(!response.ok||!data.ok||typeof data.formatted!=='string') throw new Error(data.error||'Formatter request failed.')
@@ -421,17 +421,38 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
   const code = referenceSolutions?.[language] || problem.solution || ''
   const [formattedCode,setFormattedCode] = useState(code)
   const [formatting,setFormatting] = useState(false)
+  const [formatColumn,setFormatColumn] = useState(52)
+  const solutionShellRef = useRef(null)
+
+  useEffect(()=>{ setFormattedCode(code) },[language,code])
+
+  useEffect(()=>{
+    const element=solutionShellRef.current
+    if(!element||typeof ResizeObserver==='undefined') return undefined
+    let timer
+    const update=entries=>{
+      const width=entries[0]?.contentRect?.width||element.clientWidth||0
+      if(!width) return
+      const next=Math.max(32,Math.min(92,Math.floor((width-76)/7.7)))
+      clearTimeout(timer)
+      timer=setTimeout(()=>setFormatColumn(current=>current===next?current:next),160)
+    }
+    const observer=new ResizeObserver(update)
+    observer.observe(element)
+    update([{contentRect:element.getBoundingClientRect()}])
+    return ()=>{clearTimeout(timer);observer.disconnect()}
+  },[])
+
   useEffect(()=>{
     let active=true
-    setFormattedCode(code)
     if(!code||!RUNNER_URL){setFormatting(false);return ()=>{active=false}}
     setFormatting(true)
-    requestFormattedReference(language,code)
+    requestFormattedReference(language,code,formatColumn)
       .then(value=>{if(active)setFormattedCode(value)})
       .catch(()=>{if(active)setFormattedCode(code)})
       .finally(()=>{if(active)setFormatting(false)})
     return ()=>{active=false}
-  },[language,code])
+  },[language,code,formatColumn])
   const displayCode = addTeachingComments(problem.id, language, formattedCode || code)
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
@@ -477,9 +498,9 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
     <section className="solution-guide-section solution-reference">
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
-      <div className="solution-code-shell">
+      <div className="solution-code-shell" ref={solutionShellRef}>
         <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}{formatting?' · formatting…':''}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,displayCode || code)}>Load into editor</button></div></div>
-        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
+        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} wrapColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
       </div>
     </section>
   </article>

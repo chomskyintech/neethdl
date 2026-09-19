@@ -70,10 +70,10 @@ function registerLanguages(monaco) {
 }
 
 
-export function ReadOnlyHDLViewer({ code, language }) {
+export function ReadOnlyHDLViewer({ code, language, wrapColumn = 52 }) {
   const lineCount = Math.max(1, (code || '').split('\n').length)
   const height = Math.min(640, Math.max(180, lineCount * 22 + 24))
-  return <div className="reference-monaco" style={{ height }} aria-label={`${language} reference implementation`}>
+  return <div className="reference-monaco" style={{ height }} data-wrap-column={wrapColumn} aria-label={`${language} reference implementation`}>
     <MonacoEditor
       height="100%"
       value={code}
@@ -97,7 +97,10 @@ export function ReadOnlyHDLViewer({ code, language }) {
         detectIndentation: false,
         scrollBeyondLastLine: false,
         smoothScrolling: true,
-        wordWrap: 'off',
+        wordWrap: 'bounded',
+        wordWrapColumn: wrapColumn,
+        wrappingIndent: 'indent',
+        wrappingStrategy: 'advanced',
         renderLineHighlight: 'none',
         renderWhitespace: 'none',
         bracketPairColorization: { enabled: true },
@@ -109,7 +112,7 @@ export function ReadOnlyHDLViewer({ code, language }) {
         selectionHighlight: false,
         occurrencesHighlight: 'off',
         scrollbar: {
-          horizontal: 'auto',
+          horizontal: 'hidden',
           vertical: 'auto',
           alwaysConsumeMouseWheel: false,
           horizontalScrollbarSize: 10,

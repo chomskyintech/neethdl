@@ -24,16 +24,33 @@ for(const testCase of cases){
   const response=await fetch(`${base}/format`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({language:testCase.language,source:testCase.source}),
+    body:JSON.stringify({language:testCase.language,source:testCase.source,columnLimit:40}),
   })
   const data=await response.json()
   assert.equal(response.ok,true,`${testCase.language}: HTTP ${response.status} ${JSON.stringify(data)}`)
   assert.equal(data.ok,true,`${testCase.language}: formatter returned failure`)
   assert.equal(typeof data.formatted,'string')
+  assert.equal(data.columnLimit,40)
   assert.ok(data.formatted.includes('\n'),`${testCase.language}: formatter did not introduce readable line structure`)
   assert.notEqual(data.formatted.trim(),testCase.source.trim(),`${testCase.language}: formatter returned unchanged dense source`)
   for(const fragment of testCase.mustContain) assert.ok(data.formatted.toLowerCase().includes(fragment.toLowerCase()),`${testCase.language}: formatted output lost ${fragment}`)
+  if(testCase.language!=='VHDL'){
+    const longest=Math.max(...data.formatted.split('\n').map(line=>line.length))
+    assert.ok(longest<=55,`${testCase.language}: responsive column limit was not respected (longest line ${longest})`)
+  }
   console.log(`PASS ${testCase.language} via ${data.formatter}`)
 }
+
+const denseVhdl="library ieee; use ieee.std_logic_1164.all; entity demo is port(clk,reset: in std_logic; q: out std_logic); end; architecture rtl of demo is begin process(clk) begin if rising_edge(clk) then if reset='1' then q<='0'; else q<='1'; end if; end if; end process; end architecture;"
+const denseResponse=await fetch(`${base}/format`,{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({language:'VHDL',source:denseVhdl,columnLimit:40}),
+})
+const denseData=await denseResponse.json()
+assert.equal(denseResponse.ok,true,JSON.stringify(denseData))
+assert.match(denseData.formatted,/then\s*\n/i)
+assert.match(denseData.formatted,/q\s*<=\s*'0';\s*\n/i)
+assert.match(denseData.formatted,/else\s*\n/i)
 
 console.log('All HDL formatter regression checks passed.')

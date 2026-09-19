@@ -16,6 +16,8 @@ const MAX_SOURCE=20000
 const TIMEOUT_MS=5000
 const FORMAT_TIMEOUT_MS=5000
 const FORMAT_COLUMN_LIMIT=52
+const MIN_FORMAT_COLUMN=32
+const MAX_FORMAT_COLUMN=100
 const vhdlBenches={
 'rtl-mux':`library ieee; use ieee.std_logic_1164.all; entity tb is end; architecture sim of tb is signal a,b,sel,y: std_logic:='0'; begin dut: entity work.{{DUT}}(rtl) port map(a=>a,b=>b,sel=>sel,y=>y); process begin a<='0';b<='0';sel<='0';wait for 1 ns;assert y='0' report "mux case 1" severity failure; a<='0';b<='1';sel<='0';wait for 1 ns;assert y='0' report "mux case 2" severity failure;sel<='1';wait for 1 ns;assert y='1' report "mux case 3" severity failure;a<='1';b<='0';wait for 1 ns;assert y='0' report "mux case 4" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`,
 'rtl-counter':`library ieee; use ieee.std_logic_1164.all; use ieee.numeric_std.all; entity tb is end; architecture sim of tb is signal clk,reset: std_logic:='0'; signal count: std_logic_vector(7 downto 0); begin dut: entity work.{{DUT}}(rtl) port map(clk=>clk,reset=>reset,count=>count);clk<=not clk after 1 ns;process begin reset<='1';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"00" report "reset" severity failure;reset<='0';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"01" report "increment 1" severity failure;wait until rising_edge(clk);wait for 0.1 ns;assert count=x"02" report "increment 2" severity failure;reset<='1';wait until rising_edge(clk);wait for 0.1 ns;assert count=x"00" report "second reset" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`,
@@ -55,14 +57,59 @@ function vhdlFormatterSettings(){
   return new BeautifierSettings(false,false,false,alignment,'lowercase','lowercase','  ',newLines,'\n',false)
 }
 
-async function formatVerilog(source){
+function clampFormatColumn(value){
+  const numeric=Number(value)
+  if(!Number.isFinite(numeric)) return FORMAT_COLUMN_LIMIT
+  return Math.max(MIN_FORMAT_COLUMN,Math.min(MAX_FORMAT_COLUMN,Math.round(numeric)))
+}
+
+function prepareVhdlForFormatting(source){
+  let output=''
+  let quote=''
+  let lineComment=false
+  for(let i=0;i<source.length;i+=1){
+    const char=source[i]
+    const next=source[i+1]
+    if(lineComment){
+      output+=char
+      if(char==='\n') lineComment=false
+      continue
+    }
+    if(!quote&&char==='-'&&next==='-'){
+      output+=char+next
+      i+=1
+      lineComment=true
+      continue
+    }
+    if(char==='"'){
+      output+=char
+      if(quote==='"') quote=''
+      else if(!quote) quote='"'
+      continue
+    }
+    output+=char
+    if(!quote&&char===';'){
+      let cursor=i+1
+      while(cursor<source.length&&(source[cursor]===' '||source[cursor]==='\t')) cursor+=1
+      if(source[cursor]&&source[cursor]!=='\n') output+='\n'
+    }
+  }
+  return output
+    .replace(/\bthen[ \t]+(?=\S)/gi,'then\n')
+    .replace(/[ \t]+\belse\b[ \t]*/gi,'\nelse\n')
+    .replace(/\bbegin[ \t]+(?=\S)/gi,'begin\n')
+    .replace(/\bloop[ \t]+(?=\S)/gi,'loop\n')
+    .replace(/\n{3,}/g,'\n\n')
+}
+
+async function formatVerilog(source,columnLimit=FORMAT_COLUMN_LIMIT){
   let dir
   try{
     dir=await mkdtemp(join(tmpdir(),'hdlforge-format-'))
     const input=join(dir,'input.sv')
     await writeFile(input,source.endsWith('\n')?source:`${source}\n`,'utf8')
     const {stdout,stderr}=await execFileAsync('verible-verilog-format',[
-      `--column_limit=${FORMAT_COLUMN_LIMIT}`,
+      `--column_limit=${clampFormatColumn(columnLimit)}`,
       '--indentation_spaces=2',
       '--wrap_spaces=2',
       '--try_wrap_long_lines=true',
@@ -76,9 +123,9 @@ async function formatVerilog(source){
   }
 }
 
-async function formatHdl(language,source){
-  if(language==='VHDL') return beautify(source,vhdlFormatterSettings()).trimEnd()
-  if(language==='Verilog'||language==='SystemVerilog') return formatVerilog(source)
+async function formatHdl(language,source,columnLimit=FORMAT_COLUMN_LIMIT){
+  if(language==='VHDL') return beautify(prepareVhdlForFormatting(source),vhdlFormatterSettings()).trimEnd()
+  if(language==='Verilog'||language==='SystemVerilog') return formatVerilog(source,columnLimit)
   throw new Error('Unsupported HDL language.')
 }
 
@@ -93,13 +140,13 @@ const proxy=http.createServer(async(req,res)=>{
   if(req.method==='POST'&&req.url==='/format'){
     try{
       const data=await body(req)
-      const {language,source}=data||{}
+      const {language,source,columnLimit}=data||{}
       if(!['Verilog','SystemVerilog','VHDL'].includes(language)) return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Language must be Verilog, SystemVerilog, or VHDL.'}))
       if(typeof source!=='string'||!source.trim()) return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is required.'}))
       if(source.length>MAX_SOURCE) return res.writeHead(413,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is too large.'}))
-      const formatted=await formatHdl(language,source)
+      const formatted=await formatHdl(language,source,columnLimit)
       const formatter=language==='VHDL'?'VHDLFormatter':'Verible'
-      return res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({ok:true,formatted,formatter}))
+      return res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({ok:true,formatted,formatter,columnLimit:clampFormatColumn(columnLimit)}))
     }catch(e){
       const detail=`${e.stderr||''}${e.stdout||''}${e.message||''}`.trim().slice(0,2000)
       return res.writeHead(422,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'HDL formatting failed.',detail}))
