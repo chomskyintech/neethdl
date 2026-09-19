@@ -421,8 +421,11 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
   const code = referenceSolutions?.[language] || problem.solution || ''
   const [formattedCode,setFormattedCode] = useState(code)
   const [formatting,setFormatting] = useState(false)
-  const [formatColumn,setFormatColumn] = useState(52)
+  const [formatMode,setFormatMode] = useState('normal')
+  const [expanded,setExpanded] = useState(false)
   const solutionShellRef = useRef(null)
+  const formatColumns = { narrow: 52, normal: 68, wide: 88, expanded: 100 }
+  const formatColumn = expanded ? formatColumns.expanded : formatColumns[formatMode]
 
   useEffect(()=>{ setFormattedCode(code) },[language,code])
 
@@ -433,15 +436,15 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
     const update=entries=>{
       const width=entries[0]?.contentRect?.width||element.clientWidth||0
       if(!width) return
-      const next=Math.max(32,Math.min(92,Math.floor((width-76)/7.7)))
+      const next=width>=760?'wide':width>=560?'normal':'narrow'
       clearTimeout(timer)
-      timer=setTimeout(()=>setFormatColumn(current=>current===next?current:next),160)
+      timer=setTimeout(()=>setFormatMode(current=>current===next?current:next),160)
     }
     const observer=new ResizeObserver(update)
     observer.observe(element)
     update([{contentRect:element.getBoundingClientRect()}])
     return ()=>{clearTimeout(timer);observer.disconnect()}
-  },[])
+  },[expanded])
 
   useEffect(()=>{
     let active=true
@@ -453,6 +456,12 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       .finally(()=>{if(active)setFormatting(false)})
     return ()=>{active=false}
   },[language,code,formatColumn])
+  useEffect(()=>{
+    if(!expanded) return undefined
+    const onKeyDown=event=>{ if(event.key==='Escape') setExpanded(false) }
+    document.addEventListener('keydown',onKeyDown)
+    return ()=>document.removeEventListener('keydown',onKeyDown)
+  },[expanded])
   const displayCode = addTeachingComments(problem.id, language, formattedCode || code)
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
@@ -495,12 +504,12 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
 
-    <section className="solution-guide-section solution-reference">
+    <section className={`solution-guide-section solution-reference${expanded?' expanded':''}`}>
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
       <div className="solution-code-shell" ref={solutionShellRef}>
-        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}{formatting?' · formatting…':''}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,displayCode || code)}>Load into editor</button></div></div>
-        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} wrapColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
+        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'} · {expanded?'expanded':formatMode}{formatting?' · formatting…':''}</span><div><button type="button" onClick={()=>setExpanded(value=>!value)}>{expanded?'Collapse':'Expand'}</button><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,displayCode || code)}>Load into editor</button></div></div>
+        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={expanded?'expanded':formatMode} formatColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
       </div>
     </section>
   </article>

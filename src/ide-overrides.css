@@ -334,3 +334,27 @@
   .approach-guide h1{font-size:23px}
   .approach-guide h2{font-size:17px}
 }
+
+
+/* Expanded reference implementation */
+.solution-reference.expanded{
+  position:fixed;
+  inset:22px;
+  z-index:220;
+  margin:0;
+  padding:18px;
+  overflow:auto;
+  border:1px solid #424248;
+  border-radius:12px;
+  background:#1b1b1e;
+  box-shadow:0 24px 70px rgba(0,0,0,.55);
+}
+.solution-reference.expanded .solution-reference-head{
+  margin-bottom:12px;
+}
+.solution-reference.expanded .solution-code-shell{
+  max-width:none;
+}
+.solution-reference.expanded .reference-monaco{
+  min-height:420px;
+}

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 
 const editorRoot = page => page.locator('.monaco-editor-wrap')
 const codeText = async page => (await page.locator('.monaco-editor-wrap .view-lines').innerText()).replace(/\u00a0/g, ' ')
+const guideOrPage = page => page.locator('.solution-guide')
 const muxSolution = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a;\nendmodule'
 const brokenMux = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a\nendmodule'
 
@@ -84,29 +85,37 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(() => codeText(page)).toContain('always @(*)')
   })
 
-  test('reflows the reference solution when the problem/editor splitter is resized', async ({ page }) => {
+  test('changes structural formatting mode when the problem/editor splitter is resized', async ({ page }) => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
 
     const viewer = page.locator('.reference-monaco')
     await expect(viewer).toBeVisible()
-    const beforeColumn = Number(await viewer.getAttribute('data-wrap-column'))
-    expect(beforeColumn).toBeGreaterThan(30)
+    const beforeColumn = Number(await viewer.getAttribute('data-format-column'))
+    expect(beforeColumn).toBeGreaterThan(40)
 
     const resizer = page.locator('.ide-panel-resizer')
     const box = await resizer.boundingBox()
     expect(box).toBeTruthy()
     await page.mouse.move(box.x + box.width / 2, box.y + 100)
     await page.mouse.down()
-    await page.mouse.move(box.x - 140, box.y + 100, { steps: 6 })
+    await page.mouse.move(box.x - 160, box.y + 100, { steps: 6 })
     await page.mouse.up()
 
-    await expect.poll(async () => Number(await viewer.getAttribute('data-wrap-column'))).toBeLessThan(beforeColumn)
-    await expect.poll(() => page.evaluate(() => {
-      const root = document.querySelector('.reference-monaco')
-      const scroller = root?.querySelector('.monaco-scrollable-element')
-      if (!root || !scroller) return 999
-      return Math.max(0, scroller.scrollWidth - scroller.clientWidth)
-    })).toBeLessThanOrEqual(2)
+    await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
+    await expect(viewer).toHaveAttribute('data-format-mode', 'narrow')
+
+    await expect(guideOrPage(page).getByRole('button', { name: 'Expand', exact: true })).toBeVisible()
+  })
+
+  test('expands the reference implementation into a focused large viewer', async ({ page }) => {
+    await page.getByRole('button', { name: 'Solution', exact: true }).click()
+    const reference = page.locator('.solution-reference')
+    await reference.getByRole('button', { name: 'Expand', exact: true }).click()
+    await expect(reference).toHaveClass(/expanded/)
+    await expect(reference.locator('.reference-monaco')).toHaveAttribute('data-format-mode', 'expanded')
+    await expect(reference.getByRole('button', { name: 'Collapse', exact: true })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(reference).not.toHaveClass(/expanded/)
   })
 
   test('opens Monaco native find with Ctrl+F', async ({ page }) => {

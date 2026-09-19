@@ -112,7 +112,7 @@ async function formatVerilog(source,columnLimit=FORMAT_COLUMN_LIMIT){
       `--column_limit=${clampFormatColumn(columnLimit)}`,
       '--indentation_spaces=2',
       '--wrap_spaces=2',
-      '--try_wrap_long_lines=true',
+      '--try_wrap_long_lines=false',
       '--failsafe_success=false',
       input,
     ],{cwd:dir,timeout:FORMAT_TIMEOUT_MS,maxBuffer:1024*1024})
