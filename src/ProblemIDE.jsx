@@ -334,18 +334,95 @@ function commonMistakes(problem) {
   return ['Incorrect reset or hold behavior.','Width/sign mistakes that only appear at corner values.','Writing behavior that simulates correctly but infers unintended hardware.']
 }
 
+function formatReferenceCode(raw = '') {
+  let output = ''
+  let parenDepth = 0
+  let quote = ''
+  let lineComment = false
+  let blockComment = false
+
+  for (let index = 0; index < raw.length; index += 1) {
+    const char = raw[index]
+    const next = raw[index + 1]
+
+    if (lineComment) {
+      output += char
+      if (char === '\n') lineComment = false
+      continue
+    }
+
+    if (blockComment) {
+      output += char
+      if (char === '*' && next === '/') {
+        output += next
+        index += 1
+        blockComment = false
+      }
+      continue
+    }
+
+    if (quote) {
+      output += char
+      if (char === '\\' && next) {
+        output += next
+        index += 1
+      } else if (char === quote) {
+        quote = ''
+      }
+      continue
+    }
+
+    if (char === '/' && next === '/') {
+      output += char + next
+      index += 1
+      lineComment = true
+      continue
+    }
+
+    if (char === '/' && next === '*') {
+      output += char + next
+      index += 1
+      blockComment = true
+      continue
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char
+      output += char
+      continue
+    }
+
+    if (char === '(') parenDepth += 1
+    if (char === ')') parenDepth = Math.max(0, parenDepth - 1)
+
+    output += char
+
+    if (char === ';' && parenDepth === 0) {
+      let cursor = index + 1
+      while (cursor < raw.length && (raw[cursor] === ' ' || raw[cursor] === '\t')) cursor += 1
+      if (raw[cursor] !== '\n' && cursor < raw.length) output += '\n'
+    }
+  }
+
+  return output
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad }) {
   const available = Object.keys(referenceSolutions || {})
   const [language,setLanguage] = useState(available.includes(initialLanguage) ? initialLanguage : available[0] || initialLanguage)
   const [copied,setCopied] = useState(false)
   const code = referenceSolutions?.[language] || problem.solution || ''
+  const formattedCode = formatReferenceCode(code)
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
   const hardware = inferredHardware(problem)
   const mistakes = commonMistakes(problem)
   const copy = async () => {
     if (!code) return
-    try { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
+    try { await navigator.clipboard.writeText(formattedCode); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
   }
   return <article className="solution-guide">
     <section className="solution-guide-section solution-guide-intro">
@@ -384,8 +461,8 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
       <div className="solution-code-shell">
-        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,code)}>Load into editor</button></div></div>
-        <pre className="solution-code">{code || 'Reference solution will be added for this problem.'}</pre>
+        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>formattedCode&&onLoad(language,formattedCode)}>Load into editor</button></div></div>
+        <pre className="solution-code">{formattedCode || 'Reference solution will be added for this problem.'}</pre>
       </div>
     </section>
   </article>

@@ -203,7 +203,10 @@
   color:#fff;
 }
 .solution-guide .solution-code{
-  max-width:none;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
   margin:0;
   padding:16px;
   border:0;
@@ -211,8 +214,11 @@
   background:#171719;
   color:#d8d8dc;
   font:11px/1.72 ui-monospace,SFMono-Regular,Consolas,monospace;
-  white-space:pre;
-  overflow:auto;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  overflow-x:hidden;
+  overflow-y:auto;
 }
 
 @media(max-width:900px){
