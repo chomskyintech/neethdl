@@ -81,8 +81,7 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(referenceViewer.locator('.view-lines')).toContainText('always @(*)')
 
     await expect(guide.getByRole('button', { name: 'Copy reference solution', exact: true })).toBeVisible()
-    await expect(guide.locator('.solution-reference-tabs-row').getByRole('button', { name: /Expand|Collapse reference/i })).toHaveCount(0)
-    await expect(guide.getByRole('button', { name: 'Expand reference code area', exact: true })).toBeVisible()
+    await expect(guide.getByRole('button', { name: /Expand|Collapse reference/i })).toHaveCount(0)
     await expect(guide.getByRole('button', { name: 'Load into editor', exact: true })).toHaveCount(0)
   })
 
@@ -105,31 +104,23 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
     await expect(viewer).toHaveAttribute('data-format-mode', 'narrow')
 
-    await expect(guideOrPage(page).getByRole('button', { name: 'Expand reference code area', exact: true })).toBeVisible()
   })
 
-  test('expands the reference code vertically in the same solution pane', async ({ page }) => {
-    await page.getByRole('button', { name: 'Solution', exact: true }).click()
-    const reference = page.locator('.solution-reference')
-    const viewer = reference.locator('.reference-monaco')
-    await expect(viewer).toBeVisible()
+  test('adapts the editable HDL formatter width to the editor pane', async ({ page }) => {
+    const editor = page.locator('.monaco-editor-wrap')
+    await expect(editor).toBeVisible()
+    const beforeColumn = Number(await editor.getAttribute('data-format-column'))
+    expect(beforeColumn).toBeGreaterThan(50)
 
-    const before = await viewer.boundingBox()
-    expect(before).toBeTruthy()
+    const resizer = page.locator('.ide-panel-resizer')
+    const box = await resizer.boundingBox()
+    expect(box).toBeTruthy()
+    await page.mouse.move(box.x + box.width / 2, box.y + 120)
+    await page.mouse.down()
+    await page.mouse.move(box.x + 180, box.y + 120, { steps: 6 })
+    await page.mouse.up()
 
-    await reference.getByRole('button', { name: 'Expand reference code area', exact: true }).click()
-    await expect(reference).toHaveClass(/code-expanded/)
-    await expect(viewer).toHaveAttribute('data-expanded', 'true')
-    await expect(reference.getByRole('button', { name: 'Collapse reference code area', exact: true })).toBeVisible()
-
-    const after = await viewer.boundingBox()
-    expect(after).toBeTruthy()
-    expect(after.height).toBeGreaterThan(before.height)
-    expect(await reference.evaluate(node => getComputedStyle(node).position)).not.toBe('fixed')
-
-    await page.keyboard.press('Escape')
-    await expect(reference).not.toHaveClass(/code-expanded/)
-    await expect(viewer).toHaveAttribute('data-expanded', 'false')
+    await expect.poll(async () => Number(await editor.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
   })
 
   test('opens Monaco native find with Ctrl+F', async ({ page }) => {

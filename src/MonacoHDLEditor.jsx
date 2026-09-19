@@ -70,11 +70,10 @@ function registerLanguages(monaco) {
 }
 
 
-export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', formatColumn = 68, expanded = false }) {
+export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', formatColumn = 68 }) {
   const lineCount = Math.max(1, (code || '').split('\n').length)
-  const collapsedHeight = Math.min(520, Math.max(180, lineCount * 22 + 24))
-  const height = expanded ? 'clamp(520px, 72vh, 860px)' : collapsedHeight
-  return <div className="reference-monaco" style={{ height }} data-format-mode={formatMode} data-format-column={formatColumn} data-expanded={expanded?'true':'false'} aria-label={`${language} reference implementation`}>
+  const height = Math.min(640, Math.max(180, lineCount * 22 + 24))
+  return <div className="reference-monaco" style={{ height }} data-format-mode={formatMode} data-format-column={formatColumn} aria-label={`${language} reference implementation`}>
     <MonacoEditor
       height="100%"
       value={code}
@@ -121,17 +120,53 @@ export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', forma
   </div>
 }
 
-export default function MonacoHDLEditor({ code, language, onChange, onRun }) {
+export default function MonacoHDLEditor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange }) {
   const editorRef = useRef(null)
+  const wrapRef = useRef(null)
+  const layoutColumnRef = useRef(84)
+  const [layoutColumn,setLayoutColumn] = useState(84)
   const [toolbarTarget, setToolbarTarget] = useState(null)
-  const handleMount = (editor, monaco) => { editorRef.current = editor; editor.addAction({ id: 'hdlforge-run-tests', label: 'Run HDLForge tests', keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => onRun() }); editor.focus() }
+  const handleMount = (editor, monaco) => {
+    editorRef.current = editor
+    editor.addAction({ id: 'hdlforge-run-tests', label: 'Run HDLForge tests', keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => onRun() })
+    editor.addAction({
+      id: 'hdlforge-format-source',
+      label: 'Format HDL source',
+      keybindings: [monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF],
+      run: async () => {
+        if (!onFormat) return
+        const before = editor.getValue()
+        const formatted = await onFormat(before, layoutColumnRef.current)
+        if (typeof formatted === 'string' && formatted && formatted !== before) editor.setValue(formatted)
+      }
+    })
+    editor.focus()
+  }
   const openFind = () => { editorRef.current?.getAction('actions.find')?.run() }
 
   useEffect(() => {
     setToolbarTarget(document.querySelector('.ide-page .file-tabs:has(.editor-language)'))
   }, [])
 
+  useEffect(()=>{
+    const element=wrapRef.current
+    if(!element || typeof ResizeObserver==='undefined') return undefined
+    const update=entries=>{
+      const width=entries[0]?.contentRect?.width || element.clientWidth || 0
+      if(!width) return
+      const next=width>=900?100:width>=700?84:width>=520?68:52
+      if(layoutColumnRef.current===next) return
+      layoutColumnRef.current=next
+      setLayoutColumn(next)
+      onLayoutColumnChange?.(next)
+    }
+    const observer=new ResizeObserver(update)
+    observer.observe(element)
+    update([{contentRect:element.getBoundingClientRect()}])
+    return ()=>observer.disconnect()
+  },[onLayoutColumnChange])
+
   const hiddenStatusStyle = { position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }
 
-  return <><div className="editor-wrap monaco-editor-wrap" style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">HDL source · {language}</span><div className="monaco-editor-stage" aria-label={`${language} HDL source editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} /></div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
+  return <><div ref={wrapRef} className="editor-wrap monaco-editor-wrap" data-format-column={layoutColumn} style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">HDL source · {language}</span><div className="monaco-editor-stage" aria-label={`${language} HDL source editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', wordWrapColumn: layoutColumn, wrappingIndent: 'indent', wrappingStrategy: 'advanced', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} /></div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
 }

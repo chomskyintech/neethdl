@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Activity, CheckCircle2, Code2, Copy, FileCode2, Maximize2, Minimize2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
+import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
 import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
@@ -422,7 +422,6 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
   const [formattedCode,setFormattedCode] = useState(code)
   const [formatting,setFormatting] = useState(false)
   const [formatMode,setFormatMode] = useState('normal')
-  const [expanded,setExpanded] = useState(false)
   const solutionShellRef = useRef(null)
   const formatColumns = { narrow: 52, normal: 68, wide: 88 }
   const formatColumn = formatColumns[formatMode]
@@ -456,12 +455,6 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       .finally(()=>{if(active)setFormatting(false)})
     return ()=>{active=false}
   },[language,code,formatColumn])
-  useEffect(()=>{
-    if(!expanded) return undefined
-    const onKeyDown=event=>{ if(event.key==='Escape') setExpanded(false) }
-    document.addEventListener('keydown',onKeyDown)
-    return ()=>document.removeEventListener('keydown',onKeyDown)
-  },[expanded])
   const displayCode = addTeachingComments(problem.id, language, formattedCode || code)
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
@@ -504,7 +497,7 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
 
-    <section className={`solution-guide-section solution-reference${expanded?' code-expanded':''}`}>
+    <section className="solution-guide-section solution-reference">
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       <div className="solution-reference-tabs-row">
         {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
@@ -516,23 +509,66 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       </div>
       <div className="solution-code-shell" ref={solutionShellRef}>
         {formatting && <span className="solution-formatting-status" aria-live="polite">Formatting…</span>}
-        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={formatMode} formatColumn={formatColumn} expanded={expanded} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
-        {displayCode && <button type="button" className="solution-bottom-expand" onClick={()=>setExpanded(value=>!value)} title={expanded?'Show less code':'Show more code'} aria-label={expanded?'Collapse reference code area':'Expand reference code area'}>
-          {expanded?<Minimize2 size={17}/>:<Maximize2 size={17}/>}
-        </button>}
+        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={formatMode} formatColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
       </div>
     </section>
   </article>
 }
 
-function Editor({ code, language, onChange, onRun }) {
-  return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} />
+function Editor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange }) {
+  return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} onFormat={onFormat} onLayoutColumnChange={onLayoutColumnChange} />
 }
 export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onSolved, onToggle, onPrevious, onNext, hasPrevious, hasNext, navigationLabel }) {
   const supported = problem.languages?.length ? problem.languages : languages, evaluationType = problem.evaluation?.type || 'simulation', isConceptual = evaluationType === 'answer', initialLanguage = supported.includes('SystemVerilog') ? 'SystemVerilog' : supported[0] || 'SystemVerilog'
   const [code, setCode] = useState(draft ?? languageStarter(problem, initialLanguage)), [editorLanguage, setEditorLanguage] = useState(initialLanguage), [bottomTab, setBottomTab] = useState('console'), [result, setResult] = useState(null), [running, setRunning] = useState(false), [statementTab, setStatementTab] = useState('problem'), [bottomCollapsed, setBottomCollapsed] = useState(false), [panelSplit, setPanelSplit] = useState(38), [draggingPanel, setDraggingPanel] = useState(false), [waveformOpen, setWaveformOpen] = useState(false)
-  const update = value => { setCode(value); onSave(problem.id, value) }
-  const changeLanguage = language => { setEditorLanguage(language); const next = languageStarter(problem, language); setCode(next); onSave(problem.id, next); setResult(null); setWaveformOpen(false) }
+  const [editorFormatColumn,setEditorFormatColumn] = useState(84)
+  const [editorDirty,setEditorDirty] = useState(Boolean(draft))
+  const editorDirtyRef = useRef(Boolean(draft))
+  const editorFormatRequest = useRef(0)
+
+  const update = value => {
+    editorFormatRequest.current += 1
+    editorDirtyRef.current = true
+    setEditorDirty(true)
+    setCode(value)
+    onSave(problem.id, value)
+  }
+
+  const changeLanguage = language => {
+    editorFormatRequest.current += 1
+    editorDirtyRef.current = false
+    setEditorDirty(false)
+    setEditorLanguage(language)
+    const next = languageStarter(problem, language)
+    setCode(next)
+    onSave(problem.id, next)
+    setResult(null)
+    setWaveformOpen(false)
+  }
+
+  const formatEditorText = async (source, columnLimit = editorFormatColumn) => {
+    if (!RUNNER_URL || isConceptual || !source) return source
+    try {
+      return await requestFormattedReference(editorLanguage, source, columnLimit)
+    } catch {
+      return source
+    }
+  }
+
+  useEffect(()=>{
+    if (isConceptual || editorDirty || !RUNNER_URL) return undefined
+    const requestId = ++editorFormatRequest.current
+    const source = languageStarter(problem, editorLanguage)
+    let active = true
+    requestFormattedReference(editorLanguage, source, editorFormatColumn)
+      .then(formatted=>{
+        if(!active || editorDirtyRef.current || requestId!==editorFormatRequest.current || !formatted) return
+        setCode(formatted)
+        onSave(problem.id, formatted)
+      })
+      .catch(()=>{})
+    return ()=>{active=false}
+  },[problem.id,editorLanguage,editorFormatColumn,editorDirty,isConceptual])
   useEffect(() => {
     if (!waveformOpen) return undefined
     const onKeyDown = event => { if (event.key === 'Escape' && !document.fullscreenElement) setWaveformOpen(false) }
@@ -555,6 +591,6 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   return <div className="ide-page"><header className="ide-topbar"><button className="ide-brand topbar-brand" onClick={onBack} aria-label="Back to HDLForge problems" style={{flex:'0 0 auto',margin:0,padding:'7px 9px',border:'0',background:'transparent',color:'#e8eef5',cursor:'pointer'}}><span className="ide-brand-icon">HDL</span><strong>HDLForge</strong></button><div className="ide-problem-navigation topbar-navigation" style={{position:'absolute',left:'50%',transform:'translateX(-50%)'}}><button onClick={onPrevious} disabled={!hasPrevious}>← Previous</button><button className="section-navigation" onClick={onBack} aria-label={`Back to ${navigationLabel || problem.topic || problem.category}`}>{navigationLabel || problem.topic || problem.category}</button><button onClick={onNext} disabled={!hasNext}>Next →</button></div><div className="ide-actions">{solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div></header>
     <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><div className="ide-problem-content">{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <ApproachGuide problem={problem}/>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</div></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
       <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
-      <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
+      <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} onFormat={formatEditorText} onLayoutColumnChange={setEditorFormatColumn} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
       <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <div className={result.pass ? 'run-result pass' : 'run-result fail'}><strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong>{result.tests?.length ? <div className="test-cases">{result.tests.map((testCase,index)=><div className={`test-case ${testCase.passed?'pass':'fail'}`} key={`${testCase.name}-${index}`}><span className="test-case-status">{testCase.passed?'✓':'×'}</span><span className="test-case-name">Test {index+1}: {testCase.name}</span><span className="test-case-time">t={testCase.time}</span></div>)}</div> : null}<pre>{result.output}</pre></div> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
 }
