@@ -42,6 +42,21 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await codeText(page)).toContain('assign y = sel ? b : a;')
   })
 
+  test('renders hardware theory and design reasoning in the Approach tab', async ({ page }) => {
+    await page.getByRole('button', { name: 'Approach', exact: true }).click()
+
+    const guide = page.locator('.approach-guide')
+    await expect(guide).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Core theory', exact: true })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'How to reason about it', exact: true })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'What the interviewer is checking', exact: true })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Combinational logic', exact: true })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Multiplexing', exact: true })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Complete assignment', exact: true })).toBeVisible()
+    await expect(guide).toContainText('no memory')
+    await expect(guide).toContainText('latch')
+  })
+
   test('renders the rich hardware Solution guide and can load a reference implementation', async ({ page }) => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
 
