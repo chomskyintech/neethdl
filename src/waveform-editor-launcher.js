@@ -28,18 +28,18 @@ function injectStyles() {
       border:1px solid transparent!important;
       border-radius:6px!important;
       background:transparent!important;
-      color:#9ca3ad!important;
+      color:#848484!important;
       cursor:pointer!important;
       flex:0 0 28px!important;
     }
     .file-tabs .sim-editor-waveform-launch:hover{
-      color:#e4e7eb!important;
-      background:#292929!important;
+      color:#d4d4d4!important;
+      background:#29282a!important;
     }
     .file-tabs .sim-editor-waveform-launch.active{
-      color:#8ee7a2!important;
-      background:rgba(71,190,101,.12)!important;
-      border-color:rgba(71,190,101,.28)!important;
+      color:#4cc8b0!important;
+      background:rgba(76,200,176,.12)!important;
+      border-color:rgba(76,200,176,.28)!important;
     }
     body.hdlforge-ide-active .ide-page .file-tabs:has(.editor-language)>.editor-find-btn{
       order:4!important;
