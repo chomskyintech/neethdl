@@ -70,10 +70,11 @@ function registerLanguages(monaco) {
 }
 
 
-export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', formatColumn = 68 }) {
+export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', formatColumn = 68, expanded = false }) {
   const lineCount = Math.max(1, (code || '').split('\n').length)
-  const height = Math.min(640, Math.max(180, lineCount * 22 + 24))
-  return <div className="reference-monaco" style={{ height }} data-format-mode={formatMode} data-format-column={formatColumn} aria-label={`${language} reference implementation`}>
+  const collapsedHeight = Math.min(520, Math.max(180, lineCount * 22 + 24))
+  const height = expanded ? 'clamp(520px, 72vh, 860px)' : collapsedHeight
+  return <div className="reference-monaco" style={{ height }} data-format-mode={formatMode} data-format-column={formatColumn} data-expanded={expanded?'true':'false'} aria-label={`${language} reference implementation`}>
     <MonacoEditor
       height="100%"
       value={code}

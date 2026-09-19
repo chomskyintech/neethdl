@@ -203,6 +203,33 @@
   border-radius:0 0 10px 10px;
   background:#171719;
 }
+.solution-bottom-expand{
+  position:absolute;
+  z-index:6;
+  right:10px;
+  bottom:10px;
+  width:30px;
+  height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:rgba(13,13,13,.78);
+  color:#bdbdc3;
+  cursor:pointer;
+  backdrop-filter:blur(3px);
+}
+.solution-bottom-expand:hover{
+  border:0;
+  background:rgba(13,13,13,.88);
+  color:#fff;
+}
+.solution-bottom-expand:focus-visible{
+  outline:1px solid #8a8a91;
+  outline-offset:2px;
+}
 .solution-formatting-status{
   position:absolute;
   z-index:4;
@@ -347,25 +374,8 @@
 }
 
 
-/* Expanded reference implementation */
-.solution-reference.expanded{
-  position:fixed;
-  inset:22px;
-  z-index:220;
-  margin:0;
-  padding:18px;
-  overflow:auto;
-  border:1px solid #424248;
-  border-radius:12px;
-  background:#1b1b1e;
-  box-shadow:0 24px 70px rgba(0,0,0,.55);
+/* In-place reference-code expansion */
+.solution-reference.code-expanded .solution-code-shell{
+  box-shadow:0 0 0 1px rgba(255,255,255,.025);
 }
-.solution-reference.expanded .solution-reference-head{
-  margin-bottom:12px;
-}
-.solution-reference.expanded .solution-code-shell{
-  max-width:none;
-}
-.solution-reference.expanded .reference-monaco{
-  min-height:420px;
-}
+

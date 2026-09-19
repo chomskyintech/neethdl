@@ -424,8 +424,8 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
   const [formatMode,setFormatMode] = useState('normal')
   const [expanded,setExpanded] = useState(false)
   const solutionShellRef = useRef(null)
-  const formatColumns = { narrow: 52, normal: 68, wide: 88, expanded: 100 }
-  const formatColumn = expanded ? formatColumns.expanded : formatColumns[formatMode]
+  const formatColumns = { narrow: 52, normal: 68, wide: 88 }
+  const formatColumn = formatColumns[formatMode]
 
   useEffect(()=>{ setFormattedCode(code) },[language,code])
 
@@ -444,7 +444,7 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
     observer.observe(element)
     update([{contentRect:element.getBoundingClientRect()}])
     return ()=>{clearTimeout(timer);observer.disconnect()}
-  },[expanded])
+  },[])
 
   useEffect(()=>{
     let active=true
@@ -504,14 +504,11 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
 
-    <section className={`solution-guide-section solution-reference${expanded?' expanded':''}`}>
+    <section className={`solution-guide-section solution-reference${expanded?' code-expanded':''}`}>
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       <div className="solution-reference-tabs-row">
         {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
         <div className="solution-reference-actions">
-          <button type="button" className="solution-icon-action" onClick={()=>setExpanded(value=>!value)} title={expanded?'Collapse':'Expand'} aria-label={expanded?'Collapse reference solution':'Expand reference solution'}>
-            {expanded?<Minimize2 size={17}/>:<Maximize2 size={17}/>}
-          </button>
           <button type="button" className="solution-icon-action" onClick={copy} title={copied?'Copied':'Copy'} aria-label={copied?'Copied reference solution':'Copy reference solution'}>
             <Copy size={17}/>
           </button>
@@ -519,7 +516,10 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       </div>
       <div className="solution-code-shell" ref={solutionShellRef}>
         {formatting && <span className="solution-formatting-status" aria-live="polite">Formatting…</span>}
-        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={expanded?'expanded':formatMode} formatColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
+        {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={formatMode} formatColumn={formatColumn} expanded={expanded} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
+        {displayCode && <button type="button" className="solution-bottom-expand" onClick={()=>setExpanded(value=>!value)} title={expanded?'Show less code':'Show more code'} aria-label={expanded?'Collapse reference code area':'Expand reference code area'}>
+          {expanded?<Minimize2 size={17}/>:<Maximize2 size={17}/>}
+        </button>}
       </div>
     </section>
   </article>
