@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 const editorRoot = page => page.locator('.monaco-editor-wrap')
-const codeText = async page => (await page.locator('.monaco-editor .view-lines').innerText()).replace(/\u00a0/g, ' ')
+const codeText = async page => (await page.locator('.monaco-editor-wrap .view-lines').innerText()).replace(/\u00a0/g, ' ')
 const muxSolution = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a;\nendmodule'
 const brokenMux = 'module mux2(input logic a, b, sel, output logic y);\n  assign y = sel ? b : a\nendmodule'
 
