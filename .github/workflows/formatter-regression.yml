@@ -1,0 +1,47 @@
+name: HDL formatter regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'src/ProblemIDE.jsx'
+      - 'tests/formatter-regression.mjs'
+      - '.github/workflows/formatter-regression.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'src/ProblemIDE.jsx'
+      - 'tests/formatter-regression.mjs'
+      - '.github/workflows/formatter-regression.yml'
+  workflow_dispatch:
+
+jobs:
+  formatter-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build runner with HDL formatters
+        run: docker build -t hdlforge-runner ./server
+
+      - name: Start runner
+        run: docker run -d --name hdlforge-runner -p 8787:8787 hdlforge-runner
+
+      - name: Wait for runner
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8787/health >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          docker logs hdlforge-runner
+          exit 1
+
+      - name: Exercise Verilog, SystemVerilog, and VHDL formatters
+        run: node tests/formatter-regression.mjs
+
+      - name: Show runner logs on failure
+        if: failure()
+        run: docker logs hdlforge-runner

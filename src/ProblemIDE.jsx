@@ -8,6 +8,24 @@ import './waveform-window.css'
 
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || '').replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
+const referenceFormatCache = new Map()
+async function requestFormattedReference(language,source){
+  if(!RUNNER_URL||!source) return source
+  const key=`${language}\u0000${source}`
+  if(referenceFormatCache.has(key)) return referenceFormatCache.get(key)
+  const pending=fetch(`${RUNNER_URL}/format`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({language,source}),
+  }).then(async response=>{
+    const data=await response.json().catch(()=>({}))
+    if(!response.ok||!data.ok||typeof data.formatted!=='string') throw new Error(data.error||'Formatter request failed.')
+    return data.formatted
+  })
+  referenceFormatCache.set(key,pending)
+  try{return await pending}
+  catch(error){referenceFormatCache.delete(key);throw error}
+}
 const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback } }
 const vhdlStarters = {
   'rtl-mux': `library ieee;\nuse ieee.std_logic_1164.all;\n\nentity mux2 is\n  port(a, b, sel : in std_logic; y : out std_logic);\nend entity mux2;\n\narchitecture rtl of mux2 is\nbegin\n  -- Your RTL here\nend architecture rtl;`,
@@ -334,95 +352,31 @@ function commonMistakes(problem) {
   return ['Incorrect reset or hold behavior.','Width/sign mistakes that only appear at corner values.','Writing behavior that simulates correctly but infers unintended hardware.']
 }
 
-function formatReferenceCode(raw = '') {
-  let output = ''
-  let parenDepth = 0
-  let quote = ''
-  let lineComment = false
-  let blockComment = false
-
-  for (let index = 0; index < raw.length; index += 1) {
-    const char = raw[index]
-    const next = raw[index + 1]
-
-    if (lineComment) {
-      output += char
-      if (char === '\n') lineComment = false
-      continue
-    }
-
-    if (blockComment) {
-      output += char
-      if (char === '*' && next === '/') {
-        output += next
-        index += 1
-        blockComment = false
-      }
-      continue
-    }
-
-    if (quote) {
-      output += char
-      if (char === '\\' && next) {
-        output += next
-        index += 1
-      } else if (char === quote) {
-        quote = ''
-      }
-      continue
-    }
-
-    if (char === '/' && next === '/') {
-      output += char + next
-      index += 1
-      lineComment = true
-      continue
-    }
-
-    if (char === '/' && next === '*') {
-      output += char + next
-      index += 1
-      blockComment = true
-      continue
-    }
-
-    if (char === '"' || char === "'") {
-      quote = char
-      output += char
-      continue
-    }
-
-    if (char === '(') parenDepth += 1
-    if (char === ')') parenDepth = Math.max(0, parenDepth - 1)
-
-    output += char
-
-    if (char === ';' && parenDepth === 0) {
-      let cursor = index + 1
-      while (cursor < raw.length && (raw[cursor] === ' ' || raw[cursor] === '\t')) cursor += 1
-      if (raw[cursor] !== '\n' && cursor < raw.length) output += '\n'
-    }
-  }
-
-  return output
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
-}
-
 function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad }) {
   const available = Object.keys(referenceSolutions || {})
   const [language,setLanguage] = useState(available.includes(initialLanguage) ? initialLanguage : available[0] || initialLanguage)
   const [copied,setCopied] = useState(false)
   const code = referenceSolutions?.[language] || problem.solution || ''
-  const formattedCode = formatReferenceCode(code)
+  const [formattedCode,setFormattedCode] = useState(code)
+  const [formatting,setFormatting] = useState(false)
+  useEffect(()=>{
+    let active=true
+    setFormattedCode(code)
+    if(!code||!RUNNER_URL){setFormatting(false);return ()=>{active=false}}
+    setFormatting(true)
+    requestFormattedReference(language,code)
+      .then(value=>{if(active)setFormattedCode(value)})
+      .catch(()=>{if(active)setFormattedCode(code)})
+      .finally(()=>{if(active)setFormatting(false)})
+    return ()=>{active=false}
+  },[language,code])
   const prerequisites = solutionPrerequisites(problem)
   const steps = solutionSteps(problem)
   const hardware = inferredHardware(problem)
   const mistakes = commonMistakes(problem)
   const copy = async () => {
     if (!code) return
-    try { await navigator.clipboard.writeText(formattedCode); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
+    try { await navigator.clipboard.writeText(formattedCode || code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
   }
   return <article className="solution-guide">
     <section className="solution-guide-section solution-guide-intro">
@@ -461,8 +415,8 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage, onLoad })
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       {available.length>1&&<div className="solution-language-tabs">{available.map(item=><button key={item} className={language===item?'active':''} onClick={()=>setLanguage(item)}>{item}</button>)}</div>}
       <div className="solution-code-shell">
-        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>formattedCode&&onLoad(language,formattedCode)}>Load into editor</button></div></div>
-        <pre className="solution-code">{formattedCode || 'Reference solution will be added for this problem.'}</pre>
+        <div className="solution-code-toolbar"><span>{language || 'Reference RTL'}{formatting?' · formatting…':''}</span><div><button onClick={copy}><Copy size={13}/>{copied?'Copied':'Copy'}</button><button onClick={()=>code&&onLoad(language,formattedCode || code)}>Load into editor</button></div></div>
+        <pre className="solution-code">{formattedCode || code || 'Reference solution will be added for this problem.'}</pre>
       </div>
     </section>
   </article>
