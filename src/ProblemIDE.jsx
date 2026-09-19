@@ -63,6 +63,178 @@ function Discussion({ problem }) {
   const submit = event => { event.preventDefault(); if (!draft.trim()) return; const next = [...posts, { id: Date.now(), name: 'You', text: draft.trim(), time: new Date().toLocaleString() }]; setPosts(next); localStorage.setItem(key, JSON.stringify(next)); setDraft('') }
   return <div className="discussion discussion-in-tab"><div className="discussion-head"><div><h2>Discussion</h2><p>Ask questions, compare implementations and discuss edge cases.</p></div><span><MessageSquare size={15} /> {posts.length} posts</span></div><form className="discussion-form" onSubmit={submit}><textarea value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ask a question or share an approach…" /><button className="primary">Post discussion</button></form><div className="discussion-list">{posts.length ? posts.map(post => <article className="discussion-post" key={post.id}><div className="post-avatar">Y</div><div><strong>{post.name}</strong><small>{post.time}</small><p>{post.text}</p></div></article>) : <div className="discussion-empty"><MessageSquare size={22} /><strong>Start the discussion</strong><p>Be the first to ask a question about this problem.</p></div>}</div></div>
 }
+function approachTheory(problem) {
+  const topic = problem.topic || ''
+  if (problem.id === 'rtl-mux') return [
+    ['Combinational logic','A combinational circuit has no memory: its outputs are a function only of the inputs at the current instant. A multiplexer therefore needs no clock or state register.'],
+    ['Multiplexing','A 2:1 multiplexer selects one of two data inputs. The select signal is control, not stored state: sel=0 routes one input and sel=1 routes the other.'],
+    ['Complete assignment','Every possible input condition must determine y. In procedural combinational RTL, leaving a path unassigned can infer a latch because the old value would need to be remembered.'],
+    ['RTL versus hardware','A ternary operator, an if/else inside always_comb, and an equivalent case statement can all synthesize to the same mux. RTL describes behavior; synthesis chooses gates and routing.'],
+  ]
+  if (/FSM/.test(topic)) return [
+    ['State','An FSM remembers a finite amount of history in a state register. The current state plus current inputs determine what happens next.'],
+    ['Next-state logic','Combinational logic computes the next state. Clocked logic transfers that next state into the state register on the active edge.'],
+    ['Moore and Mealy outputs','Moore outputs depend only on state; Mealy outputs can depend on state and current inputs. Mealy logic can react within the cycle but needs careful timing analysis.'],
+    ['State encoding','Binary, one-hot and other encodings represent the same abstract machine differently. The encoding affects area, decode complexity and sometimes timing.'],
+  ]
+  if (/FIFO|Buffer/.test(topic)) return [
+    ['FIFO ordering','A FIFO preserves arrival order: the oldest accepted item must be the next one removed. Storage alone is not enough; control must track where to write and read.'],
+    ['Pointers and occupancy','Write and read pointers identify locations. Full/empty can be derived from occupancy or carefully encoded pointer relationships.'],
+    ['Simultaneous transfers','A read and write may happen on the same cycle. Occupancy should usually stay unchanged when both are accepted.'],
+    ['Backpressure','A full FIFO must stop accepting writes; an empty FIFO must stop reads. These conditions form part of the interface contract.'],
+  ]
+  if (/CDC/.test(topic)) return [
+    ['Metastability','Sampling an asynchronous transition near a receiving clock edge can violate setup/hold time and leave a flip-flop temporarily metastable.'],
+    ['Two-flop synchronizer','For a single-bit level signal, cascaded destination-domain flops greatly reduce the probability that metastability propagates into functional logic.'],
+    ['Pulse transfer','A narrow source pulse can be missed by a slower or unrelated destination clock. Toggle, handshake or pulse-stretch techniques convert the event into something observable.'],
+    ['Multi-bit crossings','Synchronizing each bit independently can create incoherent words. Multi-bit data typically uses handshakes, Gray coding, or asynchronous FIFOs.'],
+  ]
+  if (/Protocol|Handshake/.test(topic)) return [
+    ['Handshake','A transfer occurs only when the protocol-defined acceptance condition is true, such as VALID && READY. Intent to transfer is not the same as a completed transfer.'],
+    ['Backpressure','A receiver can delay acceptance. The sender must preserve any required control and payload values while stalled.'],
+    ['Channel independence','Protocols such as AXI separate information into channels. Correct RTL must not assume independent channels arrive in a particular order unless the protocol guarantees it.'],
+    ['Persistence','Signals such as VALID or a response often have to remain asserted until the matching READY is observed. One-cycle pulses are frequently incorrect.'],
+  ]
+  if (/Counter/.test(topic)) return [
+    ['Stateful behavior','A counter is sequential logic because its next value depends on its previous value. The register is the state; the incrementer computes the next state.'],
+    ['Clock edges','The counter changes only on the specified active edge. Inputs between edges influence what will be captured, not the stored value immediately.'],
+    ['Width and wraparound','An N-bit unsigned counter naturally wraps modulo 2^N unless extra terminal-count logic changes that behavior.'],
+    ['Reset semantics','Synchronous reset is sampled on the clock edge; asynchronous reset can change state independently of the clock. The specification determines which is correct.'],
+  ]
+  if (/Sequential|Memor/.test(topic)) return [
+    ['Stored state','Sequential circuits remember information in flip-flops or memories. Their behavior depends on both current inputs and previously stored values.'],
+    ['Nonblocking assignment','Clocked SystemVerilog normally uses nonblocking assignments so all state updates conceptually occur together after values are sampled at the edge.'],
+    ['Reset and enable','Reset defines a known state. Enables determine when state changes versus when it must hold its previous value.'],
+    ['Memory behavior','Read/write timing matters: synchronous versus asynchronous read and read-during-write behavior can change both simulation and inferred hardware.'],
+  ]
+  if (/Pipeline/.test(topic)) return [
+    ['Latency versus throughput','Pipelining adds register stages, increasing latency in cycles while often allowing a new transaction to enter every cycle.'],
+    ['Data/control alignment','Metadata such as valid, tags or destination IDs must be delayed through the same number of stages as the data they describe.'],
+    ['Stage boundaries','Registers break long combinational paths. Good stage placement balances logic delay rather than merely adding registers arbitrarily.'],
+    ['Stalls and bubbles','Elastic pipelines need explicit rules for when stages advance, hold, or contain invalid bubbles under backpressure.'],
+  ]
+  if (/Arithmetic|Datapath/.test(topic)) return [
+    ['Bit growth','Addition and multiplication can require wider results than their operands. Truncating too early silently changes arithmetic behavior.'],
+    ['Signedness','Two’s-complement signed values require the HDL expression to be signed. Mixing signed and unsigned operands can produce unexpected extension and comparison rules.'],
+    ['Combinational depth','A mathematically correct expression may create a long critical path. Trees, pipelining and resource sharing trade area, latency and frequency.'],
+    ['Saturation versus wraparound','Fixed-width arithmetic normally wraps on overflow unless saturation or explicit clipping logic is implemented.'],
+  ]
+  if (/CPU/.test(topic)) return [
+    ['Datapath and control','Processor RTL separates data movement/computation from control decisions that select operations, sources and destinations.'],
+    ['Instruction fields','Opcode and function fields are decoded into concrete control signals. Immediate fields often need format-specific extraction and sign extension.'],
+    ['Architectural state','Registers, PC, CSRs and memory-visible state must change only according to the ISA rules. Internal implementation can vary as long as architectural behavior matches.'],
+    ['Pipelining hazards','Dependencies, branches and memory timing can require forwarding, stalls or flushes so overlapped instructions still behave sequentially at the ISA level.'],
+  ]
+  if (/Testbenches/.test(topic)) return [
+    ['Stimulus','A testbench controls DUT inputs over time. Useful stimulus includes nominal cases, boundaries, reset behavior and sequences that exercise state transitions.'],
+    ['Sampling','Checks must observe outputs at the correct time relative to clock edges and nonblocking updates. Sampling too early can make a correct DUT look wrong.'],
+    ['Self-checking tests','A strong testbench computes or stores expected behavior and reports mismatches automatically instead of relying only on waveform inspection.'],
+    ['Determinism','Tests should clearly control reset, clocks and timing so a failure is reproducible. Random stimulus should preserve the seed when debugging.'],
+  ]
+  if (/Interfaces/.test(topic)) return [
+    ['Signal bundling','A SystemVerilog interface groups related protocol signals into one reusable object, reducing long port lists and connection mistakes.'],
+    ['Modports','Modports describe which signals a participant may drive or read, documenting roles such as master, slave, driver or monitor.'],
+    ['Clocking blocks','Clocking blocks define sampling/driving timing relative to a clock and help testbench code avoid races with the DUT.'],
+    ['Virtual interfaces','Class-based verification components use virtual interfaces to access static interface instances without hard-wiring hierarchy into the class.'],
+  ]
+  if (/SVA/.test(topic)) return [
+    ['Sampled temporal logic','SVA reasons about values sampled on clocking events and relationships across cycles, not ordinary software execution order.'],
+    ['Sequence versus property','A sequence describes a temporal pattern. A property turns temporal behavior into something that can be asserted, assumed or covered.'],
+    ['Implication','Overlapped |-> starts the consequent in the same sampled cycle; non-overlapped |=> starts it on the next one. That one-cycle distinction is critical.'],
+    ['Reset disabling','disable iff commonly suspends a property while reset is active so initialization behavior does not create meaningless failures.'],
+  ]
+  if (/Constrained Random/.test(topic)) return [
+    ['Random variables','rand fields let the solver choose values; constraints define which combinations are legal or interesting.'],
+    ['Constraint solving','Constrained random is not arbitrary noise. The solver generates values satisfying all active constraints, including relationships between fields.'],
+    ['Distribution','Legal values are not necessarily equally useful. dist constraints can bias generation toward boundaries, rare cases or protocol conditions.'],
+    ['Reproducibility','Random failures must be reproducible by seed. Preserve the failing seed before simplifying or adding debug instrumentation.'],
+  ]
+  if (/Functional Coverage/.test(topic)) return [
+    ['Coverage intent','Functional coverage measures whether planned scenarios occurred; it does not prove the DUT was correct when they occurred.'],
+    ['Coverpoints and bins','A coverpoint samples an expression and bins divide its value space into meaningful scenarios.'],
+    ['Cross coverage','Crosses measure combinations of conditions, exposing gaps that individual coverpoints can hide.'],
+    ['Coverage closure','High percentage alone is not the goal. Unhit bins should be classified as unreachable, missing stimulus, or evidence of a design/testbench issue.'],
+  ]
+  if (/UVM/.test(topic)) return [
+    ['Transactions','UVM models meaningful operations as sequence items rather than manipulating every signal from the test directly.'],
+    ['Separation of roles','Sequences generate intent, drivers translate transactions into pin activity, and monitors reconstruct observed transactions without driving the DUT.'],
+    ['TLM communication','Analysis ports and other transaction-level interfaces decouple components so monitors, scoreboards and coverage collectors can evolve independently.'],
+    ['Phases and objections','UVM phases coordinate construction, connection and runtime behavior. Objections keep the run phase alive while stimulus is still active.'],
+  ]
+  if (/Scoreboards/.test(topic)) return [
+    ['Reference model','A scoreboard needs an independent way to predict expected behavior. Reusing DUT implementation logic weakens the check.'],
+    ['Observed transactions','Monitors should send what actually happened at the interface, not what the driver intended to happen.'],
+    ['Ordering','In-order designs can compare queues directly; out-of-order designs need IDs, tags or associative matching.'],
+    ['Error localization','Useful scoreboard messages include transaction identity, expected value, actual value and enough context to reproduce the mismatch.'],
+  ]
+  if (/Formal/.test(topic)) return [
+    ['Exhaustive reasoning','Formal tools explore reachable state space mathematically rather than sampling a finite set of simulation vectors.'],
+    ['Assertions','Assertions define behavior that must hold for all legal traces within the proof model.'],
+    ['Assumptions','Assumptions constrain the environment. Over-constraining can make a proof vacuous, so they must reflect real interface guarantees.'],
+    ['Cover properties','Covers show that an interesting state or sequence is reachable and are useful for detecting impossible or over-constrained scenarios.'],
+  ]
+  return [
+    ['RTL abstraction','RTL describes transfers and transformations of data between registers and combinational logic. Synthesis maps that behavior into hardware structures.'],
+    ['Combinational versus sequential','First decide whether the problem needs memory. If previous cycles matter, state is required; otherwise the logic can be combinational.'],
+    ['Timing intent','Clock, reset, enable and handshake semantics are part of the functionality. Correct Boolean logic with incorrect cycle timing is still wrong hardware.'],
+    ['Corner cases','Hardware bugs often appear at reset, wraparound, simultaneous events, maximum/minimum values and backpressure boundaries.'],
+  ]
+}
+
+function approachReasoning(problem) {
+  const topic = problem.topic || ''
+  if (problem.id === 'rtl-mux') return [
+    'Write the truth table first: sel=0 means y=a and sel=1 means y=b.',
+    'Notice that no previous value of y is needed, so this is combinational logic.',
+    'Choose a complete combinational construct such as assign, always_comb with if/else, or case.',
+    'Check both selector values and transitions of a, b and sel in simulation.',
+  ]
+  if (/SVA|Formal/.test(topic)) return [
+    'Rewrite the requirement as a precise cycle-by-cycle statement.',
+    'Identify the sampling clock, reset condition, antecedent and required consequence.',
+    'Decide whether the consequence starts in the same cycle or a later cycle.',
+    'Add boundary scenarios that could make the property pass vacuously or fail unexpectedly.',
+  ]
+  if (/Testbenches|Interfaces|Constrained Random|Functional Coverage|UVM|Scoreboards/.test(topic)) return [
+    'Identify what behavior is being generated, observed and checked.',
+    'Keep stimulus, protocol access and checking responsibilities separate.',
+    'Define expected behavior independently from the DUT implementation.',
+    'Include reset, boundaries and error-prone scenarios in the verification plan.',
+  ]
+  return [
+    'Classify the problem as combinational, sequential, protocol-driven or verification-only.',
+    'List the state elements, inputs, outputs and exact cycle in which each output may change.',
+    'Translate the specification into a small set of invariants or transfer rules.',
+    'Only then choose the RTL construct that expresses those rules most directly.',
+  ]
+}
+
+function ApproachGuide({problem}) {
+  const concepts = approachTheory(problem)
+  const reasoning = approachReasoning(problem)
+  return <article className="approach-guide">
+    <section className="approach-guide-section approach-guide-intro">
+      <h1>Approach</h1>
+      <p>{problem.approach || problem.description || 'Understand the hardware behavior first, then map it to a synthesizable structure.'}</p>
+    </section>
+    <section className="approach-guide-section">
+      <h2>Core theory</h2>
+      <p>These concepts are the foundation of this problem:</p>
+      <div className="approach-concepts">{concepts.map(([name,description])=><div className="approach-concept" key={name}><h3>{name}</h3><p>{description}</p></div>)}</div>
+    </section>
+    <section className="approach-guide-section">
+      <h2>How to reason about it</h2>
+      <ol className="approach-reasoning">{reasoning.map((step,index)=><li key={index}>{step}</li>)}</ol>
+    </section>
+    <section className="approach-guide-section">
+      <h2>What the interviewer is checking</h2>
+      <p>{/SVA|Formal|Testbenches|Interfaces|Constrained Random|Functional Coverage|UVM|Scoreboards/.test(problem.topic||'')
+        ? 'Whether you understand verification intent, timing semantics, separation of responsibilities and how to build checks that can expose real design bugs.'
+        : 'Whether you can translate a written hardware requirement into the correct state, timing and datapath structure—not just write syntactically valid HDL.'}</p>
+    </section>
+  </article>
+}
+
 function solutionPrerequisites(problem) {
   const topic = problem.topic || ''
   const common = []
@@ -247,7 +419,7 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   const resizePanel = e => { if (!draggingPanel) return; const body = e.currentTarget.closest('.ide-body'); if (!body) return; const rect = body.getBoundingClientRect(); setPanelSplit(Math.min(65, Math.max(25, ((e.clientX - rect.left) / rect.width) * 100))) }
   const referenceSolutions = solutions[problem.id] || (problem.solution ? {[editorLanguage]:problem.solution} : {})
   return <div className="ide-page"><header className="ide-topbar"><button className="ide-brand topbar-brand" onClick={onBack} aria-label="Back to HDLForge problems" style={{flex:'0 0 auto',margin:0,padding:'7px 9px',border:'0',background:'transparent',color:'#e8eef5',cursor:'pointer'}}><span className="ide-brand-icon">HDL</span><strong>HDLForge</strong></button><div className="ide-problem-navigation topbar-navigation" style={{position:'absolute',left:'50%',transform:'translateX(-50%)'}}><button onClick={onPrevious} disabled={!hasPrevious}>← Previous</button><button className="section-navigation" onClick={onBack} aria-label={`Back to ${navigationLabel || problem.topic || problem.category}`}>{navigationLabel || problem.topic || problem.category}</button><button onClick={onNext} disabled={!hasNext}>Next →</button></div><div className="ide-actions">{solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div></header>
-    <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><div className="ide-problem-content">{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <div className="content-card"><h2>How to think about it</h2><p>{problem.approach || 'Identify inputs, outputs, timing, reset semantics and required state. Implement the simplest synthesizable solution and check corner cases.'}</p></div>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage} onLoad={(language,referenceCode)=>{setEditorLanguage(language);setCode(referenceCode);onSave(problem.id,referenceCode);setResult(null);setWaveformOpen(false)}}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</div></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
+    <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><div className="ide-problem-content">{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <ApproachGuide problem={problem}/>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage} onLoad={(language,referenceCode)=>{setEditorLanguage(language);setCode(referenceCode);onSave(problem.id,referenceCode);setResult(null);setWaveformOpen(false)}}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</div></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
       <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
       <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
       <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <div className={result.pass ? 'run-result pass' : 'run-result fail'}><strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong>{result.tests?.length ? <div className="test-cases">{result.tests.map((testCase,index)=><div className={`test-case ${testCase.passed?'pass':'fail'}`} key={`${testCase.name}-${index}`}><span className="test-case-status">{testCase.passed?'✓':'×'}</span><span className="test-case-name">Test {index+1}: {testCase.name}</span><span className="test-case-time">t={testCase.time}</span></div>)}</div> : null}<pre>{result.output}</pre></div> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
