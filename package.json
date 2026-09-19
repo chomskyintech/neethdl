@@ -10,7 +10,8 @@
     "dev": "vite",
     "build": "node scripts/build-all.mjs",
     "preview": "vite preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:problem-solutions": "node tests/problem-solution-regression.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
