@@ -12,12 +12,14 @@ import './lockedEditor.js'
 import problems,{problemTopics} from './data/activeProblems'
 import {riscvProject} from './data/riscvProject'
 import tracks from './data/tracks'
+import {careerPaths,careerPathBySlug} from './data/careerPaths'
 import LandingHub from './LandingHub'
 import {addActivityDay,calculatePoints,calculateStreak} from './progressTracking'
 
 const ProblemIDE=lazy(()=>import('./ProblemIDE'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
+const CareerPath=lazy(()=>import('./CareerPath'))
 
 const categories=['All',...problemTopics]
 const difficulties=['All','Easy','Medium','Hard']
@@ -33,7 +35,7 @@ const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||t
 const languages=['All','Verilog','SystemVerilog','VHDL']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
 const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/'}
-const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge'}
+const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge',career:'Career Roadmap | HDLForge'}
 
 function problemLanguages(p){
  if(p.languages?.length)return p.languages
@@ -44,7 +46,8 @@ function problemLanguages(p){
 }
 function problemLanguageLabel(p){const ls=problemLanguages(p);return ls.length?ls.join(' / '):'Conceptual'}
 function normalizePath(path){return path==='/'?'/':path.replace(/\/+$/,'')}
-function appPath(page,problem,projectId=null,trackId=null){
+function appPath(page,problem,projectId=null,trackId=null,careerId=null){
+ if(page==='career'&&careerId){const career=careerPaths[careerId];return career?`/app/roadmaps/${career.slug}/`:'/app/problems/'}
  if(page==='problems'&&trackId)return `/app/problems/company/${encodeURIComponent(trackId)}/`
  if(page==='problem'&&problem){
   if(projectId===riscvProject.id)return `/app/projects/${riscvProject.slug}/${encodeURIComponent(problem.id)}/`
@@ -55,6 +58,8 @@ function appPath(page,problem,projectId=null,trackId=null){
 }
 function routeFromLocation(){
  const path=normalizePath(window.location.pathname)
+ const careerMatch=path.match(/^\/app\/roadmaps\/([^/]+)$/)
+ if(careerMatch){const career=careerPathBySlug[decodeURIComponent(careerMatch[1])];if(career)return {page:'career',problem:null,projectId:null,trackId:null,careerId:career.id}}
  if(path==='/app/tracks'||path==='/app/progress'||path==='/app/courses')return {page:'problems',problem:null,projectId:null,trackId:null,legacySection:true}
  const companyMatch=path.match(/^\/app\/problems\/company\/([^/]+)\/([^/]+)$/)
  if(companyMatch){
@@ -90,7 +95,7 @@ function RouteLoading(){return <div role="status" aria-live="polite" style={{pad
 
 function App(){
  const initialRoute=useRef(routeFromLocation()).current
- const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[projectId,setProjectId]=useState(initialRoute.projectId||null),[trackId,setTrackId]=useState(initialRoute.trackId||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
+ const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[projectId,setProjectId]=useState(initialRoute.projectId||null),[trackId,setTrackId]=useState(initialRoute.trackId||null),[careerId,setCareerId]=useState(initialRoute.careerId||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
  const syncTimer=useRef(null)
  const markSolved=id=>{if(solved.includes(id))return;const n=[...solved,id];setSolved(n);localStorage.setItem('hdlforge-solved',JSON.stringify(n));const days=addActivityDay(activityDays);setActivityDays(days);localStorage.setItem('hdlforge-activity-days',JSON.stringify(days))}
  const saveDraft=(id,code)=>{const n={...drafts,[id]:code},updated={...draftUpdatedAt,[id]:new Date().toISOString()};setDrafts(n);setDraftUpdatedAt(updated);localStorage.setItem('hdlforge-drafts',JSON.stringify(n));localStorage.setItem('hdlforge-draft-updated-at',JSON.stringify(updated))}
@@ -100,20 +105,23 @@ function App(){
   return source.filter(p=>{const ls=problemLanguages(p);return (category==='All'||p.topic===category)&&(difficulty==='All'||p.difficulty===difficulty)&&(language==='All'||ls.includes(language))&&(status==='All'||(status==='Solved'?solved.includes(p.id):!solved.includes(p.id)))&&(!query||`${p.title} ${p.topic} ${p.category} ${problemLanguageLabel(p)} ${p.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()))})
  },[activeTrack,category,difficulty,language,status,query,solved])
  const points=useMemo(()=>calculatePoints(problems,solved),[solved]),streak=useMemo(()=>calculateStreak(activityDays),[activityDays])
- const navigate=(nextPage,problem=null,{replace=false,project=null,track=null}={})=>{
+ const navigate=(nextPage,problem=null,{replace=false,project=null,track=null,career=null}={})=>{
   const nextProject=nextPage==='problem'?project:null
   const nextTrack=nextPage==='problem'?track:(nextPage==='problems'?trackId:null)
+  const nextCareer=nextPage==='career'?career:(nextPage==='problem'?careerId:null)
   if(nextPage==='problem'&&problem)setSelected(problem)
   setProjectId(nextProject)
   setTrackId(nextTrack)
+  setCareerId(nextCareer)
   setPage(nextPage)
-  const target=appPath(nextPage,problem,nextProject,nextTrack)
+  const target=appPath(nextPage,problem,nextProject,nextTrack,nextCareer)
   const current=`${window.location.pathname}${window.location.search}`
-  if(current!==target)window.history[replace?'replaceState':'pushState']({page:nextPage,problemId:problem?.id||null,projectId:nextProject,trackId:nextTrack},'',target)
+  if(current!==target)window.history[replace?'replaceState':'pushState']({page:nextPage,problemId:problem?.id||null,projectId:nextProject,trackId:nextTrack,careerId:nextCareer},'',target)
   window.scrollTo({top:0,behavior:'auto'})
  }
  const openProblem=p=>navigate('problem',p,{track:trackId})
  const go=p=>navigate(p)
+ const openCareer=id=>{const career=careerPaths[id];if(career)navigate('career',null,{career:id})}
  const selectTrack=id=>{
   const next=id||null
   setTrackId(next);setCategory('All');setDifficulty('All');setLanguage('All');setStatus('All');setQuery('')
@@ -137,13 +145,13 @@ function App(){
  useEffect(()=>{
   if(initialRoute.legacy&&initialRoute.problem)window.history.replaceState({page:'problem',problemId:initialRoute.problem.id,projectId:null,trackId:null},'',appPath('problem',initialRoute.problem))
   if(initialRoute.legacySection)window.history.replaceState({page:'problems',problemId:null,projectId:null,trackId:null},'',appPaths.problems)
-  const onPopState=()=>{const route=routeFromLocation();setPage(route.page);setProjectId(route.projectId||null);setTrackId(route.trackId||null);if(route.problem)setSelected(route.problem)}
+  const onPopState=()=>{const route=routeFromLocation();setPage(route.page);setProjectId(route.projectId||null);setTrackId(route.trackId||null);setCareerId(route.careerId||null);if(route.problem)setSelected(route.problem)}
   window.addEventListener('popstate',onPopState)
   return()=>window.removeEventListener('popstate',onPopState)
  },[])
 
  useEffect(()=>{
-  document.title=page==='problem'&&selected?`${selected.title} | HDLForge`:(pageTitles[page]||pageTitles.home)
+  document.title=page==='problem'&&selected?`${selected.title} | HDLForge`:page==='career'&&careerId?`${careerPaths[careerId]?.label||'Career Roadmap'} | HDLForge`:(pageTitles[page]||pageTitles.home)
  },[page,selected?.id])
 
  useEffect(()=>{
@@ -182,13 +190,14 @@ function App(){
 
  return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
- {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack}/>} 
+ {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!(projectId||trackId)||solved.includes(selected.id))} navigationLabel={projectId?riscvProject.name:activeTrack?trackLabel(activeTrack)+' Track':selected.topic}/>} 
- {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved} drafts={drafts}/>} 
+ {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
+ {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartRiscv={startRiscvProject} onSelectCareer={openCareer}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
-function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack}){
+function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack,onSelectCareer}){
  const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
  const [expandedTopics,setExpandedTopics]=useState(['Combinational Logic'])
@@ -220,7 +229,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   <aside className="guided-roadmap" aria-label="Guided Roadmap">
    <section className="guided-roadmap-card">
     <h2>Guided Roadmap</h2>
-    <div className="guided-roadmap-list">{careerRoadmaps.map(item=><button key={item.id} className={activeTrack?.id===item.id?'guided-roadmap-item active':'guided-roadmap-item'} onClick={()=>onSelectTrack(item.id)}>{item.label}<ChevronRight size={15}/></button>)}</div>
+    <div className="guided-roadmap-list">{careerRoadmaps.map(item=><button key={item.id} className={activeTrack?.id===item.id?'guided-roadmap-item active':'guided-roadmap-item'} onClick={()=>onSelectCareer(item.id)}>{item.label}<ChevronRight size={15}/></button>)}</div>
    </section>
   </aside>
 
