@@ -167,17 +167,17 @@ function registerLanguages(monaco) {
     inherit: true,
     rules: [
       { token: 'keyword.control', foreground: '549CD4' },
-      { token: 'keyword.declaration', foreground: '4CC8B0' },
-      { token: 'type.identifier', foreground: '4CC8B0' },
-      { token: 'entity.name.module', foreground: 'DCDCA8', fontStyle: 'bold' },
+      { token: 'keyword.declaration', foreground: '4AB8A5' },
+      { token: 'type.identifier', foreground: '4AB8A5' },
+      { token: 'entity.name.module', foreground: 'CDC98F', fontStyle: 'bold' },
       { token: 'variable.parameter', foreground: 'D4D4D4' },
-      { token: 'support.function.system', foreground: 'DCDCA8' },
-      { token: 'support.function.builtin', foreground: 'DCDCA8' },
-      { token: 'preprocessor', foreground: 'DCDCA8' },
+      { token: 'support.function.system', foreground: 'CDC98F' },
+      { token: 'support.function.builtin', foreground: 'CDC98F' },
+      { token: 'preprocessor', foreground: '549CD4' },
       { token: 'number', foreground: 'D4D4D4' },
-      { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-      { token: 'string', foreground: 'CE9178' },
-      { token: 'string.escape', foreground: 'DCDCA8' },
+      { token: 'comment', foreground: '628A55', fontStyle: 'italic' },
+      { token: 'string', foreground: 'C58C74' },
+      { token: 'string.escape', foreground: 'CDC98F' },
       { token: 'operator', foreground: 'D4D4D4' },
       { token: 'identifier', foreground: 'D4D4D4' }
     ],
@@ -190,10 +190,10 @@ function registerLanguages(monaco) {
       'editor.selectionBackground': '#549CD447',
       'editor.inactiveSelectionBackground': '#549CD426',
       'editorIndentGuide.background1': '#302F32',
-      'editorIndentGuide.activeBackground1': '#3A393C',
+      'editorIndentGuide.activeBackground1': '#39393B',
       'editorBracketHighlight.foreground1': '#549CD4',
-      'editorBracketHighlight.foreground2': '#4CC8B0',
-      'editorBracketHighlight.foreground3': '#DCDCA8'
+      'editorBracketHighlight.foreground2': '#4AB8A5',
+      'editorBracketHighlight.foreground3': '#CDC98F'
     }
   })
 }

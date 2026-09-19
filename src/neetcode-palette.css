@@ -3,22 +3,23 @@
  * Colour-only overrides. Layout and typography remain component-owned.
  */
 :root{
-  --nc-bg:#1f1e20;
+  --nc-bg:#1f1f20;
   --nc-editor:#262527;
   --nc-surface:#29282a;
   --nc-surface-2:#2e2d30;
   --nc-surface-3:#302f31;
-  --nc-border:#3a393c;
+  --nc-border:#39393b;
   --nc-border-soft:#302f32;
   --nc-text:#d4d4d4;
   --nc-text-strong:#ececec;
+  --nc-active:#ececec;
   --nc-muted:#848484;
   --nc-dim:#66666b;
   --nc-blue:#549cd4;
-  --nc-teal:#4cc8b0;
-  --nc-yellow:#dcdca8;
-  --nc-orange:#ce9178;
-  --nc-comment:#6a9955;
+  --nc-teal:#4ab8a5;
+  --nc-yellow:#cdc98f;
+  --nc-orange:#c58c74;
+  --nc-comment:#628a55;
 
   --bg:var(--nc-bg)!important;
   --panel:var(--nc-editor)!important;
@@ -135,7 +136,7 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text)!important;
 }
 .search:focus-within,.filters select:focus,.account-form input:focus,.discussion-form input:focus,.discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(76,200,176,.14)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(74,184,165,.14)!important;
 }
 .search input::placeholder,input::placeholder,textarea::placeholder{color:var(--nc-muted)!important}
 
@@ -195,8 +196,8 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
 .problem-tabs button,.bottom-tabs button,.solution-language-tabs button,.file-tab{color:var(--nc-muted)!important}
 .problem-tabs button:hover,.bottom-tabs button:hover,.solution-language-tabs button:hover,.file-tab:hover{color:var(--nc-text)!important}
 .problem-tabs button.active,.bottom-tabs button.active,.solution-language-tabs button.active,.file-tab.active{
-  color:var(--nc-text-strong)!important;border-color:var(--nc-teal)!important;border-bottom-color:var(--nc-teal)!important;
-  box-shadow:inset 0 -2px 0 var(--nc-teal)!important;background:transparent!important;
+  color:var(--nc-active)!important;border-color:var(--nc-active)!important;border-bottom-color:var(--nc-active)!important;
+  box-shadow:inset 0 -2px 0 var(--nc-active)!important;background:transparent!important;
 }
 .ide-problem>.problem-tabs button.active{background:var(--nc-surface)!important}
 .editor-language select,.solution-icon-action,.editor-find-btn,.waveform-launch-button,.sim-editor-waveform-launch{color:var(--nc-muted)!important}
@@ -234,9 +235,9 @@ body.hdlforge-ide-active .ide-page .file-tabs .sim-editor-waveform-launch.active
   background:var(--nc-surface)!important;color:var(--nc-text-strong)!important;
 }
 .lab-steps>button.active,.project-task-tabs button.active,.project-file-item.current{
-  background:var(--nc-surface-2)!important;border-color:var(--nc-teal)!important;color:var(--nc-text-strong)!important;
+  background:var(--nc-surface-2)!important;border-color:var(--nc-border)!important;color:var(--nc-active)!important;
 }
-.project-task-tabs button.active:after{background:var(--nc-teal)!important}
+.project-task-tabs button.active:after{background:var(--nc-active)!important}
 .project-badge,.project-file-meta span,.lesson-meta span{
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-muted)!important;
 }
@@ -302,7 +303,7 @@ html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thum
 }
 .discussion-in-tab .discussion-form textarea{color:var(--nc-text)!important}
 .discussion-in-tab .discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(76,200,176,.14)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(74,184,165,.14)!important;
 }
 .post-avatar{background:var(--nc-surface-2)!important;color:var(--nc-blue)!important}
 .icon-btn:hover,.editor-shortcuts button:hover,.bottom-collapse:hover,.wave-tools button:hover{

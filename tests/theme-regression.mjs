@@ -8,22 +8,23 @@ const monaco = await readFile('src/MonacoHDLEditor.jsx','utf8')
 const launcher = await readFile('src/waveform-editor-launcher.js','utf8')
 
 const expected = {
-  '--nc-bg':'#1f1e20',
+  '--nc-bg':'#1f1f20',
   '--nc-editor':'#262527',
   '--nc-surface':'#29282a',
   '--nc-surface-2':'#2e2d30',
   '--nc-surface-3':'#302f31',
-  '--nc-border':'#3a393c',
+  '--nc-border':'#39393b',
   '--nc-border-soft':'#302f32',
   '--nc-text':'#d4d4d4',
   '--nc-text-strong':'#ececec',
+  '--nc-active':'#ececec',
   '--nc-muted':'#848484',
   '--nc-dim':'#66666b',
   '--nc-blue':'#549cd4',
-  '--nc-teal':'#4cc8b0',
-  '--nc-yellow':'#dcdca8',
-  '--nc-orange':'#ce9178',
-  '--nc-comment':'#6a9955',
+  '--nc-teal':'#4ab8a5',
+  '--nc-yellow':'#cdc98f',
+  '--nc-orange':'#c58c74',
+  '--nc-comment':'#628a55',
 }
 
 for (const [name,value] of Object.entries(expected)) {
@@ -38,7 +39,7 @@ assert.ok(paletteImport < sideEffectImport, 'NeetCode palette must remain in sty
 
 const banned = [
   '#615fff','#4f4bcf','#7772ff','#7b76ff','#8884ff','#8e8aff','#9b97ff',
-  '#0d0d0d','#569cd6','#4ec9b0','#c586c0','#ffd700','#da70d6','#179fff'
+  '#0d0d0d','#569cd6','#4ec9b0','#4cc8b0','#dcdca8','#ce9178','#6a9955','#c586c0','#ffd700','#da70d6','#179fff'
 ]
 for (const colour of banned) {
   for (const [name,source] of [['palette',palette],['Monaco',monaco],['waveform launcher',launcher]]) {
@@ -48,11 +49,11 @@ for (const colour of banned) {
 
 const monacoChecks = [
   ['keyword.control','549CD4'],
-  ['keyword.declaration','4CC8B0'],
-  ['type.identifier','4CC8B0'],
-  ['entity.name.module','DCDCA8'],
-  ['comment','6A9955'],
-  ['string','CE9178'],
+  ['keyword.declaration','4AB8A5'],
+  ['type.identifier','4AB8A5'],
+  ['entity.name.module','CDC98F'],
+  ['comment','628A55'],
+  ['string','C58C74'],
   ['editor.background',"'#262527'"],
   ['editor.foreground',"'#D4D4D4'"],
 ]

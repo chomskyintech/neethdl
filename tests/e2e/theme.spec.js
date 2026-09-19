@@ -1,10 +1,10 @@
 import { test, expect } from '@playwright/test'
 
 const colours = {
-  bg: 'rgb(31, 30, 32)',
+  bg: 'rgb(31, 31, 32)',
   editor: 'rgb(38, 37, 39)',
-  border: 'rgb(58, 57, 60)',
-  teal: 'rgb(76, 200, 176)',
+  border: 'rgb(57, 57, 59)',
+  teal: 'rgb(74, 184, 165)',
 }
 
 test.describe('NeetCode theme regression', () => {
@@ -23,17 +23,19 @@ test.describe('NeetCode theme regression', () => {
           blue:value('--nc-blue'),
           teal:value('--nc-teal'),
           yellow:value('--nc-yellow'),
+          active:value('--nc-active'),
         }
       })
       expect(vars).toEqual({
-        bg:'#1f1e20',
+        bg:'#1f1f20',
         editor:'#262527',
         surface:'#29282a',
-        border:'#3a393c',
+        border:'#39393b',
         text:'#d4d4d4',
         blue:'#549cd4',
-        teal:'#4cc8b0',
-        yellow:'#dcdca8',
+        teal:'#4ab8a5',
+        yellow:'#cdc98f',
+        active:'#ececec',
       })
     }
   })
@@ -59,10 +61,15 @@ test.describe('NeetCode theme regression', () => {
     expect(await page.locator('.file-tabs').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.editor)
   })
 
-  test('uses teal rather than the previous violet for active UI accents', async ({ page }) => {
+  test('uses neutral white for active navigation underlines', async ({ page }) => {
     await page.goto('/app/problems/rtl-shift-register/')
     const active = page.locator('.problem-tabs button.active')
     await expect(active).toBeVisible()
-    expect(await active.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe(colours.teal)
+    expect(await active.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(236, 236, 236)')
+
+    await page.getByRole('button', { name: 'Solution', exact: true }).click()
+    const solutionTab = page.locator('.solution-language-tabs button.active')
+    await expect(solutionTab).toBeVisible()
+    expect(await solutionTab.evaluate(node => getComputedStyle(node).borderBottomColor)).toBe('rgb(236, 236, 236)')
   })
 })
