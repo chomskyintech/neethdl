@@ -147,6 +147,18 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await editor.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
   })
 
+  test('renders a richer HDL syntax colour palette', async ({ page }) => {
+    await expect(page.locator('.monaco-editor-wrap .view-lines')).toBeVisible()
+    await expect.poll(async () => page.locator('.monaco-editor-wrap .view-lines span').evaluateAll(nodes => {
+      const colors = new Set(
+        nodes
+          .filter(node => (node.textContent || '').trim())
+          .map(node => getComputedStyle(node).color)
+      )
+      return colors.size
+    })).toBeGreaterThanOrEqual(4)
+  })
+
   test('opens Monaco native find with Ctrl+F', async ({ page }) => {
     await page.locator('.monaco-editor .view-lines').click()
     await page.keyboard.press('Control+F')

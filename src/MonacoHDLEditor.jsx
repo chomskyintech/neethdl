@@ -15,60 +15,188 @@ const languageIds = {
   VHDL: 'vhdl'
 }
 
-const verilogKeywords = [
-  'always','always_comb','always_ff','always_latch','assign','automatic','begin','bit','case','casex','casez','class','clocking','const','constraint','cover','covergroup','coverpoint','default','disable','do','else','end','endcase','endclass','endfunction','endgenerate','endgroup','endinterface','endmodule','endpackage','endproperty','endsequence','endtask','enum','event','for','foreach','forever','fork','function','generate','genvar','if','initial','inout','input','int','integer','interface','localparam','logic','longint','modport','module','package','parameter','property','rand','randc','reg','repeat','return','sequence','shortint','signed','static','struct','task','time','typedef','union','unsigned','var','virtual','void','wait','while','wire'
+const verilogControlKeywords = [
+  'begin','break','case','casex','casez','continue','default','disable','do','else',
+  'end','endcase','for','foreach','forever','fork','if','join','join_any','join_none',
+  'negedge','posedge','repeat','return','wait','while'
 ]
 
-const vhdlKeywords = [
-  'abs','access','after','alias','all','and','architecture','array','assert','attribute','begin','block','body','buffer','bus','case','component','configuration','constant','disconnect','downto','else','elsif','end','entity','exit','file','for','function','generate','generic','group','guarded','if','impure','in','inertial','inout','is','label','library','linkage','literal','loop','map','mod','nand','new','next','nor','not','null','of','on','open','or','others','out','package','port','postponed','procedure','process','pure','range','record','register','reject','rem','report','return','rol','ror','select','severity','signal','shared','sla','sll','sra','srl','subtype','then','to','transport','type','unaffected','units','until','use','variable','wait','when','while','with','xnor','xor'
+const verilogDeclarationKeywords = [
+  'always','always_comb','always_ff','always_latch','assign','automatic','class',
+  'clocking','const','constraint','cover','covergroup','coverpoint','endclass',
+  'endclocking','endfunction','endgenerate','endgroup','endinterface','endmodule',
+  'endpackage','endprogram','endproperty','endsequence','endtask','enum','export',
+  'function','generate','genvar','import','initial','inout','input','interface',
+  'localparam','modport','module','package','parameter','program','property','rand',
+  'randc','sequence','static','struct','task','typedef','union','var','virtual'
 ]
+
+const verilogTypeKeywords = [
+  'bit','byte','chandle','event','int','integer','logic','longint','real','realtime',
+  'reg','shortint','shortreal','signed','string','time','tri','tri0','tri1',
+  'unsigned','uwire','void','wand','wire','wor'
+]
+
+const vhdlControlKeywords = [
+  'begin','case','downto','else','elsif','end','exit','for','if','loop','next',
+  'return','then','to','until','wait','when','while'
+]
+
+const vhdlDeclarationKeywords = [
+  'architecture','attribute','block','body','component','configuration','constant',
+  'entity','file','function','generate','generic','group','impure','in','inout',
+  'library','package','port','procedure','process','pure','signal','subtype','type',
+  'units','use','variable'
+]
+
+const vhdlTypeKeywords = [
+  'bit','bit_vector','boolean','character','integer','natural','positive','real',
+  'signed','std_logic','std_logic_vector','string','time','unsigned'
+]
+
+const vhdlBuiltins = [
+  'falling_edge','rising_edge','resize','std_logic_vector','to_integer',
+  'to_signed','to_unsigned','unsigned','signed'
+]
+
+const identifier = /[a-zA-Z_$][\w$]*/
+const vhdlIdentifier = /[a-zA-Z][\w]*/
+
+function verilogTokenizer(tokenPostfix) {
+  return {
+    defaultToken: '',
+    tokenPostfix,
+    controlKeywords: verilogControlKeywords,
+    declarationKeywords: verilogDeclarationKeywords,
+    typeKeywords: verilogTypeKeywords,
+    tokenizer: {
+      root: [
+        [/\/\*/, 'comment', '@comment'],
+        [/\/\/.*$/, 'comment'],
+        [/\`[a-zA-Z_$][\w$]*/, 'preprocessor'],
+        [/\$[a-zA-Z_$][\w$]*/, 'support.function.system'],
+        [new RegExp('\\b(module|interface|program|package|class)(\\s+)(' + identifier.source + ')'), ['keyword.declaration', '', 'entity.name.module']],
+        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+        [/"/, 'string', '@string'],
+        [/\b\d+'[sS]?[bBoOdDhH][0-9a-fA-F_xXzZ?]+\b/, 'number'],
+        [/'[01xXzZ]\b/, 'number'],
+        [/\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b/, 'number'],
+        [/[A-Z][A-Z0-9_$]*/, 'variable.parameter'],
+        [identifier, {
+          cases: {
+            '@controlKeywords': 'keyword.control',
+            '@declarationKeywords': 'keyword.declaration',
+            '@typeKeywords': 'type.identifier',
+            '@default': 'identifier'
+          }
+        }],
+        [/[{}()\[\]]/, '@brackets'],
+        [/[<>]=?|==?=?|!=?=?|&&|\|\||<<<?|>>>?|[+\-*\/%&|^~?:]/, 'operator']
+      ],
+      comment: [
+        [/[^/*]+/, 'comment'],
+        [/\*\//, 'comment', '@pop'],
+        [/[/*]/, 'comment']
+      ],
+      string: [
+        [/[^\\"]+/, 'string'],
+        [/\\./, 'string.escape'],
+        [/"/, 'string', '@pop']
+      ]
+    }
+  }
+}
+
+function vhdlTokenizer() {
+  return {
+    ignoreCase: true,
+    defaultToken: '',
+    tokenPostfix: '.vhd',
+    controlKeywords: vhdlControlKeywords,
+    declarationKeywords: vhdlDeclarationKeywords,
+    typeKeywords: vhdlTypeKeywords,
+    builtinFunctions: vhdlBuiltins,
+    tokenizer: {
+      root: [
+        [/--.*$/, 'comment'],
+        [new RegExp('\\b(entity|architecture|component|package)(\\s+)(' + vhdlIdentifier.source + ')', 'i'), ['keyword.declaration', '', 'entity.name.module']],
+        [/[BOXbox]"[0-9a-fA-F_xXzZ]+"/, 'number'],
+        [/'[^']'/, 'number'],
+        [/"/, 'string', '@string'],
+        [/\b\d+(?:#(?:[0-9a-fA-F_]+)#)?(?:\.\d+)?(?:[eE][+-]?\d+)?\b/, 'number'],
+        [/[A-Z][A-Z0-9_]*/, 'variable.parameter'],
+        [vhdlIdentifier, {
+          cases: {
+            '@controlKeywords': 'keyword.control',
+            '@declarationKeywords': 'keyword.declaration',
+            '@typeKeywords': 'type.identifier',
+            '@builtinFunctions': 'support.function.builtin',
+            '@default': 'identifier'
+          }
+        }],
+        [/[()\[\]]/, '@brackets'],
+        [/:=|=>|<=|>=|\/=|\*\*|[+\-*\/%&=<>]/, 'operator']
+      ],
+      string: [
+        [/[^"]+/, 'string'],
+        [/""/, 'string.escape'],
+        [/"/, 'string', '@pop']
+      ]
+    }
+  }
+}
 
 function registerLanguages(monaco) {
   if (!monaco.languages.getLanguages().some(item => item.id === 'verilog')) {
     monaco.languages.register({ id: 'verilog' })
-    monaco.languages.setMonarchTokensProvider('verilog', {
-      defaultToken: '', tokenPostfix: '.v', keywords: verilogKeywords,
-      tokenizer: { root: [[/\/\*/, 'comment', '@comment'], [/\/\/.*$/, 'comment'], [/"([^"\\]|\\.)*$/, 'string.invalid'], [/"/, 'string', '@string'], [/\b\d+'[sS]?[bBoOdDhH][0-9a-fA-F_xXzZ?]+\b/, 'number'], [/\b\d+\b/, 'number'], [/[a-zA-Z_$][\w$]*/, { cases: { '@keywords': 'keyword', '@default': 'identifier' } }], [/[{}()\[\]]/, '@brackets'], [/[<>]=?|==?=?|!=?=?|&&|\|\||[+\-*\/%&|^~?:]/, 'operator']], comment: [[/[^/*]+/, 'comment'], [/\*\//, 'comment', '@pop'], [/[/*]/, 'comment']], string: [[/[^\\"]+/, 'string'], [/\\./, 'string.escape'], [/"/, 'string', '@pop']] }
-    })
+    monaco.languages.setMonarchTokensProvider('verilog', verilogTokenizer('.v'))
   }
+
   if (!monaco.languages.getLanguages().some(item => item.id === 'systemverilog')) {
     monaco.languages.register({ id: 'systemverilog' })
-    monaco.languages.setMonarchTokensProvider('systemverilog', {
-      defaultToken: '', tokenPostfix: '.sv', keywords: verilogKeywords,
-      tokenizer: { root: [[/\/\*/, 'comment', '@comment'], [/\/\/.*$/, 'comment'], [/"([^"\\]|\\.)*$/, 'string.invalid'], [/"/, 'string', '@string'], [/\b\d+'[sS]?[bBoOdDhH][0-9a-fA-F_xXzZ?]+\b/, 'number'], [/\b\d+\b/, 'number'], [/[a-zA-Z_$][\w$]*/, { cases: { '@keywords': 'keyword', '@default': 'identifier' } }], [/[{}()\[\]]/, '@brackets'], [/[<>]=?|==?=?|!=?=?|&&|\|\||[+\-*\/%&|^~?:]/, 'operator']], comment: [[/[^/*]+/, 'comment'], [/\*\//, 'comment', '@pop'], [/[/*]/, 'comment']], string: [[/[^\\"]+/, 'string'], [/\\./, 'string.escape'], [/"/, 'string', '@pop']] }
-    })
+    monaco.languages.setMonarchTokensProvider('systemverilog', verilogTokenizer('.sv'))
   }
+
   if (!monaco.languages.getLanguages().some(item => item.id === 'vhdl')) {
     monaco.languages.register({ id: 'vhdl' })
-    monaco.languages.setMonarchTokensProvider('vhdl', {
-      ignoreCase: true, defaultToken: '', tokenPostfix: '.vhd', keywords: vhdlKeywords,
-      tokenizer: { root: [[/--.*$/, 'comment'], [/"/, 'string', '@string'], [/\b\d+(#[0-9a-fA-F_]+#)?\b/, 'number'], [/[a-zA-Z][\w]*/, { cases: { '@keywords': 'keyword', '@default': 'identifier' } }], [/[()\[\]]/, '@brackets'], [/:=|=>|<=|>=|\/=|[+\-*\/%&=<>]/, 'operator']], string: [[/[^\"]+/, 'string'], [/""/, 'string.escape'], [/"/, 'string', '@pop']] }
-    })
+    monaco.languages.setMonarchTokensProvider('vhdl', vhdlTokenizer())
   }
 
   monaco.editor.defineTheme('hdlforge-dark', {
-    base: 'vs-dark', inherit: true,
+    base: 'vs-dark',
+    inherit: true,
     rules: [
-      { token: 'keyword', foreground: '8FAFA2' },
-      { token: 'number', foreground: 'D8B4A0' },
-      { token: 'comment', foreground: '6B706D', fontStyle: 'italic' },
-      { token: 'string', foreground: '9FB9A8' },
-      { token: 'operator', foreground: 'C7CBC8' }
+      { token: 'keyword.control', foreground: '569CD6' },
+      { token: 'keyword.declaration', foreground: '4EC9B0' },
+      { token: 'type.identifier', foreground: '4EC9B0' },
+      { token: 'entity.name.module', foreground: 'DCDCAA', fontStyle: 'bold' },
+      { token: 'variable.parameter', foreground: '9CDCFE' },
+      { token: 'support.function.system', foreground: 'C586C0' },
+      { token: 'support.function.builtin', foreground: 'C586C0' },
+      { token: 'preprocessor', foreground: 'C586C0' },
+      { token: 'number', foreground: 'B5CEA8' },
+      { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+      { token: 'string', foreground: 'CE9178' },
+      { token: 'string.escape', foreground: 'D7BA7D' },
+      { token: 'operator', foreground: 'D4D4D4' },
+      { token: 'identifier', foreground: 'D4D4D4' }
     ],
     colors: {
       'editor.background': '#0D0D0D',
-      'editor.foreground': '#E8E8E8',
-      'editorLineNumber.foreground': '#5F6360',
-      'editorLineNumber.activeForeground': '#A3A7A4',
-      'editorCursor.foreground': '#7FA995',
-      'editor.selectionBackground': '#2A3A33AA',
-      'editor.inactiveSelectionBackground': '#2A3A3355',
-      'editorIndentGuide.background1': '#242724',
-      'editorIndentGuide.activeBackground1': '#3A403C'
+      'editor.foreground': '#D4D4D4',
+      'editorLineNumber.foreground': '#6F7780',
+      'editorLineNumber.activeForeground': '#C6C6C6',
+      'editorCursor.foreground': '#AEAFAD',
+      'editor.selectionBackground': '#264F78AA',
+      'editor.inactiveSelectionBackground': '#264F7855',
+      'editorIndentGuide.background1': '#252526',
+      'editorIndentGuide.activeBackground1': '#404040',
+      'editorBracketHighlight.foreground1': '#FFD700',
+      'editorBracketHighlight.foreground2': '#DA70D6',
+      'editorBracketHighlight.foreground3': '#179FFF'
     }
   })
 }
-
 
 export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', formatColumn = 68 }) {
   const lineCount = Math.max(1, (code || '').split('\n').length)
