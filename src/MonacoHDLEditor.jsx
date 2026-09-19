@@ -124,8 +124,11 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun, onFor
   const editorRef = useRef(null)
   const wrapRef = useRef(null)
   const layoutColumnRef = useRef(84)
+  const formatRef = useRef(onFormat)
   const [layoutColumn,setLayoutColumn] = useState(84)
   const [toolbarTarget, setToolbarTarget] = useState(null)
+  useEffect(()=>{ formatRef.current=onFormat },[onFormat])
+
   const handleMount = (editor, monaco) => {
     editorRef.current = editor
     editor.addAction({ id: 'hdlforge-run-tests', label: 'Run HDLForge tests', keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => onRun() })
@@ -134,9 +137,9 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun, onFor
       label: 'Format HDL source',
       keybindings: [monaco.KeyMod.Shift | monaco.KeyMod.Alt | monaco.KeyCode.KeyF],
       run: async () => {
-        if (!onFormat) return
+        if (!formatRef.current) return
         const before = editor.getValue()
-        const formatted = await onFormat(before, layoutColumnRef.current)
+        const formatted = await formatRef.current(before, layoutColumnRef.current)
         if (typeof formatted === 'string' && formatted && formatted !== before) editor.setValue(formatted)
       }
     })
