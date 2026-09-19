@@ -175,7 +175,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await page.locator('.career-problem').first().click()
     await expect(page).toHaveURL(/\/app\/problems\/rtl-mux\/$/)
     await expect(page.locator('.section-navigation')).toHaveText('RTL Design Engineer')
-    await page.locator('.section-navigation').click()
+    await page.goBack()
     await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
   })
 
