@@ -288,6 +288,45 @@ html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thum
 .topic-group-progress{background:var(--nc-surface-3)!important}
 .topic-group-progress i{background:var(--nc-teal)!important}
 
+/* Topic filter strip: intentionally unboxed. */
+.topic-cloud-shell{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.topic-cloud-item,
+.topic-cloud-toggle,
+.topic-cloud-item:hover,
+.topic-cloud-toggle:hover,
+.topic-cloud-item.active{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.topic-cloud-item em,
+.topic-cloud-item:hover em,
+.topic-cloud-item.active em{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  min-width:0!important;
+}
+.topic-cloud-item.active{
+  position:relative;
+}
+.topic-cloud-item.active::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:-9px;
+  height:2px;
+  border-radius:999px;
+  background:var(--nc-active)!important;
+}
+
 /* IDE problem copy, examples, discussion, console and resize affordances */
 .ide-topbar .back,.ide-problem-navigation button,.ide-problem-navigation span,.editor-toolbar,
 .editor-shortcuts span,.editor-search,.console-empty,.wave-head span,.wave-tools span,.waveform-empty{

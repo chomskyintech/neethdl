@@ -40,6 +40,20 @@ test.describe('NeetCode theme regression', () => {
     }
   })
 
+  test('keeps the topic filter strip unboxed', async ({ page }) => {
+    await page.goto('/app/problems/')
+    const shell = page.locator('.topic-cloud-shell')
+    const item = page.locator('.topic-cloud-item').first()
+    const count = item.locator('em')
+
+    await expect(shell).toBeVisible()
+    expect(await shell.evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    expect(await shell.evaluate(node => getComputedStyle(node).borderTopColor)).toBe('rgba(0, 0, 0, 0)')
+    expect(await item.evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    expect(await count.evaluate(node => getComputedStyle(node).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    expect(await count.evaluate(node => getComputedStyle(node).borderTopWidth)).toBe('0px')
+  })
+
   test('applies NeetCode surfaces across problems, projects, career and IDE', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.guided-roadmap-card')).toBeVisible()
