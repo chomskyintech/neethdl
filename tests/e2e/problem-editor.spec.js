@@ -49,7 +49,7 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(guide).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Prerequisites' })).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Intuition' })).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Implementation' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Implementation', exact: true })).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Hardware behavior' })).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Common mistakes' })).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Reference implementation' })).toBeVisible()
