@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:problem-solutions": "node tests/problem-solution-regression.mjs",
-    "test:starters": "node tests/starter-scaffold-regression.mjs"
+    "test:starters": "node tests/starter-scaffold-regression.mjs",
+    "test:theme": "node tests/theme-regression.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

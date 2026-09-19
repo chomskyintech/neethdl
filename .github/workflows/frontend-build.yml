@@ -24,5 +24,8 @@ jobs:
       - name: Validate starter scaffolds
         run: npm run test:starters
 
+      - name: Validate NeetCode theme
+        run: npm run test:theme
+
       - name: Build production bundle
         run: npm run build
