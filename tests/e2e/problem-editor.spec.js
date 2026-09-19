@@ -75,7 +75,9 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(languageTabs.getByRole('button', { name: 'VHDL', exact: true })).toBeVisible()
 
     await languageTabs.getByRole('button', { name: 'Verilog', exact: true }).click()
-    await expect(guide.locator('.solution-code')).toContainText('always @(*)')
+    const referenceViewer = guide.locator('.reference-monaco')
+    await expect(referenceViewer).toBeVisible()
+    await expect(referenceViewer.locator('.view-lines')).toContainText('always @(*)')
 
     await guide.getByRole('button', { name: 'Load into editor', exact: true }).click()
     await expect(page.locator('.editor-language select')).toHaveValue('Verilog')
