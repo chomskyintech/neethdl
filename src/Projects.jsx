@@ -20,7 +20,7 @@ const roadmapItems=[
  {id:'accelerators',label:'Hardware Accelerator',category:'fpga'}
 ]
 
-export default function Projects({onStartRiscv,solved=[],drafts={}}){
+export default function Projects({onStartRiscv,solved=[],drafts={},onSelectCareer}){
  const [category,setCategory]=useState('all')
  const [roadmap,setRoadmap]=useState(null)
  const completed=riscvProject.problemIds.filter(id=>solved.includes(id)).length
@@ -38,7 +38,7 @@ export default function Projects({onStartRiscv,solved=[],drafts={}}){
  const guidedVisible=category==='all'||category==='rtl'
  const countFor=item=>item.id==='all'?totalProjects:(roleGroups.find(group=>group.role===item.role)?.projects.length||0)+(item.id==='rtl'?1:0)
  const selectCategory=id=>{setCategory(id);setRoadmap(null)}
- const selectRoadmap=item=>{setRoadmap(item.id);setCategory(item.category)}
+ const selectRoadmap=item=>{setRoadmap(item.id);if(onSelectCareer)onSelectCareer(item.id);else setCategory(item.category)}
 
  return <div className="projects-workspace">
   <aside className="project-roadmap" aria-label="Guided Roadmap">
