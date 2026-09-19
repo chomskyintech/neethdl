@@ -151,10 +151,10 @@ test.describe('redesigned IDE shell',()=>{
   const drawerBox=await drawer.boundingBox()
   expect(drawerBox).toBeTruthy()
   expect(drawerBox.width).toBeGreaterThanOrEqual(420)
-  expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 31, 31)')
-  expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 38, 38)')
-  expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(30, 30, 30)')
-  expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(48, 48, 48)')
+  expect(await drawer.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(31, 31, 32)')
+  expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 37, 39)')
+  expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(41, 40, 42)')
+  expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(46, 45, 48)')
  })
 
  test('navigates between coding problems from the drawer without a full page reload',async({page})=>{

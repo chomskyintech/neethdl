@@ -208,6 +208,18 @@ body.hdlforge-ide-active .ide-page .file-tabs .sim-editor-waveform-launch.active
   color:var(--nc-teal)!important;background:var(--nc-surface)!important;border-color:var(--nc-teal)!important;
 }
 
+
+/* Monaco owns internal background styles, so lock its visible canvas too. */
+.monaco-editor,
+.monaco-editor .margin,
+.monaco-editor-background{
+  background-color:var(--nc-editor)!important;
+}
+.monaco-editor .current-line,
+.monaco-editor .view-overlays .current-line{
+  border-color:var(--nc-border-soft)!important;
+}
+
 /* Waveform and simulation */
 .waveform-editor-stage,.waveform-window,.waveform-window-body,.waveform-window-empty,.waveform,.waveform-v2,
 .wave-scroll,.sim-v2-wave-toolbar,.sim-v2-signal-panel,.sim-v2-wave-panel,.sim-v2-results,.sim-v2-compile,.sim-v2-case{
