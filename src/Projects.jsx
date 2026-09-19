@@ -15,7 +15,7 @@ const projectCategories=[
 const roadmapItems=[
  {id:'rtl-digital',label:'RTL Design Engineer',category:'rtl'},
  {id:'verification',label:'Design Verification',category:'dv'},
- {id:'fpga',label:'FPGA Engineer',category:'fpga'},
+ {id:'hft-fpga',label:'FPGA Engineer',category:'fpga'},
  {id:'cpu-gpu',label:'CPU / GPU Hardware',category:'rtl'},
  {id:'accelerators',label:'Hardware Accelerator',category:'fpga'}
 ]
