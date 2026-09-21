@@ -119,6 +119,21 @@ function projectTopic(problem){
   if(problem.project?.id==='pipelined-risc-v-core')return 'CPU / RISC-V'
   if(problem.project?.id==='hardware-dsp-pipeline')return 'Pipelining & Streaming'
   if(problem.project?.id==='matrix-multiplication-accelerator')return 'Arithmetic & Datapaths'
+  if(problem.project?.id==='cache-memory-controller')return 'Memories & Registers'
+  if(problem.project?.id==='risc-v-core-verification'){
+    const rvvTopics={
+      'rvv-instruction-item':'Interfaces',
+      'rvv-random-sequence':'Constrained Random',
+      'rvv-reference-model':'Scoreboards',
+      'rvv-retire-scoreboard':'Scoreboards',
+      'rvv-core-assertions':'SVA',
+      'rvv-functional-coverage':'Functional Coverage',
+    }
+    return rvvTopics[problem.id]||'UVM'
+  }
+  if(problem.project?.id==='fpga-packet-parser')return 'Pipelining & Streaming'
+  if(problem.project?.id==='branch-predictor')return 'CPU / RISC-V'
+  if(problem.project?.id==='convolution-accelerator')return 'Arithmetic & Datapaths'
   return null
 }
 
