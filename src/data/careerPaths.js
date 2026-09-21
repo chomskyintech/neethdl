@@ -47,6 +47,38 @@ export const careerPaths={
     problemIds:['accel-mac8','accel-dot4','accel-reduction8','accel-relu-quant','accel-systolic-pe','accel-pipelined-mul','accel-popcount32','accel-vector-max4','accel-fixed-mul','accel-stream-accum','accel-matmul2','accel-conv3'],
     projectSlugs:['matrix-multiplication-accelerator','convolution-accelerator','dma-engine','hardware-dsp-pipeline','fpga-packet-parser','feed-to-action-latency-pipeline'],
   },
+  'soc-integration':{
+    id:'soc-integration',
+    slug:'soc-design-integration',
+    label:'SoC Design / Integration Engineer',
+    summary:'Integrate processors, memories, buses, interrupts and peripherals into complete memory-mapped systems, with emphasis on address maps, subsystem interfaces and IP integration.',
+    problemIds:['proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','rtl-regfile','rtl-dual-port-ram','rtl-reset-synchronizer','soc-address-decoder','soc-gpio','soc-timer','soc-interrupt-controller'],
+    projectSlugs:['small-risc-v-soc','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
+  },
+  'formal-verification':{
+    id:'formal-verification',
+    slug:'formal-verification-engineer',
+    label:'Formal Verification Engineer',
+    summary:'Prove RTL safety, ordering and progress properties using assertions, assumptions, bounded liveness, cover goals and protocol invariants.',
+    problemIds:['sva-handshake','sva-reset','formal-reset-assumption','formal-fifo-bounds','formal-fifo-order','formal-arbiter-onehot','formal-arbiter-liveness','formal-ready-valid','formal-cover-progress'],
+    projectSlugs:['formal-verification-rtl','async-fifo','uvm-axi4-lite-verification','risc-v-core-verification'],
+  },
+  'embedded-hardware':{
+    id:'embedded-hardware',
+    slug:'embedded-hardware-firmware',
+    label:'Embedded Hardware / Firmware Engineer',
+    summary:'Bridge RTL and software through memory-mapped peripherals, serial interfaces, interrupts, timers and small processor-based systems.',
+    problemIds:['proto-uart','proto-spi','proto-apb-register','rtl-clock-divider','rtl-regfile','rv32-memory-control','soc-gpio','soc-timer','soc-interrupt-controller'],
+    projectSlugs:['uart-controller','small-risc-v-soc','axi-lite-slave','dma-engine'],
+  },
+  'noc-interconnect':{
+    id:'noc-interconnect',
+    slug:'noc-interconnect',
+    label:'NoC / Interconnect Engineer',
+    summary:'Build the arbitration, flow-control, buffering and protocol-conversion foundations used in scalable SoC fabrics and networks-on-chip.',
+    problemIds:['rtl-arbiter','rtl-round-robin-arbiter','rtl-skid-buffer','rtl-fifo','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','afifo-gray-sync','afifo-full-detect'],
+    projectSlugs:['axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
+  },
 }
 
 export const careerPathList=Object.values(careerPaths)
