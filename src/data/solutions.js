@@ -1,4 +1,7 @@
+import additionalSolutions from './additionalSolutions'
+
 const solutions = {
+  ...additionalSolutions,
   'rtl-mux': {
     Verilog: `module mux2 (
   input a,
