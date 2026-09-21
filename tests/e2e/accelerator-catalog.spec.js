@@ -7,8 +7,8 @@ test.describe('coding-only problem catalog and accelerators', () => {
 
     await expect(page.getByRole('button', { name: /^Accelerators/ })).toHaveCount(0)
     await page.getByRole('button', { name: 'Expand', exact: true }).click()
-    await expect(page.getByRole('button', { name: /^Arithmetic & Datapaths\s*9$/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Pipelining & Streaming\s*3$/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Arithmetic & Datapaths\s*21$/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Pipelining & Streaming\s*15$/ })).toBeVisible()
 
     await page.getByPlaceholder('Search problems...').fill('accelerator')
     await expect(page.locator('.problem-row')).toHaveCount(12)
