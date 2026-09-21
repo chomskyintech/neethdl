@@ -12,7 +12,8 @@ loader.config({monaco})
 const languageIds = {
   Verilog: 'verilog',
   SystemVerilog: 'systemverilog',
-  VHDL: 'vhdl'
+  VHDL: 'vhdl',
+  C: 'c'
 }
 
 const verilogControlKeywords = [
@@ -53,6 +54,61 @@ const vhdlTypeKeywords = [
   'bit','bit_vector','boolean','character','integer','natural','positive','real',
   'signed','std_logic','std_logic_vector','string','time','unsigned'
 ]
+
+const cControlKeywords = [
+  'break','case','continue','default','do','else','for','goto','if','return','switch','while'
+]
+
+const cDeclarationKeywords = [
+  'auto','const','enum','extern','inline','register','static','struct','typedef','union','volatile'
+]
+
+const cTypeKeywords = [
+  'char','double','float','int','long','short','signed','unsigned','void','size_t','uint8_t','uint16_t','uint32_t','int8_t','int16_t','int32_t'
+]
+
+function cTokenizer() {
+  return {
+    defaultToken: '',
+    tokenPostfix: '.c',
+    controlKeywords: cControlKeywords,
+    declarationKeywords: cDeclarationKeywords,
+    typeKeywords: cTypeKeywords,
+    tokenizer: {
+      root: [
+        [/\/\*/, 'comment', '@comment'],
+        [/\/\/.*$/, 'comment'],
+        [/^\s*#\s*[a-zA-Z_]+/, 'preprocessor'],
+        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+        [/"/, 'string', '@string'],
+        [/'([^'\\]|\\.)'/, 'string'],
+        [/\b0[xX][0-9a-fA-F]+\b/, 'number'],
+        [/\b\d+(?:\.\d+)?\b/, 'number'],
+        [/[A-Z][A-Z0-9_]*/, 'variable.parameter'],
+        [/[a-zA-Z_][\w]*/, {
+          cases: {
+            '@controlKeywords': 'keyword.control',
+            '@declarationKeywords': 'keyword.declaration',
+            '@typeKeywords': 'type.identifier',
+            '@default': 'identifier'
+          }
+        }],
+        [/[{}()\[\]]/, '@brackets'],
+        [/<<|>>|<=|>=|==|!=|&&|\|\||\+\+|--|->|[+\-*\/%&|^~!?:=<>]/, 'operator']
+      ],
+      comment: [
+        [/[^/*]+/, 'comment'],
+        [/\*\//, 'comment', '@pop'],
+        [/[/*]/, 'comment']
+      ],
+      string: [
+        [/[^\\"]+/, 'string'],
+        [/\\./, 'string.escape'],
+        [/"/, 'string', '@pop']
+      ]
+    }
+  }
+}
 
 const vhdlBuiltins = [
   'falling_edge','rising_edge','resize','std_logic_vector','to_integer',
@@ -153,6 +209,8 @@ function registerLanguages(monaco) {
     monaco.languages.register({ id: 'systemverilog' })
   if (!registered.has('vhdl'))
     monaco.languages.register({ id: 'vhdl' })
+  if (!registered.has('c'))
+    monaco.languages.register({ id: 'c' })
 
   // Always install HDLForge's tokenizers. Monaco can already know a language
   // ID without having our custom Monarch provider attached.
@@ -167,6 +225,10 @@ function registerLanguages(monaco) {
   monaco.languages.setMonarchTokensProvider(
     'vhdl',
     vhdlTokenizer()
+  )
+  monaco.languages.setMonarchTokensProvider(
+    'c',
+    cTokenizer()
   )
 
   monaco.editor.defineTheme('hdlforge-dark', {
@@ -306,5 +368,5 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun, onFor
 
   const hiddenStatusStyle = { position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }
 
-  return <><div ref={wrapRef} className="editor-wrap monaco-editor-wrap" data-format-column={layoutColumn} style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">HDL source · {language}</span><div className="monaco-editor-stage" aria-label={`${language} HDL source editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', wordWrapColumn: layoutColumn, wrappingIndent: 'indent', wrappingStrategy: 'advanced', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} /></div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
+  return <><div ref={wrapRef} className="editor-wrap monaco-editor-wrap" data-format-column={layoutColumn} style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">Source · {language}</span><div className="monaco-editor-stage" aria-label={`${language} source editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', wordWrapColumn: layoutColumn, wrappingIndent: 'indent', wrappingStrategy: 'advanced', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} /></div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
 }
