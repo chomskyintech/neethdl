@@ -104,7 +104,18 @@ const activeProblems=[...catalog,...guidedProjectProblems]
 function projectTopic(problem){
   if(problem.project?.id==='uart-controller'||problem.project?.id==='axi-lite-slave')return 'Protocols & Handshakes'
   if(problem.project?.id==='async-fifo')return 'CDC & Synchronization'
-  if(problem.project?.id==='uvm-axi4-lite-verification')return problem.category==='SVA'?'SVA':'UVM'
+  if(problem.project?.id==='uvm-axi4-lite-verification'){
+    const verificationTopics={
+      'uvm-axi-interface':'Interfaces',
+      'uvm-axi-sequence-item':'Constrained Random',
+      'uvm-axi-driver':'UVM',
+      'uvm-axi-monitor':'UVM',
+      'uvm-axi-scoreboard':'Scoreboards',
+      'uvm-axi-coverage':'Functional Coverage',
+      'uvm-axi-assertions':'SVA',
+    }
+    return verificationTopics[problem.id]||'UVM'
+  }
   if(problem.project?.id==='pipelined-risc-v-core')return 'CPU / RISC-V'
   if(problem.project?.id==='hardware-dsp-pipeline')return 'Pipelining & Streaming'
   if(problem.project?.id==='matrix-multiplication-accelerator')return 'Arithmetic & Datapaths'
