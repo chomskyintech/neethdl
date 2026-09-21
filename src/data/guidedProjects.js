@@ -1,5 +1,6 @@
 import rawProjectProblems from './guidedProjectProblems.js'
 import expansionGuidedProblems from './guidedProjectExpansionProblems.js'
+import expansionGuidedProblems2 from './guidedProjectExpansionProblems2.js'
 import {riscvProject,riscvProjectProblems} from './riscvProject.js'
 
 export const uartProject={
@@ -86,6 +87,66 @@ export const matrixMultiplyProject={
   problemIds:['matmul-mac-pe','matmul-dot2','matmul-input-tile','matmul-controller','matmul-result-buffer','matmul-2x2-top'],
 }
 
+export const cacheMemoryProject={
+  id:'cache-memory-controller',
+  slug:'cache-memory-controller',
+  title:'Cache / Memory Controller',
+  level:'Hard',
+  roadmap:'rtl-digital',
+  categories:['all','rtl','soc'],
+  skills:['Caches','Memory systems','FSMs','Writeback','Refill control'],
+  why:'Build a direct-mapped cache from address decode and tag/data storage through dirty writeback, refill sequencing and controller integration.',
+  problemIds:['cache-address-decode','cache-hit-logic','cache-line-store','cache-miss-fsm','cache-refill-counter','cache-controller-top'],
+}
+
+export const riscvVerificationProject={
+  id:'risc-v-core-verification',
+  slug:'risc-v-core-verification',
+  title:'RISC-V Core Verification',
+  level:'Hard',
+  roadmap:'verification',
+  categories:['all','dv'],
+  skills:['RISC-V','UVM','Constrained random','Scoreboards','Coverage'],
+  why:'Verify architectural retirement with constrained-random instructions, a reference model, scoreboarding, assertions and functional coverage.',
+  problemIds:['rvv-instruction-item','rvv-random-sequence','rvv-reference-model','rvv-retire-scoreboard','rvv-core-assertions','rvv-functional-coverage'],
+}
+
+export const packetParserProject={
+  id:'fpga-packet-parser',
+  slug:'fpga-packet-parser',
+  title:'FPGA Packet Parser',
+  level:'Intermediate to Hard',
+  roadmap:'hft-fpga',
+  categories:['all','fpga','hft'],
+  skills:['Streaming RTL','Ethernet','IPv4/UDP','Pipelining','Packet processing'],
+  why:'Build a fixed-latency Ethernet/IPv4/UDP parser with field extraction and line-rate statistics without full-frame buffering.',
+  problemIds:['pkt-byte-position','pkt-ethertype','pkt-ip-protocol','pkt-udp-ports','pkt-statistics','pkt-parser-top'],
+}
+
+export const branchPredictorProject={
+  id:'branch-predictor',
+  slug:'branch-predictor',
+  title:'Branch Predictor',
+  level:'Intermediate to Hard',
+  roadmap:'cpu-gpu',
+  categories:['all','rtl','soc'],
+  skills:['Branch prediction','BHT','BTB','Speculation','Microarchitecture'],
+  why:'Build the prediction structures behind speculative fetch: saturating counters, a PC-indexed BHT, BTB lookup, next-PC selection and recovery.',
+  problemIds:['bp-two-bit-counter','bp-bht','bp-btb','bp-next-pc','bp-mispredict','bp-top'],
+}
+
+export const convolutionProject={
+  id:'convolution-accelerator',
+  slug:'convolution-accelerator',
+  title:'Convolution Accelerator',
+  level:'Hard',
+  roadmap:'accelerators',
+  categories:['all','fpga'],
+  skills:['Convolution','Line buffers','MAC arrays','Streaming','Quantization'],
+  why:'Build a streaming 3x3 convolution datapath with row buffering, sliding windows, parallel MAC arithmetic, valid alignment and saturated output.',
+  problemIds:['conv-line-buffer','conv-window3','conv-mac9','conv-valid-pipe','conv-clamp8','conv-accelerator-top'],
+}
+
 export const guidedProjects=[
   {
     ...riscvProject,
@@ -102,12 +163,17 @@ export const guidedProjects=[
   pipelinedRiscvProject,
   dspPipelineProject,
   matrixMultiplyProject,
+  cacheMemoryProject,
+  riscvVerificationProject,
+  packetParserProject,
+  branchPredictorProject,
+  convolutionProject,
 ]
 
 export const guidedProjectById=Object.fromEntries(guidedProjects.map(project=>[project.id,project]))
 export const guidedProjectBySlug=Object.fromEntries(guidedProjects.map(project=>[project.slug,project]))
 
-const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems]
+const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2]
 const rawById=Object.fromEntries(allRawProjectProblems.map(problem=>[problem.id,problem]))
 
 export const guidedProjectProblems=[
