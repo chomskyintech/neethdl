@@ -6,6 +6,11 @@ import guidedProjectFormalProblems from './guidedProjectFormalProblems.js'
 import guidedProjectMarketProblems from './guidedProjectMarketProblems.js'
 import guidedProjectSimdProblems from './guidedProjectSimdProblems.js'
 import guidedProjectDmaProblems from './guidedProjectDmaProblems.js'
+import guidedProjectCrossbarProblems from './guidedProjectCrossbarProblems.js'
+import guidedProjectPeripheralSubsystemProblems from './guidedProjectPeripheralSubsystemProblems.js'
+import guidedProjectFirmwareProblems from './guidedProjectFirmwareProblems.js'
+import guidedProjectFormalCacheProblems from './guidedProjectFormalCacheProblems.js'
+import guidedProjectCrossbarVerificationProblems from './guidedProjectCrossbarVerificationProblems.js'
 import {riscvProject,riscvProjectProblems} from './riscvProject.js'
 
 export const uartProject={
@@ -212,6 +217,66 @@ export const dmaProject={
   problemIds:['dma-control-registers','dma-address-generator','dma-read-engine','dma-write-engine','dma-transfer-counter','dma-controller','dma-top'],
 }
 
+export const axiCrossbarProject={
+  id:'axi4-interconnect-crossbar',
+  slug:'axi4-interconnect-crossbar',
+  title:'AXI4 Interconnect / Crossbar',
+  level:'Hard',
+  roadmap:'noc-interconnect',
+  categories:['all','rtl','soc'],
+  skills:['AXI4-Lite','Crossbar','Arbitration','Routing','Backpressure'],
+  why:'Build a two-master, three-slave interconnect with address decoding, fair arbitration, ownership locking, response routing and DECERR handling.',
+  problemIds:['xbar-address-decode','xbar-round-robin','xbar-request-route','xbar-write-lock','xbar-response-route','xbar-decode-error','xbar-top'],
+}
+
+export const peripheralSubsystemProject={
+  id:'soc-peripheral-subsystem',
+  slug:'soc-peripheral-subsystem',
+  title:'SoC Peripheral Subsystem',
+  level:'Intermediate to Hard',
+  roadmap:'soc-integration',
+  categories:['all','rtl','soc'],
+  skills:['APB','SoC integration','Reset control','MMIO','Interrupts'],
+  why:'Build a reusable APB peripheral subsystem with reset control, decoding, response muxing, GPIO, timer, UART registers and interrupt aggregation.',
+  problemIds:['periph-reset-controller','periph-apb-decoder','periph-apb-mux','periph-gpio-block','periph-timer-block','periph-uart-registers','periph-subsystem-top'],
+}
+
+export const firmwareBringupProject={
+  id:'riscv-firmware-bringup',
+  slug:'riscv-firmware-bringup',
+  title:'RISC-V Firmware + Hardware Bring-Up',
+  level:'Intermediate',
+  roadmap:'embedded-hardware',
+  categories:['all','soc'],
+  skills:['Bare-metal C','MMIO','GPIO','UART','Interrupts'],
+  why:'Use C to bring up the memory-mapped hardware around a small RISC-V SoC: MMIO helpers, GPIO, UART, timer interrupts, command handling and a complete boot demo.',
+  problemIds:['fw-mmio-access','fw-gpio-driver','fw-uart-driver','fw-timer-driver','fw-timer-isr','fw-command-shell','fw-bringup-main'],
+}
+
+export const formalCacheProject={
+  id:'formal-cache-verification',
+  slug:'formal-cache-verification',
+  title:'Formal Verification of a Cache Controller',
+  level:'Hard',
+  roadmap:'formal-verification',
+  categories:['all','dv','soc'],
+  skills:['Formal verification','SVA','Caches','Safety','Liveness'],
+  why:'Prove cache invariants around hits, dirty eviction, refill ordering and bounded progress, then add reachability cover goals.',
+  problemIds:['fcache-env-assumptions','fcache-hit-correctness','fcache-no-false-hit','fcache-dirty-eviction','fcache-refill-order','fcache-progress','fcache-cover-scenarios'],
+}
+
+export const crossbarVerificationProject={
+  id:'axi-crossbar-verification',
+  slug:'axi-crossbar-verification',
+  title:'AXI Interconnect Verification Environment',
+  level:'Hard',
+  roadmap:'verification',
+  categories:['all','dv','soc'],
+  skills:['UVM','AXI','Constrained random','Scoreboards','Coverage'],
+  why:'Verify the AXI crossbar with randomized multi-master traffic, routing scoreboards, contention tests, protocol assertions and cross coverage.',
+  problemIds:['xbarv-sequence-item','xbarv-random-sequence','xbarv-monitor','xbarv-scoreboard','xbarv-contention-sequence','xbarv-assertions','xbarv-coverage'],
+}
+
 export const guidedProjects=[
   {
     ...riscvProject,
@@ -238,12 +303,17 @@ export const guidedProjects=[
   marketDataProject,
   simdVectorProject,
   dmaProject,
+  axiCrossbarProject,
+  peripheralSubsystemProject,
+  firmwareBringupProject,
+  formalCacheProject,
+  crossbarVerificationProject,
 ]
 
 export const guidedProjectById=Object.fromEntries(guidedProjects.map(project=>[project.id,project]))
 export const guidedProjectBySlug=Object.fromEntries(guidedProjects.map(project=>[project.slug,project]))
 
-const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2,...guidedProjectSocProblems,...guidedProjectFormalProblems,...guidedProjectMarketProblems,...guidedProjectSimdProblems,...guidedProjectDmaProblems]
+const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2,...guidedProjectSocProblems,...guidedProjectFormalProblems,...guidedProjectMarketProblems,...guidedProjectSimdProblems,...guidedProjectDmaProblems,...guidedProjectCrossbarProblems,...guidedProjectPeripheralSubsystemProblems,...guidedProjectFirmwareProblems,...guidedProjectFormalCacheProblems,...guidedProjectCrossbarVerificationProblems]
 const rawById=Object.fromEntries(allRawProjectProblems.map(problem=>[problem.id,problem]))
 
 export const guidedProjectProblems=[
