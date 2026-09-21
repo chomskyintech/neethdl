@@ -13,12 +13,12 @@ async function replaceEditorContents(page,source){
 }
 
 test.describe('guided project catalog',()=>{
-  test('shows eight working guided projects',async({page})=>{
+  test('shows thirteen working guided projects',async({page})=>{
     await reset(page)
     await page.getByRole('button',{name:'Projects',exact:true}).click()
 
     const guided=page.locator('.guided-project-card')
-    await expect(guided).toHaveCount(8)
+    await expect(guided).toHaveCount(13)
     await expect(guided.filter({hasText:'32-bit RISC-V CPU'})).toContainText('8 modules')
     await expect(guided.filter({hasText:'UART Controller'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'AXI4-Lite Slave Peripheral'})).toContainText('8 modules')
@@ -27,6 +27,11 @@ test.describe('guided project catalog',()=>{
     await expect(guided.filter({hasText:'Three-Stage Pipelined RISC-V Core'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'Hardware DSP Pipeline'})).toContainText('6 modules')
     await expect(guided.filter({hasText:'Matrix-Multiplication Accelerator'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'Cache / Memory Controller'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'RISC-V Core Verification'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'FPGA Packet Parser'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'Branch Predictor'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'Convolution Accelerator'})).toContainText('6 modules')
   })
 
   test('opens UART and can browse modules before solving them',async({page})=>{
@@ -65,7 +70,7 @@ test.describe('guided project catalog',()=>{
     await expect(page.getByRole('heading',{name:'CPU / GPU Hardware'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'Hardware Accelerator'})).toBeVisible()
     await expect(page.getByText(/Project Guides$/)).toHaveCount(0)
-    await expect(page.locator('.project-category-chip').first()).toContainText('All · 8')
+    await expect(page.locator('.project-category-chip').first()).toContainText('All · 13')
   })
 
   test('routes directly into the new guided projects',async({page})=>{
@@ -80,6 +85,21 @@ test.describe('guided project catalog',()=>{
 
     await page.goto('/app/projects/matrix-multiplication-accelerator/matmul-mac-pe/')
     await expect(page.getByRole('heading',{name:'Matrix MAC Processing Element'})).toBeVisible()
+
+    await page.goto('/app/projects/cache-memory-controller/cache-address-decode/')
+    await expect(page.getByRole('heading',{name:'Cache Address Decode'})).toBeVisible()
+
+    await page.goto('/app/projects/risc-v-core-verification/rvv-instruction-item/')
+    await expect(page.getByRole('heading',{name:'RISC-V Instruction Transaction'})).toBeVisible()
+
+    await page.goto('/app/projects/fpga-packet-parser/pkt-byte-position/')
+    await expect(page.getByRole('heading',{name:'Streaming Byte Position Counter'})).toBeVisible()
+
+    await page.goto('/app/projects/branch-predictor/bp-two-bit-counter/')
+    await expect(page.getByRole('heading',{name:'2-bit Saturating Counter'})).toBeVisible()
+
+    await page.goto('/app/projects/convolution-accelerator/conv-line-buffer/')
+    await expect(page.getByRole('heading',{name:'Three-Row Line Buffer'})).toBeVisible()
   })
 
   test('guided module checks can solve a project stage',async({page})=>{
