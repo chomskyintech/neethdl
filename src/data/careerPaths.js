@@ -21,7 +21,7 @@ export const careerPaths={
     label:'Design Verification',
     summary:'Practice SystemVerilog, assertions, reusable testbench structure and UVM-style checking for verification interviews.',
     problemIds:['sv-always','sv-interface','sva-handshake','sva-reset','uvm-driver','uvm-scoreboard','rtl-skid-buffer','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write'],
-    projectSlugs:['uvm-axi4-lite-verification','apb-peripheral-verification','risc-v-core-verification'],
+    projectSlugs:['uvm-axi4-lite-verification','formal-verification-rtl','apb-peripheral-verification','risc-v-core-verification'],
   },
   'hft-fpga':{
     id:'hft-fpga',
@@ -37,7 +37,7 @@ export const careerPaths={
     label:'CPU / GPU Hardware',
     summary:'Develop processor-oriented RTL skills around register structures, pipelines, memories, arbitration and compute datapaths.',
     problemIds:['rtl-regfile','rtl-pipeline-register','rtl-skid-buffer','rtl-dual-port-ram','rtl-fifo','rtl-arbiter','proto-ready-valid-source','proto-axi-lite-write','accel-vector-max4','accel-matmul2'],
-    projectSlugs:['riscv-core','pipelined-risc-v-core','branch-predictor','cache-memory-controller','small-risc-v-soc','risc-v-core-verification'],
+    projectSlugs:['riscv-core','pipelined-risc-v-core','branch-predictor','simd-vector-unit','cache-memory-controller','small-risc-v-soc','risc-v-core-verification'],
   },
   'accelerators':{
     id:'accelerators',
@@ -45,7 +45,7 @@ export const careerPaths={
     label:'Hardware Accelerator',
     summary:'Practice MACs, reductions, fixed-point arithmetic, matrix/conv datapaths and throughput-oriented streaming pipelines.',
     problemIds:['accel-mac8','accel-dot4','accel-reduction8','accel-relu-quant','accel-systolic-pe','accel-pipelined-mul','accel-popcount32','accel-vector-max4','accel-fixed-mul','accel-stream-accum','accel-matmul2','accel-conv3'],
-    projectSlugs:['matrix-multiplication-accelerator','convolution-accelerator','hardware-dsp-pipeline','fpga-packet-parser','feed-to-action-latency-pipeline'],
+    projectSlugs:['matrix-multiplication-accelerator','convolution-accelerator','dma-engine','hardware-dsp-pipeline','fpga-packet-parser','feed-to-action-latency-pipeline'],
   },
 }
 
