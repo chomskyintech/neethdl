@@ -269,6 +269,37 @@ html::-webkit-scrollbar-track,.ide-problem-content::-webkit-scrollbar-track,.edi
 html::-webkit-scrollbar-thumb,.ide-problem-content::-webkit-scrollbar-thumb,.editor-wrap::-webkit-scrollbar-thumb{background:var(--nc-border)!important}
 html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thumb:hover,.editor-wrap::-webkit-scrollbar-thumb:hover{background:var(--nc-muted)!important}
 
+/* Problem pane scrollbar: mirror Monaco's compact rectangular scrollbar. */
+.ide-problem-content{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(121,121,121,.4) transparent!important;
+}
+.ide-problem-content::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+.ide-problem-content::-webkit-scrollbar-track{
+  background:transparent!important;
+}
+.ide-problem-content::-webkit-scrollbar-thumb{
+  background:rgba(121,121,121,.4)!important;
+  border:0;
+  border-radius:0;
+  min-height:24px;
+}
+.ide-problem-content::-webkit-scrollbar-thumb:hover{
+  background:rgba(121,121,121,.7)!important;
+}
+.ide-problem-content::-webkit-scrollbar-thumb:active{
+  background:rgba(121,121,121,.8)!important;
+}
+.ide-problem-content::-webkit-scrollbar-button,
+.ide-problem-content::-webkit-scrollbar-button:single-button{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+
 
 /* Topic browser */
 .topic-cloud-shell,.topic-group,.topic-group-body,.topic-group-problems{
