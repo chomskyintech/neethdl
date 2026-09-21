@@ -108,14 +108,13 @@ function verilogTokenizer(tokenPostfix) {
 }
 
 function vhdlTokenizer() {
+  const words = values =>
+    new RegExp('\\b(?:' + values.join('|') + ')\\b', 'i')
+
   return {
     ignoreCase: true,
     defaultToken: '',
     tokenPostfix: '.vhd',
-    controlKeywords: vhdlControlKeywords,
-    declarationKeywords: vhdlDeclarationKeywords,
-    typeKeywords: vhdlTypeKeywords,
-    builtinFunctions: vhdlBuiltins,
     tokenizer: {
       root: [
         [/--.*$/, 'comment'],
@@ -124,16 +123,13 @@ function vhdlTokenizer() {
         [/'[^']'/, 'number'],
         [/"/, 'string', '@string'],
         [/\b\d+(?:#(?:[0-9a-fA-F_]+)#)?(?:\.\d+)?(?:[eE][+-]?\d+)?\b/, 'number'],
+        [words(vhdlBuiltins), 'support.function.builtin'],
+        [words(vhdlTypeKeywords), 'type.identifier'],
+        [words(vhdlDeclarationKeywords), 'keyword.declaration'],
+        [words(vhdlControlKeywords), 'keyword.control'],
+        [/\b(?:and|or|nand|nor|xor|xnor|not|mod|rem|sll|srl|sla|sra|rol|ror)\b/i, 'operator'],
         [/[A-Z][A-Z0-9_]*/, 'variable.parameter'],
-        [vhdlIdentifier, {
-          cases: {
-            '@controlKeywords': 'keyword.control',
-            '@declarationKeywords': 'keyword.declaration',
-            '@typeKeywords': 'type.identifier',
-            '@builtinFunctions': 'support.function.builtin',
-            '@default': 'identifier'
-          }
-        }],
+        [vhdlIdentifier, 'identifier'],
         [/[()\[\]]/, '@brackets'],
         [/:=|=>|<=|>=|\/=|\*\*|[+\-*\/%&=<>]/, 'operator']
       ],
