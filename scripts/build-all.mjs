@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import {build} from 'vite'
-import {riscvProjectProblems} from '../src/data/riscvProject.js'
+import {guidedProjectProblems} from '../src/data/guidedProjects.js'
 
 const root=process.cwd()
 const problemFile=path.join(root,'src/data/problems.json')
@@ -13,7 +13,7 @@ const baseProblems=JSON.parse(originalProblems)
 const acceleratorProblems=JSON.parse(originalAccelerators)
 const expansionProblems=JSON.parse(fs.readFileSync(expansionFile,'utf8'))
 const codingProblems=baseProblems.filter(problem=>problem.evaluation?.type!=='answer')
-const activeProblems=[...codingProblems,...acceleratorProblems,...expansionProblems,...riscvProjectProblems]
+const activeProblems=[...codingProblems,...acceleratorProblems,...expansionProblems,...guidedProjectProblems]
 const allAccelerators=activeProblems.filter(problem=>problem.category==='Accelerators')
 const removedCount=baseProblems.length-codingProblems.length
 
