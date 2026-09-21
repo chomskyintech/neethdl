@@ -119,11 +119,22 @@ function isCompilationError(output, tests) {
 }
 
 function enhanceConsoleResult(result) {
-  if (!result || (result.dataset.simV2 === 'true' && q(result, '.sim-v2-result-head'))) return
+  if (!result) return
 
   const tests = qa(result, '.test-case').map(parseTestCase)
   const output = q(result, 'pre')?.textContent?.trim() || ''
   const passed = result.classList.contains('pass')
+
+  if (result.dataset.reactOwned === 'true') {
+    result.dataset.simV2 = 'true'
+    const maxTime = tests.reduce((max, test) => Number.isFinite(test.time) ? Math.max(max, test.time) : max, 0)
+    const bottomPanel = result.closest('.ide-bottom')
+    if (bottomPanel && maxTime > 0) bottomPanel.dataset.simV2End = String(maxTime)
+    return
+  }
+
+  if (result.dataset.simV2 === 'true' && q(result, '.sim-v2-result-head')) return
+
   const compileError = !passed && isCompilationError(output, tests)
 
   result.dataset.simV2 = 'true'
