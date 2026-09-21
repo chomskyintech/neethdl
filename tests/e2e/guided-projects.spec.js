@@ -13,12 +13,12 @@ async function replaceEditorContents(page,source){
 }
 
 test.describe('guided project catalog',()=>{
-  test('shows twenty-three working guided projects',async({page})=>{
+  test('shows twenty-five working guided projects',async({page})=>{
     await reset(page)
     await page.getByRole('button',{name:'Projects',exact:true}).click()
 
     const guided=page.locator('.guided-project-card')
-    await expect(guided).toHaveCount(23)
+    await expect(guided).toHaveCount(25)
     await expect(guided.filter({hasText:'32-bit RISC-V CPU'})).toContainText('8 modules')
     await expect(guided.filter({hasText:'UART Controller'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'AXI4-Lite Slave Peripheral'})).toContainText('8 modules')
@@ -42,6 +42,8 @@ test.describe('guided project catalog',()=>{
     await expect(guided.filter({hasText:'RISC-V Firmware + Hardware Bring-Up'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'Formal Verification of a Cache Controller'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'AXI Interconnect Verification Environment'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'SPI Controller'})).toContainText('8 modules')
+    await expect(guided.filter({hasText:'I²C Peripheral / Slave'})).toContainText('8 modules')
   })
 
   test('opens UART and can browse modules before solving them',async({page})=>{
@@ -84,7 +86,7 @@ test.describe('guided project catalog',()=>{
     await expect(page.getByRole('heading',{name:'Embedded Hardware / Firmware Engineer'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'NoC / Interconnect Engineer'})).toBeVisible()
     await expect(page.getByText(/Project Guides$/)).toHaveCount(0)
-    await expect(page.locator('.project-category-chip').first()).toContainText('All · 23')
+    await expect(page.locator('.project-category-chip').first()).toContainText('All · 25')
   })
 
   test('routes directly into the new guided projects',async({page})=>{
@@ -146,6 +148,12 @@ test.describe('guided project catalog',()=>{
 
     await page.goto('/app/projects/axi-crossbar-verification/xbarv-sequence-item/')
     await expect(page.getByRole('heading',{name:'AXI Crossbar Sequence Item'})).toBeVisible()
+
+    await page.goto('/app/projects/spi-controller/spi-clock-divider/')
+    await expect(page.getByRole('heading',{name:'SPI Clock Divider'})).toBeVisible()
+
+    await page.goto('/app/projects/i2c-slave-peripheral/i2c-start-stop/')
+    await expect(page.getByRole('heading',{name:'I²C START / STOP Detector'})).toBeVisible()
   })
 
   test('guided module checks can solve a project stage',async({page})=>{
