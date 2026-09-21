@@ -108,7 +108,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('button', { name: /FSMs\s*2/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*2/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /CPU \/ RISC-V\s*8/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /CPU \/ RISC-V\s*21/ })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Collapse', exact: true })).toBeVisible()
     await expect(page.locator('.problem-row').first()).toBeVisible()
   })
@@ -129,7 +129,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
 
     await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/2')
-    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/1')
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/2')
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/0')
   })
 
