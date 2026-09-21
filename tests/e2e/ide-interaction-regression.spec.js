@@ -91,19 +91,20 @@ test.describe('IDE interaction regressions', () => {
     expect(difficultyBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height)
   })
 
-  test('keeps the task-to-examples spacing compact', async ({ page }) => {
+  test('keeps the approved problem spacing rhythm', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-mux/')
 
     const firstSection = page.locator('.problem-section.first')
-    const task = firstSection.locator('p')
-    const firstExample = page.locator('.structured-example').first()
-    const firstExampleTitle = firstExample.locator('.structured-example-title')
+    const taskCopy = page.locator('.problem-task-copy')
+    const taskList = page.locator('.problem-task-list')
+    const examples = page.locator('.structured-examples')
 
     expect(await firstSection.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('0px')
-    expect(await task.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('12px')
-    await expect(firstExample).toBeVisible()
-    expect(await firstExampleTitle.evaluate(el => getComputedStyle(el).marginTop)).toBe('0px')
+    expect(await taskCopy.evaluate(el => getComputedStyle(el).marginTop)).toBe('48px')
+    expect(await taskList.evaluate(el => getComputedStyle(el).marginTop)).toBe('20px')
+    expect(await taskList.evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
+    expect(await examples.evaluate(el => getComputedStyle(el).marginTop)).toBe('48px')
   })
 
   test('keeps waveform, reset and search controls together on the right', async ({ page }) => {
