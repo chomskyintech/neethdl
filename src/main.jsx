@@ -142,7 +142,6 @@ function App(){
   const next=items.find(problem=>!solved.includes(problem.id))||items[0]
   if(next)navigate('problem',next,{project:project.id})
  }
- const startRiscvProject=()=>startProject('rv32-core')
  const topicNavigationProblems=useMemo(()=>buildTopicOrderedProblems(problems,problemTopics),[])
  const selectedIndex=selected?topicNavigationProblems.findIndex(p=>p.id===selected.id):-1
  const projectIndex=activeProject&&selected?activeProject.problemIds.indexOf(selected.id):-1
@@ -203,7 +202,7 @@ function App(){
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!trackId||solved.includes(selected.id))} navigationLabel={activeProject?.title||(careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic)}/>} 
  {page==='projects'&&<Projects onStartProject={startProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
- {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartRiscv={startRiscvProject} onSelectCareer={openCareer}/>} 
+ {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartProject={startProject} onSelectCareer={openCareer}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
