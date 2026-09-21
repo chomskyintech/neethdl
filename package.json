@@ -15,7 +15,8 @@
     "test:starters": "node tests/starter-scaffold-regression.mjs",
     "test:theme": "node tests/theme-regression.mjs",
     "test:navigation": "node tests/problem-navigation-regression.mjs",
-    "test:solution-coverage": "node tests/reference-solution-coverage.mjs"
+    "test:solution-coverage": "node tests/reference-solution-coverage.mjs",
+    "runner:vhdl": "npm --prefix server install --no-audit --no-fund && node server/ghdl-proxy.js"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
