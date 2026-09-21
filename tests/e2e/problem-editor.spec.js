@@ -181,6 +181,31 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await highlightedTokens.count()).toBeGreaterThan(0)
   })
 
+  test('auto-detects pasted VHDL and switches Monaco language mode', async ({ page }) => {
+    const language = page.locator('.editor-language select')
+    await expect(language).toHaveValue('SystemVerilog')
+
+    const vhdl = `library ieee;
+use ieee.std_logic_1164.all;
+entity shift_reg is
+end entity shift_reg;
+architecture rtl of shift_reg is
+begin
+end architecture rtl;`
+
+    await replaceEditorContents(page, vhdl)
+    await expect(language).toHaveValue('VHDL')
+
+    await expect.poll(async () => page.locator('.monaco-editor .view-lines span').evaluateAll(nodes => {
+      const colours = new Set(
+        nodes
+          .filter(node => (node.textContent || '').trim())
+          .map(node => getComputedStyle(node).color)
+      )
+      return colours.size
+    })).toBeGreaterThanOrEqual(3)
+  })
+
   test('renders VHDL syntax highlighting after switching languages', async ({ page }) => {
     const language = page.locator('.editor-language select')
     await language.selectOption('VHDL')
