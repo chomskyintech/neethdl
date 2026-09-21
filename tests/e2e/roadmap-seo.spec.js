@@ -35,7 +35,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(scrollbar.colors).toContain('rgb(57, 57, 59)')
     expect(scrollbar.colors).toContain('rgb(31, 31, 32)')
     expect(scrollbar.track).toBe('rgb(31, 31, 32)')
-    expect(['rgb(57, 57, 59)','rgb(132, 132, 132)']).toContain(scrollbar.thumb)
+    expect(['rgb(57, 57, 59)','rgb(118, 118, 122)']).toContain(scrollbar.thumb)
     expect(scrollbar.radius).toBe('999px')
     expect(scrollbar.buttonDisplay).toBe('none')
   })

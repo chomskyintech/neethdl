@@ -413,3 +413,53 @@ html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thum
 .account-close:hover,.company-track-exit:hover{
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text-strong)!important;
 }
+
+
+/* Canonical theme locks for late/high-specificity component styles. */
+body.hdlforge-ide-active #hdlforge-ide-drawer{
+  background:var(--nc-bg)!important;
+}
+body.hdlforge-ide-active #hdlforge-ide-drawer .ide-drawer-header{
+  background:var(--nc-editor)!important;
+  border-color:var(--nc-border)!important;
+}
+body.hdlforge-ide-active #hdlforge-ide-drawer .ide-drawer-search{
+  background:var(--nc-surface)!important;
+  border-color:var(--nc-border)!important;
+}
+body.hdlforge-ide-active #hdlforge-ide-drawer .ide-drawer-problem.active{
+  background:var(--nc-surface-2)!important;
+  border-color:var(--nc-border)!important;
+}
+
+body.hdlforge-ide-active .monaco-editor-wrap .monaco-editor,
+body.hdlforge-ide-active .monaco-editor-wrap .monaco-editor .margin,
+body.hdlforge-ide-active .monaco-editor-wrap .monaco-editor-background,
+body.hdlforge-ide-active .reference-monaco .monaco-editor,
+body.hdlforge-ide-active .reference-monaco .monaco-editor .margin,
+body.hdlforge-ide-active .reference-monaco .monaco-editor-background{
+  background-color:var(--nc-editor)!important;
+}
+
+body.hdlforge-ide-active .ide-problem>.problem-tabs button.active,
+body.hdlforge-ide-active .ide-bottom .bottom-tabs button.active,
+body.hdlforge-ide-active .solution-reference .solution-language-tabs button.active{
+  color:var(--nc-active)!important;
+  border-color:var(--nc-active)!important;
+  border-bottom-color:var(--nc-active)!important;
+  box-shadow:inset 0 -2px 0 var(--nc-active)!important;
+}
+
+html{
+  scrollbar-color:var(--nc-border) var(--nc-bg)!important;
+}
+html::-webkit-scrollbar-track{
+  background:var(--nc-bg)!important;
+}
+html::-webkit-scrollbar-thumb{
+  background:var(--nc-border)!important;
+  border-radius:999px!important;
+}
+html::-webkit-scrollbar-thumb:hover{
+  background:var(--nc-muted)!important;
+}
