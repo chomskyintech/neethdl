@@ -1,6 +1,11 @@
 import rawProjectProblems from './guidedProjectProblems.js'
 import expansionGuidedProblems from './guidedProjectExpansionProblems.js'
 import expansionGuidedProblems2 from './guidedProjectExpansionProblems2.js'
+import guidedProjectSocProblems from './guidedProjectSocProblems.js'
+import guidedProjectFormalProblems from './guidedProjectFormalProblems.js'
+import guidedProjectMarketProblems from './guidedProjectMarketProblems.js'
+import guidedProjectSimdProblems from './guidedProjectSimdProblems.js'
+import guidedProjectDmaProblems from './guidedProjectDmaProblems.js'
 import {riscvProject,riscvProjectProblems} from './riscvProject.js'
 
 export const uartProject={
@@ -147,6 +152,66 @@ export const convolutionProject={
   problemIds:['conv-line-buffer','conv-window3','conv-mac9','conv-valid-pipe','conv-clamp8','conv-accelerator-top'],
 }
 
+export const smallRiscvSocProject={
+  id:'small-risc-v-soc',
+  slug:'small-risc-v-soc',
+  title:'Small RISC-V SoC',
+  level:'Hard',
+  roadmap:'rtl-digital',
+  categories:['all','rtl','soc'],
+  skills:['SoC integration','RISC-V','Memory maps','Peripherals','Interrupts'],
+  why:'Integrate processor-facing ROM, RAM, GPIO, timer, interrupts and memory-mapped response routing into a compact programmable SoC.',
+  problemIds:['soc-address-decoder','soc-boot-rom','soc-data-ram','soc-gpio','soc-timer','soc-interrupt-controller','soc-top-integration'],
+}
+
+export const formalVerificationProject={
+  id:'formal-verification-rtl',
+  slug:'formal-verification-rtl',
+  title:'Formal Verification of RTL Interfaces',
+  level:'Intermediate to Hard',
+  roadmap:'verification',
+  categories:['all','dv'],
+  skills:['Formal verification','SVA','Safety','Liveness','Cover properties'],
+  why:'Move beyond simulation by proving FIFO, arbiter and ready/valid properties with assumptions, assertions, bounded progress and reachability goals.',
+  problemIds:['formal-reset-assumption','formal-fifo-bounds','formal-fifo-order','formal-arbiter-onehot','formal-arbiter-liveness','formal-ready-valid','formal-cover-progress'],
+}
+
+export const marketDataProject={
+  id:'low-latency-market-data-parser',
+  slug:'low-latency-market-data-parser',
+  title:'Low-Latency Market Data Parser',
+  level:'Hard',
+  roadmap:'hft-fpga',
+  categories:['all','fpga','hft'],
+  skills:['Low-latency RTL','Streaming','Market data','Field extraction','Latency measurement'],
+  why:'Build a fixed-format line-rate parser that normalizes market-data messages while tracking deterministic cycle latency.',
+  problemIds:['md-word-counter','md-header-decode','md-symbol-filter','md-price-quantity','md-message-classifier','md-latency-meter','md-parser-top'],
+}
+
+export const simdVectorProject={
+  id:'simd-vector-unit',
+  slug:'simd-vector-unit',
+  title:'SIMD / Vector Execution Unit',
+  level:'Hard',
+  roadmap:'cpu-gpu',
+  categories:['all','rtl','fpga'],
+  skills:['SIMD','Vector ALU','Masks','Reductions','Register files'],
+  why:'Build a four-lane vector execution block with arithmetic lanes, masking, reductions, architectural vector registers and pipelined output.',
+  problemIds:['simd-lane-alu','simd-four-lanes','simd-mask','simd-reduction','simd-register-file','simd-pipeline-register','simd-top'],
+}
+
+export const dmaProject={
+  id:'dma-engine',
+  slug:'dma-engine',
+  title:'DMA Engine',
+  level:'Hard',
+  roadmap:'accelerators',
+  categories:['all','rtl','soc','fpga'],
+  skills:['DMA','Ready/valid','Address generation','FSMs','Interrupts'],
+  why:'Build the data-movement engine accelerators need: programmable registers, source/destination sequencing, backpressure, transfer counting and completion interrupts.',
+  problemIds:['dma-control-registers','dma-address-generator','dma-read-engine','dma-write-engine','dma-transfer-counter','dma-controller','dma-top'],
+}
+
 export const guidedProjects=[
   {
     ...riscvProject,
@@ -168,12 +233,17 @@ export const guidedProjects=[
   packetParserProject,
   branchPredictorProject,
   convolutionProject,
+  smallRiscvSocProject,
+  formalVerificationProject,
+  marketDataProject,
+  simdVectorProject,
+  dmaProject,
 ]
 
 export const guidedProjectById=Object.fromEntries(guidedProjects.map(project=>[project.id,project]))
 export const guidedProjectBySlug=Object.fromEntries(guidedProjects.map(project=>[project.slug,project]))
 
-const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2]
+const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2,...guidedProjectSocProblems,...guidedProjectFormalProblems,...guidedProjectMarketProblems,...guidedProjectSimdProblems,...guidedProjectDmaProblems]
 const rawById=Object.fromEntries(allRawProjectProblems.map(problem=>[problem.id,problem]))
 
 export const guidedProjectProblems=[
