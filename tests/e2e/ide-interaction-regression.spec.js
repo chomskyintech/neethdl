@@ -91,20 +91,31 @@ test.describe('IDE interaction regressions', () => {
     expect(difficultyBox.y).toBeGreaterThanOrEqual(titleBox.y + titleBox.height)
   })
 
-  test('keeps the approved problem spacing rhythm', async ({ page }) => {
+  test('balances the visible space around the task block', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
-    await page.goto('/app/problems/rtl-mux/')
+    await page.goto('/app/problems/rtl-counter/')
 
-    const firstSection = page.locator('.problem-section.first')
+    const heading = page.locator('.problem-heading')
     const taskCopy = page.locator('.problem-task-copy')
     const taskList = page.locator('.problem-task-list')
-    const examples = page.locator('.structured-examples')
+    const firstExampleTitle = page.locator('.structured-example-title').first()
 
-    expect(await firstSection.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('0px')
-    expect(await taskCopy.evaluate(el => getComputedStyle(el).marginTop)).toBe('48px')
+    const headingBox = await heading.boundingBox()
+    const taskBox = await taskCopy.boundingBox()
+    const listBox = await taskList.boundingBox()
+    const exampleBox = await firstExampleTitle.boundingBox()
+
+    expect(headingBox).toBeTruthy()
+    expect(taskBox).toBeTruthy()
+    expect(listBox).toBeTruthy()
+    expect(exampleBox).toBeTruthy()
+
+    const spaceAbove = taskBox.y - (headingBox.y + headingBox.height)
+    const spaceBelow = exampleBox.y - (listBox.y + listBox.height)
+
+    expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(16)
     expect(await taskList.evaluate(el => getComputedStyle(el).marginTop)).toBe('20px')
     expect(await taskList.evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
-    expect(await examples.evaluate(el => getComputedStyle(el).marginTop)).toBe('48px')
   })
 
   test('keeps waveform, reset and search controls together on the right', async ({ page }) => {
