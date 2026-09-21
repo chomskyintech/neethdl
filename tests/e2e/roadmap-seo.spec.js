@@ -158,6 +158,10 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('button', { name: /Jane Street/ })).toBeVisible()
     await expect(page.getByRole('button', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'CPU / GPU Hardware', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'SoC Design / Integration Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Formal Verification Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Embedded Hardware / Firmware Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'NoC / Interconnect Engineer', exact: true })).toBeVisible()
   })
 
   test('RTL Design roadmap opens a dedicated career page with related problems and projects', async ({ page }) => {
@@ -231,6 +235,10 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByRole('heading', { name: 'FPGA Engineer', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'CPU / GPU Hardware', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Hardware Accelerator', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'SoC Design / Integration Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Formal Verification Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Embedded Hardware / Firmware Engineer', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'NoC / Interconnect Engineer', exact: true })).toBeVisible()
     await expect(page.locator('.project-card-modern .project-build')).toHaveCount(0)
     await expect(page.locator('.project-card-modern .project-why')).toHaveCount(0)
   })
@@ -259,4 +267,20 @@ test.describe('HDLForge navigation and SEO content', () => {
     const canonical = page.locator('link[rel="canonical"]')
     await expect(canonical).toHaveAttribute('href', 'https://hdlforge.netlify.app/learn/verilog-interview/')
   })
+  test('new career roadmaps have working app routes and crawlable SEO pages', async ({ page }) => {
+    const careers=[
+      ['soc-design-integration','SoC Design / Integration Engineer'],
+      ['formal-verification-engineer','Formal Verification Engineer'],
+      ['embedded-hardware-firmware','Embedded Hardware / Firmware Engineer'],
+      ['noc-interconnect','NoC / Interconnect Engineer'],
+    ]
+    for(const [slug,label] of careers){
+      await page.goto(`/app/roadmaps/${slug}/`)
+      await expect(page.getByRole('heading',{name:label,exact:true})).toBeVisible()
+      await page.goto(`/careers/${slug}/index.html`)
+      await expect(page.getByRole('heading',{name:label,exact:true})).toBeVisible()
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',`https://hdlforge.netlify.app/careers/${slug}/`)
+    }
+  })
+
 })
