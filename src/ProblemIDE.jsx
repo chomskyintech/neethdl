@@ -92,7 +92,8 @@ function addTeachingComments(problemId, language, source) {
 const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback } }
 function vcdParse(vcd) {
   if (!vcd) return { signals: [], end: 0 }
-  const scaleMatch = vcd.match(/\$timescale\s+(\d+(?:\.\d+)?)\s*(s|ms|us|ns|ps|fs)\s+\$end/i)
+  const scaleBody = vcd.match(/\$timescale([\s\S]*?)\$end/i)?.[1]?.replace(/\s+/g, '') || ''
+  const scaleMatch = scaleBody.match(/^(\d+(?:\.\d+)?)(s|ms|us|ns|ps|fs)$/i)
   const scaleToNs = scaleMatch ? Number(scaleMatch[1]) * ({s:1e9,ms:1e6,us:1e3,ns:1,ps:1e-3,fs:1e-6}[scaleMatch[2].toLowerCase()] || 1) : 1
   const lines = vcd.split(/\r?\n/), vars = [], values = {}, times = []
   let scope = '', time = 0, started = false
