@@ -2,6 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import tracks from '../src/data/tracks.js'
 import {allProjects,guidedProject} from '../src/data/projects.js'
+import {careerPathList} from '../src/data/careerPaths.js'
+import {guidedProjects} from '../src/data/guidedProjects.js'
 
 const root=process.cwd()
 const publicDir=path.join(root,'public')
@@ -46,6 +48,32 @@ for(const track of companyTracks){
 const companyCards=companyTracks.map(track=>{const c=companyConfigs[track.id];return `<a class="card" href="/companies/${c.slug}/"><strong>${esc(track.name)}</strong><br><span class="meta">${esc(c.focus)}</span></a>`}).join('')
 write('companies/index.html',shell({title:'Company-Specific Hardware Interview Practice | HDLForge',description:'Practice company-style hardware design interview problems for Jane Street, AMD, Arm, NVIDIA, Qualcomm and Apple with RTL, FPGA, verification and architecture tracks.',canonical:`${base}/companies/`,crumbs:[{name:'HDLForge',url:base+'/'},{name:'Companies',url:base+'/companies/'}],type:'CollectionPage',body:`<p class="meta">HDLForge company tracks</p><h1>Company-specific hardware interview practice</h1><p class="intro">Choose a company-style preparation track and practise the RTL, verification, FPGA and computer-architecture skills most relevant to that track. HDLForge does not claim these are confidential or guaranteed interview questions.</p><div class="grid">${companyCards}</div><h2>Build the fundamentals first</h2><p>Company preparation works best after core practice. Use the <a href="/problems/">hardware design problem library</a> and <a href="/learn/">learning guides</a> alongside these tracks.</p>`}))
 
+const guidedProjectMap=new Map(guidedProjects.map(project=>[project.slug,project]))
+const staticProjectMap=new Map(allProjects.map(project=>[project.slug,project]))
+const careerProjectAliases={
+ 'rtl-digital':['asynchronous-fifo'],
+}
+
+for(const career of careerPathList){
+ const canonical=`${base}/careers/${career.slug}/`
+ const selected=career.problemIds.map(id=>problems.find(problem=>problem.id===id)).filter(Boolean)
+ const slugs=[...career.projectSlugs,...(careerProjectAliases[career.id]||[])]
+ const projectItems=[...new Set(slugs)].map(slug=>guidedProjectMap.get(slug)||staticProjectMap.get(slug)).filter(Boolean)
+ const problemCards=selected.map(problem=>`<a class="card" href="/problems/${esc(problem.id)}/"><strong>${esc(problem.title)}</strong><br><span class="meta">${esc(problem.topic||problem.category)} · ${esc(problem.difficulty)}</span><br>${esc(problem.description)}</a>`).join('')
+ const projectCards=projectItems.map(project=>{
+  const staticProject=staticProjectMap.get(project.slug)
+  const href=staticProject?`/projects/${esc(project.slug)}/`:'/app/projects/'
+  return `<a class="card" href="${href}"><strong>${esc(project.title)}</strong><br><span class="meta">${esc(project.level||'Guided')} · Hardware project</span><br>${esc(project.why||project.build||'Build this project as part of the HDLForge guided roadmap.')}</a>`
+ }).join('')
+ const skills=(career.skills||[]).map(skill=>`<span class="tag">${esc(skill)}</span>`).join('')
+ const description=`${career.label} roadmap with focused HDLForge problems and hardware projects covering the skills used in this career path.`
+ const body=`<p class="meta">HDLForge career roadmap</p><h1>${esc(career.label)}</h1><p class="intro">${esc(career.summary)}</p>${skills?`<h2>Core skills</h2><div class="tags">${skills}</div>`:''}<h2>Practice problems</h2><p>Use these exercises to build the core implementation and verification skills for this path.</p><div class="grid">${problemCards}</div><h2>Projects for this path</h2><p>Use the projects to combine individual skills into larger portfolio-ready systems.</p><div class="grid">${projectCards}</div><a class="cta" href="/app/roadmaps/${esc(career.slug)}/">Open the interactive ${esc(career.label)} roadmap</a>`
+ write(`careers/${career.slug}/index.html`,shell({title:`${career.label} Roadmap | HDLForge`,description,canonical,crumbs:[{name:'HDLForge',url:base+'/'},{name:'Career roadmaps',url:base+'/careers/'},{name:career.label,url:canonical}],body,type:'CollectionPage'}))
+}
+
+const careerCards=careerPathList.map(career=>`<a class="card" href="/careers/${esc(career.slug)}/"><strong>${esc(career.label)}</strong><br><span class="meta">${esc(career.summary)}</span></a>`).join('')
+write('careers/index.html',shell({title:'Digital Hardware Career Roadmaps | HDLForge',description:'Explore HDLForge career roadmaps for RTL design, verification, FPGA, CPU/GPU hardware, accelerators, SoC integration, formal verification, embedded hardware and NoC/interconnect engineering.',canonical:`${base}/careers/`,crumbs:[{name:'HDLForge',url:base+'/'},{name:'Career roadmaps',url:base+'/careers/'}],type:'CollectionPage',body:`<p class="meta">HDLForge career roadmaps</p><h1>Digital hardware career roadmaps</h1><p class="intro">Choose a hardware career path and work through focused problems and larger guided projects.</p><div class="grid">${careerCards}</div>`}))
+
 const roleGuidance={
  'Design Verification':['Write a concise verification plan before building the environment.','Separate stimulus, observation, prediction and checking responsibilities.','Add assertions for protocol invariants and functional coverage for meaningful scenarios.','Run regression seeds, classify failures and document coverage closure.'],
  'RTL / Digital Design':['Turn the requirements into a block diagram and explicit state/data-path decisions.','Define interfaces, reset behavior, widths and latency before coding.','Build self-checking simulation for nominal and boundary cases.','Review synthesis/timing consequences and document the trade-offs you made.'],
@@ -89,7 +117,7 @@ write('projects/index.html',shell({title:'Hardware Design, RTL, FPGA & Verificat
 const notFound=`<!doctype html><html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Page not found | HDLForge</title><meta name="robots" content="noindex, follow"><style>body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:760px;margin:12vh auto;padding:24px;line-height:1.65;color:#171717}a{color:inherit}</style></head><body><h1>Page not found</h1><p>The HDLForge page you requested does not exist.</p><p><a href="/">Return to HDLForge</a> · <a href="/problems/">Browse problems</a> · <a href="/projects/">Browse projects</a></p></body></html>`
 write('404.html',notFound)
 
-const urls=['/companies/','/projects/',...companyTracks.map(t=>`/companies/${companyConfigs[t.id].slug}/`),...allProjects.map(p=>`/projects/${p.slug}/`)]
+const urls=['/companies/','/projects/','/careers/',...careerPathList.map(career=>`/careers/${career.slug}/`),...companyTracks.map(t=>`/companies/${companyConfigs[t.id].slug}/`),...allProjects.map(p=>`/projects/${p.slug}/`)]
 const sitemapPath=path.join(publicDir,'sitemap.xml')
 if(fs.existsSync(sitemapPath)){
  let xml=fs.readFileSync(sitemapPath,'utf8')
@@ -98,4 +126,4 @@ if(fs.existsSync(sitemapPath)){
  fs.writeFileSync(sitemapPath,xml)
 }
 
-console.log(`Generated ${companyTracks.length} company pages and ${allProjects.length} project pages plus discovery hubs.`)
+console.log(`Generated ${companyTracks.length} company pages, ${allProjects.length} project pages and ${careerPathList.length} career pages plus discovery hubs.`)
