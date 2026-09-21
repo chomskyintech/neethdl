@@ -11,6 +11,7 @@ import './topic-browser.css'
 import './neetcode-palette.css'
 import './lockedEditor.js'
 import problems,{problemTopics} from './data/activeProblems'
+import {buildTopicOrderedProblems} from './problemNavigation'
 import {riscvProject} from './data/riscvProject'
 import tracks from './data/tracks'
 import {careerPaths,careerPathBySlug} from './data/careerPaths'
@@ -135,11 +136,12 @@ function App(){
   const next=projectProblems.find(problem=>!solved.includes(problem.id))||projectProblems[0]
   if(next)navigate('problem',next,{project:riscvProject.id})
  }
- const selectedIndex=selected?problems.findIndex(p=>p.id===selected.id):-1
+ const topicNavigationProblems=useMemo(()=>buildTopicOrderedProblems(problems,problemTopics),[])
+ const selectedIndex=selected?topicNavigationProblems.findIndex(p=>p.id===selected.id):-1
  const projectIndex=projectId===riscvProject.id&&selected?riscvProject.problemIds.indexOf(selected.id):-1
  const trackIndex=trackId&&activeTrack&&selected?activeTrack.problemIds.indexOf(selected.id):-1
- const previousProblem=projectIndex>=0?(projectIndex>0?projectProblems[projectIndex-1]:null):trackIndex>=0?(trackIndex>0?trackProblems[trackIndex-1]:null):(selectedIndex>0?problems[selectedIndex-1]:null)
- const nextProblem=projectIndex>=0?(projectIndex<projectProblems.length-1?projectProblems[projectIndex+1]:null):trackIndex>=0?(trackIndex<trackProblems.length-1?trackProblems[trackIndex+1]:null):(selectedIndex>=0&&selectedIndex<problems.length-1?problems[selectedIndex+1]:null)
+ const previousProblem=projectIndex>=0?(projectIndex>0?projectProblems[projectIndex-1]:null):trackIndex>=0?(trackIndex>0?trackProblems[trackIndex-1]:null):(selectedIndex>0?topicNavigationProblems[selectedIndex-1]:null)
+ const nextProblem=projectIndex>=0?(projectIndex<projectProblems.length-1?projectProblems[projectIndex+1]:null):trackIndex>=0?(trackIndex<trackProblems.length-1?trackProblems[trackIndex+1]:null):(selectedIndex>=0&&selectedIndex<topicNavigationProblems.length-1?topicNavigationProblems[selectedIndex+1]:null)
  const openPrevious=()=>previousProblem&&navigate('problem',previousProblem,{project:projectId,track:projectId?null:trackId})
  const openNext=()=>nextProblem&&navigate('problem',nextProblem,{project:projectId,track:projectId?null:trackId})
 

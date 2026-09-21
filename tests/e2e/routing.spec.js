@@ -45,6 +45,20 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveTitle('Synchronous FIFO | HDLForge')
  })
 
+ test('editor arrows finish the current topic before advancing to the next topic',async({page})=>{
+  await page.goto('/app/problems/rtl-fifo/')
+  await expect(page).toHaveTitle('Synchronous FIFO | HDLForge')
+
+  await page.getByRole('button',{name:/Next/i}).first().click()
+  await expect(page).toHaveURL(/\/app\/problems\/rtl-skid-buffer\/$/)
+
+  await page.getByRole('button',{name:/Next/i}).first().click()
+  await expect(page).toHaveURL(/\/app\/problems\/rtl-regfile\/$/)
+
+  await page.getByRole('button',{name:/Previous/i}).first().click()
+  await expect(page).toHaveURL(/\/app\/problems\/rtl-skid-buffer\/$/)
+ })
+
  test('legacy problem query links normalize to the routed problem URL',async({page})=>{
   await page.goto('/?problem=rtl-fifo')
   await expect(page).toHaveURL(/\/app\/problems\/rtl-fifo\/$/)

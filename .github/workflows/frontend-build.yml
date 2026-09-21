@@ -27,5 +27,8 @@ jobs:
       - name: Validate NeetCode theme
         run: npm run test:theme
 
+      - name: Validate problem navigation
+        run: npm run test:navigation
+
       - name: Build production bundle
         run: npm run build
