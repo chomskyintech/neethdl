@@ -33,7 +33,12 @@ let signInButton = null
 let searchInput = null
 let problemRows = []
 
-const categories = ['RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
+const preferredCategories = ['RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
+const categories = [
+  ...preferredCategories,
+  ...[...new Set(problems.map(problem=>problem.category))]
+    .filter(category=>category&&!preferredCategories.includes(category)),
+]
 
 function currentProblemId(){
   const match = window.location.pathname.match(/^\/app\/problems\/([^/]+)\/?$/)
