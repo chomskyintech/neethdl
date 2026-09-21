@@ -128,8 +128,8 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(topicRows.filter({ hasText: 'Scoreboards' })).toBeVisible()
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
 
-    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/0')
-    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/0')
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/1')
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/1')
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/0')
   })
 
