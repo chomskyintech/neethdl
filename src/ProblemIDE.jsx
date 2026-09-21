@@ -92,13 +92,15 @@ function addTeachingComments(problemId, language, source) {
 const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)) } catch { return fallback } }
 function vcdParse(vcd) {
   if (!vcd) return { signals: [], end: 0 }
+  const scaleMatch = vcd.match(/\$timescale\s+(\d+(?:\.\d+)?)\s*(s|ms|us|ns|ps|fs)\s+\$end/i)
+  const scaleToNs = scaleMatch ? Number(scaleMatch[1]) * ({s:1e9,ms:1e6,us:1e3,ns:1,ps:1e-3,fs:1e-6}[scaleMatch[2].toLowerCase()] || 1) : 1
   const lines = vcd.split(/\r?\n/), vars = [], values = {}, times = []
   let scope = '', time = 0, started = false
   for (const raw of lines) {
     const line = raw.trim()
     if (line.startsWith('$scope')) scope = line.split(/\s+/)[2] || ''
     if (line.startsWith('$var')) { const p = line.split(/\s+/), code = p[3]; vars.push({ code, name: p[4], width: Number(p[2]) || 1, scope: scope || 'tb' }); values[code] = [] }
-    if (line[0] === '#') { time = Number(line.slice(1)); times.push(time); started = true; continue }
+    if (line[0] === '#') { time = Number(line.slice(1)) * scaleToNs; times.push(time); started = true; continue }
     if (started && /^[01xXzZ][!-~]+$/.test(line)) { const code = line.slice(1); if (values[code]) values[code].push({ t: time, v: line[0].toLowerCase() }) }
     else if (started && /^b[01xXzZ]+\s+[!-~]+$/.test(line)) { const p = line.split(/\s+/); if (values[p[1]]) values[p[1]].push({ t: time, v: p[0].slice(1) }) }
   }
