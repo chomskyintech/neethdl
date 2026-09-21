@@ -348,3 +348,36 @@
 
 
 
+
+
+.problem-task-copy{
+  max-width:650px;
+}
+.problem-task-copy>p{
+  margin:0;
+}
+.problem-task-list{
+  margin:12px 0 0;
+  padding-left:18px;
+  color:#aab8c8;
+  font-size:13px;
+  line-height:1.7;
+}
+.problem-task-list li{
+  margin:7px 0;
+  padding-left:2px;
+}
+.problem-task-list li::marker{
+  color:#8f9bab;
+}
+.problem-inline-code{
+  display:inline-block;
+  padding:1px 5px;
+  margin:0 1px;
+  border:1px solid var(--ide-border);
+  border-radius:4px;
+  background:#2f3032;
+  color:#e2e5e9;
+  font:600 .92em/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;
+  vertical-align:baseline;
+}
