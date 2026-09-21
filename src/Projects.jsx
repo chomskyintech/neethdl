@@ -13,14 +13,14 @@ const projectCategories=[
 ]
 
 const roadmapItems=[
- {id:'rtl-digital',label:'RTL Design Engineer',category:'rtl'},
- {id:'verification',label:'Design Verification',category:'dv'},
- {id:'hft-fpga',label:'FPGA Engineer',category:'fpga'},
- {id:'cpu-gpu',label:'CPU / GPU Hardware',category:'rtl'},
- {id:'accelerators',label:'Hardware Accelerator',category:'fpga'}
+ {id:'rtl-digital',label:'RTL Design Engineer',category:'rtl',description:'Build synthesizable blocks, buses, CDC structures and control-heavy digital RTL.'},
+ {id:'verification',label:'Design Verification',category:'dv',description:'Build reusable SystemVerilog/UVM environments with checking, assertions and coverage.'},
+ {id:'hft-fpga',label:'FPGA Engineer',category:'fpga',description:'Build streaming, interface and signal-processing designs suited to FPGA implementation.'},
+ {id:'cpu-gpu',label:'CPU / GPU Hardware',category:'rtl',description:'Build processor datapaths and then add real microarchitectural pipeline control.'},
+ {id:'accelerators',label:'Hardware Accelerator',category:'fpga',description:'Build throughput-oriented arithmetic datapaths and small compute engines.'}
 ]
 
-const replacedGuideSlugs=new Set(['asynchronous-fifo'])
+const replacedGuideSlugs=new Set(guidedProjects.map(project=>project.slug))
 
 export default function Projects({onStartProject,solved=[],drafts={},onSelectCareer}){
  const [category,setCategory]=useState('all')
@@ -49,6 +49,10 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
  },[category])
 
  const guidedVisible=projectStats.filter(({project})=>category==='all'||project.categories?.includes(category))
+ const guidedGroups=roadmapItems.map(item=>({
+  ...item,
+  stats:guidedVisible.filter(({project})=>project.roadmap===item.id),
+ })).filter(group=>group.stats.length)
  const conceptualCount=roleGroups.reduce((sum,group)=>sum+group.projects.filter(project=>!replacedGuideSlugs.has(project.slug)).length,0)
  const totalProjects=guidedProjects.length+conceptualCount
  const countFor=item=>{
@@ -79,10 +83,10 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
     {projectCategories.map(item=><button key={item.id} type="button" className={category===item.id?'project-category-chip active':'project-category-chip'} onClick={()=>selectCategory(item.id)}>{item.label} · {countFor(item)}</button>)}
    </div>
 
-   {guidedVisible.length>0&&<section className="project-role project-role-modern guided-project-section">
-    <div className="project-role-head"><h2>Guided Projects</h2><p>Build these projects module by module in the HDLForge IDE. Each stage includes starter RTL, focused checks, a reference solution and saved progress.</p></div>
+   {guidedGroups.map(group=><section className="project-role project-role-modern guided-project-section" key={group.id}>
+    <div className="project-role-head"><h2>{group.label}</h2><p>{group.description}</p></div>
     <div className="project-grid project-grid-modern guided-project-grid">
-     {guidedVisible.map(({project,completed,action})=><article
+     {group.stats.map(({project,completed,action})=><article
       className="project-card project-card-modern guided-project-card guided-project-clickable"
       key={project.id}
       role="button"
@@ -97,7 +101,7 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
       <span className="project-guide-link">{action} <ArrowRight size={14}/></span>
      </article>)}
     </div>
-   </section>}
+   </section>)}
 
    {visibleGroups.map(group=>group.projects.length?<section className="project-role project-role-modern" key={group.role}>
     <div className="project-role-head"><h2>{group.role}</h2><p>{group.summary}</p></div>
