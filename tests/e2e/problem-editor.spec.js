@@ -377,8 +377,8 @@ endmodule`
 
     // Force React state updates after the pass result is on screen. This used
     // to crash because simulation-panel-v2 rewrote React-owned result markup.
-    await page.getByRole('button', { name: /Collapse console/i }).click()
-    await page.getByRole('button', { name: /Expand console/i }).click()
+    await page.getByRole('button', { name: 'Approach', exact: true }).click()
+    await page.getByRole('button', { name: 'Problem', exact: true }).click()
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: /Run tests/i }).first().click()
