@@ -68,13 +68,13 @@ test.describe('HDLForge Monaco problem editor', () => {
   })
 
 
-  test('explains the priority arbiter in beginner-friendly terms', async ({ page }) => {
+  test('explains the priority arbiter clearly without extra teaching sections', async ({ page }) => {
     await page.goto('/app/problems/rtl-arbiter/')
-    await expect(page.getByRole('heading', { name: 'What this means', exact: true })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Inputs & outputs', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'What this means', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Inputs & outputs', exact: true })).toHaveCount(0)
     await expect(page.locator('.problem-copy')).toContainText('req[3] > req[2] > req[1] > req[0]')
     await expect(page.locator('.problem-copy')).toContainText('Requester 2 wins because it has higher priority than requester 0.')
-    await expect(page.locator('.problem-copy')).toContainText('grant[3:0]')
+    await expect(page.locator('.problem-copy')).toContainText('Drive grant[3:0]')
   })
 
   test('renders hardware theory and design reasoning in the Approach tab', async ({ page }) => {

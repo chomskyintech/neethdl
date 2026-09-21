@@ -196,19 +196,6 @@
     ],
     "description": "A priority arbiter chooses one winner when multiple devices request access to a shared resource at the same time.",
     "task": "Design a combinational 4-request priority arbiter. The input req[3:0] represents four requesters. A bit value of 1 means that requester is asking for access. Drive grant[3:0] so that only the highest-priority active requester is granted. Requester 3 has the highest priority and requester 0 has the lowest.",
-    "explanation": "Think of req and grant as matching four-bit lists. If req[2] is 1, requester 2 is asking for access. If several request bits are 1 at the same time, only the highest-priority requester should receive a grant. The winning requester is indicated by setting the matching bit in grant to 1.",
-    "signals": [
-      {
-        "name": "req[3:0]",
-        "direction": "Input",
-        "description": "Four request bits. req[i] = 1 means requester i is requesting access."
-      },
-      {
-        "name": "grant[3:0]",
-        "direction": "Output",
-        "description": "One-hot grant result. grant[i] = 1 means requester i won arbitration."
-      }
-    ],
     "examples": [
       "req   = 4'b0101\n        bits 2 and 0 are requesting\ngrant = 4'b0100\nRequester 2 wins because it has higher priority than requester 0.",
       "req   = 4'b1011\n        bits 3, 1 and 0 are requesting\ngrant = 4'b1000\nRequester 3 wins because it has the highest priority.",
