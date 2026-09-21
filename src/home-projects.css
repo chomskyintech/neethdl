@@ -371,3 +371,10 @@
   .project-category-row{gap:7px}
   .project-category-chip{font-size:11px}
 }
+
+
+.guided-project-section{margin-top:28px}
+.guided-project-card{cursor:pointer}
+.guided-project-card-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#8f9792;font-size:10px}
+.guided-project-card .project-guide-link{margin-top:auto}
+.guided-project-card:focus-visible{outline:1px solid #5a6862;outline-offset:2px}
