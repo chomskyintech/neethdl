@@ -97,11 +97,13 @@ test.describe('IDE interaction regressions', () => {
 
     const firstSection = page.locator('.problem-section.first')
     const task = firstSection.locator('p')
-    const examplesHeading = page.locator('.problem-section.first + .problem-section h2')
+    const firstExample = page.locator('.structured-example').first()
+    const firstExampleTitle = firstExample.locator('.structured-example-title')
 
     expect(await firstSection.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('0px')
     expect(await task.evaluate(el => getComputedStyle(el).paddingBottom)).toBe('12px')
-    expect(await examplesHeading.evaluate(el => getComputedStyle(el).paddingTop)).toBe('18px')
+    await expect(firstExample).toBeVisible()
+    expect(await firstExampleTitle.evaluate(el => getComputedStyle(el).marginTop)).toBe('0px')
   })
 
   test('keeps waveform, reset and search controls together on the right', async ({ page }) => {
