@@ -58,7 +58,7 @@ function verilogFromSystemVerilog(source = '') {
 }
 
 export function languageStarter(problem, language) {
-  if (language === 'SystemVerilog') return problem.starterCode || ''
+  if (language === 'SystemVerilog' || language === 'C') return problem.starterCode || ''
   if (language === 'Verilog') return verilogFromSystemVerilog(problem.starterCode || '')
   return vhdlStarters[problem.id] || `library ieee;
 use ieee.std_logic_1164.all;
