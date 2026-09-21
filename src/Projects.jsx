@@ -1,6 +1,5 @@
 import React,{useMemo,useState} from 'react'
 import{ArrowRight,ChevronRight}from'lucide-react'
-import {roleGroups} from './data/projects'
 import {guidedProjects} from './data/guidedProjects'
 
 const projectCategories=[
@@ -20,7 +19,6 @@ const roadmapItems=[
  {id:'accelerators',label:'Hardware Accelerator',category:'fpga',description:'Build throughput-oriented arithmetic datapaths and small compute engines.'}
 ]
 
-const replacedGuideSlugs=new Set(guidedProjects.map(project=>project.slug))
 
 export default function Projects({onStartProject,solved=[],drafts={},onSelectCareer}){
  const [category,setCategory]=useState('all')
@@ -41,25 +39,15 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
   }
  }),[solved,drafts])
 
- const visibleGroups=useMemo(()=>{
-  const filtered=roleGroups.map(group=>({...group,projects:group.projects.filter(project=>!replacedGuideSlugs.has(project.slug))}))
-  if(category==='all')return filtered
-  const selected=projectCategories.find(item=>item.id===category)
-  return selected?.role?filtered.filter(group=>group.role===selected.role):filtered
- },[category])
 
  const guidedVisible=projectStats.filter(({project})=>category==='all'||project.categories?.includes(category))
  const guidedGroups=roadmapItems.map(item=>({
   ...item,
   stats:guidedVisible.filter(({project})=>project.roadmap===item.id),
  })).filter(group=>group.stats.length)
- const conceptualCount=roleGroups.reduce((sum,group)=>sum+group.projects.filter(project=>!replacedGuideSlugs.has(project.slug)).length,0)
- const totalProjects=guidedProjects.length+conceptualCount
  const countFor=item=>{
-  if(item.id==='all')return totalProjects
-  const guideCount=guidedProjects.filter(project=>project.categories?.includes(item.id)).length
-  const roleCount=roleGroups.find(group=>group.role===item.role)?.projects.filter(project=>!replacedGuideSlugs.has(project.slug)).length||0
-  return guideCount+roleCount
+  if(item.id==='all')return guidedProjects.length
+  return guidedProjects.filter(project=>project.categories?.includes(item.id)).length
  }
  const activeStats=projectStats.filter(stat=>stat.active&&!stat.complete)
  const completeStats=projectStats.filter(stat=>stat.complete)
@@ -103,15 +91,6 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
     </div>
    </section>)}
 
-   {visibleGroups.map(group=>group.projects.length?<section className="project-role project-role-modern" key={group.role}>
-    <div className="project-role-head"><h2>{group.role} Project Guides</h2><p>{group.summary}</p></div>
-    <div className="project-grid project-grid-modern">{group.projects.map(project=><article className="project-card project-card-modern" key={project.slug}>
-     <span className="project-level">{project.level}</span>
-     <h3>{project.title}</h3>
-     <div className="project-tags">{project.skills.slice(0,4).map(skill=><span key={skill}>{skill}</span>)}</div>
-     <a className="project-guide-link" href={`/projects/${project.slug}/`}>Project guide <ArrowRight size={14}/></a>
-    </article>)}</div>
-   </section>:null)}
   </section>
 
   <aside className="projects-side-rail">
