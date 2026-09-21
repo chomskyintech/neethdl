@@ -12,7 +12,7 @@ import './neetcode-palette.css'
 import './lockedEditor.js'
 import problems,{problemTopics} from './data/activeProblems'
 import {buildTopicOrderedProblems} from './problemNavigation'
-import {riscvProject} from './data/riscvProject'
+import {guidedProjectById,guidedProjectBySlug} from './data/guidedProjects'
 import tracks from './data/tracks'
 import {careerPaths,careerPathBySlug} from './data/careerPaths'
 import LandingHub from './LandingHub'
@@ -52,7 +52,8 @@ function appPath(page,problem,projectId=null,trackId=null,careerId=null){
  if(page==='career'&&careerId){const career=careerPaths[careerId];return career?`/app/roadmaps/${career.slug}/`:'/app/problems/'}
  if(page==='problems'&&trackId)return `/app/problems/company/${encodeURIComponent(trackId)}/`
  if(page==='problem'&&problem){
-  if(projectId===riscvProject.id)return `/app/projects/${riscvProject.slug}/${encodeURIComponent(problem.id)}/`
+  const project=projectId?guidedProjectById[projectId]:null
+  if(project)return `/app/projects/${project.slug}/${encodeURIComponent(problem.id)}/`
   if(trackId)return `/app/problems/company/${encodeURIComponent(trackId)}/${encodeURIComponent(problem.id)}/`
   return `/app/problems/${encodeURIComponent(problem.id)}/`
  }
@@ -76,11 +77,12 @@ function routeFromLocation(){
   const track=tracks.find(item=>item.id===trackId)
   if(track)return {page:'problems',problem:null,projectId:null,trackId:track.id}
  }
- const projectMatch=path.match(/^\/app\/projects\/riscv-core\/([^/]+)$/)
+ const projectMatch=path.match(/^\/app\/projects\/([^/]+)\/([^/]+)$/)
  if(projectMatch){
-  const id=decodeURIComponent(projectMatch[1])
-  const problem=problems.find(p=>p.id===id&&riscvProject.problemIds.includes(p.id))
-  if(problem)return {page:'problem',problem,projectId:riscvProject.id,trackId:null}
+  const project=guidedProjectBySlug[decodeURIComponent(projectMatch[1])]
+  const id=decodeURIComponent(projectMatch[2])
+  const problem=project?problems.find(p=>p.id===id&&project.problemIds.includes(p.id)):null
+  if(problem)return {page:'problem',problem,projectId:project.id,trackId:null}
  }
  const problemMatch=path.match(/^\/app\/problems\/([^/]+)$/)
  if(problemMatch){
@@ -130,15 +132,20 @@ function App(){
   const target=appPath('problems',null,null,next),current=`${window.location.pathname}${window.location.search}`
   if(current!==target)window.history.pushState({page:'problems',problemId:null,projectId:null,trackId:next},'',target)
  }
- const projectProblems=useMemo(()=>riscvProject.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean),[])
+ const activeProject=useMemo(()=>guidedProjectById[projectId]||null,[projectId])
+ const projectProblems=useMemo(()=>activeProject?activeProject.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean):[],[activeProject])
  const trackProblems=useMemo(()=>activeTrack?activeTrack.problemIds.map(id=>problems.find(p=>p.id===id)).filter(Boolean):[],[activeTrack])
- const startRiscvProject=()=>{
-  const next=projectProblems.find(problem=>!solved.includes(problem.id))||projectProblems[0]
-  if(next)navigate('problem',next,{project:riscvProject.id})
+ const startProject=id=>{
+  const project=guidedProjectById[id]
+  if(!project)return
+  const items=project.problemIds.map(problemId=>problems.find(problem=>problem.id===problemId)).filter(Boolean)
+  const next=items.find(problem=>!solved.includes(problem.id))||items[0]
+  if(next)navigate('problem',next,{project:project.id})
  }
+ const startRiscvProject=()=>startProject('rv32-core')
  const topicNavigationProblems=useMemo(()=>buildTopicOrderedProblems(problems,problemTopics),[])
  const selectedIndex=selected?topicNavigationProblems.findIndex(p=>p.id===selected.id):-1
- const projectIndex=projectId===riscvProject.id&&selected?riscvProject.problemIds.indexOf(selected.id):-1
+ const projectIndex=activeProject&&selected?activeProject.problemIds.indexOf(selected.id):-1
  const trackIndex=trackId&&activeTrack&&selected?activeTrack.problemIds.indexOf(selected.id):-1
  const previousProblem=projectIndex>=0?(projectIndex>0?projectProblems[projectIndex-1]:null):trackIndex>=0?(trackIndex>0?trackProblems[trackIndex-1]:null):(selectedIndex>0?topicNavigationProblems[selectedIndex-1]:null)
  const nextProblem=projectIndex>=0?(projectIndex<projectProblems.length-1?projectProblems[projectIndex+1]:null):trackIndex>=0?(trackIndex<trackProblems.length-1?trackProblems[trackIndex+1]:null):(selectedIndex>=0&&selectedIndex<topicNavigationProblems.length-1?topicNavigationProblems[selectedIndex+1]:null)
@@ -191,11 +198,11 @@ function App(){
   return()=>clearTimeout(syncTimer.current)
  },[user?.id,cloudReady,solved,drafts,draftUpdatedAt,activityDays])
 
- return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||projectId===riscvProject.id?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
+ return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||Boolean(projectId)?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
- {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!(projectId||trackId)||solved.includes(selected.id))} navigationLabel={projectId?riscvProject.name:careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic}/>} 
- {page==='projects'&&<Projects onStartRiscv={startRiscvProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
+ {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)} navigationLabel={activeProject?.title||(careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic)}/>} 
+ {page==='projects'&&<Projects onStartProject={startProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
  {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartRiscv={startRiscvProject} onSelectCareer={openCareer}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
