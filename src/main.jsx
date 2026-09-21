@@ -31,7 +31,11 @@ const careerRoadmaps=[
  {id:'verification',label:'Design Verification'},
  {id:'hft-fpga',label:'FPGA Engineer'},
  {id:'cpu-gpu',label:'CPU / GPU Hardware'},
- {id:'accelerators',label:'Hardware Accelerator'}
+ {id:'accelerators',label:'Hardware Accelerator'},
+ {id:'soc-integration',label:'SoC Design / Integration Engineer'},
+ {id:'formal-verification',label:'Formal Verification Engineer'},
+ {id:'embedded-hardware',label:'Embedded Hardware / Firmware Engineer'},
+ {id:'noc-interconnect',label:'NoC / Interconnect Engineer'}
 ]
 const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||track?.name||''
 const languages=['All','Verilog','SystemVerilog','VHDL']
