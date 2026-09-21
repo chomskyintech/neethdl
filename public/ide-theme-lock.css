@@ -95,3 +95,60 @@ body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-butto
 body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-corner{
   background:transparent!important;
 }
+
+
+/* Custom problem statement scrollbar: Monaco-style, rectangular, no native arrows. */
+body.hdlforge-ide-active .ide-page .ide-problem-scroll-shell{
+  position:relative!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-scroll-shell .ide-problem-content{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-scroll-shell .ide-problem-content::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+body.hdlforge-ide-active .ide-page .problem-scrollbar{
+  position:absolute!important;
+  z-index:12!important;
+  top:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:10px!important;
+  background:transparent!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  transition:opacity .12s ease!important;
+}
+body.hdlforge-ide-active .ide-page .problem-scrollbar.visible{
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+body.hdlforge-ide-active .ide-page .problem-scrollbar-thumb{
+  position:absolute!important;
+  top:0!important;
+  right:0!important;
+  width:10px!important;
+  min-height:24px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:rgba(121,121,121,.45)!important;
+  cursor:default!important;
+  touch-action:none!important;
+}
+body.hdlforge-ide-active .ide-page .problem-scrollbar-thumb:hover{
+  background:rgba(121,121,121,.7)!important;
+}
+body.hdlforge-ide-active .ide-page .problem-scrollbar-thumb:active{
+  background:rgba(121,121,121,.82)!important;
+}
