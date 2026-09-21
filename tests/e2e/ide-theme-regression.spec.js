@@ -1,33 +1,40 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('IDE visual theme regression', () => {
-  test('uses a compact rectangular problem-pane scrollbar', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 })
+  test('uses a Monaco-style custom problem-pane scrollbar', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 650 })
     await page.goto('/app/problems/rtl-fifo/')
-    const pane = page.locator('.ide-problem-content')
-    await expect(pane).toBeVisible()
 
-    const scrollbar = await pane.evaluate(node => {
-      const bar = getComputedStyle(node, '::-webkit-scrollbar')
-      const thumb = getComputedStyle(node, '::-webkit-scrollbar-thumb')
-      const track = getComputedStyle(node, '::-webkit-scrollbar-track')
-      const button = getComputedStyle(node, '::-webkit-scrollbar-button')
+    const pane = page.locator('.ide-problem-content')
+    const scrollbar = page.locator('.problem-scrollbar')
+    const thumb = page.locator('.problem-scrollbar-thumb')
+    await expect(pane).toBeVisible()
+    await expect(scrollbar).toHaveClass(/visible/)
+    await expect(thumb).toBeVisible()
+
+    const styles = await page.evaluate(() => {
+      const pane = document.querySelector('.ide-problem-content')
+      const bar = document.querySelector('.problem-scrollbar')
+      const thumb = document.querySelector('.problem-scrollbar-thumb')
+      const nativeBar = getComputedStyle(pane, '::-webkit-scrollbar')
       return {
-        width: bar.width,
-        thumbRadius: thumb.borderRadius,
-        trackBackground: track.backgroundColor,
-        buttonDisplay: button.display,
-        buttonWidth: button.width,
-        buttonHeight: button.height,
+        nativeDisplay: nativeBar.display,
+        nativeWidth: nativeBar.width,
+        barWidth: getComputedStyle(bar).width,
+        thumbWidth: getComputedStyle(thumb).width,
+        thumbRadius: getComputedStyle(thumb).borderRadius,
       }
     })
 
-    expect(scrollbar.width).toBe('10px')
-    expect(scrollbar.thumbRadius).toBe('0px')
-    expect(scrollbar.trackBackground).toBe('rgba(0, 0, 0, 0)')
-    expect(scrollbar.buttonDisplay).toBe('none')
-    expect(scrollbar.buttonWidth).toBe('0px')
-    expect(scrollbar.buttonHeight).toBe('0px')
+    expect(styles.nativeDisplay).toBe('none')
+    expect(styles.nativeWidth).toBe('0px')
+    expect(styles.barWidth).toBe('10px')
+    expect(styles.thumbWidth).toBe('10px')
+    expect(styles.thumbRadius).toBe('0px')
+
+    const before = await thumb.evaluate(node => getComputedStyle(node).transform)
+    await pane.evaluate(node => { node.scrollTop = 220; node.dispatchEvent(new Event('scroll')) })
+    await expect.poll(() => thumb.evaluate(node => getComputedStyle(node).transform)).not.toBe(before)
   })
 
   test('keeps the intended IDE component surfaces', async ({ page }) => {
