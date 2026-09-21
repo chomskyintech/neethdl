@@ -95,22 +95,22 @@ test.describe('IDE interaction regressions', () => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-counter/')
 
-    const heading = page.locator('.problem-heading')
+    const difficulty = page.locator('.problem-heading .difficulty')
     const taskCopy = page.locator('.problem-task-copy')
     const taskList = page.locator('.problem-task-list')
     const firstExampleTitle = page.locator('.structured-example-title').first()
 
-    const headingBox = await heading.boundingBox()
+    const difficultyBox = await difficulty.boundingBox()
     const taskBox = await taskCopy.boundingBox()
     const listBox = await taskList.boundingBox()
     const exampleBox = await firstExampleTitle.boundingBox()
 
-    expect(headingBox).toBeTruthy()
+    expect(difficultyBox).toBeTruthy()
     expect(taskBox).toBeTruthy()
     expect(listBox).toBeTruthy()
     expect(exampleBox).toBeTruthy()
 
-    const spaceAbove = taskBox.y - (headingBox.y + headingBox.height)
+    const spaceAbove = taskBox.y - (difficultyBox.y + difficultyBox.height)
     const spaceBelow = exampleBox.y - (listBox.y + listBox.height)
 
     expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(16)
