@@ -7,7 +7,7 @@ import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
 import './ide-overrides.css'
 import './waveform-window.css'
 
-const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || '').replace(/\/$/, '')
+const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
 const referenceFormatCache = new Map()
 async function requestFormattedReference(language,source,columnLimit=52){
