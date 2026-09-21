@@ -128,7 +128,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(topicRows.filter({ hasText: 'Scoreboards' })).toBeVisible()
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
 
-    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/1')
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/2')
     await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/1')
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/0')
   })
@@ -167,7 +167,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
     await expect(page.getByRole('heading', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
     await expect(page.locator('.career-problem')).toHaveCount(15)
-    await expect(page.locator('.career-project-card')).toHaveCount(7)
+    await expect(page.locator('.career-project-card')).toHaveCount(8)
     await expect(page.getByText('1. RTL fundamentals', { exact: true })).toBeVisible()
     await expect(page.getByText('3. Storage and flow control', { exact: true })).toBeVisible()
     await expect(page.getByText('Asynchronous FIFO / CDC', { exact: true })).toBeVisible()
