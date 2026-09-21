@@ -499,6 +499,47 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
   </article>
 }
 
+function ReactOwnedRunResult({ result, isConceptual }) {
+  const tests = Array.isArray(result?.tests) ? result.tests : []
+  const output = result?.output || ''
+  const compileError = !result?.pass && !tests.length &&
+    /syntax\s+error|parse\s+error|compil(?:e|ation)|unexpected\s+token|malformed|unknown\s+module|error\s*:/i.test(output)
+
+  if (compileError) {
+    return <div className="run-result fail sim-v2-result" data-react-owned="true">
+      <div className="sim-v2-result-head">
+        <strong className="sim-v2-status fail">Compilation Error</strong>
+        <span>Simulation did not run</span>
+      </div>
+      <div className="sim-v2-compile">
+        <pre className="sim-v2-compiler-output">{output}</pre>
+      </div>
+    </div>
+  }
+
+  const passCount = tests.filter(test => test.passed).length
+  const status = result?.pass ? 'Accepted' : isConceptual ? 'Evaluation unavailable' : 'Wrong Answer'
+  const totalLabel = tests.length
+    ? `${passCount} / ${tests.length} testcases passed`
+    : result?.pass ? 'Simulation passed' : 'Simulation failed'
+
+  return <div className={`run-result sim-v2-result ${result?.pass ? 'pass' : 'fail'}`} data-react-owned="true">
+    <div className="sim-v2-result-head">
+      <strong className={`sim-v2-status ${result?.pass ? 'pass' : 'fail'}`}>{status}</strong>
+      <span>{totalLabel}</span>
+    </div>
+    {tests.length ? <div className="test-cases sim-v2-case-strip">
+      {tests.map((testCase,index)=><div className={`test-case sim-v2-case ${testCase.passed?'pass':'fail'}`} key={`${testCase.name}-${index}`}>
+        <span className="test-case-status">{testCase.passed?'✓':'×'}</span>
+        <span className="test-case-name">Test {index+1}: {testCase.name}</span>
+        <span className="test-case-time">t={testCase.time}</span>
+      </div>)}
+    </div> : null}
+    <div className="sim-v2-output-label">Simulator output</div>
+    <pre className="sim-v2-raw-output">{output}</pre>
+  </div>
+}
+
 function Editor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange }) {
   return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} onFormat={onFormat} onLayoutColumnChange={onLayoutColumnChange} />
 }
@@ -666,5 +707,5 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><ProblemScrollPane refreshKey={`${problem.id}:${statementTab}`}>{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <ApproachGuide problem={problem}/>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</ProblemScrollPane></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
       <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
       <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} onFormat={formatEditorText} onLayoutColumnChange={setEditorFormatColumn} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
-      <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <div className={result.pass ? 'run-result pass' : 'run-result fail'}><strong>{result.pass ? '✓ All tests passed' : isConceptual ? 'Evaluation unavailable' : '× Tests failed'}</strong>{result.tests?.length ? <div className="test-cases">{result.tests.map((testCase,index)=><div className={`test-case ${testCase.passed?'pass':'fail'}`} key={`${testCase.name}-${index}`}><span className="test-case-status">{testCase.passed?'✓':'×'}</span><span className="test-case-name">Test {index+1}: {testCase.name}</span><span className="test-case-time">t={testCase.time}</span></div>)}</div> : null}<pre>{result.output}</pre></div> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
+      <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <ReactOwnedRunResult result={result} isConceptual={isConceptual}/> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
 }
