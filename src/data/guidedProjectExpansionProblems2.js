@@ -1318,15 +1318,15 @@ const guidedProjectExpansionProblems2=[
       "streaming"
     ],
     "description": "Integrate a streaming 3x3 convolution engine with valid/ready flow control.",
-    "task": "Accept one pixel per cycle when in_valid && in_ready, maintain row/column counters, produce a valid output once a complete 3x3 neighborhood exists, and hold out_valid until out_ready.",
+    "task": "Integrate row buffering, the sliding 3x3 window, nine coefficient MACs, 8-bit saturation and valid/ready flow control into one raster-streaming accelerator.",
     "examples": [
       "Complete the required behavior and preserve it under the stated control conditions."
     ],
     "constraints": [
       "Use synthesizable SystemVerilog unless this is a verification-only stage."
     ],
-    "starterCode": "module conv3x3_accel #(parameter IMAGE_W=16)(\n  input logic clk,reset,\n  input logic in_valid,output logic in_ready,\n  input logic [7:0] pixel_in,\n  input logic out_ready,\n  output logic out_valid,\n  output logic [7:0] pixel_out\n);\n  // TODO\nendmodule",
-    "solution": "module conv3x3_accel #(parameter IMAGE_W=16)(\n  input logic clk,reset,\n  input logic in_valid,output logic in_ready,\n  input logic [7:0] pixel_in,\n  input logic out_ready,\n  output logic out_valid,\n  output logic [7:0] pixel_out\n);\n  logic [$clog2(IMAGE_W)-1:0] col;\n  logic [15:0] row;\n  assign in_ready=!out_valid || out_ready;\n  always_ff @(posedge clk) begin\n    if(reset) begin col<=0;row<=0;out_valid<=0;pixel_out<=0; end\n    else begin\n      if(out_valid && out_ready) out_valid<=0;\n      if(in_valid && in_ready) begin\n        pixel_out<=pixel_in;\n        if(row>=2 && col>=2) out_valid<=1;\n        if(col==IMAGE_W-1) begin col<=0;row<=row+1'b1; end\n        else col<=col+1'b1;\n      end\n    end\n  end\nendmodule",
+    "starterCode": "module conv3x3_accel #(parameter IMAGE_W=16)(\n  input logic clk,reset,\n  input logic in_valid,output logic in_ready,\n  input logic [7:0] pixel_in,\n  input logic signed [7:0] k0,k1,k2,k3,k4,k5,k6,k7,k8,\n  input logic out_ready,\n  output logic out_valid,\n  output logic [7:0] pixel_out\n);\n  // TODO: integrate line buffers, 3x3 window, MAC and clamp\nendmodule",
+    "solution": "module conv3x3_accel #(parameter IMAGE_W=16)(\n  input logic clk,reset,\n  input logic in_valid,output logic in_ready,\n  input logic [7:0] pixel_in,\n  input logic signed [7:0] k0,k1,k2,k3,k4,k5,k6,k7,k8,\n  input logic out_ready,\n  output logic out_valid,\n  output logic [7:0] pixel_out\n);\n  logic [7:0] prev1[0:IMAGE_W-1],prev2[0:IMAGE_W-1];\n  logic [7:0] t1,t2,m1,m2,b1,b2;\n  logic [$clog2(IMAGE_W)-1:0] col;\n  logic [15:0] row;\n  logic signed [23:0] sum_comb;\n  logic [7:0] clamp_comb;\n\n  assign in_ready=!out_valid || out_ready;\n\n  always_comb begin\n    sum_comb =\n      $signed({1'b0,t1})*$signed(k0) +\n      $signed({1'b0,t2})*$signed(k1) +\n      $signed({1'b0,prev2[col]})*$signed(k2) +\n      $signed({1'b0,m1})*$signed(k3) +\n      $signed({1'b0,m2})*$signed(k4) +\n      $signed({1'b0,prev1[col]})*$signed(k5) +\n      $signed({1'b0,b1})*$signed(k6) +\n      $signed({1'b0,b2})*$signed(k7) +\n      $signed({1'b0,pixel_in})*$signed(k8);\n    if(sum_comb<0) clamp_comb=8'd0;\n    else if(sum_comb>24'sd255) clamp_comb=8'd255;\n    else clamp_comb=sum_comb[7:0];\n  end\n\n  always_ff @(posedge clk) begin\n    if(reset) begin\n      col<=0; row<=0; out_valid<=0; pixel_out<=0;\n      t1<=0;t2<=0;m1<=0;m2<=0;b1<=0;b2<=0;\n    end else begin\n      if(out_valid && out_ready) out_valid<=0;\n      if(in_valid && in_ready) begin\n        prev2[col]<=prev1[col];\n        prev1[col]<=pixel_in;\n        t1<=t2; t2<=prev2[col];\n        m1<=m2; m2<=prev1[col];\n        b1<=b2; b2<=pixel_in;\n        if(row>=2 && col>=2) begin\n          pixel_out<=clamp_comb;\n          out_valid<=1;\n        end\n        if(col==IMAGE_W-1) begin\n          col<=0; row<=row+1'b1;\n          t1<=0;t2<=0;m1<=0;m2<=0;b1<=0;b2<=0;\n        end else col<=col+1'b1;\n      end\n    end\n  end\nendmodule",
     "checks": [
       {
         "label": "Backpressure-aware input",
@@ -1334,13 +1334,23 @@ const guidedProjectExpansionProblems2=[
         "flags": "i"
       },
       {
-        "label": "Produces only after full window exists",
-        "pattern": "row\\s*>=\\s*2\\s*&&\\s*col\\s*>=\\s*2[\\s\\S]*out_valid\\s*<=\\s*1",
+        "label": "Maintains two previous rows",
+        "pattern": "prev2\\s*\\[\\s*col\\s*\\]\\s*<=\\s*prev1\\s*\\[\\s*col\\s*\\][\\s\\S]*prev1\\s*\\[\\s*col\\s*\\]\\s*<=\\s*pixel_in",
         "flags": "i"
       },
       {
-        "label": "Advances row at line end",
-        "pattern": "col\\s*==\\s*IMAGE_W-1[\\s\\S]*col\\s*<=\\s*0[\\s\\S]*row\\s*<=\\s*row\\s*\\+\\s*1'b1",
+        "label": "Builds three window rows",
+        "pattern": "t1\\s*<=\\s*t2[\\s\\S]*t2\\s*<=\\s*prev2\\s*\\[\\s*col\\s*\\][\\s\\S]*m1\\s*<=\\s*m2[\\s\\S]*b2\\s*<=\\s*pixel_in",
+        "flags": "i"
+      },
+      {
+        "label": "Nine coefficient MAC",
+        "pattern": "k0[\\s\\S]*k1[\\s\\S]*k2[\\s\\S]*k3[\\s\\S]*k4[\\s\\S]*k5[\\s\\S]*k6[\\s\\S]*k7[\\s\\S]*k8",
+        "flags": "i"
+      },
+      {
+        "label": "Only emits complete windows",
+        "pattern": "row\\s*>=\\s*2\\s*&&\\s*col\\s*>=\\s*2[\\s\\S]*pixel_out\\s*<=\\s*clamp_comb[\\s\\S]*out_valid\\s*<=\\s*1",
         "flags": "i"
       }
     ]
