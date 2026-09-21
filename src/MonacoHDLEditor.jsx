@@ -147,20 +147,31 @@ function vhdlTokenizer() {
 }
 
 function registerLanguages(monaco) {
-  if (!monaco.languages.getLanguages().some(item => item.id === 'verilog')) {
+  const registered = new Set(
+    monaco.languages.getLanguages().map(item => item.id)
+  )
+
+  if (!registered.has('verilog'))
     monaco.languages.register({ id: 'verilog' })
-    monaco.languages.setMonarchTokensProvider('verilog', verilogTokenizer('.v'))
-  }
-
-  if (!monaco.languages.getLanguages().some(item => item.id === 'systemverilog')) {
+  if (!registered.has('systemverilog'))
     monaco.languages.register({ id: 'systemverilog' })
-    monaco.languages.setMonarchTokensProvider('systemverilog', verilogTokenizer('.sv'))
-  }
-
-  if (!monaco.languages.getLanguages().some(item => item.id === 'vhdl')) {
+  if (!registered.has('vhdl'))
     monaco.languages.register({ id: 'vhdl' })
-    monaco.languages.setMonarchTokensProvider('vhdl', vhdlTokenizer())
-  }
+
+  // Always install HDLForge's tokenizers. Monaco can already know a language
+  // ID without having our custom Monarch provider attached.
+  monaco.languages.setMonarchTokensProvider(
+    'verilog',
+    verilogTokenizer('.v')
+  )
+  monaco.languages.setMonarchTokensProvider(
+    'systemverilog',
+    verilogTokenizer('.sv')
+  )
+  monaco.languages.setMonarchTokensProvider(
+    'vhdl',
+    vhdlTokenizer()
+  )
 
   monaco.editor.defineTheme('hdlforge-dark', {
     base: 'vs-dark',
