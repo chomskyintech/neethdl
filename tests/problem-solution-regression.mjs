@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
 import solutions from '../src/data/solutions.js'
-import { riscvProjectProblems } from '../src/data/riscvProject.js'
+import { guidedProjectProblems } from '../src/data/guidedProjects.js'
 import { getBrowserSimulatorBench } from '../src/browserSimulator.js'
 
 const execFileAsync=promisify(execFile)
@@ -30,7 +30,7 @@ async function loadCatalog(){
     ...base.filter(problem=>problem.evaluation?.type!=='answer'),
     ...accelerators,
     ...expansion,
-    ...riscvProjectProblems,
+    ...guidedProjectProblems,
   ]
 }
 
@@ -136,6 +136,27 @@ for(const problem of catalog){
     const source=referenceSource(problem,language)
     if(!source){
       inventoryIssues.push(`${problem.id} / ${language}: missing reference solution`)
+      continue
+    }
+
+    if(problem.evaluation?.type==='pattern'){
+      const checks=Array.isArray(problem.checks)?problem.checks:[]
+      if(!checks.length){
+        inventoryIssues.push(`${problem.id} / ${language}: pattern-evaluated problem has no checks`)
+        continue
+      }
+      for(const [index,check] of checks.entries()){
+        const label=Array.isArray(check)?check[0]:(check.label||`Check ${index+1}`)
+        const raw=Array.isArray(check)?check[1]:check.pattern
+        const flags=Array.isArray(check)?'i':(check.flags||'i')
+        let expression
+        try{expression=raw instanceof RegExp?raw:new RegExp(raw,flags)}
+        catch(error){
+          inventoryIssues.push(`${problem.id} / ${language}: invalid pattern for ${label}: ${error.message}`)
+          continue
+        }
+        if(!expression.test(source)) inventoryIssues.push(`${problem.id} / ${language}: reference solution fails guided check: ${label}`)
+      }
       continue
     }
 
