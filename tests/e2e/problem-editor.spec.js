@@ -157,6 +157,18 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await editor.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
   })
 
+  test('uses the readable task and structured example layout across problem families', async ({ page }) => {
+    for (const problemId of ['rtl-mux', 'rtl-counter', 'rtl-skid-buffer', 'accel-relu-quant']) {
+      await page.goto(`/app/problems/${problemId}/`)
+      await expect(page.locator('.problem-task-list li').first()).toBeVisible()
+      await expect(page.locator('.structured-example').first()).toBeVisible()
+      await expect(page.locator('.problem-section h2', { hasText: 'Examples' })).toHaveCount(0)
+    }
+
+    await page.goto('/app/problems/rtl-mux/')
+    await expect(page.locator('.problem-inline-code').filter({ hasText: 'sel' }).first()).toBeVisible()
+  })
+
   test('renders three structured Shift Register examples', async ({ page }) => {
     await page.goto('/app/problems/rtl-shift-register/')
     const examples = page.locator('.structured-example')
