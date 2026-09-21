@@ -137,10 +137,9 @@
     "description": "Build a parameterized register that stores multiple bits and can shift its contents by one position on each clock edge.",
     "task": "Design a synchronous shift register with a configurable width. `dout` stores the register's current contents.",
     "examples": [
-      "After reset:\nreset = 1\nnext dout = 8'b00000000\nThe synchronous reset clears every stored bit on the rising clock edge.",
-      "Shift in a 1:\ndout before clock = 8'b00000000\ndin = 1, shift_en = 1\nnext dout = 8'b00000001\nThe new din value enters at bit 0.",
-      "Shift again with din = 0:\ndout before clock = 8'b00000001\ndin = 0, shift_en = 1\nnext dout = 8'b00000010\nThe existing 1 moves from bit 0 to bit 1.",
-      "Hold the register:\ndout = 8'b00000100\nshift_en = 0\nnext dout = 8'b00000100\nWhen shifting is disabled, the stored value must not change."
+      "Input:\nreset    = 1\nshift_en = X\ndin      = X\ndout     = 8'b10110110\n\nAfter rising edge:\ndout     = 8'b00000000",
+      "Input:\nreset    = 0\nshift_en = 1\ndin      = 1\ndout     = 8'b00000000\n\nAfter rising edge:\ndout     = 8'b00000001",
+      "Input:\nreset    = 0\nshift_en = 1\ndin      = 0\ndout     = 8'b00000001\n\nAfter rising edge:\ndout     = 8'b00000010"
     ],
     "constraints": [
       "WIDTH must control the number of stored bits.",
@@ -155,6 +154,41 @@
       "If `reset = 1`, clear the entire register to `0`.",
       "If `shift_en = 1`, shift every stored bit one position toward the MSB and insert `din` into bit 0.",
       "If `shift_en = 0`, keep the current value of `dout` unchanged."
+    ],
+    "displayExamples": [
+      {
+        "input": [
+          "reset    = 1",
+          "shift_en = X",
+          "din      = X",
+          "dout     = 8'b10110110"
+        ],
+        "after": [
+          "dout     = 8'b00000000"
+        ]
+      },
+      {
+        "input": [
+          "reset    = 0",
+          "shift_en = 1",
+          "din      = 1",
+          "dout     = 8'b00000000"
+        ],
+        "after": [
+          "dout     = 8'b00000001"
+        ]
+      },
+      {
+        "input": [
+          "reset    = 0",
+          "shift_en = 1",
+          "din      = 0",
+          "dout     = 8'b00000001"
+        ],
+        "after": [
+          "dout     = 8'b00000010"
+        ]
+      }
     ]
   },
   {
