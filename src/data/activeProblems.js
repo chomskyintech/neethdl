@@ -134,6 +134,11 @@ function projectTopic(problem){
   if(problem.project?.id==='fpga-packet-parser')return 'Pipelining & Streaming'
   if(problem.project?.id==='branch-predictor')return 'CPU / RISC-V'
   if(problem.project?.id==='convolution-accelerator')return 'Arithmetic & Datapaths'
+  if(problem.project?.id==='small-risc-v-soc')return 'CPU / RISC-V'
+  if(problem.project?.id==='formal-verification-rtl')return 'Formal Verification'
+  if(problem.project?.id==='low-latency-market-data-parser')return 'Pipelining & Streaming'
+  if(problem.project?.id==='simd-vector-unit')return 'Arithmetic & Datapaths'
+  if(problem.project?.id==='dma-engine')return 'Protocols & Handshakes'
   return null
 }
 
