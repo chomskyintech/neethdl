@@ -13,16 +13,20 @@ async function replaceEditorContents(page,source){
 }
 
 test.describe('guided project catalog',()=>{
-  test('shows four working guided projects',async({page})=>{
+  test('shows eight working guided projects',async({page})=>{
     await reset(page)
     await page.getByRole('button',{name:'Projects',exact:true}).click()
 
     const guided=page.locator('.guided-project-card')
-    await expect(guided).toHaveCount(4)
+    await expect(guided).toHaveCount(8)
     await expect(guided.filter({hasText:'32-bit RISC-V CPU'})).toContainText('8 modules')
     await expect(guided.filter({hasText:'UART Controller'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'AXI4-Lite Slave Peripheral'})).toContainText('8 modules')
     await expect(guided.filter({hasText:'Asynchronous FIFO / CDC'})).toContainText('8 modules')
+    await expect(guided.filter({hasText:'UVM AXI4-Lite Verification Environment'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'Three-Stage Pipelined RISC-V Core'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'Hardware DSP Pipeline'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'Matrix-Multiplication Accelerator'})).toContainText('6 modules')
   })
 
   test('opens UART and can browse modules before solving them',async({page})=>{
@@ -49,6 +53,31 @@ test.describe('guided project catalog',()=>{
     await page.goto('/app/projects/async-fifo/afifo-gray-sync/')
     await expect(page.getByRole('heading',{name:'Synchronize Gray Pointers'})).toBeVisible()
     await expect(page.locator('#hdlforge-ide-problems-button')).toContainText('Asynchronous FIFO / CDC')
+  })
+
+  test('groups buildable projects under career titles',async({page})=>{
+    await reset(page)
+    await page.getByRole('button',{name:'Projects',exact:true}).click()
+
+    await expect(page.getByRole('heading',{name:'RTL Design Engineer'})).toBeVisible()
+    await expect(page.getByRole('heading',{name:'Design Verification'})).toBeVisible()
+    await expect(page.getByRole('heading',{name:'FPGA Engineer'})).toBeVisible()
+    await expect(page.getByRole('heading',{name:'CPU / GPU Hardware'})).toBeVisible()
+    await expect(page.getByRole('heading',{name:'Hardware Accelerator'})).toBeVisible()
+  })
+
+  test('routes directly into the new guided projects',async({page})=>{
+    await page.goto('/app/projects/uvm-axi4-lite-verification/uvm-axi-interface/')
+    await expect(page.getByRole('heading',{name:'AXI-Lite Verification Interface'})).toBeVisible()
+
+    await page.goto('/app/projects/pipelined-risc-v-core/pipe-forwarding/')
+    await expect(page.getByRole('heading',{name:'EX Forwarding Unit'})).toBeVisible()
+
+    await page.goto('/app/projects/hardware-dsp-pipeline/dsp-fixed-mac/')
+    await expect(page.getByRole('heading',{name:'Signed Fixed-Point MAC'})).toBeVisible()
+
+    await page.goto('/app/projects/matrix-multiplication-accelerator/matmul-mac-pe/')
+    await expect(page.getByRole('heading',{name:'Matrix MAC Processing Element'})).toBeVisible()
   })
 
   test('guided module checks can solve a project stage',async({page})=>{
