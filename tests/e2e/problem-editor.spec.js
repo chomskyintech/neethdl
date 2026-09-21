@@ -340,13 +340,18 @@ test.describe('HDLForge Monaco problem editor', () => {
   })
 
 
-  test('accepts the priority encoder solution without crashing the page', async ({ page }) => {
+  test('first correct solution marks solved without crashing and remains stable on rerender', async ({ page }) => {
     test.setTimeout(90_000)
     const pageErrors = []
     page.on('pageerror', error => pageErrors.push(error.message))
+    await page.addInitScript(() => {
+      localStorage.removeItem('hdlforge-solved')
+      localStorage.removeItem('hdlforge-activity-days')
+    })
 
     await page.goto('/app/problems/rtl-priority/')
     await expect(page.locator('.monaco-editor')).toBeVisible()
+    await expect(page.locator('.solve-status.passed')).toHaveCount(0)
 
     const solution = `module priority_encoder(input [7:0] in, output reg [2:0] index, output reg valid);
   integer i;
@@ -367,6 +372,17 @@ endmodule`
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect(page.getByText(/4 \/ 4 testcases passed/)).toBeVisible()
+    await expect(page.locator('.solve-status.passed')).toBeVisible()
+    await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('hdlforge-solved') || '[]'))).toContain('rtl-priority')
+
+    // Force React state updates after the pass result is on screen. This used
+    // to crash because simulation-panel-v2 rewrote React-owned result markup.
+    await page.getByRole('button', { name: /Collapse console/i }).click()
+    await page.getByRole('button', { name: /Expand console/i }).click()
+    await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: /Run tests/i }).first().click()
+    await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect(page.locator('.ide-page')).toBeVisible()
     await expect(page.locator('.monaco-editor')).toBeVisible()
     expect(pageErrors).toEqual([])
