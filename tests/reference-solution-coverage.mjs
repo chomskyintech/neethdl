@@ -34,15 +34,39 @@ for (const problem of catalog) {
     pairs++
     const central = solutions[problem.id]?.[language]
     const inline = language === 'SystemVerilog' ? problem.solution : null
-    if (!(typeof central === 'string' && central.trim()) &&
-        !(typeof inline === 'string' && inline.trim())) {
-      failures.push(`${problem.id} / ${language}`)
+    const reference =
+      typeof central === 'string' && central.trim() ? central :
+      typeof inline === 'string' && inline.trim() ? inline :
+      null
+
+    if (!reference) {
+      failures.push(`${problem.id} / ${language}: missing reference solution`)
+      continue
+    }
+
+    if (problem.evaluation?.type === 'pattern') {
+      const checks = Array.isArray(problem.checks) ? problem.checks : []
+      if (!checks.length) {
+        failures.push(`${problem.id} / ${language}: no guided checks`)
+        continue
+      }
+      for (const [index, check] of checks.entries()) {
+        const label = Array.isArray(check) ? check[0] : (check.label || `Check ${index + 1}`)
+        const raw = Array.isArray(check) ? check[1] : check.pattern
+        const flags = Array.isArray(check) ? 'i' : (check.flags || 'i')
+        try {
+          const expression = raw instanceof RegExp ? raw : new RegExp(raw, flags)
+          if (!expression.test(reference)) failures.push(`${problem.id} / ${language}: reference fails ${label}`)
+        } catch (error) {
+          failures.push(`${problem.id} / ${language}: invalid check ${label}: ${error.message}`)
+        }
+      }
     }
   }
 }
 
 if (failures.length) {
-  console.error('Missing reference solutions:')
+  console.error('Reference solution coverage failures:')
   for (const failure of failures) console.error(`  - ${failure}`)
   process.exit(1)
 }
