@@ -104,7 +104,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     const expandTopics = page.getByRole('button', { name: 'Expand', exact: true })
     await expect(expandTopics).toBeVisible()
     await expandTopics.click()
-    await expect(page.locator('.topic-cloud-item')).toHaveCount(20)
+    await expect(page.locator('.topic-cloud-item')).toHaveCount(21)
     await expect(page.getByRole('button', { name: /FSMs\s*2/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*2/ })).toBeVisible()
@@ -128,9 +128,9 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(topicRows.filter({ hasText: 'Scoreboards' })).toBeVisible()
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
 
-    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/2')
-    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/2')
-    await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/7')
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/4')
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/3')
+    await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/14')
   })
 
   test('renders compact progress inside Problems and removes standalone Progress navigation', async ({ page }) => {
@@ -171,7 +171,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page).toHaveURL(/\/app\/roadmaps\/rtl-design\/$/)
     await expect(page.getByRole('heading', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
     await expect(page.locator('.career-problem')).toHaveCount(15)
-    await expect(page.locator('.career-project-card')).toHaveCount(7)
+    await expect(page.locator('.career-project-card')).toHaveCount(8)
     await expect(page.getByText('1. RTL fundamentals', { exact: true })).toBeVisible()
     await expect(page.getByText('3. Storage and flow control', { exact: true })).toBeVisible()
     await expect(page.getByText('Asynchronous FIFO / CDC', { exact: true })).toBeVisible()
