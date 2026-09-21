@@ -463,3 +463,10 @@ html::-webkit-scrollbar-thumb{
 html::-webkit-scrollbar-thumb:hover{
   background:var(--nc-muted)!important;
 }
+
+
+/* Keep the IDE tab strip on the canonical editor surface. */
+body.hdlforge-ide-active .ide-page .file-tabs{
+  background:var(--nc-editor)!important;
+  border-color:var(--nc-border)!important;
+}

@@ -1,41 +1,52 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('IDE visual theme regression', () => {
-  test('keeps the neutral graphite colour scheme and scrollbar palette', async ({ page }) => {
+  test('keeps the canonical NeetCode graphite colour scheme and scrollbar palette', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
     await expect(page.locator('.ide-page')).toBeVisible()
 
     const palette = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement)
+      const value = name => root.getPropertyValue(name).trim()
       const colour = selector => getComputedStyle(document.querySelector(selector)).backgroundColor
       const text = selector => getComputedStyle(document.querySelector(selector)).color
       const problemContent = document.querySelector('.ide-problem-content')
       return {
+        vars: {
+          bg: value('--nc-bg'),
+          editor: value('--nc-editor'),
+          surface: value('--nc-surface'),
+          active: value('--nc-active'),
+          textStrong: value('--nc-text-strong'),
+          border: value('--nc-border'),
+        },
         body: getComputedStyle(document.body).backgroundColor,
-        topbar: colour('.ide-topbar'),
         problem: colour('.ide-problem'),
-        workspace: colour('.ide-workspace'),
         problemTabs: colour('.ide-problem>.problem-tabs'),
         fileTabs: colour('.file-tabs'),
-        editor: colour('.monaco-editor-stage'),
-        console: colour('.console'),
+        editor: colour('.monaco-editor'),
         activeProblemTab: text('.problem-tabs button.active'),
-        languageText: text('.editor-language select'),
         scrollbarColor: getComputedStyle(problemContent).scrollbarColor,
       }
     })
 
-    expect(palette.body).toBe('rgb(15, 15, 15)')
-    expect(palette.topbar).toBe('rgb(20, 20, 20)')
-    expect(palette.problem).toBe('rgb(38, 38, 38)')
-    expect(palette.workspace).toBe('rgb(31, 31, 31)')
-    expect(palette.problemTabs).toBe('rgb(38, 38, 38)')
-    expect(palette.fileTabs).toBe('rgb(38, 38, 38)')
-    expect(palette.editor).toBe('rgb(30, 30, 30)')
-    expect(palette.console).toBe('rgb(35, 35, 35)')
-    expect(palette.activeProblemTab).toBe('rgb(255, 255, 255)')
-    expect(palette.languageText).toBe('rgb(245, 245, 245)')
-    expect(palette.scrollbarColor).toContain('rgb(102, 102, 102)')
-    expect(palette.scrollbarColor).toContain('rgb(38, 38, 38)')
+    expect(palette.vars).toEqual({
+      bg: '#1f1f20',
+      editor: '#262527',
+      surface: '#29282a',
+      active: '#d7d7d9',
+      textStrong: '#ececec',
+      border: '#39393b',
+    })
+
+    expect(palette.body).toBe('rgb(31, 31, 32)')
+    expect(palette.problem).toBe('rgb(38, 37, 39)')
+    expect(palette.problemTabs).toBe('rgb(38, 37, 39)')
+    expect(palette.fileTabs).toBe('rgb(38, 37, 39)')
+    expect(palette.editor).toBe('rgb(38, 37, 39)')
+    expect(palette.activeProblemTab).toBe('rgb(215, 215, 217)')
+    expect(palette.scrollbarColor).toContain('rgb(57, 57, 59)')
+    expect(palette.scrollbarColor).toContain('rgb(31, 31, 32)')
   })
 })
