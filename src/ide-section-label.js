@@ -1,11 +1,13 @@
 import problems from './data/activeProblems'
-import {riscvProject} from './data/riscvProject'
+import {guidedProjectBySlug} from './data/guidedProjects'
 
 function currentContext(){
-  const projectMatch=window.location.pathname.match(/^\/app\/projects\/riscv-core\/([^/]+)\/?$/)
+  const projectMatch=window.location.pathname.match(/^\/app\/projects\/([^/]+)\/([^/]+)\/?$/)
   if(projectMatch){
-    const id=decodeURIComponent(projectMatch[1])
-    return {problem:problems.find(problem=>problem.id===id)||null,label:riscvProject.title}
+    const project=guidedProjectBySlug[decodeURIComponent(projectMatch[1])]
+    const id=decodeURIComponent(projectMatch[2])
+    const problem=project&&project.problemIds.includes(id)?problems.find(problem=>problem.id===id)||null:null
+    return {problem,label:project?.title||null}
   }
   const match=window.location.pathname.match(/^\/app\/problems\/([^/]+)\/?$/)
   if(!match)return {problem:null,label:null}
