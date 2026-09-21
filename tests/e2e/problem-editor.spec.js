@@ -372,7 +372,7 @@ endmodule`
     await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible()
     await expect(page.getByText(/4 \/ 4 testcases passed/)).toBeVisible()
-    await expect(page.locator('.solve-status.passed')).toBeVisible()
+    await expect(page.locator('.solve-status.passed')).toHaveCount(1)
     await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('hdlforge-solved') || '[]'))).toContain('rtl-priority')
 
     // Force React state updates after the pass result is on screen. This used
@@ -425,7 +425,7 @@ endmodule`
     await page.getByRole('button', { name: /Run tests/i }).first().click()
     await expect(page.getByText('Accepted', { exact: true })).toBeVisible({ timeout: 60_000 })
     await expect(page.getByText(/5 \/ 5 testcases passed/)).toBeVisible()
-    await expect(page.locator('.solve-status.passed')).toBeVisible()
+    await expect(page.locator('.solve-status.passed')).toHaveCount(1)
     expect(pageErrors).toEqual([])
   })
 
