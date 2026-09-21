@@ -1,4 +1,4 @@
-import additionalSolutions from './additionalSolutions'
+import additionalSolutions from './additionalSolutions.js'
 
 const solutions = {
   ...additionalSolutions,
