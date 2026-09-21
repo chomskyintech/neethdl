@@ -33,7 +33,7 @@ for (const problem of catalog) {
   for (const language of problem.languages || []) {
     pairs++
     const central = solutions[problem.id]?.[language]
-    const inline = language === 'SystemVerilog' ? problem.solution : null
+    const inline = (problem.languages?.length === 1 || language === 'SystemVerilog') ? problem.solution : null
     const reference =
       typeof central === 'string' && central.trim() ? central :
       typeof inline === 'string' && inline.trim() ? inline :
