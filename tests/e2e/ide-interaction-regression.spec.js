@@ -113,7 +113,10 @@ test.describe('IDE interaction regressions', () => {
     const spaceAbove = taskBox.y - (difficultyBox.y + difficultyBox.height)
     const spaceBelow = exampleBox.y - (listBox.y + listBox.height)
 
-    expect(Math.abs(spaceAbove - spaceBelow)).toBeLessThanOrEqual(8)
+    expect(spaceAbove).toBeGreaterThanOrEqual(47)
+    expect(spaceAbove).toBeLessThanOrEqual(49)
+    expect(spaceBelow).toBeGreaterThanOrEqual(47)
+    expect(spaceBelow).toBeLessThanOrEqual(49)
     expect(await taskList.evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
   })
 
