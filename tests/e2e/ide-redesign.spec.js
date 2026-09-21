@@ -169,13 +169,18 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
  })
 
- test('hides tab-strip scrollbars and keeps a visible neutral statement scrollbar',async({page})=>{
+ test('hides tab-strip and native statement scrollbars while keeping the custom statement scrollbar',async({page})=>{
+  await page.setViewportSize({width:1440,height:650})
   await page.goto('/app/problems/rtl-fifo/')
 
   const tabs=page.locator('.ide-problem>.problem-tabs')
   const statement=page.locator('.ide-problem-content')
+  const customScrollbar=page.locator('.problem-scrollbar')
+  const thumb=page.locator('.problem-scrollbar-thumb')
   await expect(tabs).toBeVisible()
   await expect(statement).toBeVisible()
+  await expect(customScrollbar).toHaveClass(/visible/)
+  await expect(thumb).toBeVisible()
 
   const tabStyles=await tabs.evaluate(el=>{
    const style=getComputedStyle(el)
@@ -187,13 +192,28 @@ test.describe('redesigned IDE shell',()=>{
 
   const statementStyles=await statement.evaluate(el=>{
    const style=getComputedStyle(el)
-   return{overflowX:style.overflowX,overflowY:style.overflowY,scrollbarColor:style.scrollbarColor,scrollbarWidth:style.scrollbarWidth}
+   const native=getComputedStyle(el,'::-webkit-scrollbar')
+   return{
+    overflowX:style.overflowX,
+    overflowY:style.overflowY,
+    scrollbarWidth:style.scrollbarWidth,
+    nativeDisplay:native.display,
+    nativeWidth:native.width,
+   }
   })
   expect(statementStyles.overflowX).toBe('hidden')
-  expect(statementStyles.overflowY).toBe('scroll')
-  expect(statementStyles.scrollbarWidth).not.toBe('none')
-  expect(statementStyles.scrollbarColor).toContain('rgb(102, 102, 102)')
-  expect(statementStyles.scrollbarColor).toContain('rgb(38, 38, 38)')
+  expect(statementStyles.overflowY).toBe('auto')
+  expect(statementStyles.scrollbarWidth).toBe('none')
+  expect(statementStyles.nativeDisplay).toBe('none')
+  expect(statementStyles.nativeWidth).toBe('0px')
+
+  const customStyles=await thumb.evaluate(el=>{
+   const style=getComputedStyle(el)
+   return{width:style.width,borderRadius:style.borderRadius,backgroundColor:style.backgroundColor}
+  })
+  expect(customStyles.width).toBe('10px')
+  expect(customStyles.borderRadius).toBe('0px')
+  expect(customStyles.backgroundColor).toContain('rgba(121, 121, 121')
  })
 
  test('keeps the account control icon-only',async({page})=>{
