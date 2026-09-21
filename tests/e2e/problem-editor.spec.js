@@ -329,6 +329,38 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(page.locator('.sim-v2-name-value-resizer')).toBeVisible()
   })
 
+
+  test('accepts the priority encoder solution without crashing the page', async ({ page }) => {
+    test.setTimeout(90_000)
+    const pageErrors = []
+    page.on('pageerror', error => pageErrors.push(error.message))
+
+    await page.goto('/app/problems/rtl-priority/')
+    await expect(page.locator('.monaco-editor')).toBeVisible()
+
+    const solution = `module priority_encoder(input [7:0] in, output reg [2:0] index, output reg valid);
+  integer i;
+  always @(*) begin
+    index = 3'd0;
+    valid = 1'b0;
+    for (i = 7; i >= 0; i = i - 1) begin
+      if (in[i] && !valid) begin
+        index = i[2:0];
+        valid = 1'b1;
+      end
+    end
+  end
+endmodule`
+
+    await replaceEditorContents(page, solution)
+    await page.getByRole('button', { name: /Run tests/i }).first().click()
+    await expect(page.getByText('HDLFORGE_PASS')).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByText('✓ All tests passed')).toBeVisible()
+    await expect(page.locator('.ide-page')).toBeVisible()
+    await expect(page.locator('.monaco-editor')).toBeVisible()
+    expect(pageErrors).toEqual([])
+  })
+
   test('shows a compilation error instead of testcase results for invalid syntax', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, brokenMux)
