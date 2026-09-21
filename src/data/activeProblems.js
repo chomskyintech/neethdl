@@ -23,6 +23,7 @@ export const problemTopics=[
   'UVM',
   'Scoreboards',
   'Formal Verification',
+  'Embedded / Firmware',
 ]
 
 const topicById={
@@ -139,6 +140,22 @@ function projectTopic(problem){
   if(problem.project?.id==='low-latency-market-data-parser')return 'Pipelining & Streaming'
   if(problem.project?.id==='simd-vector-unit')return 'Arithmetic & Datapaths'
   if(problem.project?.id==='dma-engine')return 'Protocols & Handshakes'
+  if(problem.project?.id==='axi4-interconnect-crossbar')return 'Protocols & Handshakes'
+  if(problem.project?.id==='soc-peripheral-subsystem')return 'Protocols & Handshakes'
+  if(problem.project?.id==='riscv-firmware-bringup')return 'Embedded / Firmware'
+  if(problem.project?.id==='formal-cache-verification')return 'Formal Verification'
+  if(problem.project?.id==='axi-crossbar-verification'){
+    const xbarVerificationTopics={
+      'xbarv-sequence-item':'Interfaces',
+      'xbarv-random-sequence':'Constrained Random',
+      'xbarv-monitor':'UVM',
+      'xbarv-scoreboard':'Scoreboards',
+      'xbarv-contention-sequence':'Constrained Random',
+      'xbarv-assertions':'SVA',
+      'xbarv-coverage':'Functional Coverage',
+    }
+    return xbarVerificationTopics[problem.id]||'UVM'
+  }
   return null
 }
 
