@@ -808,7 +808,6 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
           </div>
           <span className={`difficulty ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span>
         </div>
-        <h2>Task</h2>
         <div className="problem-task-copy">
           <p>{renderProblemInlineText(problem.task,problem)}</p>
           {taskBullets.length ? <ul className="problem-task-list">{taskBullets.map((item,index)=><li key={index}>{renderProblemInlineText(item,problem)}</li>)}</ul> : null}
