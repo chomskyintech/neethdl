@@ -144,6 +144,8 @@ function projectTopic(problem){
   if(problem.project?.id==='soc-peripheral-subsystem')return 'Protocols & Handshakes'
   if(problem.project?.id==='riscv-firmware-bringup')return 'Embedded / Firmware'
   if(problem.project?.id==='formal-cache-verification')return 'Formal Verification'
+  if(problem.project?.id==='spi-controller')return 'Protocols & Handshakes'
+  if(problem.project?.id==='i2c-slave-peripheral')return 'Protocols & Handshakes'
   if(problem.project?.id==='axi-crossbar-verification'){
     const xbarVerificationTopics={
       'xbarv-sequence-item':'Interfaces',
