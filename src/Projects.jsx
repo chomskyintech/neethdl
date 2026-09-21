@@ -16,7 +16,11 @@ const roadmapItems=[
  {id:'verification',label:'Design Verification',category:'dv',description:'Build reusable SystemVerilog/UVM environments with checking, assertions and coverage.'},
  {id:'hft-fpga',label:'FPGA Engineer',category:'fpga',description:'Build streaming, interface and signal-processing designs suited to FPGA implementation.'},
  {id:'cpu-gpu',label:'CPU / GPU Hardware',category:'rtl',description:'Build processor datapaths and then add real microarchitectural pipeline control.'},
- {id:'accelerators',label:'Hardware Accelerator',category:'fpga',description:'Build throughput-oriented arithmetic datapaths and small compute engines.'}
+ {id:'accelerators',label:'Hardware Accelerator',category:'fpga',description:'Build throughput-oriented arithmetic datapaths and small compute engines.'},
+ {id:'soc-integration',label:'SoC Design / Integration Engineer',category:'soc',description:'Integrate processors, memories, buses, interrupts and peripherals into complete SoC subsystems.'},
+ {id:'formal-verification',label:'Formal Verification Engineer',category:'dv',description:'Prove safety, ordering and progress properties with assertions, assumptions and cover goals.'},
+ {id:'embedded-hardware',label:'Embedded Hardware / Firmware Engineer',category:'soc',description:'Bridge RTL and software with serial interfaces, timers, interrupts and memory-mapped peripherals.'},
+ {id:'noc-interconnect',label:'NoC / Interconnect Engineer',category:'soc',description:'Build arbitration, buffering, flow control and protocol-conversion foundations for scalable fabrics.'}
 ]
 
 
