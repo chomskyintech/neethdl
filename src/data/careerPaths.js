@@ -29,7 +29,7 @@ export const careerPaths={
     label:'FPGA Engineer',
     summary:'Focus on deterministic RTL, streaming datapaths, clock-domain control and board-relevant interfaces.',
     problemIds:['rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source','rtl-fifo','rtl-edge-detector','fpga-pulse-sync','fpga-clock-enable','accel-pipelined-mul','accel-stream-accum'],
-    projectSlugs:['uart-controller','hardware-dsp-pipeline','async-fifo','fpga-packet-parser','low-latency-market-data-parser'],
+    projectSlugs:['spi-controller','uart-controller','hardware-dsp-pipeline','async-fifo','fpga-packet-parser','low-latency-market-data-parser'],
   },
   'cpu-gpu':{
     id:'cpu-gpu',
@@ -53,7 +53,7 @@ export const careerPaths={
     label:'SoC Design / Integration Engineer',
     summary:'Integrate processors, memories, buses, interrupts and peripherals into complete memory-mapped systems, with emphasis on address maps, subsystem interfaces and IP integration.',
     problemIds:['proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','rtl-regfile','rtl-dual-port-ram','rtl-reset-synchronizer','soc-address-decoder','soc-gpio','soc-timer','soc-interrupt-controller'],
-    projectSlugs:['small-risc-v-soc','soc-peripheral-subsystem','axi4-interconnect-crossbar','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
+    projectSlugs:['small-risc-v-soc','soc-peripheral-subsystem','i2c-slave-peripheral','axi4-interconnect-crossbar','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
   },
   'formal-verification':{
     id:'formal-verification',
@@ -69,7 +69,7 @@ export const careerPaths={
     label:'Embedded Hardware / Firmware Engineer',
     summary:'Bridge RTL and software through memory-mapped peripherals, serial interfaces, interrupts, timers and small processor-based systems.',
     problemIds:['proto-uart','proto-spi','proto-apb-register','rtl-clock-divider','rtl-regfile','rv32-memory-control','soc-gpio','soc-timer','soc-interrupt-controller'],
-    projectSlugs:['riscv-firmware-bringup','uart-controller','soc-peripheral-subsystem','small-risc-v-soc','axi-lite-slave','dma-engine'],
+    projectSlugs:['riscv-firmware-bringup','spi-controller','i2c-slave-peripheral','uart-controller','soc-peripheral-subsystem','small-risc-v-soc','axi-lite-slave','dma-engine'],
   },
   'noc-interconnect':{
     id:'noc-interconnect',
