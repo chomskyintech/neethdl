@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import solutions from '../src/data/solutions.js'
-import { riscvProjectProblems } from '../src/data/riscvProject.js'
+import { guidedProjectProblems } from '../src/data/guidedProjects.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
@@ -23,7 +23,7 @@ const catalog = [
   ...base.filter(problem => problem.evaluation?.type !== 'answer'),
   ...accelerators,
   ...expansion,
-  ...riscvProjectProblems,
+  ...guidedProjectProblems,
 ]
 
 const failures = []
