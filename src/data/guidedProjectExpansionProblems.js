@@ -128,7 +128,7 @@ const expansionGuidedProblems=[
     "checks": [
       {
         "label": "Sequencer handshake",
-        "pattern": "get_next_item\\s*\\([\\s\\S]{0,80}item_done\\s*\\(",
+        "pattern": "get_next_item\\s*\\([\\s\\S]{0,220}item_done\\s*\\(",
         "flags": "i"
       },
       {
