@@ -7,7 +7,7 @@ export const careerPaths={
     summary:'Build the core digital-design skills used in RTL interviews and day-to-day block design: combinational logic, state, memories, FIFOs, pipelining, CDC and clean synthesizable interfaces.',
     skills:['Verilog / SystemVerilog','Combinational logic','Sequential logic','FSMs','FIFOs','Memories','Pipelining','CDC'],
     problemIds:['rtl-mux','rtl-counter','rtl-priority','rtl-fifo','rtl-shift-register','rtl-edge-detector','rtl-arbiter','rtl-regfile','rtl-clock-divider','rtl-skid-buffer','rtl-pipeline-register','rtl-reset-synchronizer','rtl-gray-counter','rtl-dual-port-ram','rtl-onehot-fsm'],
-    projectSlugs:['axi-lite-slave','asynchronous-fifo','guided-risc-v-cpu','cache-memory-controller','axi-lite-apb-bridge','dma-engine','small-risc-v-soc'],
+    projectSlugs:['axi-lite-slave','async-fifo','riscv-core','cache-memory-controller','axi-lite-apb-bridge','dma-engine','small-risc-v-soc'],
     milestones:[
       {title:'1. RTL fundamentals',problemIds:['rtl-mux','rtl-priority','rtl-counter','rtl-clock-divider','rtl-shift-register','rtl-edge-detector']},
       {title:'2. Control and state',problemIds:['rtl-arbiter','rtl-onehot-fsm','rtl-regfile']},
@@ -29,7 +29,7 @@ export const careerPaths={
     label:'FPGA Engineer',
     summary:'Focus on deterministic RTL, streaming datapaths, clock-domain control and board-relevant interfaces.',
     problemIds:['rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source','rtl-fifo','rtl-edge-detector','fpga-pulse-sync','fpga-clock-enable','accel-pipelined-mul','accel-stream-accum'],
-    projectSlugs:['uart-controller','hardware-dsp-pipeline','asynchronous-fifo','fpga-packet-parser','low-latency-market-data-parser'],
+    projectSlugs:['uart-controller','hardware-dsp-pipeline','async-fifo','fpga-packet-parser','low-latency-market-data-parser'],
   },
   'cpu-gpu':{
     id:'cpu-gpu',
@@ -37,7 +37,7 @@ export const careerPaths={
     label:'CPU / GPU Hardware',
     summary:'Develop processor-oriented RTL skills around register structures, pipelines, memories, arbitration and compute datapaths.',
     problemIds:['rtl-regfile','rtl-pipeline-register','rtl-skid-buffer','rtl-dual-port-ram','rtl-fifo','rtl-arbiter','proto-ready-valid-source','proto-axi-lite-write','accel-vector-max4','accel-matmul2'],
-    projectSlugs:['guided-risc-v-cpu','pipelined-risc-v-core','cache-memory-controller','small-risc-v-soc','risc-v-core-verification'],
+    projectSlugs:['riscv-core','pipelined-risc-v-core','cache-memory-controller','small-risc-v-soc','risc-v-core-verification'],
   },
   'accelerators':{
     id:'accelerators',
