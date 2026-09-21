@@ -1,5 +1,5 @@
-import rawProjectProblems from './guidedProjectProblems.json'
-import {riscvProject,riscvProjectProblems} from './riscvProject'
+import rawProjectProblems from './guidedProjectProblems.js'
+import {riscvProject,riscvProjectProblems} from './riscvProject.js'
 
 export const uartProject={
   id:'uart-controller',
