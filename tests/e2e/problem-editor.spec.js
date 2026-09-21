@@ -388,6 +388,47 @@ endmodule`
     expect(pageErrors).toEqual([])
   })
 
+
+  test('accepts the exact Shift Register reference solution', async ({ page }) => {
+    test.setTimeout(90_000)
+    const pageErrors = []
+    page.on('pageerror', error => pageErrors.push(error.message))
+
+    await page.addInitScript(() => {
+      localStorage.removeItem('hdlforge-solved')
+      localStorage.removeItem('hdlforge-activity-days')
+      localStorage.removeItem('hdlforge-drafts')
+    })
+    await page.goto('/app/problems/rtl-shift-register/')
+    await expect(page.locator('.monaco-editor')).toBeVisible()
+
+    const solution = `module shift_reg #(
+  parameter WIDTH = 8
+) (
+  input clk,
+  input reset,
+  input shift_en,
+  input din,
+  output reg [WIDTH-1:0] dout
+);
+
+always @(posedge clk) begin
+  if (reset)
+    dout <= {WIDTH{1'b0}};
+  else if (shift_en)
+    dout <= {dout[WIDTH-2:0], din};
+end
+
+endmodule`
+
+    await replaceEditorContents(page, solution)
+    await page.getByRole('button', { name: /Run tests/i }).first().click()
+    await expect(page.getByText('Accepted', { exact: true })).toBeVisible({ timeout: 60_000 })
+    await expect(page.getByText(/5 \/ 5 testcases passed/)).toBeVisible()
+    await expect(page.locator('.solve-status.passed')).toBeVisible()
+    expect(pageErrors).toEqual([])
+  })
+
   test('shows a compilation error instead of testcase results for invalid syntax', async ({ page }) => {
     test.setTimeout(90_000)
     await replaceEditorContents(page, brokenMux)
