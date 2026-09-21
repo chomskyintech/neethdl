@@ -1,7 +1,7 @@
 import baseProblems from './problems.json'
 import acceleratorProblems from './acceleratorProblems.json'
 import expansionProblems from './expansionProblems.json'
-import {riscvProjectProblems} from './riscvProject'
+import {guidedProjectProblems} from './guidedProjects'
 
 export const problemTopics=[
   'Combinational Logic',
@@ -97,16 +97,17 @@ const catalog=[
   ...expansionProblems,
 ]
 
-// Scatter project tasks through the ordinary problem library so they remain
-// discoverable as standalone exercises while Projects can assemble them in order.
-const insertionSlots=[3,8,14,20,26,32,38,44]
-const activeProblems=[...catalog]
-riscvProjectProblems.forEach((problem,index)=>{
-  const offset=Math.min(insertionSlots[index]+index,activeProblems.length)
-  activeProblems.splice(offset,0,problem)
-})
+// Guided-project modules stay discoverable as standalone exercises while
+// Projects assembles them into ordered build sequences.
+const activeProblems=[...catalog,...guidedProjectProblems]
+
+function projectTopic(problem){
+  if(problem.project?.id==='uart-controller'||problem.project?.id==='axi-lite-slave')return 'Protocols & Handshakes'
+  if(problem.project?.id==='async-fifo')return 'CDC & Synchronization'
+  return null
+}
 
 export default activeProblems.map(problem=>({
   ...problem,
-  topic:topicById[problem.id]||'Other',
+  topic:topicById[problem.id]||problem.topic||projectTopic(problem)||'Other',
 }))
