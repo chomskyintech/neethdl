@@ -38,7 +38,7 @@ const careerRoadmaps=[
  {id:'noc-interconnect',label:'NoC / Interconnect Engineer'}
 ]
 const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||track?.name||''
-const languages=['All','Verilog','SystemVerilog','VHDL']
+const languages=['All','Verilog','SystemVerilog','VHDL','C']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
 const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/'}
 const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge',career:'Career Roadmap | HDLForge'}
