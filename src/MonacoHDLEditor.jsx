@@ -167,8 +167,8 @@ function registerLanguages(monaco) {
     inherit: true,
     rules: [
       { token: 'keyword.control', foreground: '4B82AC' },
-      { token: 'keyword.declaration', foreground: '419789' },
-      { token: 'type.identifier', foreground: '419789' },
+      { token: 'keyword.declaration', foreground: '397E73' },
+      { token: 'type.identifier', foreground: '397E73' },
       { token: 'entity.name.module', foreground: 'AAA672' },
       { token: 'variable.parameter', foreground: 'C2C2C4' },
       { token: 'support.function.system', foreground: 'AAA672' },

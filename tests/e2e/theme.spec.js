@@ -4,7 +4,7 @@ const colours = {
   bg: 'rgb(31, 31, 32)',
   editor: 'rgb(38, 37, 39)',
   border: 'rgb(57, 57, 59)',
-  teal: 'rgb(65, 151, 137)',
+  teal: 'rgb(57, 126, 115)',
 }
 
 test.describe('NeetCode theme regression', () => {
@@ -33,7 +33,7 @@ test.describe('NeetCode theme regression', () => {
         border:'#39393b',
         text:'#c2c2c4',
         blue:'#4b82ac',
-        teal:'#419789',
+        teal:'#397e73',
         yellow:'#aaa672',
         active:'#d7d7d9',
       })
@@ -84,7 +84,7 @@ test.describe('NeetCode theme regression', () => {
     )
 
     expect(coloursSeen).toContain('rgb(194, 194, 196)')
-    expect(coloursSeen).toContain('rgb(65, 151, 137)')
+    expect(coloursSeen).toContain('rgb(57, 126, 115)')
     expect(coloursSeen).not.toContain('rgb(76, 200, 176)')
     expect(coloursSeen).not.toContain('rgb(220, 220, 168)')
   })

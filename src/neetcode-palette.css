@@ -16,7 +16,7 @@
   --nc-muted:#76767a;
   --nc-dim:#66666b;
   --nc-blue:#4b82ac;
-  --nc-teal:#419789;
+  --nc-teal:#397e73;
   --nc-yellow:#aaa672;
   --nc-orange:#a37261;
   --nc-comment:#526f49;
@@ -136,7 +136,7 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text)!important;
 }
 .search:focus-within,.filters select:focus,.account-form input:focus,.discussion-form input:focus,.discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(65,151,137,.12)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(57,126,115,.12)!important;
 }
 .search input::placeholder,input::placeholder,textarea::placeholder{color:var(--nc-muted)!important}
 
@@ -354,7 +354,7 @@ html::-webkit-scrollbar-thumb:hover,.ide-problem-content::-webkit-scrollbar-thum
 }
 .discussion-in-tab .discussion-form textarea{color:var(--nc-text)!important}
 .discussion-in-tab .discussion-form textarea:focus{
-  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(65,151,137,.12)!important;
+  border-color:var(--nc-teal)!important;box-shadow:0 0 0 2px rgba(57,126,115,.12)!important;
 }
 .post-avatar{background:var(--nc-surface-2)!important;color:var(--nc-blue)!important}
 .icon-btn:hover,.editor-shortcuts button:hover,.bottom-collapse:hover,.wave-tools button:hover{

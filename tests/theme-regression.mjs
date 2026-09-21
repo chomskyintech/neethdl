@@ -21,7 +21,7 @@ const expected = {
   '--nc-muted':'#76767a',
   '--nc-dim':'#66666b',
   '--nc-blue':'#4b82ac',
-  '--nc-teal':'#419789',
+  '--nc-teal':'#397e73',
   '--nc-yellow':'#aaa672',
   '--nc-orange':'#a37261',
   '--nc-comment':'#526f49',
@@ -39,7 +39,7 @@ assert.ok(paletteImport < sideEffectImport, 'NeetCode palette must remain in sty
 
 const banned = [
   '#615fff','#4f4bcf','#7772ff','#7b76ff','#8884ff','#8e8aff','#9b97ff',
-  '#0d0d0d','#569cd6','#4ec9b0','#4cc8b0','#4ab8a5','#549cd4','#dcdca8','#cdc98f','#ce9178','#c58c74','#6a9955','#628a55','#c586c0','#ffd700','#da70d6','#179fff'
+  '#0d0d0d','#569cd6','#4ec9b0','#4cc8b0','#4ab8a5','#419789','#549cd4','#dcdca8','#cdc98f','#ce9178','#c58c74','#6a9955','#628a55','#c586c0','#ffd700','#da70d6','#179fff'
 ]
 for (const colour of banned) {
   for (const [name,source] of [['palette',palette],['Monaco',monaco],['waveform launcher',launcher]]) {
@@ -49,8 +49,8 @@ for (const colour of banned) {
 
 const monacoChecks = [
   ['keyword.control','4B82AC'],
-  ['keyword.declaration','419789'],
-  ['type.identifier','419789'],
+  ['keyword.declaration','397E73'],
+  ['type.identifier','397E73'],
   ['entity.name.module','AAA672'],
   ['comment','526F49'],
   ['string','A37261'],
