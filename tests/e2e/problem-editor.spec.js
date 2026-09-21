@@ -157,6 +157,14 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await editor.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
   })
 
+  test('renders Shift Register task as readable bullets with inline signal chips', async ({ page }) => {
+    await page.goto('/app/problems/rtl-shift-register/')
+    const task = page.locator('.problem-section.first')
+    await expect(task).toContainText("stores the register's current contents")
+    await expect(task.locator('.problem-task-list li')).toHaveCount(4)
+    await expect(task.locator('.problem-inline-code')).toContainText(['dout','clk','reset','reset = 1','0','shift_en = 1','din','shift_en = 0','dout'])
+  })
+
   test('renders a richer HDL syntax colour palette', async ({ page }) => {
     await expect(page.locator('.monaco-editor-wrap .view-lines')).toBeVisible()
     await expect.poll(async () => page.locator('.monaco-editor-wrap .view-lines span').evaluateAll(nodes => {
