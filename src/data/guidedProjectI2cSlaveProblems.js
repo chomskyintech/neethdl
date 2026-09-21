@@ -291,25 +291,25 @@ const guidedProjectI2cSlaveProblems=[
       "slave",
       "register peripheral"
     ],
-    "description": "Integrate a simplified I²C slave register peripheral with address matching, ACK generation and internal register storage.",
-    "task": "Use 7-bit address SLAVE_ADDR. After START, receive address+R/W. ACK matching addresses. In write mode, first data byte loads reg_ptr and following bytes write regs[reg_ptr] with auto-increment. STOP returns to idle.",
+    "description": "Integrate a simplified I²C register peripheral with address matching, ACK generation, register writes and sequential register reads.",
+    "task": "Use 7-bit address SLAVE_ADDR. After START, receive address+R/W and ACK matches. In write mode, the first data byte loads reg_ptr and following bytes write regs[reg_ptr] with auto-increment. In read mode, present regs[reg_ptr] on tx_data, pulse tx_load, and advance to the next register when read_next is asserted. STOP returns to idle.",
     "examples": [
       "Implement the required protocol behavior and preserve it across the stated timing/control conditions."
     ],
     "constraints": [
       "Use synthesizable SystemVerilog and synchronous state/control logic unless the task explicitly requires edge detection or open-drain behavior."
     ],
-    "starterCode": "module i2c_register_slave #(parameter logic [6:0] SLAVE_ADDR=7'h42)(\n  input logic clk,reset,start_pulse,stop_pulse,byte_valid,\n  input logic [7:0] rx_byte,\n  output logic ack_enable,\n  output logic [7:0] reg_ptr,\n  output logic [7:0] reg0\n);\n  // TODO\nendmodule",
-    "solution": "module i2c_register_slave #(parameter logic [6:0] SLAVE_ADDR=7'h42)(\n  input logic clk,reset,start_pulse,stop_pulse,byte_valid,\n  input logic [7:0] rx_byte,\n  output logic ack_enable,\n  output logic [7:0] reg_ptr,\n  output logic [7:0] reg0\n);\n  typedef enum logic [1:0] {IDLE,ADDRESS,REGADDR,WRITE_DATA} state_t;\n  state_t state;\n  logic [7:0] regs[0:255];\n  always_ff @(posedge clk) begin\n    if(reset) begin state<=IDLE;reg_ptr<=0;ack_enable<=0; end\n    else begin\n      ack_enable<=0;\n      if(start_pulse) state<=ADDRESS;\n      else if(stop_pulse) state<=IDLE;\n      else if(byte_valid) begin\n        case(state)\n          ADDRESS: begin\n            if(rx_byte[7:1]==SLAVE_ADDR && rx_byte[0]==1'b0) begin ack_enable<=1;state<=REGADDR;end\n            else state<=IDLE;\n          end\n          REGADDR: begin reg_ptr<=rx_byte;ack_enable<=1;state<=WRITE_DATA;end\n          WRITE_DATA: begin regs[reg_ptr]<=rx_byte;reg_ptr<=reg_ptr+1'b1;ack_enable<=1;end\n          default: state<=IDLE;\n        endcase\n      end\n    end\n  end\n  assign reg0=regs[0];\nendmodule",
+    "starterCode": "module i2c_register_slave #(parameter logic [6:0] SLAVE_ADDR=7'h42)(\n  input logic clk,reset,start_pulse,stop_pulse,byte_valid,read_next,\n  input logic [7:0] rx_byte,\n  output logic ack_enable,tx_load,\n  output logic [7:0] reg_ptr,tx_data,reg0\n);\n  // TODO\nendmodule",
+    "solution": "module i2c_register_slave #(parameter logic [6:0] SLAVE_ADDR=7'h42)(\n  input logic clk,reset,start_pulse,stop_pulse,byte_valid,read_next,\n  input logic [7:0] rx_byte,\n  output logic ack_enable,tx_load,\n  output logic [7:0] reg_ptr,tx_data,reg0\n);\n  typedef enum logic [2:0] {IDLE,ADDRESS,REGADDR,WRITE_DATA,READ_DATA} state_t;\n  state_t state;\n  logic [7:0] regs[0:255];\n\n  always_ff @(posedge clk) begin\n    if(reset) begin\n      state<=IDLE;reg_ptr<=0;ack_enable<=0;tx_load<=0;tx_data<=0;\n    end else begin\n      ack_enable<=0;\n      tx_load<=0;\n\n      if(start_pulse) state<=ADDRESS;\n      else if(stop_pulse) state<=IDLE;\n      else begin\n        if(byte_valid) begin\n          case(state)\n            ADDRESS: begin\n              if(rx_byte[7:1]==SLAVE_ADDR) begin\n                ack_enable<=1;\n                if(rx_byte[0]) begin\n                  state<=READ_DATA;\n                  tx_data<=regs[reg_ptr];\n                  tx_load<=1;\n                end else state<=REGADDR;\n              end else state<=IDLE;\n            end\n            REGADDR: begin\n              reg_ptr<=rx_byte;\n              ack_enable<=1;\n              state<=WRITE_DATA;\n            end\n            WRITE_DATA: begin\n              regs[reg_ptr]<=rx_byte;\n              reg_ptr<=reg_ptr+1'b1;\n              ack_enable<=1;\n            end\n            default: ;\n          endcase\n        end\n\n        if(state==READ_DATA && read_next) begin\n          reg_ptr<=reg_ptr+1'b1;\n          tx_data<=regs[reg_ptr+1'b1];\n          tx_load<=1;\n        end\n      end\n    end\n  end\n\n  assign reg0=regs[0];\nendmodule",
     "checks": [
       {
-        "label": "Address match",
+        "label": "Matches slave address",
         "pattern": "rx_byte\\s*\\[\\s*7\\s*:\\s*1\\s*\\]\\s*==\\s*SLAVE_ADDR",
         "flags": "i"
       },
       {
-        "label": "Write mode required",
-        "pattern": "rx_byte\\s*\\[\\s*0\\s*\\]\\s*==\\s*1'b0",
+        "label": "Separates read and write modes",
+        "pattern": "if\\s*\\(\\s*rx_byte\\s*\\[\\s*0\\s*\\]\\s*\\)[\\s\\S]*state\\s*<=\\s*READ_DATA[\\s\\S]*else\\s+state\\s*<=\\s*REGADDR",
         "flags": "i"
       },
       {
@@ -323,8 +323,13 @@ const guidedProjectI2cSlaveProblems=[
         "flags": "i"
       },
       {
-        "label": "Auto increments pointer",
-        "pattern": "reg_ptr\\s*<=\\s*reg_ptr\\s*\\+\\s*1'b1",
+        "label": "Loads read data",
+        "pattern": "READ_DATA[\\s\\S]*read_next[\\s\\S]*tx_data\\s*<=\\s*regs\\s*\\[\\s*reg_ptr\\s*\\+\\s*1'b1\\s*\\]",
+        "flags": "i"
+      },
+      {
+        "label": "Pulses transmit load",
+        "pattern": "tx_load\\s*<=\\s*1",
         "flags": "i"
       },
       {
