@@ -11,7 +11,7 @@ test.describe('coding-only problem catalog and accelerators', () => {
     await expect(page.getByRole('button', { name: /^Pipelining & Streaming\s*15$/ })).toBeVisible()
 
     await page.getByPlaceholder('Search problems...').fill('accelerator')
-    await expect(page.locator('.problem-row')).toHaveCount(12)
+    await expect(page.locator('.problem-row')).toHaveCount(27)
     await expect(page.getByText('Signed INT8 Multiply-Accumulate', { exact: true })).toBeVisible()
     await expect(page.getByText('2x2 Matrix Multiply Datapath', { exact: true })).toBeVisible()
     await expect(page.getByText('Three-Tap INT8 Convolution', { exact: true })).toBeVisible()
