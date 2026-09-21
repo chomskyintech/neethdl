@@ -64,6 +64,8 @@ test.describe('guided project catalog',()=>{
     await expect(page.getByRole('heading',{name:'FPGA Engineer'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'CPU / GPU Hardware'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'Hardware Accelerator'})).toBeVisible()
+    await expect(page.getByText(/Project Guides$/)).toHaveCount(0)
+    await expect(page.locator('.project-category-chip').first()).toContainText('All · 8')
   })
 
   test('routes directly into the new guided projects',async({page})=>{
