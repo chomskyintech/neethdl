@@ -13,12 +13,12 @@ async function replaceEditorContents(page,source){
 }
 
 test.describe('guided project catalog',()=>{
-  test('shows thirteen working guided projects',async({page})=>{
+  test('shows eighteen working guided projects',async({page})=>{
     await reset(page)
     await page.getByRole('button',{name:'Projects',exact:true}).click()
 
     const guided=page.locator('.guided-project-card')
-    await expect(guided).toHaveCount(13)
+    await expect(guided).toHaveCount(18)
     await expect(guided.filter({hasText:'32-bit RISC-V CPU'})).toContainText('8 modules')
     await expect(guided.filter({hasText:'UART Controller'})).toContainText('7 modules')
     await expect(guided.filter({hasText:'AXI4-Lite Slave Peripheral'})).toContainText('8 modules')
@@ -32,6 +32,11 @@ test.describe('guided project catalog',()=>{
     await expect(guided.filter({hasText:'FPGA Packet Parser'})).toContainText('6 modules')
     await expect(guided.filter({hasText:'Branch Predictor'})).toContainText('6 modules')
     await expect(guided.filter({hasText:'Convolution Accelerator'})).toContainText('6 modules')
+    await expect(guided.filter({hasText:'Small RISC-V SoC'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'Formal Verification of RTL Interfaces'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'Low-Latency Market Data Parser'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'SIMD / Vector Execution Unit'})).toContainText('7 modules')
+    await expect(guided.filter({hasText:'DMA Engine'})).toContainText('7 modules')
   })
 
   test('opens UART and can browse modules before solving them',async({page})=>{
@@ -70,7 +75,7 @@ test.describe('guided project catalog',()=>{
     await expect(page.getByRole('heading',{name:'CPU / GPU Hardware'})).toBeVisible()
     await expect(page.getByRole('heading',{name:'Hardware Accelerator'})).toBeVisible()
     await expect(page.getByText(/Project Guides$/)).toHaveCount(0)
-    await expect(page.locator('.project-category-chip').first()).toContainText('All · 13')
+    await expect(page.locator('.project-category-chip').first()).toContainText('All · 18')
   })
 
   test('routes directly into the new guided projects',async({page})=>{
@@ -100,6 +105,21 @@ test.describe('guided project catalog',()=>{
 
     await page.goto('/app/projects/convolution-accelerator/conv-line-buffer/')
     await expect(page.getByRole('heading',{name:'Three-Row Line Buffer'})).toBeVisible()
+
+    await page.goto('/app/projects/small-risc-v-soc/soc-address-decoder/')
+    await expect(page.getByRole('heading',{name:'SoC Address Decoder'})).toBeVisible()
+
+    await page.goto('/app/projects/formal-verification-rtl/formal-reset-assumption/')
+    await expect(page.getByRole('heading',{name:'Formal Reset Assumptions'})).toBeVisible()
+
+    await page.goto('/app/projects/low-latency-market-data-parser/md-word-counter/')
+    await expect(page.getByRole('heading',{name:'Feed Word Counter'})).toBeVisible()
+
+    await page.goto('/app/projects/simd-vector-unit/simd-lane-alu/')
+    await expect(page.getByRole('heading',{name:'SIMD Lane ALU'})).toBeVisible()
+
+    await page.goto('/app/projects/dma-engine/dma-control-registers/')
+    await expect(page.getByRole('heading',{name:'DMA Control Registers'})).toBeVisible()
   })
 
   test('guided module checks can solve a project stage',async({page})=>{
