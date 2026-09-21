@@ -104,7 +104,7 @@ export default function Projects({onStartProject,solved=[],drafts={},onSelectCar
    </section>)}
 
    {visibleGroups.map(group=>group.projects.length?<section className="project-role project-role-modern" key={group.role}>
-    <div className="project-role-head"><h2>{group.role}</h2><p>{group.summary}</p></div>
+    <div className="project-role-head"><h2>{group.role} Project Guides</h2><p>{group.summary}</p></div>
     <div className="project-grid project-grid-modern">{group.projects.map(project=><article className="project-card project-card-modern" key={project.slug}>
      <span className="project-level">{project.level}</span>
      <h3>{project.title}</h3>
