@@ -11,6 +11,8 @@ import guidedProjectPeripheralSubsystemProblems from './guidedProjectPeripheralS
 import guidedProjectFirmwareProblems from './guidedProjectFirmwareProblems.js'
 import guidedProjectFormalCacheProblems from './guidedProjectFormalCacheProblems.js'
 import guidedProjectCrossbarVerificationProblems from './guidedProjectCrossbarVerificationProblems.js'
+import guidedProjectSpiProblems from './guidedProjectSpiProblems.js'
+import guidedProjectI2cSlaveProblems from './guidedProjectI2cSlaveProblems.js'
 import {riscvProject,riscvProjectProblems} from './riscvProject.js'
 
 export const uartProject={
@@ -277,6 +279,30 @@ export const crossbarVerificationProject={
   problemIds:['xbarv-sequence-item','xbarv-random-sequence','xbarv-monitor','xbarv-scoreboard','xbarv-contention-sequence','xbarv-assertions','xbarv-coverage'],
 }
 
+export const spiControllerProject={
+  id:'spi-controller',
+  slug:'spi-controller',
+  title:'SPI Controller',
+  level:'Intermediate',
+  roadmap:'hft-fpga',
+  categories:['all','fpga','rtl','soc'],
+  skills:['SPI','CPOL/CPHA','Serial protocols','Shift registers','Timing'],
+  why:'Build a configurable SPI master from clock generation and edge timing through MOSI/MISO shifting, chip-select control and complete multi-mode transfers.',
+  problemIds:['spi-clock-divider','spi-sclk-generator','spi-edge-classifier','spi-tx-shifter','spi-rx-shifter','spi-chip-select','spi-bit-counter','spi-master-top'],
+}
+
+export const i2cSlaveProject={
+  id:'i2c-slave-peripheral',
+  slug:'i2c-slave-peripheral',
+  title:'I²C Peripheral / Slave',
+  level:'Intermediate to Hard',
+  roadmap:'soc-integration',
+  categories:['all','rtl','soc','fpga'],
+  skills:['I²C','Open-drain I/O','ACK/NACK','Register maps','Clock stretching'],
+  why:'Build the slave side of I²C from START/STOP detection and address matching through ACKs, byte RX/TX, register addressing and open-drain control.',
+  problemIds:['i2c-start-stop','i2c-address-match','i2c-rx-byte','i2c-ack-driver','i2c-tx-byte','i2c-register-pointer','i2c-clock-stretch','i2c-slave-top'],
+}
+
 export const guidedProjects=[
   {
     ...riscvProject,
@@ -308,12 +334,14 @@ export const guidedProjects=[
   firmwareBringupProject,
   formalCacheProject,
   crossbarVerificationProject,
+  spiControllerProject,
+  i2cSlaveProject,
 ]
 
 export const guidedProjectById=Object.fromEntries(guidedProjects.map(project=>[project.id,project]))
 export const guidedProjectBySlug=Object.fromEntries(guidedProjects.map(project=>[project.slug,project]))
 
-const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2,...guidedProjectSocProblems,...guidedProjectFormalProblems,...guidedProjectMarketProblems,...guidedProjectSimdProblems,...guidedProjectDmaProblems,...guidedProjectCrossbarProblems,...guidedProjectPeripheralSubsystemProblems,...guidedProjectFirmwareProblems,...guidedProjectFormalCacheProblems,...guidedProjectCrossbarVerificationProblems]
+const allRawProjectProblems=[...rawProjectProblems,...expansionGuidedProblems,...expansionGuidedProblems2,...guidedProjectSocProblems,...guidedProjectFormalProblems,...guidedProjectMarketProblems,...guidedProjectSimdProblems,...guidedProjectDmaProblems,...guidedProjectCrossbarProblems,...guidedProjectPeripheralSubsystemProblems,...guidedProjectFirmwareProblems,...guidedProjectFormalCacheProblems,...guidedProjectCrossbarVerificationProblems,...guidedProjectSpiProblems,...guidedProjectI2cSlaveProblems]
 const rawById=Object.fromEntries(allRawProjectProblems.map(problem=>[problem.id,problem]))
 
 export const guidedProjectProblems=[
