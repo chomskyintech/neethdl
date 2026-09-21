@@ -26,6 +26,24 @@ function detectStrongSourceLanguage(source) {
 
   return null
 }
+function runPatternEvaluation(problem,source){
+  const checks=Array.isArray(problem.checks)?problem.checks:[]
+  const tests=checks.map((check,index)=>{
+    const label=Array.isArray(check)?check[0]:(check.label||`Check ${index+1}`)
+    const raw=Array.isArray(check)?check[1]:check.pattern
+    const flags=Array.isArray(check)?'i':(check.flags||'i')
+    let passed=false
+    try{
+      const expression=raw instanceof RegExp?raw:new RegExp(raw,flags)
+      passed=expression.test(source)
+    }catch{}
+    return {name:label,passed,time:0}
+  })
+  const passed=tests.length>0&&tests.every(test=>test.passed)
+  const output=tests.map(test=>`${test.passed?'PASS':'FAIL'} · ${test.name}`).join('\n')
+  return {passed,output:output||'No guided checks are configured for this module.',waveform:null,tests}
+}
+
 async function requestFormattedReference(language,source,columnLimit=52){
   if(!RUNNER_URL||!source) return source
   const key=`${language}\u0000${columnLimit}\u0000${source}`
@@ -789,7 +807,8 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     setRunning(true); setBottomTab('console'); setBottomCollapsed(false)
     try {
       let data
-      if (editorLanguage === 'VHDL') { if (!RUNNER_URL) throw new Error('VHDL simulator is not configured. Set VITE_RUNNER_URL to the HDLForge GHDL runner.'); const response = await fetch(`${RUNNER_URL}/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problemId: problem.id, source: code, language: 'VHDL' }) }); data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || 'VHDL runner failed.') }
+      if (evaluationType === 'pattern') data = runPatternEvaluation(problem,code)
+      else if (editorLanguage === 'VHDL') { if (!RUNNER_URL) throw new Error('VHDL simulator is not configured. Set VITE_RUNNER_URL to the HDLForge GHDL runner.'); const response = await fetch(`${RUNNER_URL}/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problemId: problem.id, source: code, language: 'VHDL' }) }); data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || 'VHDL runner failed.') }
       else data = await runBrowserSimulation(problem.id, code)
       const passed = Boolean(data.passed); setResult({ pass: passed, output: data.output || 'Simulation completed.', waveform: data.waveform, tests: Array.isArray(data.tests) ? data.tests : [] }); if (passed && !solved) (onSolved || onToggle)?.(problem.id)
     } catch (error) { setResult({ pass: false, output: error?.message || 'Simulator failed.', waveform: null, tests: [] }) } finally { setRunning(false) }
