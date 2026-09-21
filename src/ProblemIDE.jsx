@@ -10,6 +10,22 @@ import './waveform-window.css'
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
 const referenceFormatCache = new Map()
+
+function detectStrongSourceLanguage(source) {
+  const text = String(source || '')
+  const looksVhdl =
+    /\blibrary\s+ieee\s*;/i.test(text) ||
+    (/\bentity\s+[A-Za-z_]\w*\s+is\b/i.test(text) &&
+     /\barchitecture\s+[A-Za-z_]\w*\s+of\s+[A-Za-z_]\w*\s+is\b/i.test(text))
+  if (looksVhdl) return 'VHDL'
+
+  const looksVerilog =
+    /\bmodule\s+[A-Za-z_$][\w$]*\b/.test(text) &&
+    /\bendmodule\b/.test(text)
+  if (looksVerilog) return 'SystemVerilog'
+
+  return null
+}
 async function requestFormattedReference(language,source,columnLimit=52){
   if(!RUNNER_URL||!source) return source
   const key=`${language}\u0000${columnLimit}\u0000${source}`
@@ -648,6 +664,18 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     editorFormatRequest.current += 1
     editorDirtyRef.current = true
     setEditorDirty(true)
+
+    const detectedLanguage = detectStrongSourceLanguage(value)
+    if (
+      detectedLanguage &&
+      detectedLanguage !== editorLanguage &&
+      supported.includes(detectedLanguage)
+    ) {
+      setEditorLanguage(detectedLanguage)
+      setResult(null)
+      setWaveformOpen(false)
+    }
+
     setCode(value)
     onSave(problem.id, value)
   }
