@@ -7,7 +7,7 @@ export const careerPaths={
     summary:'Build the core digital-design skills used in RTL interviews and day-to-day block design: combinational logic, state, memories, FIFOs, pipelining, CDC and clean synthesizable interfaces.',
     skills:['Verilog / SystemVerilog','Combinational logic','Sequential logic','FSMs','FIFOs','Memories','Pipelining','CDC'],
     problemIds:['rtl-mux','rtl-counter','rtl-priority','rtl-fifo','rtl-shift-register','rtl-edge-detector','rtl-arbiter','rtl-regfile','rtl-clock-divider','rtl-skid-buffer','rtl-pipeline-register','rtl-reset-synchronizer','rtl-gray-counter','rtl-dual-port-ram','rtl-onehot-fsm'],
-    projectSlugs:['axi-lite-slave','async-fifo','riscv-core','cache-memory-controller','axi-lite-apb-bridge','dma-engine','small-risc-v-soc'],
+    projectSlugs:['axi-lite-slave','async-fifo','riscv-core','cache-memory-controller','axi4-interconnect-crossbar','axi-lite-apb-bridge','dma-engine','small-risc-v-soc'],
     milestones:[
       {title:'1. RTL fundamentals',problemIds:['rtl-mux','rtl-priority','rtl-counter','rtl-clock-divider','rtl-shift-register','rtl-edge-detector']},
       {title:'2. Control and state',problemIds:['rtl-arbiter','rtl-onehot-fsm','rtl-regfile']},
@@ -21,7 +21,7 @@ export const careerPaths={
     label:'Design Verification',
     summary:'Practice SystemVerilog, assertions, reusable testbench structure and UVM-style checking for verification interviews.',
     problemIds:['sv-always','sv-interface','sva-handshake','sva-reset','uvm-driver','uvm-scoreboard','rtl-skid-buffer','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write'],
-    projectSlugs:['uvm-axi4-lite-verification','formal-verification-rtl','apb-peripheral-verification','risc-v-core-verification'],
+    projectSlugs:['uvm-axi4-lite-verification','axi-crossbar-verification','formal-cache-verification','formal-verification-rtl','apb-peripheral-verification','risc-v-core-verification'],
   },
   'hft-fpga':{
     id:'hft-fpga',
@@ -53,7 +53,7 @@ export const careerPaths={
     label:'SoC Design / Integration Engineer',
     summary:'Integrate processors, memories, buses, interrupts and peripherals into complete memory-mapped systems, with emphasis on address maps, subsystem interfaces and IP integration.',
     problemIds:['proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','rtl-regfile','rtl-dual-port-ram','rtl-reset-synchronizer','soc-address-decoder','soc-gpio','soc-timer','soc-interrupt-controller'],
-    projectSlugs:['small-risc-v-soc','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
+    projectSlugs:['small-risc-v-soc','soc-peripheral-subsystem','axi4-interconnect-crossbar','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
   },
   'formal-verification':{
     id:'formal-verification',
@@ -61,7 +61,7 @@ export const careerPaths={
     label:'Formal Verification Engineer',
     summary:'Prove RTL safety, ordering and progress properties using assertions, assumptions, bounded liveness, cover goals and protocol invariants.',
     problemIds:['sva-handshake','sva-reset','formal-reset-assumption','formal-fifo-bounds','formal-fifo-order','formal-arbiter-onehot','formal-arbiter-liveness','formal-ready-valid','formal-cover-progress'],
-    projectSlugs:['formal-verification-rtl','async-fifo','uvm-axi4-lite-verification','risc-v-core-verification'],
+    projectSlugs:['formal-verification-rtl','formal-cache-verification','async-fifo','uvm-axi4-lite-verification','risc-v-core-verification'],
   },
   'embedded-hardware':{
     id:'embedded-hardware',
@@ -69,7 +69,7 @@ export const careerPaths={
     label:'Embedded Hardware / Firmware Engineer',
     summary:'Bridge RTL and software through memory-mapped peripherals, serial interfaces, interrupts, timers and small processor-based systems.',
     problemIds:['proto-uart','proto-spi','proto-apb-register','rtl-clock-divider','rtl-regfile','rv32-memory-control','soc-gpio','soc-timer','soc-interrupt-controller'],
-    projectSlugs:['uart-controller','small-risc-v-soc','axi-lite-slave','dma-engine'],
+    projectSlugs:['riscv-firmware-bringup','uart-controller','soc-peripheral-subsystem','small-risc-v-soc','axi-lite-slave','dma-engine'],
   },
   'noc-interconnect':{
     id:'noc-interconnect',
@@ -77,7 +77,7 @@ export const careerPaths={
     label:'NoC / Interconnect Engineer',
     summary:'Build the arbitration, flow-control, buffering and protocol-conversion foundations used in scalable SoC fabrics and networks-on-chip.',
     problemIds:['rtl-arbiter','rtl-round-robin-arbiter','rtl-skid-buffer','rtl-fifo','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','afifo-gray-sync','afifo-full-detect'],
-    projectSlugs:['axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
+    projectSlugs:['axi4-interconnect-crossbar','axi-crossbar-verification','axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
   },
 }
 
