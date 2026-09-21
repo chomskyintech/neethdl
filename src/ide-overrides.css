@@ -350,8 +350,12 @@
 
 
 
+.problem-section.first{
+  padding-bottom:0;
+}
 .problem-task-copy{
   max-width:650px;
+  margin-top:48px;
   color:#aab8c8;
   font-size:13px;
   line-height:1.75;
@@ -363,14 +367,16 @@
   line-height:inherit;
 }
 .problem-task-list{
-  margin:12px 0 0;
+  margin:20px 0 0;
   padding-left:18px;
+  display:grid;
+  gap:14px;
   color:inherit;
   font-size:inherit;
   line-height:inherit;
 }
 .problem-task-list li{
-  margin:7px 0;
+  margin:0;
   padding-left:2px;
   color:inherit;
   font-size:inherit;
@@ -394,6 +400,7 @@
 
 .structured-examples{
   min-width:0;
+  margin-top:48px;
   display:grid;
   gap:42px;
 }
