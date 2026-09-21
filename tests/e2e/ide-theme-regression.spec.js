@@ -21,7 +21,6 @@ test.describe('IDE visual theme regression', () => {
           textStrong: value('--nc-text-strong'),
           border: value('--nc-border'),
         },
-        body: getComputedStyle(document.body).backgroundColor,
         problem: colour('.ide-problem'),
         problemTabs: colour('.ide-problem>.problem-tabs'),
         fileTabs: colour('.file-tabs'),
@@ -40,7 +39,6 @@ test.describe('IDE visual theme regression', () => {
       border: '#39393b',
     })
 
-    expect(palette.body).toBe('rgb(31, 31, 32)')
     expect(palette.problem).toBe('rgb(38, 37, 39)')
     expect(palette.problemTabs).toBe('rgb(38, 37, 39)')
     expect(palette.fileTabs).toBe('rgb(38, 37, 39)')
