@@ -134,16 +134,20 @@
       "sequential",
       "shift-register"
     ],
-    "description": "Design a parameterized synchronous shift register.",
-    "task": "On each rising edge, shift stored bits toward the MSB and insert din at bit 0.",
+    "description": "Build a parameterized register that stores multiple bits and can shift its contents by one position on each clock edge.",
+    "task": "Design a synchronous shift register with a configurable width. The output dout holds the register's current contents. On every rising edge of clk, first check reset: when reset is high, clear the entire register to 0. Otherwise, if shift_en is high, move every stored bit one position toward the most-significant bit (MSB) and insert the new serial input din into bit 0. If shift_en is low, keep the previous value of dout unchanged.",
     "examples": [
-      "reset=1 → dout=0",
-      "dout=8'b00000001, din=0 → next dout=8'b00000010"
+      "After reset:\nreset = 1\nnext dout = 8'b00000000\nThe synchronous reset clears every stored bit on the rising clock edge.",
+      "Shift in a 1:\ndout before clock = 8'b00000000\ndin = 1, shift_en = 1\nnext dout = 8'b00000001\nThe new din value enters at bit 0.",
+      "Shift again with din = 0:\ndout before clock = 8'b00000001\ndin = 0, shift_en = 1\nnext dout = 8'b00000010\nThe existing 1 moves from bit 0 to bit 1.",
+      "Hold the register:\ndout = 8'b00000100\nshift_en = 0\nnext dout = 8'b00000100\nWhen shifting is disabled, the stored value must not change."
     ],
     "constraints": [
-      "Parameterize the width.",
-      "Reset is synchronous and active high.",
-      "Shift only when shift_en is high."
+      "WIDTH must control the number of stored bits.",
+      "reset is synchronous and active high, so it is sampled on the rising edge of clk.",
+      "When reset is high, reset takes priority over shift_en.",
+      "When shift_en is high, shift toward the MSB: dout[0] receives din and every other bit receives the bit below it.",
+      "When shift_en is low and reset is low, dout must hold its previous value."
     ],
     "starterCode": "module shift_reg #(\n  parameter WIDTH = 8\n) (\n  input logic clk,\n  input logic reset,\n  input logic shift_en,\n  input logic din,\n  output logic [WIDTH-1:0] dout\n);\n\n  // Your RTL here\n\nendmodule"
   },
