@@ -181,6 +181,50 @@ test.describe('HDLForge Monaco problem editor', () => {
     expect(await highlightedTokens.count()).toBeGreaterThan(0)
   })
 
+  test('renders VHDL syntax highlighting after switching languages', async ({ page }) => {
+    const language = page.locator('.editor-language select')
+    await language.selectOption('VHDL')
+    await expect(editorRoot(page)).toContainText('HDL source · VHDL')
+
+    const vhdl = `library ieee;
+use ieee.std_logic_1164.all;
+
+entity shift_reg is
+  port (
+    clk   : in std_logic;
+    reset : in std_logic;
+    dout  : out std_logic_vector(7 downto 0)
+  );
+end entity shift_reg;
+
+architecture rtl of shift_reg is
+  signal q : std_logic_vector(7 downto 0);
+begin
+  process(clk)
+  begin
+    if rising_edge(clk) then
+      if reset = '1' then
+        q <= (others => '0');
+      end if;
+    end if;
+  end process;
+
+  dout <= q;
+end architecture rtl;`
+
+    await replaceEditorContents(page, vhdl)
+    await expect(page.locator('.monaco-editor .view-line').first()).toBeVisible()
+
+    await expect.poll(async () => page.locator('.monaco-editor .view-lines span').evaluateAll(nodes => {
+      const colours = new Set(
+        nodes
+          .filter(node => (node.textContent || '').trim())
+          .map(node => getComputedStyle(node).color)
+      )
+      return colours.size
+    })).toBeGreaterThanOrEqual(4)
+  })
+
   test('supports Verilog, VHDL and SystemVerilog switching', async ({ page }) => {
     const language = page.locator('.editor-language select')
     await expect(language).toHaveValue('SystemVerilog')
