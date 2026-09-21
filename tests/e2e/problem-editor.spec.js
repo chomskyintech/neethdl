@@ -157,6 +157,19 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect.poll(async () => Number(await editor.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
   })
 
+  test('renders three structured Shift Register examples', async ({ page }) => {
+    await page.goto('/app/problems/rtl-shift-register/')
+    const examples = page.locator('.structured-example')
+    await expect(examples).toHaveCount(3)
+    await expect(examples.nth(0)).toContainText('Example 1:')
+    await expect(examples.nth(0)).toContainText('Input:')
+    await expect(examples.nth(0)).toContainText('After rising edge:')
+    await expect(examples.nth(0)).toContainText("8'b10110110")
+    await expect(examples.nth(0)).toContainText("8'b00000000")
+    await expect(examples.nth(2)).toContainText("8'b00000001")
+    await expect(examples.nth(2)).toContainText("8'b00000010")
+  })
+
   test('renders Shift Register task as readable bullets with inline signal chips', async ({ page }) => {
     await page.goto('/app/problems/rtl-shift-register/')
     const task = page.locator('.problem-section.first')
