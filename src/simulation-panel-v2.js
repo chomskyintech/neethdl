@@ -354,9 +354,12 @@ function fitWaveform(state) {
   const viewWidth = Number(state.svg.dataset.simV2ViewWidth)
   const viewport = Math.max(1, state.scroll.clientWidth)
   const panelWidth = Number.parseFloat(getComputedStyle(state.waveform).getPropertyValue('--sim-signal-width')) || 220
-  const plotViewWidth = Math.max(1, right - left)
+  // Fit the full SVG content, not just the last trace. The source SVG keeps
+  // a small right-side gutter after the final transition; ignoring it leaves
+  // a horizontal scrollbar even at "Fit".
+  const fullViewWidth = Math.max(1, viewWidth - left)
   const desiredPlotWidth = Math.max(160, viewport - panelWidth)
-  const baseScale = desiredPlotWidth / plotViewWidth
+  const baseScale = desiredPlotWidth / fullViewWidth
   state.fitScale = baseScale
   state.zoom = 1
   state.svg.style.width = `${viewWidth * baseScale}px`
