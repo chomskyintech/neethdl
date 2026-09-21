@@ -63,3 +63,35 @@ body.hdlforge-ide-active .ide-page .bottom-tabs::-webkit-scrollbar{
   width:0!important;
   height:0!important;
 }
+
+
+/* Problem statement scrollbar intentionally matches Monaco's compact rectangular thumb. */
+body.hdlforge-ide-active .ide-page .ide-problem-content{
+  scrollbar-width:thin!important;
+  scrollbar-color:#666 transparent!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar{
+  display:block!important;
+  width:10px!important;
+  height:0!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-track{
+  background:transparent!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-thumb{
+  background:#666!important;
+  border:0!important;
+  border-radius:0!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-thumb:hover{
+  background:#7a7a7a!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-button,
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-button:single-button{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+body.hdlforge-ide-active .ide-page .ide-problem-content::-webkit-scrollbar-corner{
+  background:transparent!important;
+}
