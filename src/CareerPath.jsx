@@ -1,12 +1,16 @@
 import React,{useMemo} from 'react'
 import{ArrowRight,CheckCircle2,ChevronRight}from'lucide-react'
 import {allProjects} from './data/projects'
+import {guidedProjectBySlug} from './data/guidedProjects'
 import {careerPathList} from './data/careerPaths'
 import './career-path.css'
 
-const projectMap=Object.fromEntries(allProjects.map(project=>[project.slug,project]))
+const projectMap={
+ ...Object.fromEntries(allProjects.map(project=>[project.slug,project])),
+ ...guidedProjectBySlug,
+}
 
-export default function CareerPath({career,allProblems,solved=[],onOpenProblem,onStartRiscv,onSelectCareer}){
+export default function CareerPath({career,allProblems,solved=[],onOpenProblem,onStartProject,onSelectCareer}){
  const careerProblems=useMemo(()=>career.problemIds.map(id=>allProblems.find(problem=>problem.id===id)).filter(Boolean),[career,allProblems])
  const careerProjects=useMemo(()=>career.projectSlugs.map(slug=>projectMap[slug]).filter(Boolean),[career])
  const completed=careerProblems.filter(problem=>solved.includes(problem.id)).length
@@ -51,12 +55,12 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
      <strong>{careerProjects.length} projects</strong>
     </div>
     <div className="career-project-grid">{careerProjects.map(project=><article className="career-project-card" key={project.slug}>
-      <span className="career-project-level">{project.guided?'Guided':project.level}</span>
+      <span className="career-project-level">{project.problemIds?'Guided':project.level}</span>
       <h3>{project.title}</h3>
       <p>{project.why||project.build}</p>
       <div className="career-project-tags">{project.skills?.slice(0,4).map(skill=><span key={skill}>{skill}</span>)}</div>
-      {project.slug==='guided-risc-v-cpu'
-       ?<button type="button" onClick={onStartRiscv}>Start guided project <ArrowRight size={14}/></button>
+      {project.problemIds
+       ?<button type="button" onClick={()=>onStartProject(project.id)}>Start guided project <ArrowRight size={14}/></button>
        :<a href={`/projects/${project.slug}/`}>Open project guide <ArrowRight size={14}/></a>}
      </article>)}</div>
    </section>
