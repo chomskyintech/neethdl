@@ -1,9 +1,9 @@
 .career-workspace{
-  --career-bg:#1c1c1e;
-  --career-panel:#232326;
-  --career-surface:#29292c;
-  --career-surface-2:#303034;
-  --career-border:#3a3a3f;
+  --career-bg:#1f1f20;
+  --career-panel:#262527;
+  --career-surface:#29282a;
+  --career-surface-2:#303033;
+  --career-border:#39393b;
   --career-border-soft:#303034;
   --career-text:#f4f4f5;
   --career-text-soft:#d5d5d9;
@@ -14,7 +14,7 @@
 
   width:100%;
   display:grid;
-  grid-template-columns:245px minmax(0,1fr) 300px;
+  grid-template-columns:245px minmax(0,1fr) 330px;
   gap:24px;
   align-items:start;
   color:var(--career-text-soft);
@@ -61,62 +61,63 @@
 }
 
 .career-hero{
-  margin:18px 0 34px;
-  padding:30px;
-  border:1px solid var(--career-border);
-  border-radius:18px;
-  background:var(--career-panel);
+  margin:18px 0 46px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
 }
 .career-eyebrow{
   display:inline-block;
-  margin-bottom:13px;
+  margin-bottom:16px;
   color:var(--career-accent);
   font-size:10px;
   font-weight:800;
-  letter-spacing:.09em;
+  letter-spacing:.1em;
+  text-transform:uppercase;
 }
 .career-hero h1{
   margin:0;
   color:var(--career-text);
-  font-size:46px;
-  line-height:1.02;
-  letter-spacing:-.035em;
+  font-size:56px;
+  line-height:1;
+  letter-spacing:-.045em;
 }
 .career-hero p{
-  max-width:850px;
-  margin:18px 0 0;
+  max-width:900px;
+  margin:22px 0 0;
   color:var(--career-muted);
-  font-size:15px;
-  line-height:1.75;
+  font-size:17px;
+  line-height:1.7;
 }
 .career-skill-row{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
-  margin-top:22px;
+  gap:9px;
+  margin-top:26px;
 }
 .career-skill-row span{
-  padding:6px 9px;
+  padding:6px 10px;
   border:1px solid var(--career-border);
   border-radius:999px;
-  background:var(--career-surface);
+  background:var(--career-panel);
   color:var(--career-text-soft);
   font-size:10px;
   font-weight:700;
 }
-.career-section{margin:0 0 42px}
+.career-section{margin:0 0 48px}
 .career-section-head{
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
   gap:18px;
-  margin-bottom:16px;
+  margin-bottom:22px;
 }
 .career-section-head>div>span{
   display:block;
-  margin-bottom:6px;
+  margin-bottom:9px;
   color:var(--career-accent);
-  font-size:9px;
+  font-size:10px;
   font-weight:800;
   letter-spacing:.1em;
   text-transform:uppercase;
@@ -124,107 +125,130 @@
 .career-section-head h2{
   margin:0;
   color:var(--career-text);
-  font-size:25px;
-  letter-spacing:-.025em;
+  font-size:32px;
+  line-height:1.05;
+  letter-spacing:-.035em;
 }
 .career-section-head p{
-  margin:7px 0 0;
+  margin:10px 0 0;
   color:var(--career-muted);
-  font-size:12px;
+  font-size:14px;
 }
 .career-section-head>strong{
   color:var(--career-accent);
-  font-size:11px;
+  font-size:12px;
 }
 .career-milestones{
   display:grid;
-  gap:12px;
+  gap:5px;
 }
 .career-milestone{
   overflow:hidden;
-  border:1px solid var(--career-border);
+  border:1px solid #303034;
   border-radius:14px;
-  background:var(--career-panel);
+  background:#232326;
 }
 .career-milestone-head{
   width:100%;
-  min-height:56px;
-  display:flex;
+  min-height:70px;
+  display:grid;
+  grid-template-columns:22px minmax(180px,1fr) 54px minmax(130px,270px);
   align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  padding:0 16px;
+  gap:12px;
+  padding:0 18px;
   border:0;
-  border-bottom:1px solid transparent;
-  background:var(--career-panel);
-  color:var(--career-text);
+  background:transparent;
+  color:#f1f1f2;
   cursor:pointer;
   text-align:left;
 }
-.career-milestone.open .career-milestone-head{
-  border-bottom-color:var(--career-border-soft);
-}
 .career-milestone-head:hover{
-  background:var(--career-surface);
+  background:#28282b;
 }
-.career-milestone-head h3{
-  margin:0;
-  color:var(--career-text);
-  font-size:14px;
-}
-.career-milestone-meta{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:var(--career-accent);
-}
-.career-milestone-meta>span{
-  color:var(--career-accent);
-  font:500 10px ui-monospace,SFMono-Regular,Consolas,monospace;
-}
-.career-milestone-meta svg{
-  color:var(--career-dim);
+.career-milestone-chevron{
+  color:#b7b7bb;
   transition:transform .16s ease,color .16s ease;
 }
-.career-milestone.open .career-milestone-meta svg{
+.career-milestone.open .career-milestone-chevron{
   color:var(--career-accent);
-  transform:rotate(180deg);
+  transform:rotate(90deg);
+}
+.career-milestone-head h3{
+  min-width:0;
+  overflow:hidden;
+  margin:0;
+  color:var(--career-text);
+  font-size:17px;
+  font-weight:750;
+  letter-spacing:-.015em;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.career-milestone-count{
+  justify-self:end;
+  color:#c5c5c9;
+  font:500 11px ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+.career-milestone-progress{
+  position:relative;
+  height:8px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#555559;
+}
+.career-milestone-progress i{
+  position:absolute;
+  inset:0 auto 0 0;
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:var(--career-accent);
+  transition:width .2s ease;
 }
 .career-milestone-head:focus-visible{
   outline:2px solid var(--career-accent);
   outline-offset:-2px;
 }
-.career-problem-list{display:grid}
+.career-problem-list{
+  display:grid;
+  border-top:1px solid #343438;
+  background:#1c1c1e;
+}
 .career-problem-list[hidden]{display:none}
 .career-problem{
   width:100%;
   min-height:60px;
   display:grid;
-  grid-template-columns:24px minmax(0,1fr) 18px;
+  grid-template-columns:24px 28px minmax(0,1fr) 78px 18px;
   align-items:center;
-  gap:10px;
-  padding:10px 14px;
+  gap:12px;
+  padding:8px 18px;
   border:0;
-  border-bottom:1px solid var(--career-border-soft);
-  background:var(--career-bg);
+  border-bottom:1px solid #2b2b2e;
+  background:transparent;
   color:var(--career-text-soft);
   cursor:pointer;
   text-align:left;
 }
 .career-problem:last-child{border-bottom:0}
-.career-problem:hover{background:var(--career-surface)}
-.career-problem>svg{color:var(--career-dim)}
+.career-problem:hover{background:#242427}
 .career-problem-check{
-  width:17px;
-  height:17px;
+  width:22px;
+  height:22px;
   display:grid;
   place-items:center;
-  border:1px solid var(--career-border);
+  border:1px solid #45454a;
   border-radius:50%;
+  color:#55555a;
 }
 .career-problem-check.done{
-  border-color:var(--career-accent);
-  color:var(--career-accent);
+  border-color:#1d6b51;
+  background:#133329;
+  color:#42c68d;
+}
+.career-problem-index{
+  color:#73737a;
+  font:11px ui-monospace,SFMono-Regular,Consolas,monospace;
 }
 .career-problem-copy{
   min-width:0;
@@ -235,13 +259,33 @@
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  color:var(--career-text);
-  font-size:12px;
+  color:#dedee1;
+  font-size:14px;
+  font-weight:700;
 }
 .career-problem-copy small{
-  color:var(--career-muted);
-  font-size:10px;
+  overflow:hidden;
+  color:#85858c;
+  font-size:11px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
+.career-problem-difficulty{
+  justify-self:end;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#29292c;
+  font-size:10px;
+  font-weight:800;
+}
+.career-problem-difficulty.easy{color:#45bd88}
+.career-problem-difficulty.medium{color:#d8c86e}
+.career-problem-difficulty.hard{color:#df7b83}
+.career-problem-chevron{
+  justify-self:end;
+  color:#7d7d83;
+}
+
 .career-project-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -382,7 +426,10 @@
   line-height:1.7;
 }
 
-@media(max-width:1200px){
+@media(max-width:1280px){
+  .career-workspace{grid-template-columns:210px minmax(0,1fr) 280px;gap:18px}
+}
+@media(max-width:1040px){
   .career-workspace{grid-template-columns:210px minmax(0,1fr)}
   .career-side-rail{position:static;grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .career-next-card{margin-top:0}
@@ -392,9 +439,30 @@
   .career-roadmap{position:static}
   .career-project-grid{grid-template-columns:1fr}
 }
-@media(max-width:600px){
-  .career-hero{padding:22px}
-  .career-hero h1{font-size:36px}
+@media(max-width:760px){
+  .career-hero h1{font-size:42px}
+  .career-hero p{font-size:15px}
   .career-section-head{align-items:flex-start;flex-direction:column}
+  .career-milestone-head{
+    grid-template-columns:20px minmax(0,1fr) 48px;
+    min-height:64px;
+    padding:0 14px;
+  }
+  .career-milestone-progress{
+    grid-column:2/-1;
+    width:100%;
+    margin:-10px 0 12px;
+  }
+  .career-milestone-head h3{font-size:15px}
+  .career-problem{
+    grid-template-columns:24px minmax(0,1fr) 64px 18px;
+    padding:8px 14px;
+  }
+  .career-problem-index{display:none}
+}
+@media(max-width:600px){
+  .career-hero h1{font-size:36px}
   .career-side-rail{grid-template-columns:1fr}
+  .career-problem-difficulty{display:none}
+  .career-problem{grid-template-columns:24px minmax(0,1fr) 18px}
 }
