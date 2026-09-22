@@ -26,6 +26,7 @@ COPY package.json ./
 RUN npm install --omit=dev
 COPY server.js ./
 COPY ghdl-proxy.js ./
+COPY standalone-benches.js ./
 COPY vendor ./vendor
 
 ENV NODE_ENV=production
