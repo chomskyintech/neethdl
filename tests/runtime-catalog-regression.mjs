@@ -84,7 +84,7 @@ for(const script of globallyLoadedIdeScripts){
   }
 }
 
-const globallyLoadedIdeStyles=[
+const requiredIdeStyles=[
   'ide-redesign.css',
   'ide-sizing-fix.css',
   'ide-control-refinement.css',
@@ -101,11 +101,18 @@ const globallyLoadedIdeStyles=[
   'simulation-panel-v2.css',
   'simulation-panel-quality.css',
 ]
-for(const stylesheet of globallyLoadedIdeStyles){
-  if(indexHtml.includes(`href="/${stylesheet}"`)){
-    console.error(`IDE-only stylesheet is still globally loaded from index.html: ${stylesheet}`)
+let lastStyleIndex=-1
+for(const stylesheet of requiredIdeStyles){
+  const index=indexHtml.indexOf(`href="/${stylesheet}"`)
+  if(index<0){
+    console.error(`Required IDE stylesheet is missing from the stable cascade: ${stylesheet}`)
     process.exit(1)
   }
+  if(index<=lastStyleIndex){
+    console.error(`IDE stylesheet cascade order changed near: ${stylesheet}`)
+    process.exit(1)
+  }
+  lastStyleIndex=index
 }
 
 const mainSource=fs.readFileSync(path.join(root,'src/main.jsx'),'utf8')
