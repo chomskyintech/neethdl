@@ -1829,5 +1829,1565 @@
         "flags": "i"
       }
     ]
+  },
+  {
+    "id": "tb-clock-reset",
+    "title": "Clock and Reset Generator",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "clock",
+      "reset"
+    ],
+    "description": "Create reusable testbench clock and reset stimulus.",
+    "task": "Generate a 10 ns clock period and hold active-high reset for three rising edges before deasserting it.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "module tb;\n  logic clk, reset;\n  // TODO\nendmodule",
+    "solution": "module tb;\n  logic clk=0, reset=1;\n  always #5 clk = ~clk;\n  initial begin\n    repeat(3) @(posedge clk);\n    reset = 0;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "10 ns clock",
+        "pattern": "always\\s*#5\\s+clk\\s*=\\s*~clk",
+        "flags": "i"
+      },
+      {
+        "label": "Three reset cycles",
+        "pattern": "repeat\\s*\\(\\s*3\\s*\\)\\s*@\\s*\\(\\s*posedge\\s+clk\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Deasserts reset",
+        "pattern": "reset\\s*=\\s*0",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-task-driver",
+    "title": "Reusable Stimulus Task",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "task",
+      "stimulus"
+    ],
+    "description": "Encapsulate repeated stimulus in a SystemVerilog task.",
+    "task": "Create drive_word(data) that waits for a rising edge, asserts valid with data, waits until ready, then deasserts valid.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "task automatic drive_word(input logic [31:0] data);\n  // TODO\nendtask",
+    "solution": "task automatic drive_word(input logic [31:0] data);\n  @(posedge clk);\n  valid <= 1'b1;\n  payload <= data;\n  do @(posedge clk); while(!ready);\n  valid <= 1'b0;\nendtask",
+    "checks": [
+      {
+        "label": "Automatic task",
+        "pattern": "task\\s+automatic\\s+drive_word",
+        "flags": "i"
+      },
+      {
+        "label": "Drives valid",
+        "pattern": "valid\\s*<=\\s*1'b1",
+        "flags": "i"
+      },
+      {
+        "label": "Waits for ready",
+        "pattern": "while\\s*\\(\\s*!ready\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Clears valid",
+        "pattern": "valid\\s*<=\\s*1'b0",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-self-checking",
+    "title": "Self-Checking Adder Testbench",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "self-checking",
+      "assert"
+    ],
+    "description": "Make a simple combinational testbench report mismatches automatically.",
+    "task": "After driving a and b, compare sum against a+b and call $error on mismatch.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "initial begin\n  // Drive a and b, then self-check sum.\nend",
+    "solution": "initial begin\n  a = 8'd7;\n  b = 8'd9;\n  #1;\n  if(sum !== (a+b))\n    $error(\"sum mismatch: got %0d expected %0d\",sum,a+b);\nend",
+    "checks": [
+      {
+        "label": "Compares expected sum",
+        "pattern": "sum\\s*!==\\s*\\(\\s*a\\s*\\+\\s*b\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Reports error",
+        "pattern": "\\$error\\s*\\(",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-scoreboard-queue",
+    "title": "Queue-Based Expected-Value Checker",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "queue",
+      "scoreboard"
+    ],
+    "description": "Use a queue to align expected outputs with a variable-latency DUT.",
+    "task": "Push expected values when inputs are accepted. Pop and compare the oldest expected value whenever out_valid is asserted.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "logic [31:0] expected_q[$];\n\nalways @(posedge clk) begin\n  // TODO\nend",
+    "solution": "logic [31:0] expected_q[$];\n\nalways @(posedge clk) begin\n  if(in_valid && in_ready)\n    expected_q.push_back(model(in_data));\n\n  if(out_valid && out_ready) begin\n    logic [31:0] expected;\n    expected = expected_q.pop_front();\n    if(out_data !== expected)\n      $error(\"mismatch\");\n  end\nend",
+    "checks": [
+      {
+        "label": "Pushes expected value",
+        "pattern": "expected_q\\.push_back",
+        "flags": "i"
+      },
+      {
+        "label": "Pops oldest expected",
+        "pattern": "expected_q\\.pop_front",
+        "flags": "i"
+      },
+      {
+        "label": "Compares output",
+        "pattern": "out_data\\s*!==\\s*expected",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-random-stimulus",
+    "title": "Randomized RTL Stimulus Loop",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "random",
+      "stimulus"
+    ],
+    "description": "Generate repeatable pseudo-random input combinations.",
+    "task": "Run 100 trials, assigning a and b from $urandom_range(0,255) before checking the DUT.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "initial begin\n  // TODO\nend",
+    "solution": "initial begin\n  repeat(100) begin\n    a = $urandom_range(0,255);\n    b = $urandom_range(0,255);\n    #1;\n    if(y !== reference(a,b)) $error(\"mismatch\");\n  end\nend",
+    "checks": [
+      {
+        "label": "Hundred trials",
+        "pattern": "repeat\\s*\\(\\s*100\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Randomizes a",
+        "pattern": "a\\s*=\\s*\\$urandom_range\\s*\\(\\s*0\\s*,\\s*255\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Checks DUT",
+        "pattern": "\\$error\\s*\\(",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-timeout-watchdog",
+    "title": "Simulation Timeout Watchdog",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "timeout",
+      "watchdog"
+    ],
+    "description": "Prevent a hung test from running forever.",
+    "task": "Fork the main test and a watchdog. The watchdog must call $fatal if done is not observed within 1000 clock cycles.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "initial begin\n  // TODO\nend",
+    "solution": "initial begin\n  fork\n    begin : main_test\n      wait(done);\n    end\n    begin : watchdog\n      repeat(1000) @(posedge clk);\n      if(!done) $fatal(1,\"timeout\");\n    end\n  join_any\n  disable fork;\nend",
+    "checks": [
+      {
+        "label": "Forks watchdog",
+        "pattern": "fork",
+        "flags": "i"
+      },
+      {
+        "label": "Thousand-cycle timeout",
+        "pattern": "repeat\\s*\\(\\s*1000\\s*\\)\\s*@\\s*\\(\\s*posedge\\s+clk\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Fatal on timeout",
+        "pattern": "\\$fatal\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Stops remaining thread",
+        "pattern": "disable\\s+fork",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-file-vectors",
+    "title": "File-Driven Test Vectors",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "file-io",
+      "vectors"
+    ],
+    "description": "Read test vectors from a text file.",
+    "task": "Open vectors.txt, repeatedly read hexadecimal a, b and expected values with $fscanf, compare DUT output, and close the file.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "initial begin\n  integer fd;\n  // TODO\nend",
+    "solution": "initial begin\n  integer fd;\n  logic [7:0] exp;\n  fd = $fopen(\"vectors.txt\",\"r\");\n  while(!$feof(fd)) begin\n    if($fscanf(fd,\"%h %h %h\\n\",a,b,exp)==3) begin\n      #1;\n      if(y !== exp) $error(\"vector mismatch\");\n    end\n  end\n  $fclose(fd);\nend",
+    "checks": [
+      {
+        "label": "Opens vector file",
+        "pattern": "\\$fopen\\s*\\(\\s*\"vectors\\.txt\"",
+        "flags": "i"
+      },
+      {
+        "label": "Reads vectors",
+        "pattern": "\\$fscanf",
+        "flags": "i"
+      },
+      {
+        "label": "Checks expected output",
+        "pattern": "y\\s*!==\\s*exp",
+        "flags": "i"
+      },
+      {
+        "label": "Closes file",
+        "pattern": "\\$fclose",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-latency-checker",
+    "title": "Fixed-Latency Pipeline Checker",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "latency",
+      "pipeline"
+    ],
+    "description": "Check a pipeline that must produce results exactly three cycles after input acceptance.",
+    "task": "Store expected results through a three-stage testbench pipeline and compare when the delayed valid reaches stage 2.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "logic [31:0] exp0,exp1,exp2;\nlogic [2:0] vld_pipe;\n\nalways @(posedge clk) begin\n  // TODO\nend",
+    "solution": "logic [31:0] exp0,exp1,exp2;\nlogic [2:0] vld_pipe;\n\nalways @(posedge clk) begin\n  vld_pipe <= {vld_pipe[1:0],in_valid};\n  if(in_valid) exp0 <= model(in_data);\n  exp1 <= exp0;\n  exp2 <= exp1;\n  if(vld_pipe[2] && out_data !== exp2)\n    $error(\"latency/data mismatch\");\nend",
+    "checks": [
+      {
+        "label": "Three-stage valid pipeline",
+        "pattern": "vld_pipe\\s*<=\\s*\\{\\s*vld_pipe\\s*\\[\\s*1\\s*:\\s*0\\s*\\]\\s*,\\s*in_valid\\s*\\}",
+        "flags": "i"
+      },
+      {
+        "label": "Delays expected value",
+        "pattern": "exp1\\s*<=\\s*exp0[\\s\\S]*exp2\\s*<=\\s*exp1",
+        "flags": "i"
+      },
+      {
+        "label": "Checks stage two",
+        "pattern": "vld_pipe\\s*\\[\\s*2\\s*\\]",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "tb-backpressure-driver",
+    "title": "Backpressure-Aware Stream Driver",
+    "topic": "Testbenches",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "testbench",
+      "ready-valid",
+      "driver"
+    ],
+    "description": "Write a testbench task that obeys ready/valid backpressure.",
+    "task": "Hold valid and data stable until a ready/valid handshake occurs, then clear valid on the following edge.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "task automatic send(input logic [15:0] word);\n  // TODO\nendtask",
+    "solution": "task automatic send(input logic [15:0] word);\n  valid <= 1'b1;\n  data <= word;\n  do @(posedge clk); while(!ready);\n  valid <= 1'b0;\nendtask",
+    "checks": [
+      {
+        "label": "Asserts valid",
+        "pattern": "valid\\s*<=\\s*1'b1",
+        "flags": "i"
+      },
+      {
+        "label": "Drives data once",
+        "pattern": "data\\s*<=\\s*word",
+        "flags": "i"
+      },
+      {
+        "label": "Waits under backpressure",
+        "pattern": "while\\s*\\(\\s*!ready\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Deasserts after handshake",
+        "pattern": "valid\\s*<=\\s*1'b0",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "if-modports",
+    "title": "Interface Modports",
+    "topic": "Interfaces",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "interface",
+      "modport",
+      "directions"
+    ],
+    "description": "Define producer and consumer views of a ready/valid interface.",
+    "task": "Producer drives valid/data and observes ready. Consumer observes valid/data and drives ready.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "interface rv_if #(parameter WIDTH=32)(input logic clk);\n  logic valid,ready;\n  logic [WIDTH-1:0] data;\n  // TODO\nendinterface",
+    "solution": "interface rv_if #(parameter WIDTH=32)(input logic clk);\n  logic valid,ready;\n  logic [WIDTH-1:0] data;\n  modport producer(output valid,data,input ready,clk);\n  modport consumer(input valid,data,output ready,input clk);\nendinterface",
+    "checks": [
+      {
+        "label": "Producer modport",
+        "pattern": "modport\\s+producer\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Consumer modport",
+        "pattern": "modport\\s+consumer\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Producer directions",
+        "pattern": "output\\s+valid\\s*,\\s*data[\\s\\S]*input\\s+ready",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "if-clocking-block",
+    "title": "Interface Clocking Block",
+    "topic": "Interfaces",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "interface",
+      "clocking-block",
+      "testbench"
+    ],
+    "description": "Add a testbench clocking block to a bus interface.",
+    "task": "Create clocking cb on posedge clk with default input #1step and output #0; sample ready and drive valid/data.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "interface bus_if(input logic clk);\n  logic valid,ready;\n  logic [7:0] data;\n  // TODO\nendinterface",
+    "solution": "interface bus_if(input logic clk);\n  logic valid,ready;\n  logic [7:0] data;\n  clocking cb @(posedge clk);\n    default input #1step output #0;\n    input ready;\n    output valid,data;\n  endclocking\nendinterface",
+    "checks": [
+      {
+        "label": "Clocking block",
+        "pattern": "clocking\\s+cb\\s*@\\s*\\(\\s*posedge\\s+clk\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Input skew",
+        "pattern": "default\\s+input\\s+#1step\\s+output\\s+#0",
+        "flags": "i"
+      },
+      {
+        "label": "Samples ready",
+        "pattern": "input\\s+ready",
+        "flags": "i"
+      },
+      {
+        "label": "Drives valid data",
+        "pattern": "output\\s+valid\\s*,\\s*data",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "if-monitor-modport",
+    "title": "Monitor-Only Interface Modport",
+    "topic": "Interfaces",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "interface",
+      "monitor",
+      "modport"
+    ],
+    "description": "Expose a read-only monitor view of an interface.",
+    "task": "Create a monitor modport that can observe clk, valid, ready and data but cannot drive them.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "interface stream_if(input logic clk);\n  logic valid,ready;\n  logic [31:0] data;\n  // TODO\nendinterface",
+    "solution": "interface stream_if(input logic clk);\n  logic valid,ready;\n  logic [31:0] data;\n  modport monitor(input clk,valid,ready,data);\nendinterface",
+    "checks": [
+      {
+        "label": "Monitor modport",
+        "pattern": "modport\\s+monitor\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "All monitor signals input",
+        "pattern": "input\\s+clk\\s*,\\s*valid\\s*,\\s*ready\\s*,\\s*data",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "if-parameterized",
+    "title": "Parameterized Bus Interface",
+    "topic": "Interfaces",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "interface",
+      "parameter",
+      "bus"
+    ],
+    "description": "Build a reusable interface whose address and data widths are configurable.",
+    "task": "Parameterize AW and DW and declare addr[AW-1:0], wdata[DW-1:0], valid and ready.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "interface simple_bus_if #(\n  // TODO\n)(input logic clk);\nendinterface",
+    "solution": "interface simple_bus_if #(parameter AW=16, parameter DW=32)(input logic clk);\n  logic [AW-1:0] addr;\n  logic [DW-1:0] wdata;\n  logic valid,ready;\nendinterface",
+    "checks": [
+      {
+        "label": "Address parameter",
+        "pattern": "parameter\\s+AW\\s*=\\s*16",
+        "flags": "i"
+      },
+      {
+        "label": "Data parameter",
+        "pattern": "parameter\\s+DW\\s*=\\s*32",
+        "flags": "i"
+      },
+      {
+        "label": "Parameterized address",
+        "pattern": "logic\\s*\\[\\s*AW-1\\s*:\\s*0\\s*\\]\\s*addr",
+        "flags": "i"
+      },
+      {
+        "label": "Parameterized data",
+        "pattern": "logic\\s*\\[\\s*DW-1\\s*:\\s*0\\s*\\]\\s*wdata",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-stable-while-stalled",
+    "title": "Payload Stable While Stalled",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "ready-valid",
+      "stable"
+    ],
+    "description": "Assert that a source cannot change its payload while valid is high and ready is low.",
+    "task": "On a stalled cycle, require valid to remain high and data to stay stable on the next cycle.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "property p_stable;\n  // TODO\nendproperty\nassert property(p_stable);",
+    "solution": "property p_stable;\n  @(posedge clk) disable iff(!reset_n)\n    valid && !ready |=> valid && $stable(data);\nendproperty\nassert property(p_stable);",
+    "checks": [
+      {
+        "label": "Stall antecedent",
+        "pattern": "valid\\s*&&\\s*!ready",
+        "flags": "i"
+      },
+      {
+        "label": "Valid remains asserted",
+        "pattern": "\\|=>\\s*valid",
+        "flags": "i"
+      },
+      {
+        "label": "Data stable",
+        "pattern": "\\$stable\\s*\\(\\s*data\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-onehot-grant",
+    "title": "One-Hot Grant Assertion",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "onehot",
+      "arbiter"
+    ],
+    "description": "Assert that an arbiter never grants more than one requester.",
+    "task": "Use $onehot0 so zero or one grant bit is legal.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "// Write an assertion for grant[3:0].",
+    "solution": "assert property(@(posedge clk) disable iff(!reset_n) $onehot0(grant));",
+    "checks": [
+      {
+        "label": "Uses onehot0",
+        "pattern": "\\$onehot0\\s*\\(\\s*grant\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Clocked assertion",
+        "pattern": "@\\s*\\(\\s*posedge\\s+clk\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-fifo-overflow",
+    "title": "No FIFO Overflow Assertion",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "fifo",
+      "overflow"
+    ],
+    "description": "Assert that a write is never attempted while the FIFO is full.",
+    "task": "Whenever full is high, wr_en must be low.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "// TODO",
+    "solution": "assert property(@(posedge clk) disable iff(reset) full |-> !wr_en);",
+    "checks": [
+      {
+        "label": "Full implies no write",
+        "pattern": "full\\s*\\|->\\s*!wr_en",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-fifo-underflow",
+    "title": "No FIFO Underflow Assertion",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "fifo",
+      "underflow"
+    ],
+    "description": "Assert that a read is never attempted while the FIFO is empty.",
+    "task": "Whenever empty is high, rd_en must be low.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "// TODO",
+    "solution": "assert property(@(posedge clk) disable iff(reset) empty |-> !rd_en);",
+    "checks": [
+      {
+        "label": "Empty implies no read",
+        "pattern": "empty\\s*\\|->\\s*!rd_en",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-bounded-response",
+    "title": "Bounded Request Response",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "liveness",
+      "bounded"
+    ],
+    "description": "Require a response within a bounded number of cycles.",
+    "task": "Every req pulse must be followed by resp within 1 to 8 cycles.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "property p_response;\n  // TODO\nendproperty",
+    "solution": "property p_response;\n  @(posedge clk) disable iff(reset)\n    req |-> ##[1:8] resp;\nendproperty\nassert property(p_response);",
+    "checks": [
+      {
+        "label": "Request implication",
+        "pattern": "req\\s*\\|->",
+        "flags": "i"
+      },
+      {
+        "label": "Bounded delay",
+        "pattern": "##\\s*\\[\\s*1\\s*:\\s*8\\s*\\]\\s*resp",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-mutual-exclusion",
+    "title": "Mutual Exclusion Assertion",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "mutex",
+      "safety"
+    ],
+    "description": "Assert that read_active and write_active are never high together.",
+    "task": "Use a clocked assertion to forbid simultaneous activity.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "// TODO",
+    "solution": "assert property(@(posedge clk) disable iff(reset) !(read_active && write_active));",
+    "checks": [
+      {
+        "label": "Forbids overlap",
+        "pattern": "!\\s*\\(\\s*read_active\\s*&&\\s*write_active\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "sva-pulse-width",
+    "title": "One-Cycle Pulse Width",
+    "topic": "SVA",
+    "category": "SVA",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sva",
+      "pulse",
+      "temporal"
+    ],
+    "description": "Assert that done is never high for two consecutive cycles.",
+    "task": "If done is high now, it must be low on the next sampled cycle.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "property p_done_one_cycle;\n  // TODO\nendproperty",
+    "solution": "property p_done_one_cycle;\n  @(posedge clk) disable iff(reset)\n    done |=> !done;\nendproperty\nassert property(p_done_one_cycle);",
+    "checks": [
+      {
+        "label": "Next-cycle implication",
+        "pattern": "done\\s*\\|=>\\s*!done",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cr-address-range",
+    "title": "Constrain Address Range",
+    "topic": "Constrained Random",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "constraint",
+      "randomization",
+      "address"
+    ],
+    "description": "Constrain a randomized address to a legal MMIO window.",
+    "task": "Declare rand addr and constrain it inside 0x1000 through 0x1FFF.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class txn;\n  rand bit [31:0] addr;\n  // TODO\nendclass",
+    "solution": "class txn;\n  rand bit [31:0] addr;\n  constraint c_addr { addr inside {[32'h00001000:32'h00001fff]}; }\nendclass",
+    "checks": [
+      {
+        "label": "Address constraint",
+        "pattern": "constraint\\s+c_addr",
+        "flags": "i"
+      },
+      {
+        "label": "Inside range",
+        "pattern": "addr\\s+inside\\s*\\{\\s*\\[\\s*32'h00001000\\s*:\\s*32'h00001fff\\s*\\]\\s*\\}",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cr-weighted-distribution",
+    "title": "Weighted Random Distribution",
+    "topic": "Constrained Random",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "constraint",
+      "dist",
+      "randomization"
+    ],
+    "description": "Bias randomized traffic toward reads without eliminating writes.",
+    "task": "Constrain write so 0 has weight 80 and 1 has weight 20.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class txn;\n  rand bit write;\n  // TODO\nendclass",
+    "solution": "class txn;\n  rand bit write;\n  constraint c_rw { write dist {0 := 80, 1 := 20}; }\nendclass",
+    "checks": [
+      {
+        "label": "Uses dist constraint",
+        "pattern": "write\\s+dist",
+        "flags": "i"
+      },
+      {
+        "label": "Read weight",
+        "pattern": "0\\s*:=\\s*80",
+        "flags": "i"
+      },
+      {
+        "label": "Write weight",
+        "pattern": "1\\s*:=\\s*20",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cr-solve-before",
+    "title": "Solve-Before Constraint",
+    "topic": "Constrained Random",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "constraint",
+      "solve-before",
+      "length"
+    ],
+    "description": "Control randomization ordering between packet type and length.",
+    "task": "Solve packet_type before length. Type 0 allows length 1-16; type 1 allows length 64-128.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class packet;\n  rand bit packet_type;\n  rand int unsigned length;\n  // TODO\nendclass",
+    "solution": "class packet;\n  rand bit packet_type;\n  rand int unsigned length;\n  constraint c_order { solve packet_type before length; }\n  constraint c_len {\n    if(packet_type==0) length inside {[1:16]};\n    else length inside {[64:128]};\n  }\nendclass",
+    "checks": [
+      {
+        "label": "Solve order",
+        "pattern": "solve\\s+packet_type\\s+before\\s+length",
+        "flags": "i"
+      },
+      {
+        "label": "Short packet range",
+        "pattern": "length\\s+inside\\s*\\{\\s*\\[\\s*1\\s*:\\s*16\\s*\\]",
+        "flags": "i"
+      },
+      {
+        "label": "Long packet range",
+        "pattern": "length\\s+inside\\s*\\{\\s*\\[\\s*64\\s*:\\s*128\\s*\\]",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cr-unique-bytes",
+    "title": "Unique Random Byte Array",
+    "topic": "Constrained Random",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "constraint",
+      "unique",
+      "array"
+    ],
+    "description": "Generate four distinct randomized bytes.",
+    "task": "Declare a four-element rand byte array and constrain all elements to be unique.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class byte_set;\n  rand byte values[4];\n  // TODO\nendclass",
+    "solution": "class byte_set;\n  rand byte values[4];\n  constraint c_unique { unique {values}; }\nendclass",
+    "checks": [
+      {
+        "label": "Unique constraint",
+        "pattern": "unique\\s*\\{\\s*values\\s*\\}",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cov-basic-coverpoint",
+    "title": "Basic Coverpoint Bins",
+    "topic": "Functional Coverage",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "coverage",
+      "coverpoint",
+      "bins"
+    ],
+    "description": "Measure whether low, mid and high values have been observed.",
+    "task": "Create a coverpoint on value with bins low=0-3, mid=4-11 and high=12-15.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "covergroup cg @(posedge clk);\n  // TODO\nendgroup",
+    "solution": "covergroup cg @(posedge clk);\n  cp_value: coverpoint value {\n    bins low = {[0:3]};\n    bins mid = {[4:11]};\n    bins high = {[12:15]};\n  }\nendgroup",
+    "checks": [
+      {
+        "label": "Value coverpoint",
+        "pattern": "coverpoint\\s+value",
+        "flags": "i"
+      },
+      {
+        "label": "Low bin",
+        "pattern": "bins\\s+low\\s*=\\s*\\{\\s*\\[\\s*0\\s*:\\s*3\\s*\\]",
+        "flags": "i"
+      },
+      {
+        "label": "Mid bin",
+        "pattern": "bins\\s+mid",
+        "flags": "i"
+      },
+      {
+        "label": "High bin",
+        "pattern": "bins\\s+high",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cov-cross-operation-size",
+    "title": "Cross Operation and Size",
+    "topic": "Functional Coverage",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "coverage",
+      "cross",
+      "coverpoint"
+    ],
+    "description": "Measure combinations of operation type and transfer size.",
+    "task": "Create coverpoints cp_op and cp_size then cross them.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "covergroup cg;\n  // TODO\nendgroup",
+    "solution": "covergroup cg;\n  cp_op: coverpoint op;\n  cp_size: coverpoint size;\n  op_size: cross cp_op, cp_size;\nendgroup",
+    "checks": [
+      {
+        "label": "Operation coverpoint",
+        "pattern": "cp_op\\s*:\\s*coverpoint\\s+op",
+        "flags": "i"
+      },
+      {
+        "label": "Size coverpoint",
+        "pattern": "cp_size\\s*:\\s*coverpoint\\s+size",
+        "flags": "i"
+      },
+      {
+        "label": "Cross coverage",
+        "pattern": "cross\\s+cp_op\\s*,\\s*cp_size",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cov-illegal-bins",
+    "title": "Illegal Coverage Bin",
+    "topic": "Functional Coverage",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "coverage",
+      "illegal-bins",
+      "protocol"
+    ],
+    "description": "Flag protocol values that should never occur.",
+    "task": "Cover response and declare value 3 as an illegal bin named reserved.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "covergroup cg;\n  // TODO\nendgroup",
+    "solution": "covergroup cg;\n  cp_resp: coverpoint response {\n    illegal_bins reserved = {3};\n  }\nendgroup",
+    "checks": [
+      {
+        "label": "Response coverpoint",
+        "pattern": "coverpoint\\s+response",
+        "flags": "i"
+      },
+      {
+        "label": "Illegal bin",
+        "pattern": "illegal_bins\\s+reserved\\s*=\\s*\\{\\s*3\\s*\\}",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cov-ignore-bins",
+    "title": "Ignore Uninteresting Coverage Range",
+    "topic": "Functional Coverage",
+    "category": "SystemVerilog",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "coverage",
+      "ignore-bins"
+    ],
+    "description": "Exclude irrelevant values from coverage closure.",
+    "task": "Cover addr and ignore addresses 0xF0 through 0xFF.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "covergroup cg;\n  // TODO\nendgroup",
+    "solution": "covergroup cg;\n  cp_addr: coverpoint addr {\n    ignore_bins reserved = {[8'hf0:8'hff]};\n  }\nendgroup",
+    "checks": [
+      {
+        "label": "Address coverpoint",
+        "pattern": "coverpoint\\s+addr",
+        "flags": "i"
+      },
+      {
+        "label": "Ignore bin",
+        "pattern": "ignore_bins\\s+reserved\\s*=\\s*\\{\\s*\\[\\s*8'hf0\\s*:\\s*8'hff\\s*\\]",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "cov-transition-bins",
+    "title": "State Transition Coverage",
+    "topic": "Functional Coverage",
+    "category": "SystemVerilog",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "coverage",
+      "transition-bins",
+      "fsm"
+    ],
+    "description": "Measure an FSM transition sequence.",
+    "task": "Create a transition bin that records IDLE => BUSY => DONE.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "covergroup cg @(posedge clk);\n  // TODO\nendgroup",
+    "solution": "covergroup cg @(posedge clk);\n  cp_state: coverpoint state {\n    bins operation = (IDLE => BUSY => DONE);\n  }\nendgroup",
+    "checks": [
+      {
+        "label": "State coverpoint",
+        "pattern": "coverpoint\\s+state",
+        "flags": "i"
+      },
+      {
+        "label": "Transition sequence",
+        "pattern": "IDLE\\s*=>\\s*BUSY\\s*=>\\s*DONE",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-sequence-item",
+    "title": "UVM Sequence Item",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "sequence-item",
+      "transaction"
+    ],
+    "description": "Define and register a simple randomized UVM transaction.",
+    "task": "Extend uvm_sequence_item with rand addr/data/write and register fields using uvm_object_utils.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class bus_item extends uvm_sequence_item;\n  // TODO\nendclass",
+    "solution": "class bus_item extends uvm_sequence_item;\n  rand bit [15:0] addr;\n  rand bit [31:0] data;\n  rand bit write;\n  `uvm_object_utils_begin(bus_item)\n    `uvm_field_int(addr,UVM_ALL_ON)\n    `uvm_field_int(data,UVM_ALL_ON)\n    `uvm_field_int(write,UVM_ALL_ON)\n  `uvm_object_utils_end\n  function new(string name=\"bus_item\"); super.new(name); endfunction\nendclass",
+    "checks": [
+      {
+        "label": "Extends sequence item",
+        "pattern": "extends\\s+uvm_sequence_item",
+        "flags": "i"
+      },
+      {
+        "label": "Random fields",
+        "pattern": "rand\\s+bit\\s*\\[\\s*15\\s*:\\s*0\\s*\\]\\s*addr[\\s\\S]*rand\\s+bit\\s*\\[\\s*31\\s*:\\s*0\\s*\\]\\s*data",
+        "flags": "i"
+      },
+      {
+        "label": "Object registration",
+        "pattern": "`uvm_object_utils_begin\\s*\\(\\s*bus_item\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-sequence",
+    "title": "UVM Sequence Body",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "sequence",
+      "randomization"
+    ],
+    "description": "Generate a stream of randomized sequence items.",
+    "task": "Extend uvm_sequence#(bus_item), repeat 20 times, create an item, start_item, randomize, and finish_item.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class bus_sequence extends uvm_sequence #(bus_item);\n  // TODO\nendclass",
+    "solution": "class bus_sequence extends uvm_sequence #(bus_item);\n  `uvm_object_utils(bus_sequence)\n  task body();\n    bus_item tr;\n    repeat(20) begin\n      tr=bus_item::type_id::create(\"tr\");\n      start_item(tr);\n      if(!tr.randomize()) `uvm_fatal(\"RAND\",\"randomization failed\")\n      finish_item(tr);\n    end\n  endtask\nendclass",
+    "checks": [
+      {
+        "label": "Typed sequence",
+        "pattern": "uvm_sequence\\s*#\\s*\\(\\s*bus_item\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Twenty items",
+        "pattern": "repeat\\s*\\(\\s*20\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Start item",
+        "pattern": "start_item\\s*\\(\\s*tr\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Finish item",
+        "pattern": "finish_item\\s*\\(\\s*tr\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-monitor",
+    "title": "UVM Monitor Analysis Port",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "monitor",
+      "analysis-port"
+    ],
+    "description": "Publish observed transactions from a passive UVM monitor.",
+    "task": "Create uvm_analysis_port#(bus_item) ap and write a transaction when valid&&ready is observed.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class bus_monitor extends uvm_monitor;\n  `uvm_component_utils(bus_monitor)\n  // TODO\nendclass",
+    "solution": "class bus_monitor extends uvm_monitor;\n  `uvm_component_utils(bus_monitor)\n  uvm_analysis_port #(bus_item) ap;\n  virtual bus_if vif;\n  function new(string name,uvm_component parent);super.new(name,parent);ap=new(\"ap\",this);endfunction\n  task run_phase(uvm_phase phase);\n    forever begin\n      @(posedge vif.clk);\n      if(vif.valid && vif.ready) begin\n        bus_item tr=bus_item::type_id::create(\"tr\");\n        tr.addr=vif.addr;tr.data=vif.data;tr.write=vif.write;\n        ap.write(tr);\n      end\n    end\n  endtask\nendclass",
+    "checks": [
+      {
+        "label": "Analysis port",
+        "pattern": "uvm_analysis_port\\s*#\\s*\\(\\s*bus_item\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Observes handshake",
+        "pattern": "vif\\.valid\\s*&&\\s*vif\\.ready",
+        "flags": "i"
+      },
+      {
+        "label": "Publishes item",
+        "pattern": "ap\\.write\\s*\\(\\s*tr\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-agent",
+    "title": "UVM Agent Build and Connect",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "agent",
+      "sequencer",
+      "driver"
+    ],
+    "description": "Assemble a reusable active UVM agent.",
+    "task": "Create sequencer, driver and monitor in build_phase; connect driver seq_item_port to sequencer seq_item_export in connect_phase.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "class bus_agent extends uvm_agent;\n  `uvm_component_utils(bus_agent)\n  // TODO\nendclass",
+    "solution": "class bus_agent extends uvm_agent;\n  `uvm_component_utils(bus_agent)\n  uvm_sequencer #(bus_item) sequencer;\n  bus_driver driver;\n  bus_monitor monitor;\n  function void build_phase(uvm_phase phase);\n    super.build_phase(phase);\n    sequencer=uvm_sequencer#(bus_item)::type_id::create(\"sequencer\",this);\n    driver=bus_driver::type_id::create(\"driver\",this);\n    monitor=bus_monitor::type_id::create(\"monitor\",this);\n  endfunction\n  function void connect_phase(uvm_phase phase);\n    driver.seq_item_port.connect(sequencer.seq_item_export);\n  endfunction\nendclass",
+    "checks": [
+      {
+        "label": "Creates sequencer",
+        "pattern": "sequencer[\\s\\S]*type_id::create",
+        "flags": "i"
+      },
+      {
+        "label": "Creates driver",
+        "pattern": "driver\\s*=\\s*bus_driver::type_id::create",
+        "flags": "i"
+      },
+      {
+        "label": "Creates monitor",
+        "pattern": "monitor\\s*=\\s*bus_monitor::type_id::create",
+        "flags": "i"
+      },
+      {
+        "label": "Connects driver sequencer",
+        "pattern": "seq_item_port\\.connect\\s*\\(\\s*sequencer\\.seq_item_export\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-config-db",
+    "title": "UVM Config DB Virtual Interface",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "config-db",
+      "virtual-interface"
+    ],
+    "description": "Retrieve a virtual interface from uvm_config_db.",
+    "task": "In build_phase, get virtual bus_if into vif and issue uvm_fatal if the lookup fails.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "virtual bus_if vif;\n\nfunction void build_phase(uvm_phase phase);\n  // TODO\nendfunction",
+    "solution": "virtual bus_if vif;\n\nfunction void build_phase(uvm_phase phase);\n  super.build_phase(phase);\n  if(!uvm_config_db#(virtual bus_if)::get(this,\"\",\"vif\",vif))\n    `uvm_fatal(\"NOVIF\",\"virtual interface not set\")\nendfunction",
+    "checks": [
+      {
+        "label": "Config DB get",
+        "pattern": "uvm_config_db\\s*#\\s*\\(\\s*virtual\\s+bus_if\\s*\\)::get",
+        "flags": "i"
+      },
+      {
+        "label": "Fatal on missing interface",
+        "pattern": "`uvm_fatal\\s*\\(",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "uvm-objections",
+    "title": "UVM Test Objections",
+    "topic": "UVM",
+    "category": "UVM",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "uvm",
+      "objection",
+      "run-phase"
+    ],
+    "description": "Control UVM test lifetime with phase objections.",
+    "task": "In run_phase raise an objection, start seq on sequencer, then drop the objection.",
+    "examples": [
+      "Implement the requested verification structure or behavior."
+    ],
+    "constraints": [
+      "Use SystemVerilog.",
+      "Keep the code focused on the requested verification concept."
+    ],
+    "starterCode": "task run_phase(uvm_phase phase);\n  // TODO\nendtask",
+    "solution": "task run_phase(uvm_phase phase);\n  bus_sequence seq=bus_sequence::type_id::create(\"seq\");\n  phase.raise_objection(this);\n  seq.start(env.agent.sequencer);\n  phase.drop_objection(this);\nendtask",
+    "checks": [
+      {
+        "label": "Raises objection",
+        "pattern": "phase\\.raise_objection\\s*\\(\\s*this\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Starts sequence",
+        "pattern": "seq\\.start\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Drops objection",
+        "pattern": "phase\\.drop_objection\\s*\\(\\s*this\\s*\\)",
+        "flags": "i"
+      }
+    ]
   }
 ]
