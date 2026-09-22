@@ -21,6 +21,12 @@ export const careerPaths={
     label:'Design Verification',
     summary:'Practice SystemVerilog, assertions, reusable testbench structure and UVM-style checking for verification interviews.',
     problemIds:['sv-always','sv-interface','sva-handshake','sva-reset','uvm-driver','uvm-scoreboard','rtl-skid-buffer','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write'],
+    milestones:[
+      {title:'1. SystemVerilog foundations',problemIds:['sv-always','sv-interface']},
+      {title:'2. Assertions and handshakes',problemIds:['sva-handshake','sva-reset','rtl-skid-buffer','proto-ready-valid-source']},
+      {title:'3. UVM and checking',problemIds:['uvm-driver','uvm-scoreboard']},
+      {title:'4. Bus verification',problemIds:['proto-apb-register','proto-axi-lite-write']},
+    ],
     projectSlugs:['uvm-axi4-lite-verification','axi-crossbar-verification','formal-cache-verification','formal-verification-rtl','apb-peripheral-verification','risc-v-core-verification'],
   },
   'hft-fpga':{
@@ -29,6 +35,12 @@ export const careerPaths={
     label:'FPGA Engineer',
     summary:'Focus on deterministic RTL, streaming datapaths, clock-domain control and board-relevant interfaces.',
     problemIds:['rtl-round-robin-arbiter','rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source','rtl-fifo','rtl-edge-detector','fpga-pulse-sync','fpga-clock-enable','accel-pipelined-mul','accel-stream-accum'],
+    milestones:[
+      {title:'1. Timing and control',problemIds:['rtl-round-robin-arbiter','rtl-edge-detector','fpga-clock-enable']},
+      {title:'2. Streaming datapaths',problemIds:['rtl-skid-buffer','rtl-pipeline-register','proto-ready-valid-source']},
+      {title:'3. Buffering and CDC',problemIds:['rtl-fifo','fpga-pulse-sync']},
+      {title:'4. Pipelined compute',problemIds:['accel-pipelined-mul','accel-stream-accum']},
+    ],
     projectSlugs:['spi-controller','uart-controller','hardware-dsp-pipeline','async-fifo','fpga-packet-parser','low-latency-market-data-parser'],
   },
   'cpu-gpu':{
@@ -37,6 +49,12 @@ export const careerPaths={
     label:'CPU / GPU Hardware',
     summary:'Develop processor-oriented RTL skills around register structures, pipelines, memories, arbitration and compute datapaths.',
     problemIds:['rtl-regfile','rtl-pipeline-register','rtl-skid-buffer','rtl-dual-port-ram','rtl-fifo','rtl-arbiter','proto-ready-valid-source','proto-axi-lite-write','accel-vector-max4','accel-matmul2'],
+    milestones:[
+      {title:'1. Core structures',problemIds:['rtl-regfile','rtl-dual-port-ram','rtl-fifo']},
+      {title:'2. Pipeline and flow control',problemIds:['rtl-pipeline-register','rtl-skid-buffer','proto-ready-valid-source']},
+      {title:'3. Arbitration and interconnect',problemIds:['rtl-arbiter','proto-axi-lite-write']},
+      {title:'4. Compute datapaths',problemIds:['accel-vector-max4','accel-matmul2']},
+    ],
     projectSlugs:['riscv-core','pipelined-risc-v-core','branch-predictor','simd-vector-unit','cache-memory-controller','small-risc-v-soc','risc-v-core-verification'],
   },
   'accelerators':{
@@ -45,6 +63,12 @@ export const careerPaths={
     label:'Hardware Accelerator',
     summary:'Practice MACs, reductions, fixed-point arithmetic, matrix/conv datapaths and throughput-oriented streaming pipelines.',
     problemIds:['accel-mac8','accel-dot4','accel-reduction8','accel-relu-quant','accel-systolic-pe','accel-pipelined-mul','accel-popcount32','accel-vector-max4','accel-fixed-mul','accel-stream-accum','accel-matmul2','accel-conv3'],
+    milestones:[
+      {title:'1. Arithmetic building blocks',problemIds:['accel-mac8','accel-dot4','accel-reduction8','accel-fixed-mul']},
+      {title:'2. Vector and nonlinear operations',problemIds:['accel-relu-quant','accel-popcount32','accel-vector-max4']},
+      {title:'3. Throughput and streaming',problemIds:['accel-pipelined-mul','accel-stream-accum','accel-systolic-pe']},
+      {title:'4. Matrix and convolution',problemIds:['accel-matmul2','accel-conv3']},
+    ],
     projectSlugs:['matrix-multiplication-accelerator','convolution-accelerator','dma-engine','hardware-dsp-pipeline','fpga-packet-parser','feed-to-action-latency-pipeline'],
   },
   'soc-integration':{
@@ -53,6 +77,11 @@ export const careerPaths={
     label:'SoC Design / Integration Engineer',
     summary:'Integrate processors, memories, buses, interrupts and peripherals into complete memory-mapped systems, with emphasis on address maps, subsystem interfaces and IP integration.',
     problemIds:['proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','rtl-regfile','rtl-dual-port-ram','rtl-reset-synchronizer','soc-address-decoder','soc-gpio','soc-timer','soc-interrupt-controller'],
+    milestones:[
+      {title:'1. Interfaces and address maps',problemIds:['proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','soc-address-decoder']},
+      {title:'2. Memory and reset integration',problemIds:['rtl-regfile','rtl-dual-port-ram','rtl-reset-synchronizer']},
+      {title:'3. Peripherals and interrupts',problemIds:['soc-gpio','soc-timer','soc-interrupt-controller']},
+    ],
     projectSlugs:['small-risc-v-soc','soc-peripheral-subsystem','i2c-slave-peripheral','axi4-interconnect-crossbar','axi-lite-slave','axi-lite-apb-bridge','dma-engine','uart-controller'],
   },
   'formal-verification':{
@@ -61,6 +90,11 @@ export const careerPaths={
     label:'Formal Verification Engineer',
     summary:'Prove RTL safety, ordering and progress properties using assertions, assumptions, bounded liveness, cover goals and protocol invariants.',
     problemIds:['sva-handshake','sva-reset','formal-reset-assumption','formal-fifo-bounds','formal-fifo-order','formal-arbiter-onehot','formal-arbiter-liveness','formal-ready-valid','formal-cover-progress'],
+    milestones:[
+      {title:'1. Property foundations',problemIds:['sva-handshake','sva-reset','formal-reset-assumption']},
+      {title:'2. FIFO and ordering proofs',problemIds:['formal-fifo-bounds','formal-fifo-order','formal-ready-valid']},
+      {title:'3. Arbitration, progress and cover',problemIds:['formal-arbiter-onehot','formal-arbiter-liveness','formal-cover-progress']},
+    ],
     projectSlugs:['formal-verification-rtl','formal-cache-verification','async-fifo','uvm-axi4-lite-verification','risc-v-core-verification'],
   },
   'embedded-hardware':{
@@ -69,6 +103,11 @@ export const careerPaths={
     label:'Embedded Hardware / Firmware Engineer',
     summary:'Bridge RTL and software through memory-mapped peripherals, serial interfaces, interrupts, timers and small processor-based systems.',
     problemIds:['proto-uart','proto-spi','proto-apb-register','rtl-clock-divider','rtl-regfile','rv32-memory-control','soc-gpio','soc-timer','soc-interrupt-controller'],
+    milestones:[
+      {title:'1. Serial interfaces and timing',problemIds:['proto-uart','proto-spi','rtl-clock-divider']},
+      {title:'2. MMIO and processor-facing hardware',problemIds:['proto-apb-register','rtl-regfile','rv32-memory-control']},
+      {title:'3. Peripherals and interrupts',problemIds:['soc-gpio','soc-timer','soc-interrupt-controller']},
+    ],
     projectSlugs:['riscv-firmware-bringup','spi-controller','i2c-slave-peripheral','uart-controller','soc-peripheral-subsystem','small-risc-v-soc','axi-lite-slave','dma-engine'],
   },
   'noc-interconnect':{
@@ -77,6 +116,12 @@ export const careerPaths={
     label:'NoC / Interconnect Engineer',
     summary:'Build the arbitration, flow-control, buffering and protocol-conversion foundations used in scalable SoC fabrics and networks-on-chip.',
     problemIds:['rtl-arbiter','rtl-round-robin-arbiter','rtl-skid-buffer','rtl-fifo','proto-ready-valid-source','proto-apb-register','proto-axi-lite-write','afifo-gray-sync','afifo-full-detect'],
+    milestones:[
+      {title:'1. Arbitration',problemIds:['rtl-arbiter','rtl-round-robin-arbiter']},
+      {title:'2. Flow control and buffering',problemIds:['rtl-skid-buffer','rtl-fifo','proto-ready-valid-source']},
+      {title:'3. Bus and interconnect protocols',problemIds:['proto-apb-register','proto-axi-lite-write']},
+      {title:'4. CDC-safe interconnect',problemIds:['afifo-gray-sync','afifo-full-detect']},
+    ],
     projectSlugs:['axi4-interconnect-crossbar','axi-crossbar-verification','axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
   },
 }
