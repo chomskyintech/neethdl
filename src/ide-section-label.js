@@ -1,5 +1,4 @@
-import problems from './data/activeProblems'
-import {guidedProjectBySlug} from './data/guidedProjects'
+import problems,{guidedProjectBySlug} from './data/runtimeCatalog'
 
 function currentContext(){
   const projectMatch=window.location.pathname.match(/^\/app\/projects\/([^/]+)\/([^/]+)\/?$/)
