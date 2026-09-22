@@ -14,6 +14,7 @@ const execFileAsync=promisify(execFile)
 const here=dirname(fileURLToPath(import.meta.url))
 const root=resolve(here,'..')
 const LANGUAGES=['Verilog','SystemVerilog','VHDL']
+const NON_HDL_LANGUAGES=new Set(['C'])
 const TIMEOUT_MS=15000
 
 async function readJson(relativePath){
@@ -128,9 +129,10 @@ for(const problem of catalog){
   }
 
   for(const language of supported){
+    if(NON_HDL_LANGUAGES.has(language)) continue
     advertisedPairs++
     if(!LANGUAGES.includes(language)){
-      inventoryIssues.push(`${problem.id} / ${language}: unsupported language name in catalog`)
+      inventoryIssues.push(`${problem.id} / ${language}: unsupported HDL language name in catalog`)
       continue
     }
 
