@@ -1,0 +1,42 @@
+import fs from 'node:fs'
+import path from 'node:path'
+import activeProblems,{problemTopics} from '../src/data/activeProblems.js'
+import {guidedProjects} from '../src/data/guidedProjects.js'
+
+const root=process.cwd()
+const outDir=path.join(root,'src/data/.generated')
+fs.mkdirSync(outDir,{recursive:true})
+
+const problemCatalog=activeProblems.map(problem=>({
+  id:problem.id,
+  title:problem.title,
+  difficulty:problem.difficulty,
+  category:problem.category,
+  topic:problem.topic,
+  languages:Array.isArray(problem.languages)?problem.languages:[],
+  tags:Array.isArray(problem.tags)?problem.tags:[],
+  project:problem.project?{
+    id:problem.project.id,
+    title:problem.project.title,
+    step:problem.project.step,
+    total:problem.project.total,
+  }:undefined,
+}))
+
+const projectCatalog=guidedProjects.map(project=>({
+  id:project.id,
+  slug:project.slug,
+  title:project.title,
+  level:project.level,
+  roadmap:project.roadmap,
+  categories:Array.isArray(project.categories)?project.categories:[],
+  skills:Array.isArray(project.skills)?project.skills:[],
+  why:project.why||'',
+  problemIds:Array.isArray(project.problemIds)?project.problemIds:[],
+}))
+
+fs.writeFileSync(path.join(outDir,'problemCatalog.json'),JSON.stringify(problemCatalog,null,2)+'\n')
+fs.writeFileSync(path.join(outDir,'guidedProjectCatalog.json'),JSON.stringify(projectCatalog,null,2)+'\n')
+fs.writeFileSync(path.join(outDir,'problemTopics.json'),JSON.stringify(problemTopics,null,2)+'\n')
+
+console.log(`Generated lightweight runtime catalogs: ${problemCatalog.length} problems, ${projectCatalog.length} guided projects.`)
