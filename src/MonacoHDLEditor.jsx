@@ -317,18 +317,66 @@ export function ReadOnlyHDLViewer({ code, language, formatMode = 'normal', forma
   </div>
 }
 
-export default function MonacoHDLEditor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange }) {
+export default function MonacoHDLEditor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange, onAskSelection }) {
   const editorRef = useRef(null)
   const wrapRef = useRef(null)
   const layoutColumnRef = useRef(84)
   const formatRef = useRef(onFormat)
+  const askSelectionRef = useRef(onAskSelection)
   const [layoutColumn,setLayoutColumn] = useState(84)
+  const [selectionAction,setSelectionAction] = useState(null)
   const [toolbarTarget, setToolbarTarget] = useState(null)
   useEffect(()=>{ formatRef.current=onFormat },[onFormat])
+  useEffect(()=>{ askSelectionRef.current=onAskSelection },[onAskSelection])
 
   const handleMount = (editor, monaco) => {
     editorRef.current = editor
+
+    const currentSelection = () => {
+      const selection = editor.getSelection()
+      const model = editor.getModel()
+      if (!selection || selection.isEmpty() || !model) return null
+      const selectedCode = model.getValueInRange(selection)
+      if (!selectedCode.trim()) return null
+      return {
+        code: selectedCode.slice(0, 6000),
+        startLine: selection.startLineNumber,
+        endLine: selection.endLineNumber,
+      }
+    }
+
+    const syncSelectionAction = () => {
+      const selected = currentSelection()
+      if (!selected) {
+        setSelectionAction(null)
+        return
+      }
+      const selection = editor.getSelection()
+      const position = editor.getScrolledVisiblePosition(selection.getEndPosition())
+      const layout = editor.getLayoutInfo()
+      setSelectionAction({
+        ...selected,
+        top: Math.max(8, Math.min((position?.top ?? 8) + 26, layout.height - 42)),
+        left: Math.max(8, Math.min((position?.left ?? 8) + 56, layout.width - 96)),
+      })
+    }
+
+    editor.onDidChangeCursorSelection(syncSelectionAction)
+    editor.onDidScrollChange(syncSelectionAction)
+    editor.onDidLayoutChange(syncSelectionAction)
+
     editor.addAction({ id: 'hdlforge-run-tests', label: 'Run HDLForge tests', keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], run: () => onRun() })
+    editor.addAction({
+      id: 'hdlforge-ask-ai-selection',
+      label: 'Ask HDLForge AI about selection',
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 1.4,
+      precondition: 'editorHasSelection',
+      run: () => {
+        const selected = currentSelection()
+        if (selected) askSelectionRef.current?.(selected)
+      }
+    })
     editor.addAction({
       id: 'hdlforge-format-source',
       label: 'Format HDL source',
@@ -368,5 +416,5 @@ export default function MonacoHDLEditor({ code, language, onChange, onRun, onFor
 
   const hiddenStatusStyle = { position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }
 
-  return <><div ref={wrapRef} className="editor-wrap monaco-editor-wrap" data-format-column={layoutColumn} style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">{language === 'C' ? 'Source' : 'HDL source'} · {language}</span><div className="monaco-editor-stage" aria-label={`${language} ${language === 'C' ? 'source' : 'HDL source'} editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', wordWrapColumn: layoutColumn, wrappingIndent: 'indent', wrappingStrategy: 'advanced', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} /></div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
+  return <><div ref={wrapRef} className="editor-wrap monaco-editor-wrap" data-format-column={layoutColumn} style={{ minHeight: 0 }}><span style={hiddenStatusStyle} aria-live="polite">{language === 'C' ? 'Source' : 'HDL source'} · {language}</span><div className="monaco-editor-stage" aria-label={`${language} ${language === 'C' ? 'source' : 'HDL source'} editor`} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'var(--ide-editor)' }}><MonacoEditor height="100%" value={code} language={languageIds[language] || 'systemverilog'} theme="hdlforge-dark" beforeMount={registerLanguages} onMount={handleMount} onChange={value => onChange(value ?? '')} options={{ automaticLayout: true, fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace", fontSize: 16, lineHeight: 24, lineNumbers: 'on', minimap: { enabled: false }, tabSize: 2, insertSpaces: true, detectIndentation: false, scrollBeyondLastLine: false, smoothScrolling: true, wordWrap: 'off', wordWrapColumn: layoutColumn, wrappingIndent: 'indent', wrappingStrategy: 'advanced', bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true }, renderWhitespace: 'selection', padding: { top: 12, bottom: 12 }, fixedOverflowWidgets: true, find: { addExtraSpaceOnTop: false } }} />{selectionAction && onAskSelection ? <button type="button" className="editor-ask-ai-selection" style={{ top: selectionAction.top, left: selectionAction.left }} onMouseDown={event => event.preventDefault()} onClick={() => askSelectionRef.current?.(selectionAction)}>Ask AI</button> : null}</div></div>{toolbarTarget && createPortal(<button className="editor-find-btn" title="Find" aria-label="Find in source" onClick={openFind}><Search size={14} /></button>, toolbarTarget)}</>
 }
