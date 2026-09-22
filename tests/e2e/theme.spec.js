@@ -5,6 +5,7 @@ const colours = {
   editor: 'rgb(38, 37, 39)',
   border: 'rgb(57, 57, 59)',
   teal: 'rgb(57, 126, 115)',
+  careerPanel: 'rgb(35, 35, 38)',
 }
 
 test.describe('NeetCode theme regression', () => {
@@ -54,7 +55,7 @@ test.describe('NeetCode theme regression', () => {
     expect(await count.evaluate(node => getComputedStyle(node).borderTopWidth)).toBe('0px')
   })
 
-  test('applies NeetCode surfaces across problems, projects, career and IDE', async ({ page }) => {
+  test('applies canonical surfaces across problems, projects, career and IDE', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.guided-roadmap-card')).toBeVisible()
     expect(await page.locator('.guided-roadmap-card').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.editor)
@@ -67,7 +68,7 @@ test.describe('NeetCode theme regression', () => {
 
     await page.goto('/app/roadmaps/rtl-design/')
     await expect(page.locator('.career-progress-card')).toBeVisible()
-    expect(await page.locator('.career-progress-card').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.editor)
+    expect(await page.locator('.career-progress-card').evaluate(node => getComputedStyle(node).backgroundColor)).toBe(colours.careerPanel)
 
     await page.goto('/app/problems/rtl-shift-register/')
     await expect(page.locator('.monaco-editor')).toBeVisible()
