@@ -41,7 +41,7 @@ test.describe('HDLForge discovery SEO',()=>{
  })
 
  test('homepage exposes crawlable company and project links',async({page})=>{
-  await page.goto('/')
+  await page.goto('/home/')
   await expect(page.locator('a[href="/companies/"]')).toBeVisible()
   await expect(page.locator('a[href="/projects/"]')).toBeVisible()
  })
