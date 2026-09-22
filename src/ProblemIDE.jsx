@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp } from 'lucide-react'
+import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, RotateCcw, Terminal, ChevronDown, ChevronUp, Sparkles, Send, X, Bug, Cpu } from 'lucide-react'
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
 import { languageStarter, resolveInitialStarterDraft } from './data/starterScaffolds'
@@ -640,8 +640,36 @@ function ReactOwnedRunResult({ result, isConceptual }) {
   </div>
 }
 
-function Editor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange }) {
-  return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} onFormat={onFormat} onLayoutColumnChange={onLayoutColumnChange} />
+function AiAssistantPanel({ selection, language, messages, question, setQuestion, loading, error, onClose, onSubmit, onQuickAction }) {
+  if (!selection) return null
+  return <aside className="ai-assistant-panel" aria-label="HDLForge AI assistant">
+    <div className="ai-assistant-head">
+      <div><Sparkles size={15}/><strong>HDLForge AI</strong><span>Lines {selection.startLine}{selection.endLine !== selection.startLine ? `–${selection.endLine}` : ''}</span></div>
+      <button type="button" onClick={onClose} aria-label="Close AI assistant"><X size={15}/></button>
+    </div>
+    <div className="ai-selection-card">
+      <span>{language} selection</span>
+      <pre>{selection.code}</pre>
+    </div>
+    <div className="ai-quick-actions" aria-label="AI quick actions">
+      <button type="button" disabled={loading} onClick={() => onQuickAction('Explain this selected code line by line and tell me why it is written this way.')}><Sparkles size={13}/>Explain</button>
+      <button type="button" disabled={loading} onClick={() => onQuickAction('Find any bug or risky RTL behavior in this selected code. Focus on timing, widths, latches, reset, and synthesizability where relevant.')}><Bug size={13}/>Find bug</button>
+      <button type="button" disabled={loading} onClick={() => onQuickAction('What hardware will this selected code infer after synthesis? Explain the datapath, registers, muxes, or combinational logic involved.')}><Cpu size={13}/>Hardware?</button>
+    </div>
+    <div className="ai-chat-log">
+      {!messages.length ? <div className="ai-chat-empty">Ask about the selected code. The assistant also receives the problem statement, surrounding source, and latest simulator output.</div> : messages.map((message,index)=><div className={`ai-message ${message.role}`} key={index}><span>{message.role === 'user' ? 'You' : 'HDLForge AI'}</span><div>{message.text}</div></div>)}
+      {loading ? <div className="ai-message assistant pending"><span>HDLForge AI</span><div>Thinking…</div></div> : null}
+      {error ? <div className="ai-error">{error}</div> : null}
+    </div>
+    <form className="ai-chat-form" onSubmit={event => { event.preventDefault(); onSubmit(question) }}>
+      <textarea value={question} onChange={event => setQuestion(event.target.value)} placeholder="Ask about this code…" rows={3}/>
+      <button type="submit" disabled={loading || !question.trim()} aria-label="Send AI question"><Send size={14}/></button>
+    </form>
+  </aside>
+}
+
+function Editor({ code, language, onChange, onRun, onFormat, onLayoutColumnChange, onAskSelection }) {
+  return <MonacoHDLEditor code={code} language={language} onChange={onChange} onRun={onRun} onFormat={onFormat} onLayoutColumnChange={onLayoutColumnChange} onAskSelection={onAskSelection} />
 }
 function ProblemScrollPane({ children, refreshKey }) {
   const paneRef = useRef(null)
@@ -734,6 +762,11 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   const [code, setCode] = useState(initialDraftState.code), [editorLanguage, setEditorLanguage] = useState(initialDraftState.language), [bottomTab, setBottomTab] = useState('console'), [result, setResult] = useState(null), [running, setRunning] = useState(false), [statementTab, setStatementTab] = useState('problem'), [bottomCollapsed, setBottomCollapsed] = useState(false), [panelSplit, setPanelSplit] = useState(38), [draggingPanel, setDraggingPanel] = useState(false), [waveformOpen, setWaveformOpen] = useState(false)
   const [editorFormatColumn,setEditorFormatColumn] = useState(84)
   const [editorDirty,setEditorDirty] = useState(!initialDraftState.isStarter)
+  const [aiSelection,setAiSelection] = useState(null)
+  const [aiMessages,setAiMessages] = useState([])
+  const [aiQuestion,setAiQuestion] = useState('')
+  const [aiLoading,setAiLoading] = useState(false)
+  const [aiError,setAiError] = useState('')
   const editorDirtyRef = useRef(!initialDraftState.isStarter)
   const editorFormatRequest = useRef(0)
 
@@ -802,6 +835,71 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [waveformOpen])
+  const openAiSelection = selection => {
+    if (!selection?.code?.trim()) return
+    setAiSelection(selection)
+    setAiMessages([])
+    setAiQuestion('')
+    setAiError('')
+  }
+
+  const closeAi = () => {
+    setAiSelection(null)
+    setAiMessages([])
+    setAiQuestion('')
+    setAiError('')
+  }
+
+  const askAi = async prompt => {
+    const questionText = String(prompt || '').trim()
+    if (!questionText || !aiSelection || aiLoading) return
+    setAiQuestion('')
+    setAiError('')
+    setAiLoading(true)
+
+    const priorMessages = aiMessages.slice(-6)
+    setAiMessages(messages => [...messages, { role: 'user', text: questionText }])
+
+    if (!RUNNER_URL) {
+      setAiError('AI is not configured for this HDLForge deployment yet.')
+      setAiLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch(`${RUNNER_URL}/ai`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          problem: {
+            id: problem.id,
+            title: problem.title,
+            topic: problem.topic || problem.category || '',
+            task: problem.task || problem.description || '',
+            constraints: problem.taskBullets || problem.constraints || [],
+          },
+          language: editorLanguage,
+          selection: {
+            code: aiSelection.code,
+            startLine: aiSelection.startLine,
+            endLine: aiSelection.endLine,
+          },
+          source: code,
+          simulatorOutput: result?.output || '',
+          history: priorMessages,
+          question: questionText,
+        }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !data.ok || !data.answer) throw new Error(data.error || 'AI request failed.')
+      setAiMessages(messages => [...messages, { role: 'assistant', text: data.answer }])
+    } catch (error) {
+      setAiError(error?.message || 'AI request failed.')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
   const run = async () => {
     if (isConceptual) { setResult({ pass: false, output: 'Automated answer evaluation is not configured for this problem yet.', waveform: null, tests: [] }); return }
     setRunning(true); setBottomTab('console'); setBottomCollapsed(false)
@@ -865,6 +963,6 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   return <div className="ide-page"><header className="ide-topbar"><button className="ide-brand topbar-brand" onClick={onBack} aria-label="Back to HDLForge problems" style={{flex:'0 0 auto',margin:0,padding:'7px 9px',border:'0',background:'transparent',color:'#e8eef5',cursor:'pointer'}}><span className="ide-brand-icon">HDL</span><strong>HDLForge</strong></button><div className="ide-problem-navigation topbar-navigation" style={{position:'absolute',left:'50%',transform:'translateX(-50%)'}}><button onClick={onPrevious} disabled={!hasPrevious}>← Previous</button><button className="section-navigation" onClick={onBack} aria-label={`Back to ${navigationLabel || problem.topic || problem.category}`}>{navigationLabel || problem.topic || problem.category}</button><button onClick={onNext} disabled={!hasNext}>Next →</button></div><div className="ide-actions">{solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div></header>
     <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><ProblemScrollPane refreshKey={`${problem.id}:${statementTab}`}>{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <ApproachGuide problem={problem}/>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</ProblemScrollPane></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
       <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : editorLanguage === 'C' ? 'c' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
-      <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} onFormat={formatEditorText} onLayoutColumnChange={setEditorFormatColumn} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
+      <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} onFormat={formatEditorText} onLayoutColumnChange={setEditorFormatColumn} onAskSelection={openAiSelection} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}{!isConceptual && aiSelection ? <AiAssistantPanel selection={aiSelection} language={editorLanguage} messages={aiMessages} question={aiQuestion} setQuestion={setAiQuestion} loading={aiLoading} error={aiError} onClose={closeAi} onSubmit={askAi} onQuickAction={askAi} /> : null}</div>
       <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <ReactOwnedRunResult result={result} isConceptual={isConceptual}/> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
 }
