@@ -309,6 +309,47 @@ test.describe('HDLForge navigation and SEO content', () => {
     }
   })
 
+  test('career roadmap mirrors Problems page layout and accordion geometry', async ({ page }) => {
+    await page.goto('/app/problems/')
+    const problemLayout=await page.locator('.problems-workspace').evaluate(node=>{
+      const s=getComputedStyle(node)
+      return {columns:s.gridTemplateColumns,gap:s.gap}
+    })
+    const topicGeometry=await page.locator('.topic-group').first().evaluate(node=>{
+      const group=getComputedStyle(node)
+      const head=getComputedStyle(node.querySelector('.topic-group-head'))
+      const progress=getComputedStyle(node.querySelector('.topic-group-progress'))
+      return {
+        radius:group.borderTopLeftRadius,
+        headHeight:head.minHeight,
+        progressHeight:progress.height,
+      }
+    })
+
+    await page.goto('/app/roadmaps/rtl-design/')
+    const careerLayout=await page.locator('.career-workspace').evaluate(node=>{
+      const s=getComputedStyle(node)
+      return {columns:s.gridTemplateColumns,gap:s.gap}
+    })
+    const hero=page.locator('.career-hero')
+    expect(await hero.evaluate(node=>getComputedStyle(node).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    expect(await hero.evaluate(node=>getComputedStyle(node).borderTopWidth)).toBe('0px')
+
+    const milestoneGeometry=await page.locator('.career-milestone').first().evaluate(node=>{
+      const group=getComputedStyle(node)
+      const head=getComputedStyle(node.querySelector('.career-milestone-head'))
+      const progress=getComputedStyle(node.querySelector('.career-milestone-progress'))
+      return {
+        radius:group.borderTopLeftRadius,
+        headHeight:head.minHeight,
+        progressHeight:progress.height,
+      }
+    })
+
+    expect(careerLayout).toEqual(problemLayout)
+    expect(milestoneGeometry).toEqual(topicGeometry)
+  })
+
   test('all career roadmap pages share one canonical palette', async ({ page }) => {
     const slugs=[
       'rtl-design',
@@ -338,7 +379,7 @@ test.describe('HDLForge navigation and SEO content', () => {
         const eyebrow=style('.career-eyebrow')
         return {
           heroBackground:hero.backgroundColor,
-          heroBorder:hero.borderColor,
+          heroBorderWidth:hero.borderTopWidth,
           roadmapBackground:roadmap.backgroundColor,
           roadmapBorder:roadmap.borderColor,
           activeColor:active.color,
@@ -354,9 +395,12 @@ test.describe('HDLForge navigation and SEO content', () => {
       expect(palette).toEqual(baseline)
     }
 
-    expect(baseline.heroBackground).toBe('rgb(35, 35, 38)')
-    expect(baseline.projectBackground).toBe('rgb(35, 35, 38)')
-    expect(baseline.heroBorder).toBe('rgb(58, 58, 63)')
+    expect(baseline.heroBackground).toBe('rgba(0, 0, 0, 0)')
+    expect(baseline.heroBorderWidth).toBe('0px')
+    expect(baseline.projectBackground).toBe('rgb(38, 37, 39)')
+    expect(baseline.roadmapBackground).toBe('rgb(38, 37, 39)')
+    expect(baseline.roadmapBorder).toBe('rgb(57, 57, 59)')
+    expect(baseline.projectBorder).toBe('rgb(57, 57, 59)')
     expect(baseline.activeColor).toBe('rgb(54, 164, 135)')
     expect(baseline.progressColor).toBe('rgb(54, 164, 135)')
     expect(baseline.numberColor).toBe('rgb(54, 164, 135)')
