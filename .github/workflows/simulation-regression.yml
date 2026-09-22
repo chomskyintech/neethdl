@@ -24,8 +24,14 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Install Icarus Verilog
-        run: sudo apt-get update && sudo apt-get install -y iverilog
+      - name: Install HDL simulators
+        run: sudo apt-get update && sudo apt-get install -y iverilog ghdl
+
+      - name: Verify every problem has an appropriate testbench
+        run: npm run test:testbench-coverage
+
+      - name: Simulate every advertised reference solution
+        run: npm run test:problem-solutions
 
       - name: Run all 10 RTL regressions
         run: python3 tests/simulation-regression.py
