@@ -352,6 +352,10 @@ test.describe('HDLForge navigation and SEO content', () => {
 
   test('career roadmap uses the same surfaces and muted palette as Problems', async ({ page }) => {
     await page.goto('/app/problems/')
+    await expect(page.locator('.guided-roadmap-card')).toBeVisible()
+    await expect(page.locator('.problem-progress-panel')).toBeVisible()
+    await expect(page.locator('.topic-group').first()).toBeVisible()
+    await expect(page.locator('.problems-page-head p')).toBeVisible()
     const problemsPalette=await page.evaluate(() => {
       const style = selector => getComputedStyle(document.querySelector(selector))
       const roadmap=style('.guided-roadmap-card')
@@ -376,6 +380,10 @@ test.describe('HDLForge navigation and SEO content', () => {
     })
 
     await page.goto('/app/roadmaps/rtl-design/')
+    await expect(page.locator('.career-workspace .guided-roadmap-card')).toBeVisible()
+    await expect(page.locator('.career-progress-card')).toBeVisible()
+    await expect(page.locator('.career-milestone').first()).toBeVisible()
+    await expect(page.locator('.career-hero p')).toBeVisible()
     const careerPalette=await page.evaluate(() => {
       const style = selector => getComputedStyle(document.querySelector(selector))
       const roadmap=style('.career-workspace .guided-roadmap-card')
@@ -413,8 +421,13 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.getByText('Build',{exact:true})).toHaveCount(0)
 
     const roadmap=page.locator('.career-roadmap')
+    const progressRail=page.locator('.career-side-rail')
     const bounds=await roadmap.boundingBox()
+    const progressBounds=await progressRail.boundingBox()
     expect(bounds).toBeTruthy()
+    expect(progressBounds).toBeTruthy()
+    expect(Math.abs(bounds.y-progressBounds.y)).toBeLessThanOrEqual(1)
+    expect(bounds.y).toBeLessThanOrEqual(100)
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(650)
 
     const scrollState=await roadmap.evaluate(node=>{
