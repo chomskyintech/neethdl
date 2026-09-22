@@ -849,7 +849,7 @@
       "status"
     ],
     "description": "Latch an event until software explicitly clears it.",
-    "task": "event sets flag. clear clears flag. Reset has highest priority, then clear, then event.",
+    "task": "event_in sets flag. clear clears flag. Reset has highest priority, then clear, then event_in.",
     "examples": [
       "Implement the stated behavior for all legal input combinations."
     ],
@@ -857,8 +857,8 @@
       "Use synthesizable SystemVerilog.",
       "Do not use delays."
     ],
-    "starterCode": "module sticky_flag(input logic clk,reset,clear,event,output logic flag);\n  // TODO\nendmodule",
-    "solution": "module sticky_flag(input logic clk,reset,clear,event,output logic flag);\n  always_ff @(posedge clk) begin\n    if(reset) flag<=1'b0;\n    else if(clear) flag<=1'b0;\n    else if(event) flag<=1'b1;\n  end\nendmodule"
+    "starterCode": "module sticky_flag(input logic clk,reset,clear,event_in,output logic flag);\n  // TODO\nendmodule",
+    "solution": "module sticky_flag(input logic clk,reset,clear,event_in,output logic flag);\n  always_ff @(posedge clk) begin\n    if(reset) flag<=1'b0;\n    else if(clear) flag<=1'b0;\n    else if(event_in) flag<=1'b1;\n  end\nendmodule"
   },
   {
     "id": "seq-pulse-stretcher",
@@ -970,7 +970,7 @@
       "Do not use delays."
     ],
     "starterCode": "module seq1011(input logic clk,reset,bit_in,output logic match);\n  // TODO\nendmodule",
-    "solution": "module seq1011(input logic clk,reset,bit_in,output logic match);\n  typedef enum logic [1:0] {S0,S1,S10,S101} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state; match=0;\n    case(state)\n      S0: next=bit_in?S1:S0;\n      S1: next=bit_in?S1:S10;\n      S10: next=bit_in?S101:S0;\n      S101: begin\n        if(bit_in) begin match=1; next=S1; end\n        else next=S10;\n      end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset) state<=S0; else state<=next;\nendmodule"
+    "solution": "module seq1011(input logic clk,reset,bit_in,output logic match);\n  typedef enum logic [1:0] {S0,S1,S10,S101} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state; match=0;\n    case(state)\n      S0: begin if(bit_in) next=S1; else next=S0; end\n      S1: begin if(bit_in) next=S1; else next=S10; end\n      S10: begin if(bit_in) next=S101; else next=S0; end\n      S101: begin\n        if(bit_in) begin match=1; next=S1; end\n        else next=S10;\n      end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset) state<=S0; else state<=next;\nendmodule"
   },
   {
     "id": "fsm-handshake-controller",
@@ -1055,7 +1055,7 @@
       "Do not use delays."
     ],
     "starterCode": "module retry_fsm(\n  input logic clk,reset,start,ack,timeout,\n  output logic req,done,error\n);\n  // TODO\nendmodule",
-    "solution": "module retry_fsm(input logic clk,reset,start,ack,timeout,output logic req,done,error);\n  typedef enum logic [2:0] {IDLE,ISSUE,WAIT,SUCCESS,FAIL} state_t;\n  state_t state,next;\n  logic [1:0] attempts;\n  always_comb begin\n    next=state;req=0;done=0;error=0;\n    case(state)\n      IDLE: if(start) next=ISSUE;\n      ISSUE: begin req=1;next=WAIT;end\n      WAIT: if(ack) next=SUCCESS; else if(timeout) next=(attempts==2)?FAIL:ISSUE;\n      SUCCESS: begin done=1;next=IDLE;end\n      FAIL: begin error=1;next=IDLE;end\n    endcase\n  end\n  always_ff @(posedge clk) begin\n    if(reset) begin state<=IDLE;attempts<=0;end\n    else begin\n      state<=next;\n      if(state==IDLE) attempts<=0;\n      else if(state==WAIT && timeout && attempts!=2) attempts<=attempts+1'b1;\n    end\n  end\nendmodule"
+    "solution": "module retry_fsm(input logic clk,reset,start,ack,timeout,output logic req,done,error);\n  typedef enum logic [2:0] {IDLE,ISSUE,WAIT,SUCCESS,FAIL} state_t;\n  state_t state,next;\n  logic [1:0] attempts;\n  always_comb begin\n    next=state;req=0;done=0;error=0;\n    case(state)\n      IDLE: if(start) next=ISSUE;\n      ISSUE: begin req=1;next=WAIT;end\n      WAIT: begin\n        if(ack) next=SUCCESS;\n        else if(timeout) begin\n          if(attempts==2) next=FAIL;\n          else next=ISSUE;\n        end\n      end\n      SUCCESS: begin done=1;next=IDLE;end\n      FAIL: begin error=1;next=IDLE;end\n    endcase\n  end\n  always_ff @(posedge clk) begin\n    if(reset) begin state<=IDLE;attempts<=0;end\n    else begin\n      state<=next;\n      if(state==IDLE) attempts<=0;\n      else if(state==WAIT && timeout && attempts!=2) attempts<=attempts+1'b1;\n    end\n  end\nendmodule"
   },
   {
     "id": "fsm-packet-parser",
