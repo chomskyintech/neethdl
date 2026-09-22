@@ -9,3 +9,6 @@ server/.env.*
 # Dependencies and build output
 node_modules/
 dist/
+
+# Build-generated lightweight browser catalogs
+src/data/.generated/
