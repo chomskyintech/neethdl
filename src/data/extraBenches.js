@@ -1,6 +1,6 @@
-import acceleratorBenches from './acceleratorBenches'
-import expansionBenches from './expansionBenches'
-import riscvProjectBenches from './riscvProjectBenches'
+import acceleratorBenches from './acceleratorBenches.js'
+import expansionBenches from './expansionBenches.js'
+import riscvProjectBenches from './riscvProjectBenches.js'
 
 const extraBenches = {
   ...acceleratorBenches,
