@@ -93,7 +93,20 @@ npm install
 node server.js
 ```
 
-The runner exposes `GET /health` and `POST /run`.
+The runner exposes `GET /health`, `POST /run`, and `POST /ai`.
+
+### Enable the editor AI assistant
+
+The selection-aware editor assistant calls the runner backend, so the API key is never exposed in the browser. Set these environment variables on the runner:
+
+```text
+OPENAI_API_KEY=your_server_side_key
+OPENAI_MODEL=gpt-5.6-luna
+```
+
+`OPENAI_MODEL` is optional. The runner defaults to `gpt-5.6-luna` for the editor assistant. The frontend continues to use `VITE_RUNNER_URL` to reach the runner.
+
+In the Monaco editor, select HDL source and use **Ask AI** (or the editor context-menu action). HDLForge sends the selected lines, current source, problem requirements, recent AI conversation, and latest simulator/compiler output to the backend. Do not place `OPENAI_API_KEY` in a `VITE_*` variable or commit it to the repository.
 
 ## Expose the runner with Cloudflare Quick Tunnel
 
