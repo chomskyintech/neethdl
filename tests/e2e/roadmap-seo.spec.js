@@ -350,61 +350,85 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(milestoneGeometry).toEqual(topicGeometry)
   })
 
-  test('all career roadmap pages share one canonical palette', async ({ page }) => {
-    const slugs=[
-      'rtl-design',
-      'design-verification',
-      'fpga-engineer',
-      'cpu-gpu-hardware',
-      'hardware-accelerator',
-      'soc-design-integration',
-      'formal-verification-engineer',
-      'embedded-hardware-firmware',
-      'noc-interconnect',
-    ]
+  test('career roadmap uses the same surfaces and muted palette as Problems', async ({ page }) => {
+    await page.goto('/app/problems/')
+    const problemsPalette=await page.evaluate(() => {
+      const style = selector => getComputedStyle(document.querySelector(selector))
+      const roadmap=style('.guided-roadmap-card')
+      const progressCard=style('.problem-progress-panel')
+      const topic=style('.topic-group')
+      const topicHead=style('.topic-group-head')
+      const topicTrack=style('.topic-group-progress')
+      const topicFill=style('.topic-group-progress i')
+      const description=style('.problems-page-head p')
+      return {
+        roadmapBackground:roadmap.backgroundColor,
+        roadmapBorder:roadmap.borderColor,
+        progressBackground:progressCard.backgroundColor,
+        progressBorder:progressCard.borderColor,
+        groupBackground:topic.backgroundColor,
+        groupBorder:topic.borderColor,
+        headBackground:topicHead.backgroundColor,
+        trackBackground:topicTrack.backgroundColor,
+        fillColor:topicFill.backgroundColor,
+        descriptionColor:description.color,
+      }
+    })
 
-    let baseline=null
-    for(const slug of slugs){
-      await page.goto(`/app/roadmaps/${slug}/`)
-      await expect(page.locator('.career-workspace')).toBeVisible()
+    await page.goto('/app/roadmaps/rtl-design/')
+    const careerPalette=await page.evaluate(() => {
+      const style = selector => getComputedStyle(document.querySelector(selector))
+      const roadmap=style('.career-workspace .guided-roadmap-card')
+      const progressCard=style('.career-progress-card')
+      const milestone=style('.career-milestone')
+      const milestoneHead=style('.career-milestone-head')
+      const milestoneTrack=style('.career-milestone-progress')
+      const milestoneFill=style('.career-milestone-progress i')
+      const description=style('.career-hero p')
+      return {
+        roadmapBackground:roadmap.backgroundColor,
+        roadmapBorder:roadmap.borderColor,
+        progressBackground:progressCard.backgroundColor,
+        progressBorder:progressCard.borderColor,
+        groupBackground:milestone.backgroundColor,
+        groupBorder:milestone.borderColor,
+        headBackground:milestoneHead.backgroundColor,
+        trackBackground:milestoneTrack.backgroundColor,
+        fillColor:milestoneFill.backgroundColor,
+        descriptionColor:description.color,
+      }
+    })
 
-      const palette=await page.evaluate(() => {
-        const style = selector => getComputedStyle(document.querySelector(selector))
-        const hero=style('.career-hero')
-        const roadmap=style('.career-workspace .guided-roadmap-card')
-        const active=style('.career-workspace .guided-roadmap-item.active')
-        const project=style('.career-project-card')
-        const progress=style('.career-progress-track i')
-        const number=style('.career-progress-number strong')
-        const eyebrow=style('.career-eyebrow')
-        return {
-          heroBackground:hero.backgroundColor,
-          heroBorderWidth:hero.borderTopWidth,
-          roadmapBackground:roadmap.backgroundColor,
-          roadmapBorder:roadmap.borderColor,
-          activeColor:active.color,
-          projectBackground:project.backgroundColor,
-          projectBorder:project.borderColor,
-          progressColor:progress.backgroundColor,
-          numberColor:number.color,
-          eyebrowColor:eyebrow.color,
-        }
-      })
+    expect(careerPalette).toEqual(problemsPalette)
+  })
 
-      baseline ||= palette
-      expect(palette).toEqual(baseline)
-    }
+  test('career roadmap removes extra labels and keeps Guided Roadmap inside the viewport', async ({ page }) => {
+    await page.setViewportSize({width:1750,height:650})
+    await page.goto('/app/roadmaps/rtl-design/')
 
-    expect(baseline.heroBackground).toBe('rgba(0, 0, 0, 0)')
-    expect(baseline.heroBorderWidth).toBe('0px')
-    expect(baseline.projectBackground).toBe('rgb(38, 37, 39)')
-    expect(baseline.roadmapBackground).toBe('rgb(38, 37, 39)')
-    expect(baseline.roadmapBorder).toBe('rgb(57, 57, 59)')
-    expect(baseline.projectBorder).toBe('rgb(57, 57, 59)')
-    expect(baseline.activeColor).toBe('rgb(54, 164, 135)')
-    expect(baseline.progressColor).toBe('rgb(54, 164, 135)')
-    expect(baseline.numberColor).toBe('rgb(54, 164, 135)')
-    expect(baseline.eyebrowColor).toBe('rgb(54, 164, 135)')
+    await expect(page.locator('.career-eyebrow')).toHaveCount(0)
+    await expect(page.getByText('How to use this roadmap',{exact:true})).toHaveCount(0)
+    await expect(page.locator('.career-next-card')).toHaveCount(0)
+    await expect(page.getByText('Practice',{exact:true})).toHaveCount(0)
+    await expect(page.getByText('Build',{exact:true})).toHaveCount(0)
+
+    const roadmap=page.locator('.career-roadmap')
+    const bounds=await roadmap.boundingBox()
+    expect(bounds).toBeTruthy()
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(650)
+
+    const scrollState=await roadmap.evaluate(node=>{
+      const style=getComputedStyle(node)
+      return {
+        overflowY:style.overflowY,
+        maxHeight:style.maxHeight,
+        clientHeight:node.clientHeight,
+        scrollHeight:node.scrollHeight,
+      }
+    })
+    expect(scrollState.overflowY).toBe('auto')
+    expect(scrollState.maxHeight).not.toBe('none')
+    expect(scrollState.scrollHeight).toBeGreaterThanOrEqual(scrollState.clientHeight)
   })
 
   test('new standalone interview problems open in the editor', async ({ page }) => {
