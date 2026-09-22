@@ -39,7 +39,7 @@ const careerRoadmaps=[
 const trackLabel=track=>careerRoadmaps.find(item=>item.id===track?.id)?.label||track?.name||''
 const languages=['All','Verilog','SystemVerilog','VHDL','C']
 const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch{return f}}
-const appPaths={home:'/',problems:'/app/problems/',projects:'/app/projects/'}
+const appPaths={home:'/home/',problems:'/app/problems/',projects:'/app/projects/'}
 const pageTitles={home:'HDLForge — Hardware Design Interview Practice',problems:'Problems | HDLForge',projects:'Projects | HDLForge',career:'Career Roadmap | HDLForge'}
 
 function problemLanguages(p){
@@ -64,6 +64,7 @@ function appPath(page,problem,projectId=null,trackId=null,careerId=null){
 }
 function routeFromLocation(){
  const path=normalizePath(window.location.pathname)
+ if(path==='/')return {page:'problems',problem:null,projectId:null,trackId:null,rootLanding:true}
  const careerMatch=path.match(/^\/app\/roadmaps\/([^/]+)$/)
  if(careerMatch){const career=careerPathBySlug[decodeURIComponent(careerMatch[1])];if(career)return {page:'career',problem:null,projectId:null,trackId:null,careerId:career.id}}
  if(path==='/app/tracks'||path==='/app/progress'||path==='/app/courses')return {page:'problems',problem:null,projectId:null,trackId:null,legacySection:true}
