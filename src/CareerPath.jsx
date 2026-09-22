@@ -1,5 +1,5 @@
 import React,{useEffect,useMemo,useState} from 'react'
-import{ArrowRight,CheckCircle2,ChevronDown,ChevronRight}from'lucide-react'
+import{ArrowRight,CheckCircle2,ChevronRight}from'lucide-react'
 import {allProjects} from './data/projects'
 import {guidedProjectBySlug} from './data/guidedProjects'
 import {careerPathList} from './data/careerPaths'
@@ -60,12 +60,15 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
       const open=openMilestones.has(index)
       const panelId=`career-milestone-${career.id}-${index}`
       const solvedCount=milestone.problems.filter(problem=>solved.includes(problem.id)).length
+      const milestoneProgress=milestone.problems.length?Math.round(solvedCount/milestone.problems.length*100):0
       return <section className={open?'career-milestone open':'career-milestone'} key={milestone.title}>
        <button type="button" className="career-milestone-head" aria-expanded={open} aria-controls={panelId} onClick={()=>toggleMilestone(index)}>
+        <ChevronRight className="career-milestone-chevron" size={18}/>
         <h3>{milestone.title}</h3>
-        <span className="career-milestone-meta"><span>{solvedCount}/{milestone.problems.length}</span><ChevronDown size={16}/></span>
+        <span className="career-milestone-count">{solvedCount}/{milestone.problems.length}</span>
+        <span className="career-milestone-progress"><i style={{width:`${milestoneProgress}%`}}/></span>
        </button>
-       <div id={panelId} className="career-problem-list" hidden={!open}>{milestone.problems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>
+       <div id={panelId} className="career-problem-list" hidden={!open}>{milestone.problems.map((problem,problemIndex)=><CareerProblem key={problem.id} index={problemIndex+1} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>
       </section>
      })}</div>:
      <div className="career-problem-list">{careerProblems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>}
@@ -103,10 +106,13 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
  </div>
 }
 
-function CareerProblem({problem,solved,onOpen}){
+function CareerProblem({problem,solved,onOpen,index}){
+ const languageLabel=problem.languages?.length?problem.languages.join(' / '):''
  return <button type="button" className="career-problem" onClick={()=>onOpen(problem)}>
   <span className={solved?'career-problem-check done':'career-problem-check'}>{solved?<CheckCircle2 size={15}/>:null}</span>
-  <span className="career-problem-copy"><strong>{problem.title}</strong><small>{problem.topic} · {problem.difficulty}</small></span>
-  <ChevronRight size={16}/>
+  <span className="career-problem-index">{String(index).padStart(2,'0')}</span>
+  <span className="career-problem-copy"><strong>{problem.title}</strong><small>{problem.topic}{languageLabel?` · ${languageLabel}`:''}</small></span>
+  <span className={`career-problem-difficulty ${problem.difficulty.toLowerCase()}`}>{problem.difficulty}</span>
+  <ChevronRight className="career-problem-chevron" size={16}/>
  </button>
 }
