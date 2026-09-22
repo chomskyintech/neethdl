@@ -1,4 +1,4 @@
-import problems,{problemTopics} from './data/activeProblems'
+import problems,{problemTopics} from './data/runtimeCatalog'
 
 const topPaneBorderStyle=document.createElement('style')
 topPaneBorderStyle.textContent=`
