@@ -46,7 +46,17 @@ try{
  fs.writeFileSync(problemFile,originalProblems)
  fs.writeFileSync(acceleratorFile,originalAccelerators)
 
- await build()
+ const buildResult=await build()
+ const outputs=(Array.isArray(buildResult)?buildResult:[buildResult]).flatMap(result=>result?.output||[])
+ const entryChunk=outputs.find(output=>output?.type==='chunk'&&output.isEntry)
+ if(entryChunk?.modules){
+  const largestModules=Object.entries(entryChunk.modules)
+   .map(([id,meta])=>({id:id.replace(root,''),bytes:meta.renderedLength||0}))
+   .sort((a,b)=>b.bytes-a.bytes)
+   .slice(0,15)
+  console.log('Largest modules in initial entry chunk:')
+  for(const item of largestModules)console.log(`  ${String(item.bytes).padStart(8)} B  ${item.id}`)
+ }
  console.log(`Built HDLForge with ${activeProblems.length} coding problems; removed ${removedCount} theory-only problems, including ${allAccelerators.length} accelerator problems.`)
 } finally {
  fs.writeFileSync(problemFile,originalProblems)
