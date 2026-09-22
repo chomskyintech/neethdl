@@ -96,27 +96,34 @@ test.describe('IDE interaction regressions', () => {
     await page.goto('/app/problems/rtl-counter/')
 
     const difficulty = page.locator('.problem-heading .difficulty')
+    const category = page.locator('.problem-heading .problem-category')
     const taskCopy = page.locator('.problem-task-copy')
     const taskList = page.locator('.problem-task-list')
     const firstExampleTitle = page.locator('.structured-example-title').first()
 
     const difficultyBox = await difficulty.boundingBox()
+    const categoryBox = await category.boundingBox()
     const taskBox = await taskCopy.boundingBox()
     const listBox = await taskList.boundingBox()
     const exampleBox = await firstExampleTitle.boundingBox()
 
     expect(difficultyBox).toBeTruthy()
+    expect(categoryBox).toBeTruthy()
     expect(taskBox).toBeTruthy()
     expect(listBox).toBeTruthy()
     expect(exampleBox).toBeTruthy()
 
-    const spaceAbove = taskBox.y - (difficultyBox.y + difficultyBox.height)
+    const chipRowBottom = Math.max(
+      difficultyBox.y + difficultyBox.height,
+      categoryBox.y + categoryBox.height,
+    )
+    const spaceAbove = taskBox.y - chipRowBottom
     const spaceBelow = exampleBox.y - (listBox.y + listBox.height)
 
-    expect(spaceAbove).toBeGreaterThanOrEqual(47)
-    expect(spaceAbove).toBeLessThanOrEqual(49)
-    expect(spaceBelow).toBeGreaterThanOrEqual(47)
-    expect(spaceBelow).toBeLessThanOrEqual(49)
+    expect(spaceAbove).toBeGreaterThanOrEqual(29)
+    expect(spaceAbove).toBeLessThanOrEqual(31)
+    expect(spaceBelow).toBeGreaterThanOrEqual(29)
+    expect(spaceBelow).toBeLessThanOrEqual(31)
     expect(await taskList.evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
   })
 
