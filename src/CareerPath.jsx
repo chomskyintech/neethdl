@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useState} from 'react'
 import{ArrowRight,CheckCircle2,ChevronRight}from'lucide-react'
 import {allProjects} from './data/projects'
-import {guidedProjectBySlug} from './data/guidedProjects'
+import {guidedProjectBySlug} from './data/runtimeCatalog'
 import {careerPathList} from './data/careerPaths'
 import './career-path.css'
 
