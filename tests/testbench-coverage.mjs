@@ -86,11 +86,14 @@ for (const problem of standaloneCatalog) {
   }
 
   if (languages.includes('VHDL')) {
-    const bench = vhdlBenches[problem.id]
-    if (!bench) {
-      failures.push(`${problem.id}: missing VHDL testbench`)
-    } else if (!bench.includes('HDLFORGE_PASS')) {
+    const nativeBench = vhdlBenches[problem.id]
+    const sharedBench = getBrowserSimulatorBench(problem.id)
+    if (!nativeBench && !sharedBench) {
+      failures.push(`${problem.id}: missing VHDL-compatible behavioral testbench`)
+    } else if (nativeBench && !nativeBench.includes('HDLFORGE_PASS')) {
       failures.push(`${problem.id}: VHDL testbench is not self-checking (missing HDLFORGE_PASS)`)
+    } else if (!nativeBench && !sharedBench.includes('HDLFORGE_PASS')) {
+      failures.push(`${problem.id}: shared VHDL testbench is not self-checking (missing HDLFORGE_PASS)`)
     }
   }
 
