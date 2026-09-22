@@ -426,17 +426,21 @@
   line-height:1.7;
 }
 
-@media(max-width:1280px){
-  .career-workspace{grid-template-columns:210px minmax(0,1fr) 280px;gap:18px}
+@media(max-width:1480px){
+  .career-workspace{grid-template-columns:220px minmax(0,1fr) 300px;gap:20px}
+}
+@media(max-width:1240px){
+  .career-workspace{grid-template-columns:190px minmax(0,1fr) 280px;gap:18px}
 }
 @media(max-width:1040px){
-  .career-workspace{grid-template-columns:210px minmax(0,1fr)}
-  .career-side-rail{position:static;grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .career-next-card{margin-top:0}
+  .career-workspace{grid-template-columns:minmax(0,1fr) 280px}
+  .career-roadmap{position:static;grid-column:1/-1}
+  .career-side-rail{top:104px}
 }
 @media(max-width:900px){
   .career-workspace{grid-template-columns:1fr}
-  .career-roadmap{position:static}
+  .career-side-rail{position:static;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .career-next-card{margin-top:0}
   .career-project-grid{grid-template-columns:1fr}
 }
 @media(max-width:760px){
