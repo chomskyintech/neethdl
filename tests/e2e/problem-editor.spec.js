@@ -68,7 +68,21 @@ test.describe('HDLForge Monaco problem editor', () => {
   })
 
 
-  test('opens the contextual AI assistant for selected HDL code', async ({ page }) => {
+  test('opens the contextual AI assistant and sends selected HDL context', async ({ page }) => {
+    let requestBody = null
+    await page.route('**/api/ai', async route => {
+      requestBody = route.request().postDataJSON()
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          answer: 'This selected block describes combinational mux behavior.',
+          model: 'gpt-5.6-luna',
+        }),
+      })
+    })
+
     const editor = page.locator('.monaco-editor .view-lines')
     await editor.click()
     await page.keyboard.press('Control+A')
@@ -85,6 +99,15 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(panel.getByRole('button', { name: 'Find bug', exact: true })).toBeVisible()
     await expect(panel.getByRole('button', { name: 'Hardware?', exact: true })).toBeVisible()
     await expect(panel.getByPlaceholder('Ask about this code…')).toBeVisible()
+
+    await panel.getByRole('button', { name: 'Explain', exact: true }).click()
+    await expect(panel).toContainText('This selected block describes combinational mux behavior.')
+
+    expect(requestBody).toBeTruthy()
+    expect(requestBody.language).toBe('SystemVerilog')
+    expect(requestBody.selection.code).toContain('module')
+    expect(requestBody.problem.id).toBeTruthy()
+    expect(requestBody.question).toContain('Explain this selected code')
 
     await panel.getByRole('button', { name: 'Close AI assistant' }).click()
     await expect(panel).toHaveCount(0)
