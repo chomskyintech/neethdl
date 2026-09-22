@@ -10,6 +10,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 
 const STRUCTURAL_ONLY_TOPICS = new Set([
+  'SystemVerilog',
   'Testbenches',
   'Interfaces',
   'SVA',
