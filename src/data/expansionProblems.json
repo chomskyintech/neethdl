@@ -550,5 +550,1284 @@
       "Combinational RTL."
     ],
     "starterCode": "module conv3_int8 (\n  input signed [7:0] x0,\n  input signed [7:0] x1,\n  input signed [7:0] x2,\n  input signed [7:0] k0,\n  input signed [7:0] k1,\n  input signed [7:0] k2,\n  output reg signed [17:0] y\n);\n\n  // Your RTL here\n\nendmodule"
+  },
+  {
+    "id": "comb-decoder3to8",
+    "title": "3-to-8 Decoder",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "decoder",
+      "combinational"
+    ],
+    "description": "Decode a 3-bit input into a one-hot 8-bit output.",
+    "task": "Exactly one output bit must be high: y = 1 << a.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module decoder3to8(input logic [2:0] a, output logic [7:0] y);\n  // TODO\nendmodule",
+    "solution": "module decoder3to8(input logic [2:0] a, output logic [7:0] y);\n  always_comb begin\n    y = 8'b00000001 << a;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Combinational block",
+        "pattern": "always_comb",
+        "flags": "i"
+      },
+      {
+        "label": "One-hot shift",
+        "pattern": "8'b00000001\\s*<<\\s*a",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-onehot-mux4",
+    "title": "4-Way One-Hot Multiplexer",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "mux",
+      "one-hot"
+    ],
+    "description": "Select one of four 8-bit inputs using a one-hot select vector.",
+    "task": "When sel is 0001/0010/0100/1000 choose d0/d1/d2/d3. Invalid select values return zero.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module onehot_mux4(input logic [3:0] sel,input logic [7:0] d0,d1,d2,d3,output logic [7:0] y);\n  // TODO\nendmodule",
+    "solution": "module onehot_mux4(input logic [3:0] sel,input logic [7:0] d0,d1,d2,d3,output logic [7:0] y);\n  always_comb begin\n    case(sel)\n      4'b0001: y=d0;\n      4'b0010: y=d1;\n      4'b0100: y=d2;\n      4'b1000: y=d3;\n      default: y='0;\n    endcase\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "One-hot cases",
+        "pattern": "4'b0001[\\s\\S]*4'b0010[\\s\\S]*4'b0100[\\s\\S]*4'b1000",
+        "flags": "i"
+      },
+      {
+        "label": "Invalid select clears output",
+        "pattern": "default\\s*:\\s*y\\s*=\\s*'0",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-comparator16",
+    "title": "16-bit Magnitude Comparator",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "comparator",
+      "unsigned"
+    ],
+    "description": "Compare two unsigned 16-bit values.",
+    "task": "Drive exactly one of lt, eq, or gt high according to the relationship between a and b.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module comparator16(input logic [15:0] a,b,output logic lt,eq,gt);\n  // TODO\nendmodule",
+    "solution": "module comparator16(input logic [15:0] a,b,output logic lt,eq,gt);\n  always_comb begin\n    lt = (a < b);\n    eq = (a == b);\n    gt = (a > b);\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Less-than comparison",
+        "pattern": "a\\s*<\\s*b",
+        "flags": "i"
+      },
+      {
+        "label": "Equality comparison",
+        "pattern": "a\\s*==\\s*b",
+        "flags": "i"
+      },
+      {
+        "label": "Greater-than comparison",
+        "pattern": "a\\s*>\\s*b",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-barrel-shifter",
+    "title": "8-bit Barrel Shifter",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "barrel-shifter",
+      "shift"
+    ],
+    "description": "Shift an 8-bit word left or right by 0-7 positions in one combinational stage.",
+    "task": "Use dir=0 for left shift and dir=1 for right shift.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module barrel_shifter8(input logic [7:0] data,input logic [2:0] shamt,input logic dir,output logic [7:0] y);\n  // TODO\nendmodule",
+    "solution": "module barrel_shifter8(input logic [7:0] data,input logic [2:0] shamt,input logic dir,output logic [7:0] y);\n  always_comb begin\n    if(dir) y = data >> shamt;\n    else    y = data << shamt;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Right shift",
+        "pattern": "data\\s*>>\\s*shamt",
+        "flags": "i"
+      },
+      {
+        "label": "Left shift",
+        "pattern": "data\\s*<<\\s*shamt",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-leading-zero",
+    "title": "Leading-Zero Counter",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "leading-zero",
+      "priority"
+    ],
+    "description": "Count the number of leading zeros in an 8-bit value.",
+    "task": "Return count=8 for an all-zero input; otherwise count zeros before the highest set bit.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module leading_zero8(input logic [7:0] data,output logic [3:0] count);\n  // TODO\nendmodule",
+    "solution": "module leading_zero8(input logic [7:0] data,output logic [3:0] count);\n  always_comb begin\n    casez(data)\n      8'b1???????: count=0;\n      8'b01??????: count=1;\n      8'b001?????: count=2;\n      8'b0001????: count=3;\n      8'b00001???: count=4;\n      8'b000001??: count=5;\n      8'b0000001?: count=6;\n      8'b00000001: count=7;\n      default:     count=8;\n    endcase\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Priority case",
+        "pattern": "casez\\s*\\(\\s*data\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "All-zero result",
+        "pattern": "default\\s*:\\s*count\\s*=\\s*8",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-popcount8",
+    "title": "8-bit Population Count",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "popcount",
+      "reduction"
+    ],
+    "description": "Count how many bits are set in an 8-bit input.",
+    "task": "Produce a 4-bit result from 0 through 8.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module popcount8(input logic [7:0] data,output logic [3:0] count);\n  // TODO\nendmodule",
+    "solution": "module popcount8(input logic [7:0] data,output logic [3:0] count);\n  integer i;\n  always_comb begin\n    count=0;\n    for(i=0;i<8;i=i+1) count = count + data[i];\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Loops over eight bits",
+        "pattern": "for\\s*\\(\\s*i\\s*=\\s*0\\s*;\\s*i\\s*<\\s*8",
+        "flags": "i"
+      },
+      {
+        "label": "Accumulates bits",
+        "pattern": "count\\s*=\\s*count\\s*\\+\\s*data\\s*\\[\\s*i\\s*\\]",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-minmax4",
+    "title": "Four-Input Min/Max",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "min",
+      "max",
+      "comparator-tree"
+    ],
+    "description": "Find the minimum and maximum of four unsigned 8-bit values.",
+    "task": "Produce min_value and max_value combinationally.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module minmax4(input logic [7:0] a,b,c,d,output logic [7:0] min_value,max_value);\n  // TODO\nendmodule",
+    "solution": "module minmax4(input logic [7:0] a,b,c,d,output logic [7:0] min_value,max_value);\n  always_comb begin\n    min_value=a;\n    max_value=a;\n    if(b<min_value) min_value=b;\n    if(c<min_value) min_value=c;\n    if(d<min_value) min_value=d;\n    if(b>max_value) max_value=b;\n    if(c>max_value) max_value=c;\n    if(d>max_value) max_value=d;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Initializes min and max",
+        "pattern": "min_value\\s*=\\s*a[\\s\\S]*max_value\\s*=\\s*a",
+        "flags": "i"
+      },
+      {
+        "label": "Updates min",
+        "pattern": "b\\s*<\\s*min_value",
+        "flags": "i"
+      },
+      {
+        "label": "Updates max",
+        "pattern": "b\\s*>\\s*max_value",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "comb-parity",
+    "title": "Even-Parity Generator",
+    "topic": "Combinational Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "parity",
+      "reduction-xor"
+    ],
+    "description": "Generate the parity bit required to make an 8-bit word have even parity.",
+    "task": "Use reduction XOR so data plus parity contains an even number of ones.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module even_parity(input logic [7:0] data,output logic parity);\n  // TODO\nendmodule",
+    "solution": "module even_parity(input logic [7:0] data,output logic parity);\n  assign parity = ^data;\nendmodule",
+    "checks": [
+      {
+        "label": "Reduction XOR",
+        "pattern": "parity\\s*=\\s*\\^data",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-enable-reg",
+    "title": "Register with Clock Enable",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "register",
+      "enable"
+    ],
+    "description": "Build an 8-bit register that updates only when enable is high.",
+    "task": "Reset clears q. When enable=1 capture d; otherwise hold q.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module enable_reg(input logic clk,reset,enable,input logic [7:0] d,output logic [7:0] q);\n  // TODO\nendmodule",
+    "solution": "module enable_reg(input logic clk,reset,enable,input logic [7:0] d,output logic [7:0] q);\n  always_ff @(posedge clk) begin\n    if(reset) q <= '0;\n    else if(enable) q <= d;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Sequential block",
+        "pattern": "always_ff\\s*@\\s*\\(\\s*posedge\\s+clk",
+        "flags": "i"
+      },
+      {
+        "label": "Enable capture",
+        "pattern": "enable[\\s\\S]*q\\s*<=\\s*d",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-toggle-flop",
+    "title": "Toggle Flip-Flop",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "toggle",
+      "flip-flop"
+    ],
+    "description": "Toggle an output bit whenever toggle_en is asserted.",
+    "task": "Reset drives q low; otherwise invert q on enabled cycles.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module toggle_ff(input logic clk,reset,toggle_en,output logic q);\n  // TODO\nendmodule",
+    "solution": "module toggle_ff(input logic clk,reset,toggle_en,output logic q);\n  always_ff @(posedge clk) begin\n    if(reset) q<=1'b0;\n    else if(toggle_en) q<=~q;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Reset clears output",
+        "pattern": "reset[\\s\\S]*q\\s*<=\\s*1'b0",
+        "flags": "i"
+      },
+      {
+        "label": "Toggles output",
+        "pattern": "toggle_en[\\s\\S]*q\\s*<=\\s*~q",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-sticky-flag",
+    "title": "Sticky Status Flag",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "sticky-bit",
+      "status"
+    ],
+    "description": "Latch an event until software explicitly clears it.",
+    "task": "event sets flag. clear clears flag. Reset has highest priority, then clear, then event.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module sticky_flag(input logic clk,reset,clear,event,output logic flag);\n  // TODO\nendmodule",
+    "solution": "module sticky_flag(input logic clk,reset,clear,event,output logic flag);\n  always_ff @(posedge clk) begin\n    if(reset) flag<=1'b0;\n    else if(clear) flag<=1'b0;\n    else if(event) flag<=1'b1;\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Clear priority",
+        "pattern": "clear[\\s\\S]*flag\\s*<=\\s*1'b0",
+        "flags": "i"
+      },
+      {
+        "label": "Event sets flag",
+        "pattern": "event[\\s\\S]*flag\\s*<=\\s*1'b1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-pulse-stretcher",
+    "title": "Pulse Stretcher",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "pulse",
+      "counter"
+    ],
+    "description": "Stretch a one-cycle input pulse into a four-cycle output pulse.",
+    "task": "On pulse_in load a counter with 4. Keep pulse_out high while the counter is nonzero.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module pulse_stretcher(input logic clk,reset,pulse_in,output logic pulse_out);\n  // TODO\nendmodule",
+    "solution": "module pulse_stretcher(input logic clk,reset,pulse_in,output logic pulse_out);\n  logic [2:0] count;\n  always_ff @(posedge clk) begin\n    if(reset) count<=0;\n    else if(pulse_in) count<=3'd4;\n    else if(count!=0) count<=count-1'b1;\n  end\n  assign pulse_out=(count!=0);\nendmodule",
+    "checks": [
+      {
+        "label": "Loads four cycles",
+        "pattern": "pulse_in[\\s\\S]*count\\s*<=\\s*3'd4",
+        "flags": "i"
+      },
+      {
+        "label": "Counts down",
+        "pattern": "count\\s*<=\\s*count\\s*-\\s*1'b1",
+        "flags": "i"
+      },
+      {
+        "label": "Output from counter",
+        "pattern": "pulse_out\\s*=\\s*\\(\\s*count\\s*!=\\s*0\\s*\\)",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-delay-line",
+    "title": "4-Cycle Delay Line",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "delay-line",
+      "pipeline"
+    ],
+    "description": "Delay an 8-bit sample by exactly four clock cycles.",
+    "task": "Shift input data through four registers every rising clock edge.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module delay_line4(input logic clk,reset,input logic [7:0] din,output logic [7:0] dout);\n  // TODO\nendmodule",
+    "solution": "module delay_line4(input logic clk,reset,input logic [7:0] din,output logic [7:0] dout);\n  logic [7:0] d0,d1,d2,d3;\n  always_ff @(posedge clk) begin\n    if(reset) begin d0<=0;d1<=0;d2<=0;d3<=0; end\n    else begin d0<=din;d1<=d0;d2<=d1;d3<=d2; end\n  end\n  assign dout=d3;\nendmodule",
+    "checks": [
+      {
+        "label": "Four pipeline stages",
+        "pattern": "d0\\s*<=\\s*din[\\s\\S]*d1\\s*<=\\s*d0[\\s\\S]*d2\\s*<=\\s*d1[\\s\\S]*d3\\s*<=\\s*d2",
+        "flags": "i"
+      },
+      {
+        "label": "Output last stage",
+        "pattern": "dout\\s*=\\s*d3",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "seq-serial-parallel",
+    "title": "Serial-to-Parallel Receiver",
+    "topic": "Sequential Logic",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "serial",
+      "shift-register"
+    ],
+    "description": "Collect eight serial bits into one parallel byte.",
+    "task": "On each enable cycle shift serial_in into bit 0. Pulse valid after eight samples.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module serial_to_parallel(input logic clk,reset,enable,serial_in,output logic [7:0] data,output logic valid);\n  // TODO\nendmodule",
+    "solution": "module serial_to_parallel(input logic clk,reset,enable,serial_in,output logic [7:0] data,output logic valid);\n  logic [2:0] count;\n  always_ff @(posedge clk) begin\n    if(reset) begin data<=0;count<=0;valid<=0; end\n    else begin\n      valid<=0;\n      if(enable) begin\n        data<={data[6:0],serial_in};\n        if(count==3'd7) begin count<=0;valid<=1; end\n        else count<=count+1'b1;\n      end\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Shifts serial input",
+        "pattern": "data\\s*<=\\s*\\{\\s*data\\s*\\[\\s*6\\s*:\\s*0\\s*\\]\\s*,\\s*serial_in\\s*\\}",
+        "flags": "i"
+      },
+      {
+        "label": "Valid after eight bits",
+        "pattern": "count\\s*==\\s*3'd7[\\s\\S]*valid\\s*<=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-seq1011",
+    "title": "1011 Sequence Detector",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "sequence-detector"
+    ],
+    "description": "Detect the serial bit pattern 1011 with overlapping matches allowed.",
+    "task": "Pulse match for one cycle when the newest bits complete 1011.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module seq1011(input logic clk,reset,bit_in,output logic match);\n  // TODO\nendmodule",
+    "solution": "module seq1011(input logic clk,reset,bit_in,output logic match);\n  typedef enum logic [1:0] {S0,S1,S10,S101} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state; match=0;\n    case(state)\n      S0: next=bit_in?S1:S0;\n      S1: next=bit_in?S1:S10;\n      S10: next=bit_in?S101:S0;\n      S101: begin\n        if(bit_in) begin match=1; next=S1; end\n        else next=S10;\n      end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset) state<=S0; else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Uses four states",
+        "pattern": "S0[\\s\\S]*S1[\\s\\S]*S10[\\s\\S]*S101",
+        "flags": "i"
+      },
+      {
+        "label": "Detects final one",
+        "pattern": "S101[\\s\\S]*bit_in[\\s\\S]*match\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-handshake-controller",
+    "title": "Request/Acknowledge Controller",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "handshake"
+    ],
+    "description": "Control a request/acknowledge transaction.",
+    "task": "IDLE waits for start, REQUEST asserts req until ack, DONE pulses done then returns to IDLE.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module req_ack_ctrl(input logic clk,reset,start,ack,output logic req,done);\n  // TODO\nendmodule",
+    "solution": "module req_ack_ctrl(input logic clk,reset,start,ack,output logic req,done);\n  typedef enum logic [1:0] {IDLE,REQUEST,DONE} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state; req=0; done=0;\n    case(state)\n      IDLE: if(start) next=REQUEST;\n      REQUEST: begin req=1; if(ack) next=DONE; end\n      DONE: begin done=1; next=IDLE; end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset) state<=IDLE; else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Request held in state",
+        "pattern": "REQUEST[\\s\\S]*req\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Ack advances",
+        "pattern": "ack[\\s\\S]*next\\s*=\\s*DONE",
+        "flags": "i"
+      },
+      {
+        "label": "Done pulse",
+        "pattern": "DONE[\\s\\S]*done\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-pedestrian-light",
+    "title": "Pedestrian Crossing FSM",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "controller"
+    ],
+    "description": "Control traffic and pedestrian signals through WAIT, STOP and WALK phases.",
+    "task": "WAIT keeps cars green. A pedestrian request moves to STOP, then WALK, then returns to WAIT when timer_done is asserted.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module pedestrian_fsm(input logic clk,reset,ped_request,timer_done,output logic car_green,car_red,walk);\n  // TODO\nendmodule",
+    "solution": "module pedestrian_fsm(input logic clk,reset,ped_request,timer_done,output logic car_green,car_red,walk);\n  typedef enum logic [1:0] {WAIT,STOP,WALK} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state;car_green=0;car_red=0;walk=0;\n    case(state)\n      WAIT: begin car_green=1;if(ped_request)next=STOP;end\n      STOP: begin car_red=1;if(timer_done)next=WALK;end\n      WALK: begin car_red=1;walk=1;if(timer_done)next=WAIT;end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset)state<=WAIT;else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Wait drives green",
+        "pattern": "WAIT[\\s\\S]*car_green\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Walk drives pedestrian signal",
+        "pattern": "WALK[\\s\\S]*walk\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Timer returns to wait",
+        "pattern": "WALK[\\s\\S]*timer_done[\\s\\S]*next\\s*=\\s*WAIT",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-timeout-retry",
+    "title": "Timeout and Retry FSM",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "timeout",
+      "retry"
+    ],
+    "description": "Retry a request after a timeout, up to three attempts.",
+    "task": "ISSUE asserts req, WAIT waits for ack or timeout, SUCCESS pulses done, FAIL pulses error after the third timed-out attempt.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module retry_fsm(input logic clk,reset,start,ack,timeout,output logic req,done,error);\n  // TODO\nendmodule",
+    "solution": "module retry_fsm(input logic clk,reset,start,ack,timeout,output logic req,done,error);\n  typedef enum logic [2:0] {IDLE,ISSUE,WAIT,SUCCESS,FAIL} state_t;\n  state_t state,next;\n  logic [1:0] attempts;\n  always_comb begin\n    next=state;req=0;done=0;error=0;\n    case(state)\n      IDLE: if(start) next=ISSUE;\n      ISSUE: begin req=1;next=WAIT;end\n      WAIT: if(ack) next=SUCCESS; else if(timeout) next=(attempts==2)?FAIL:ISSUE;\n      SUCCESS: begin done=1;next=IDLE;end\n      FAIL: begin error=1;next=IDLE;end\n    endcase\n  end\n  always_ff @(posedge clk) begin\n    if(reset) begin state<=IDLE;attempts<=0;end\n    else begin\n      state<=next;\n      if(state==IDLE) attempts<=0;\n      else if(state==WAIT && timeout && attempts!=2) attempts<=attempts+1'b1;\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Third timeout fails",
+        "pattern": "attempts\\s*==\\s*2[\\s\\S]*FAIL",
+        "flags": "i"
+      },
+      {
+        "label": "Retry increments",
+        "pattern": "attempts\\s*<=\\s*attempts\\s*\\+\\s*1'b1",
+        "flags": "i"
+      },
+      {
+        "label": "Success pulse",
+        "pattern": "SUCCESS[\\s\\S]*done\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-packet-parser",
+    "title": "Packet Header Parser FSM",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "packet",
+      "parser"
+    ],
+    "description": "Parse a four-byte header followed by payload bytes.",
+    "task": "Consume SYNC, TYPE, LENGTH, FLAGS in order. Assert payload_phase after the fourth header byte until packet_done.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module packet_parser_fsm(input logic clk,reset,byte_valid,packet_done,output logic header_done,payload_phase);\n  // TODO\nendmodule",
+    "solution": "module packet_parser_fsm(input logic clk,reset,byte_valid,packet_done,output logic header_done,payload_phase);\n  typedef enum logic [2:0] {SYNC,TYPE,LENGTH,FLAGS,PAYLOAD} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state;header_done=0;payload_phase=0;\n    case(state)\n      SYNC: if(byte_valid) next=TYPE;\n      TYPE: if(byte_valid) next=LENGTH;\n      LENGTH: if(byte_valid) next=FLAGS;\n      FLAGS: if(byte_valid) begin header_done=1;next=PAYLOAD;end\n      PAYLOAD: begin payload_phase=1;if(packet_done)next=SYNC;end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset)state<=SYNC;else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Four header states",
+        "pattern": "SYNC[\\s\\S]*TYPE[\\s\\S]*LENGTH[\\s\\S]*FLAGS",
+        "flags": "i"
+      },
+      {
+        "label": "Header done after flags",
+        "pattern": "FLAGS[\\s\\S]*header_done\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Payload phase",
+        "pattern": "PAYLOAD[\\s\\S]*payload_phase\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-burst-controller",
+    "title": "Four-Beat Burst Controller",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "burst",
+      "counter"
+    ],
+    "description": "Control a fixed four-beat streaming burst.",
+    "task": "On start enter SEND. Assert valid and advance beat only when ready. Pulse done after the fourth accepted beat.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module burst4_ctrl(input logic clk,reset,start,ready,output logic valid,done,output logic [1:0] beat);\n  // TODO\nendmodule",
+    "solution": "module burst4_ctrl(input logic clk,reset,start,ready,output logic valid,done,output logic [1:0] beat);\n  typedef enum logic {IDLE,SEND} state_t;\n  state_t state;\n  always_ff @(posedge clk) begin\n    if(reset) begin state<=IDLE;beat<=0;done<=0;end\n    else begin\n      done<=0;\n      case(state)\n        IDLE: if(start) begin state<=SEND;beat<=0;end\n        SEND: if(ready) begin\n          if(beat==2'd3) begin state<=IDLE;done<=1;beat<=0;end\n          else beat<=beat+1'b1;\n        end\n      endcase\n    end\n  end\n  assign valid=(state==SEND);\nendmodule",
+    "checks": [
+      {
+        "label": "Valid in send state",
+        "pattern": "valid\\s*=\\s*\\(\\s*state\\s*==\\s*SEND\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Advances only when ready",
+        "pattern": "SEND[\\s\\S]*if\\s*\\(\\s*ready\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Completes fourth beat",
+        "pattern": "beat\\s*==\\s*2'd3[\\s\\S]*done\\s*<=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-vending-machine",
+    "title": "Vending Machine FSM",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "controller",
+      "coin"
+    ],
+    "description": "Accept 5-unit and 10-unit coins for a 15-unit item.",
+    "task": "Track credit states 0,5,10. Pulse vend whenever the total reaches or exceeds 15 and return to zero credit.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module vending_fsm(input logic clk,reset,coin5,coin10,output logic vend);\n  // TODO\nendmodule",
+    "solution": "module vending_fsm(input logic clk,reset,coin5,coin10,output logic vend);\n  typedef enum logic [1:0] {C0,C5,C10} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state;vend=0;\n    case(state)\n      C0: if(coin10)next=C10; else if(coin5)next=C5;\n      C5: if(coin10)begin vend=1;next=C0;end else if(coin5)next=C10;\n      C10: if(coin5||coin10)begin vend=1;next=C0;end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset)state<=C0;else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Tracks credit states",
+        "pattern": "C0[\\s\\S]*C5[\\s\\S]*C10",
+        "flags": "i"
+      },
+      {
+        "label": "Vends from 5 plus 10",
+        "pattern": "C5[\\s\\S]*coin10[\\s\\S]*vend\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Vends from 10",
+        "pattern": "C10[\\s\\S]*vend\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fsm-start-busy-done",
+    "title": "Start/Busy/Done Controller",
+    "topic": "FSMs",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fsm",
+      "busy",
+      "done"
+    ],
+    "description": "Implement a standard operation-control shell with start, busy and one-cycle done.",
+    "task": "IDLE waits for start. BUSY remains active until operation_done. DONE pulses done for one cycle then returns to IDLE.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module start_busy_done(input logic clk,reset,start,operation_done,output logic busy,done);\n  // TODO\nendmodule",
+    "solution": "module start_busy_done(input logic clk,reset,start,operation_done,output logic busy,done);\n  typedef enum logic [1:0] {IDLE,BUSY,DONE} state_t;\n  state_t state,next;\n  always_comb begin\n    next=state;busy=0;done=0;\n    case(state)\n      IDLE: if(start)next=BUSY;\n      BUSY: begin busy=1;if(operation_done)next=DONE;end\n      DONE: begin done=1;next=IDLE;end\n    endcase\n  end\n  always_ff @(posedge clk) if(reset)state<=IDLE;else state<=next;\nendmodule",
+    "checks": [
+      {
+        "label": "Busy state drives busy",
+        "pattern": "BUSY[\\s\\S]*busy\\s*=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Operation completion",
+        "pattern": "operation_done[\\s\\S]*next\\s*=\\s*DONE",
+        "flags": "i"
+      },
+      {
+        "label": "Done state pulses",
+        "pattern": "DONE[\\s\\S]*done\\s*=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-counted",
+    "title": "Counted Synchronous FIFO",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "count",
+      "memory"
+    ],
+    "description": "Build an 8-entry synchronous FIFO with an occupancy count.",
+    "task": "Increment count on successful write-only cycles, decrement on read-only cycles, hold on simultaneous read/write.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module counted_fifo(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,output logic [7:0] dout,output logic [3:0] count,output logic full,empty);\n  // TODO\nendmodule",
+    "solution": "module counted_fifo(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,output logic [7:0] dout,output logic [3:0] count,output logic full,empty);\n  logic [7:0] mem[0:7];\n  logic [2:0] wptr,rptr;\n  wire write_fire=wr_en && !full;\n  wire read_fire=rd_en && !empty;\n  always_ff @(posedge clk) begin\n    if(reset) begin wptr<=0;rptr<=0;count<=0;dout<=0;end\n    else begin\n      if(write_fire) begin mem[wptr]<=din;wptr<=wptr+1'b1;end\n      if(read_fire) begin dout<=mem[rptr];rptr<=rptr+1'b1;end\n      case({write_fire,read_fire})\n        2'b10:count<=count+1'b1;\n        2'b01:count<=count-1'b1;\n        default:count<=count;\n      endcase\n    end\n  end\n  assign full=(count==8);\n  assign empty=(count==0);\nendmodule",
+    "checks": [
+      {
+        "label": "Successful write gate",
+        "pattern": "wr_en\\s*&&\\s*!full",
+        "flags": "i"
+      },
+      {
+        "label": "Successful read gate",
+        "pattern": "rd_en\\s*&&\\s*!empty",
+        "flags": "i"
+      },
+      {
+        "label": "Occupancy update",
+        "pattern": "2'b10[\\s\\S]*count\\s*<=\\s*count\\s*\\+\\s*1'b1[\\s\\S]*2'b01[\\s\\S]*count\\s*<=\\s*count\\s*-\\s*1'b1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-almost-flags",
+    "title": "FIFO Almost-Full / Almost-Empty Flags",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "threshold",
+      "flags"
+    ],
+    "description": "Generate almost_full and almost_empty from an occupancy count for a 16-entry FIFO.",
+    "task": "almost_full must assert at count>=14. almost_empty must assert at count<=2.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module fifo_thresholds(input logic [4:0] count,output logic almost_full,almost_empty);\n  // TODO\nendmodule",
+    "solution": "module fifo_thresholds(input logic [4:0] count,output logic almost_full,almost_empty);\n  assign almost_full = (count >= 14);\n  assign almost_empty = (count <= 2);\nendmodule",
+    "checks": [
+      {
+        "label": "Almost-full threshold",
+        "pattern": "count\\s*>=\\s*14",
+        "flags": "i"
+      },
+      {
+        "label": "Almost-empty threshold",
+        "pattern": "count\\s*<=\\s*2",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-fwft",
+    "title": "First-Word Fall-Through Buffer",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "fwft",
+      "buffer"
+    ],
+    "description": "Implement a two-entry first-word fall-through queue.",
+    "task": "When non-empty, dout must reflect the oldest stored word without waiting for rd_en.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module fwft2(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,output logic [7:0] dout,output logic empty,full);\n  // TODO\nendmodule",
+    "solution": "module fwft2(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,output logic [7:0] dout,output logic empty,full);\n  logic [7:0] q0,q1;\n  logic [1:0] count;\n  always_ff @(posedge clk) begin\n    if(reset) count<=0;\n    else begin\n      if(wr_en && !full && !(rd_en && !empty)) begin\n        if(count==0)q0<=din; else q1<=din;\n        count<=count+1'b1;\n      end else if(rd_en && !empty && !(wr_en && !full)) begin\n        q0<=q1;count<=count-1'b1;\n      end else if(wr_en && !full && rd_en && !empty) begin\n        if(count==1) q0<=din;\n        else begin q0<=q1;q1<=din;end\n      end\n    end\n  end\n  assign dout=q0;\n  assign empty=(count==0);\n  assign full=(count==2);\nendmodule",
+    "checks": [
+      {
+        "label": "Fall-through output",
+        "pattern": "dout\\s*=\\s*q0",
+        "flags": "i"
+      },
+      {
+        "label": "Two-entry full",
+        "pattern": "full\\s*=\\s*\\(\\s*count\\s*==\\s*2\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Read shifts queue",
+        "pattern": "q0\\s*<=\\s*q1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-overflow-underflow",
+    "title": "FIFO Overflow / Underflow Sticky Flags",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "overflow",
+      "underflow"
+    ],
+    "description": "Record illegal FIFO access attempts.",
+    "task": "Set overflow if wr_en occurs while full. Set underflow if rd_en occurs while empty. Flags remain set until clear or reset.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module fifo_error_flags(input logic clk,reset,clear,wr_en,rd_en,full,empty,output logic overflow,underflow);\n  // TODO\nendmodule",
+    "solution": "module fifo_error_flags(input logic clk,reset,clear,wr_en,rd_en,full,empty,output logic overflow,underflow);\n  always_ff @(posedge clk) begin\n    if(reset || clear) begin overflow<=0;underflow<=0;end\n    else begin\n      if(wr_en && full) overflow<=1;\n      if(rd_en && empty) underflow<=1;\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Overflow condition",
+        "pattern": "wr_en\\s*&&\\s*full[\\s\\S]*overflow\\s*<=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Underflow condition",
+        "pattern": "rd_en\\s*&&\\s*empty[\\s\\S]*underflow\\s*<=\\s*1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-two-entry-elastic",
+    "title": "Two-Entry Elastic Buffer",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "elastic",
+      "ready-valid"
+    ],
+    "description": "Build a two-entry ready/valid elastic queue.",
+    "task": "in_ready must deassert only when both entries are occupied. out_valid reflects whether at least one entry is occupied.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module elastic2(input logic clk,reset,input logic in_valid,input logic [7:0] in_data,output logic in_ready,output logic out_valid,output logic [7:0] out_data,input logic out_ready);\n  // TODO\nendmodule",
+    "solution": "module elastic2(input logic clk,reset,input logic in_valid,input logic [7:0] in_data,output logic in_ready,output logic out_valid,output logic [7:0] out_data,input logic out_ready);\n  logic [7:0] mem0,mem1;\n  logic [1:0] count;\n  wire push=in_valid && in_ready;\n  wire pop=out_valid && out_ready;\n  always_ff @(posedge clk) begin\n    if(reset) count<=0;\n    else begin\n      case({push,pop})\n        2'b10: begin if(count==0)mem0<=in_data;else mem1<=in_data;count<=count+1'b1;end\n        2'b01: begin mem0<=mem1;count<=count-1'b1;end\n        2'b11: begin if(count==1)mem0<=in_data;else begin mem0<=mem1;mem1<=in_data;end end\n      endcase\n    end\n  end\n  assign in_ready=(count<2);\n  assign out_valid=(count!=0);\n  assign out_data=mem0;\nendmodule",
+    "checks": [
+      {
+        "label": "Backpressure at two entries",
+        "pattern": "in_ready\\s*=\\s*\\(\\s*count\\s*<\\s*2\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Valid when non-empty",
+        "pattern": "out_valid\\s*=\\s*\\(\\s*count\\s*!=\\s*0\\s*\\)",
+        "flags": "i"
+      },
+      {
+        "label": "Push/pop handshakes",
+        "pattern": "in_valid\\s*&&\\s*in_ready[\\s\\S]*out_valid\\s*&&\\s*out_ready",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-packet-boundary",
+    "title": "Packet FIFO Boundary Tracker",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "fifo",
+      "packet",
+      "metadata"
+    ],
+    "description": "Track packet-end metadata alongside FIFO data.",
+    "task": "Store last_in together with each accepted data word and reproduce it as last_out when that word reaches the output.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module packet_meta_fifo(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,input logic last_in,output logic [7:0] dout,output logic last_out);\n  // TODO\nendmodule",
+    "solution": "module packet_meta_fifo(input logic clk,reset,wr_en,rd_en,input logic [7:0] din,input logic last_in,output logic [7:0] dout,output logic last_out);\n  logic [7:0] data_mem[0:3];\n  logic last_mem[0:3];\n  logic [1:0] wptr,rptr;\n  always_ff @(posedge clk) begin\n    if(reset) begin wptr<=0;rptr<=0;dout<=0;last_out<=0;end\n    else begin\n      if(wr_en) begin data_mem[wptr]<=din;last_mem[wptr]<=last_in;wptr<=wptr+1'b1;end\n      if(rd_en) begin dout<=data_mem[rptr];last_out<=last_mem[rptr];rptr<=rptr+1'b1;end\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Stores data metadata",
+        "pattern": "data_mem\\s*\\[\\s*wptr\\s*\\]\\s*<=\\s*din[\\s\\S]*last_mem\\s*\\[\\s*wptr\\s*\\]\\s*<=\\s*last_in",
+        "flags": "i"
+      },
+      {
+        "label": "Reads matching metadata",
+        "pattern": "dout\\s*<=\\s*data_mem\\s*\\[\\s*rptr\\s*\\][\\s\\S]*last_out\\s*<=\\s*last_mem\\s*\\[\\s*rptr\\s*\\]",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-circular-buffer",
+    "title": "Circular Sample Buffer",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "buffer",
+      "circular",
+      "memory"
+    ],
+    "description": "Continuously retain the most recent eight samples.",
+    "task": "Write every enabled sample at wr_ptr and wrap the pointer modulo eight.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module circular_buffer8(input logic clk,reset,enable,input logic [7:0] sample,output logic [2:0] wr_ptr);\n  logic [7:0] mem[0:7];\n  // TODO\nendmodule",
+    "solution": "module circular_buffer8(input logic clk,reset,enable,input logic [7:0] sample,output logic [2:0] wr_ptr);\n  logic [7:0] mem[0:7];\n  always_ff @(posedge clk) begin\n    if(reset) wr_ptr<=0;\n    else if(enable) begin\n      mem[wr_ptr]<=sample;\n      wr_ptr<=wr_ptr+1'b1;\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Writes current slot",
+        "pattern": "mem\\s*\\[\\s*wr_ptr\\s*\\]\\s*<=\\s*sample",
+        "flags": "i"
+      },
+      {
+        "label": "Advances pointer",
+        "pattern": "wr_ptr\\s*<=\\s*wr_ptr\\s*\\+\\s*1'b1",
+        "flags": "i"
+      }
+    ]
+  },
+  {
+    "id": "fifo-bypass-buffer",
+    "title": "Single-Entry Bypass Buffer",
+    "topic": "FIFOs & Buffers",
+    "category": "RTL Design",
+    "difficulty": "Hard",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "buffer",
+      "bypass",
+      "ready-valid"
+    ],
+    "description": "Pass data combinationally when empty, but capture it if downstream stalls.",
+    "task": "When storage is empty, out_valid/in_data may bypass directly. If out_ready is low, retain the item until consumed.",
+    "examples": [
+      "Implement the stated behavior for all legal input combinations."
+    ],
+    "constraints": [
+      "Use synthesizable SystemVerilog.",
+      "Do not use delays."
+    ],
+    "starterCode": "module bypass_buffer(input logic clk,reset,input logic in_valid,input logic [7:0] in_data,output logic in_ready,output logic out_valid,output logic [7:0] out_data,input logic out_ready);\n  // TODO\nendmodule",
+    "solution": "module bypass_buffer(input logic clk,reset,input logic in_valid,input logic [7:0] in_data,output logic in_ready,output logic out_valid,output logic [7:0] out_data,input logic out_ready);\n  logic stored_valid;\n  logic [7:0] stored_data;\n  assign out_valid = stored_valid ? 1'b1 : in_valid;\n  assign out_data  = stored_valid ? stored_data : in_data;\n  assign in_ready  = !stored_valid && out_ready;\n  always_ff @(posedge clk) begin\n    if(reset) stored_valid<=0;\n    else begin\n      if(!stored_valid && in_valid && !out_ready) begin stored_valid<=1;stored_data<=in_data;end\n      else if(stored_valid && out_ready) stored_valid<=0;\n    end\n  end\nendmodule",
+    "checks": [
+      {
+        "label": "Combinational bypass",
+        "pattern": "out_data\\s*=\\s*stored_valid\\s*\\?\\s*stored_data\\s*:\\s*in_data",
+        "flags": "i"
+      },
+      {
+        "label": "Captures on stall",
+        "pattern": "in_valid\\s*&&\\s*!out_ready[\\s\\S]*stored_valid\\s*<=\\s*1",
+        "flags": "i"
+      },
+      {
+        "label": "Releases on ready",
+        "pattern": "stored_valid\\s*&&\\s*out_ready[\\s\\S]*stored_valid\\s*<=\\s*0",
+        "flags": "i"
+      }
+    ]
   }
 ]
