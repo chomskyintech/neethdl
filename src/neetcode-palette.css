@@ -543,13 +543,15 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   gap:9px;
   border:1px solid #3a3a3d!important;
   border-radius:34px!important;
-  background:#242424!important;
+  background:rgba(36,36,36,.18)!important;
   color:#f3f3f3!important;
-  box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(10px)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.12)!important;
   transition:background .16s ease,border-color .16s ease,transform .16s ease;
 }
 .app>.nav.app-section-nav .brand:hover{
-  background:#2c2c2c!important;
+  background:rgba(44,44,44,.28)!important;
   border-color:#4a4a4d!important;
 }
 .app>.nav.app-section-nav .brand:active{transform:scale(.99)}
@@ -604,8 +606,10 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   gap:0!important;
   border:1px solid #3a3a3d;
   border-radius:34px;
-  background:#242424;
-  box-shadow:0 7px 20px rgba(0,0,0,.22);
+  background:rgba(36,36,36,.18);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 7px 20px rgba(0,0,0,.12);
 }
 .app>.nav.app-section-nav .desktop-nav button{
   flex:1;
@@ -627,7 +631,7 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   color:#fff!important;
 }
 .app>.nav.app-section-nav .desktop-nav button.active{
-  background:#3a3a3a!important;
+  background:rgba(58,58,58,.42)!important;
   color:#fff!important;
 }
 .app>.nav.app-section-nav .top-signin{
@@ -642,13 +646,15 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   justify-content:center;
   border:1px solid #3a3a3d!important;
   border-radius:50%!important;
-  background:#242424!important;
+  background:rgba(36,36,36,.18)!important;
   color:#f2f2f2!important;
-  box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(10px)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.12)!important;
   transition:background .16s ease,border-color .16s ease,transform .16s ease;
 }
 .app>.nav.app-section-nav .top-signin:hover{
-  background:#2c2c2c!important;
+  background:rgba(44,44,44,.28)!important;
   border-color:#4a4a4d!important;
   color:#fff!important;
 }
