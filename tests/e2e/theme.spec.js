@@ -5,7 +5,7 @@ const colours = {
   editor: 'rgb(38, 37, 39)',
   border: 'rgb(57, 57, 59)',
   teal: 'rgb(57, 126, 115)',
-  careerPanel: 'rgb(35, 35, 38)',
+  careerPanel: 'rgb(38, 37, 39)',
 }
 
 test.describe('NeetCode theme regression', () => {
