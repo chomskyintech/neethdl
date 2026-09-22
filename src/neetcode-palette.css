@@ -80,7 +80,17 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
 .app>.nav.app-section-nav .nav-inner::before,
 .app>.nav.app-section-nav .nav-inner::after{background:var(--nc-border)!important}
 .app>.nav .brand-icon,.app>.nav.app-section-nav .brand-icon{
-  background:var(--nc-teal)!important;color:var(--nc-bg)!important;box-shadow:none!important;
+  background:transparent!important;
+  color:var(--nc-bg)!important;
+  box-shadow:none!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+.app>.nav .brand-icon img,.app>.nav.app-section-nav .brand-icon img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 .app>.nav .brand-accent{color:var(--nc-teal)!important}
 .app>.nav .desktop-nav button,.app>.nav .profile,.app>.nav.app-section-nav .top-signin{color:var(--nc-muted)!important}
@@ -565,8 +575,8 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   width:30px!important;
   height:30px!important;
   flex:0 0 30px;
-  border-radius:12px!important;
-  background:var(--nc-teal)!important;
+  border-radius:50%!important;
+  background:transparent!important;
   color:#102b27!important;
 }
 .app>.nav.app-section-nav .brand-wordmark{
