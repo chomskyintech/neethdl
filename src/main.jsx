@@ -13,7 +13,10 @@ import tracks from './data/tracks'
 import {careerPaths,careerPathBySlug} from './data/careerPaths'
 import {addActivityDay,calculatePoints,calculateStreak} from './progressTracking'
 
-const ProblemIDE=lazy(()=>import('./ProblemIDE'))
+const ProblemIDE=lazy(()=>Promise.all([
+ import('./ProblemIDE'),
+ import('./loadIdeStyles').then(module=>module.loadIdeStyles()),
+]).then(([module])=>module))
 const LandingHub=lazy(()=>import('./LandingHub'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
