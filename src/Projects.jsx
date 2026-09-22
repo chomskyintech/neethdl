@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from 'react'
 import{ArrowRight,ChevronRight}from'lucide-react'
-import {guidedProjects} from './data/guidedProjects'
+import {guidedProjects} from './data/runtimeCatalog'
 
 const projectCategories=[
  {id:'all',label:'All'},
