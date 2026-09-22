@@ -27,6 +27,22 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveURL(/\/home\/$/)
  })
 
+ test('Problems landing defers full problem payloads until an editor opens',async({page})=>{
+  const detailRequests=[]
+  page.on('request',request=>{
+   if(request.url().includes('/problem-data/'))detailRequests.push(request.url())
+  })
+
+  await page.goto('/')
+  await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
+  expect(detailRequests).toHaveLength(0)
+
+  await page.locator('.problem-row').first().click()
+  await expect(page).toHaveURL(/\/app\/problems\/[^/]+\/$/)
+  await expect.poll(()=>detailRequests.length).toBeGreaterThan(0)
+  await expect(page.locator('.ide-page')).toBeVisible()
+ })
+
  test('legacy Progress URL redirects into Problems',async({page})=>{
   await page.goto('/app/progress/')
   await expect(page).toHaveURL(/\/app\/problems\/$/)
