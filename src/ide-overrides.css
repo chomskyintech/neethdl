@@ -366,7 +366,7 @@
   font-size:inherit;
   line-height:inherit;
 }
-.problem-task-list{
+.problem-task-copy>.problem-task-list{
   margin:14px 0 0;
   padding-left:18px;
   display:grid;
