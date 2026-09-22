@@ -1,4 +1,4 @@
-import problems from './data/activeProblems'
+import problems,{problemTopics} from './data/activeProblems'
 
 const topPaneBorderStyle=document.createElement('style')
 topPaneBorderStyle.textContent=`
@@ -32,13 +32,32 @@ let topbarButton = null
 let signInButton = null
 let searchInput = null
 let problemRows = []
+let selectedTopic = problemTopics[0] || 'Combinational Logic'
+let topicMenu = null
+let topicButton = null
+let tableBody = null
+let emptyState = null
 
-const preferredCategories = ['RTL Design','SystemVerilog','SVA','UVM','Protocols','FPGA','Accelerators']
-const categories = [
-  ...preferredCategories,
-  ...[...new Set(problems.map(problem=>problem.category))]
-    .filter(category=>category&&!preferredCategories.includes(category)),
-]
+function readStoredSet(key){
+  try{return new Set(JSON.parse(localStorage.getItem(key)||'[]'))}
+  catch{return new Set()}
+}
+
+function persistStoredSet(key,set){
+  localStorage.setItem(key,JSON.stringify([...set]))
+}
+
+function currentProblem(){
+  return problems.find(problem=>problem.id===currentProblemId())||null
+}
+
+function currentTopic(){
+  return currentProblem()?.topic || problemTopics[0] || 'Combinational Logic'
+}
+
+function topicProblems(topic){
+  return problems.filter(problem=>problem.topic===topic)
+}
 
 function currentProblemId(){
   const match = window.location.pathname.match(/^\/app\/problems\/([^/]+)\/?$/)
@@ -53,6 +72,10 @@ function closeDrawer(){
 }
 
 function openDrawer(){
+  selectedTopic=currentTopic()
+  if(searchInput)searchInput.value=''
+  renderDrawerProblems()
+  updateTopicControl()
   drawer?.classList.add('open')
   backdrop?.classList.add('open')
   topbarButton?.classList.add('active')
@@ -78,23 +101,88 @@ function difficultyClass(difficulty=''){
   return difficulty.toLowerCase().replace(/[^a-z]/g,'')
 }
 
-function createProblemRow(problem, solved){
-  const button=document.createElement('button')
-  button.type='button'
-  button.className='ide-drawer-problem'
-  button.dataset.problemId=problem.id
-  button.dataset.search=`${problem.title} ${problem.category} ${(problem.tags||[]).join(' ')}`.toLowerCase()
-  button.innerHTML=`<span class="ide-drawer-status ${solved?'solved':''}">${solved?'✓':''}</span><span class="ide-drawer-copy"><strong></strong><small></small></span><span class="ide-drawer-difficulty ${difficultyClass(problem.difficulty)}"></span>`
-  button.querySelector('strong').textContent=problem.title
-  button.querySelector('small').textContent=(problem.tags||[]).slice(0,2).join(' · ') || problem.category
-  button.querySelector('.ide-drawer-difficulty').textContent=problem.difficulty
-  button.addEventListener('click',()=>routeToProblem(problem.id))
-  problemRows.push(button)
-  return button
+function updateTopicControl(){
+  if(!drawer)return
+  const label=drawer.querySelector('.ide-drawer-topic-label')
+  const count=drawer.querySelector('.ide-drawer-topic-count')
+  if(label)label.textContent=selectedTopic
+  if(count)count.textContent=String(topicProblems(selectedTopic).length)
+  drawer.querySelectorAll('.ide-drawer-topic-item').forEach(button=>{
+    button.classList.toggle('active',button.dataset.topic===selectedTopic)
+  })
+}
+
+function createProblemRow(problem,solved,starred){
+  const row=document.createElement('div')
+  row.className='ide-drawer-problem'
+  row.dataset.problemId=problem.id
+  row.dataset.search=`${problem.title} ${problem.topic||''} ${problem.category||''} ${(problem.tags||[]).join(' ')}`.toLowerCase()
+  row.setAttribute('role','button')
+  row.setAttribute('tabindex','0')
+  row.innerHTML=`
+    <span class="ide-drawer-status ${solved?'solved':''}" aria-label="${solved?'Solved':'Not solved'}">${solved?'✓':''}</span>
+    <button type="button" class="ide-drawer-star ${starred?'starred':''}" aria-label="${starred?'Remove star':'Star problem'}">☆</button>
+    <span class="ide-drawer-copy"><strong></strong><small></small></span>
+    <span class="ide-drawer-difficulty ${difficultyClass(problem.difficulty)}"></span>
+    <button type="button" class="ide-drawer-solution" aria-label="Open solution for ${problem.title}">▤</button>`
+  row.querySelector('strong').textContent=problem.title
+  row.querySelector('small').textContent=(problem.tags||[]).slice(0,3).join(' · ') || problem.topic || problem.category
+  row.querySelector('.ide-drawer-difficulty').textContent=problem.difficulty
+
+  const star=row.querySelector('.ide-drawer-star')
+  star.addEventListener('click',event=>{
+    event.stopPropagation()
+    const starredSet=readStoredSet('hdlforge-starred')
+    if(starredSet.has(problem.id))starredSet.delete(problem.id)
+    else starredSet.add(problem.id)
+    persistStoredSet('hdlforge-starred',starredSet)
+    star.classList.toggle('starred',starredSet.has(problem.id))
+    star.setAttribute('aria-label',starredSet.has(problem.id)?'Remove star':'Star problem')
+  })
+
+  row.querySelector('.ide-drawer-solution').addEventListener('click',event=>{
+    event.stopPropagation()
+    routeToProblem(problem.id)
+    window.setTimeout(()=>{
+      const solution=[...document.querySelectorAll('.problem-tabs button')]
+        .find(button=>button.textContent.trim()==='Solution')
+      solution?.click()
+    },120)
+  })
+
+  const open=()=>routeToProblem(problem.id)
+  row.addEventListener('click',open)
+  row.addEventListener('keydown',event=>{
+    if(event.key==='Enter'||event.key===' '){
+      event.preventDefault()
+      open()
+    }
+  })
+  problemRows.push(row)
+  return row
+}
+
+function renderDrawerProblems(){
+  if(!tableBody)return
+  const solved=readStoredSet('hdlforge-solved')
+  const starred=readStoredSet('hdlforge-starred')
+  const q=(searchInput?.value||'').trim().toLowerCase()
+  const visible=topicProblems(selectedTopic).filter(problem=>{
+    if(!q)return true
+    const haystack=`${problem.title} ${problem.topic||''} ${problem.category||''} ${(problem.tags||[]).join(' ')}`.toLowerCase()
+    return haystack.includes(q)
+  })
+
+  problemRows=[]
+  tableBody.innerHTML=''
+  visible.forEach(problem=>tableBody.appendChild(
+    createProblemRow(problem,solved.has(problem.id),starred.has(problem.id))
+  ))
+  if(emptyState)emptyState.hidden=visible.length!==0
+  updateActive()
 }
 
 function createDrawer(){
-  const solved = new Set((()=>{try{return JSON.parse(localStorage.getItem('hdlforge-solved')||'[]')}catch{return []}})())
   drawer=document.createElement('aside')
   drawer.id='hdlforge-ide-drawer'
   drawer.className='ide-problem-drawer'
@@ -104,35 +192,75 @@ function createDrawer(){
       <div><span class="ide-drawer-eyebrow">Practice library</span><strong>Problems</strong></div>
       <button type="button" class="ide-drawer-close" aria-label="Close problem navigator">×</button>
     </div>
-    <label class="ide-drawer-search"><span>⌕</span><input type="search" placeholder="Search problems…" aria-label="Search problems"></label>
-    <div class="ide-drawer-groups"></div>`
-  const groups=drawer.querySelector('.ide-drawer-groups')
-  categories.forEach(category=>{
-    const categoryProblems=problems.filter(problem=>problem.category===category)
-    if(!categoryProblems.length)return
-    const section=document.createElement('section')
-    section.className='ide-drawer-group'
-    section.innerHTML=`<div class="ide-drawer-group-title"><span></span><em></em></div><div class="ide-drawer-list"></div>`
-    section.querySelector('.ide-drawer-group-title span').textContent=category
-    section.querySelector('.ide-drawer-group-title em').textContent=String(categoryProblems.length)
-    const list=section.querySelector('.ide-drawer-list')
-    categoryProblems.forEach(problem=>list.appendChild(createProblemRow(problem,solved.has(problem.id))))
-    groups.appendChild(section)
-  })
+    <div class="ide-drawer-controls">
+      <div class="ide-drawer-topic">
+        <button type="button" class="ide-drawer-topic-button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="ide-drawer-topic-icon">⌁</span>
+          <span class="ide-drawer-topic-label"></span>
+          <span class="ide-drawer-topic-count"></span>
+          <span class="ide-drawer-topic-chevron">⌄</span>
+        </button>
+        <div class="ide-drawer-topic-menu" role="listbox" aria-label="Problem topic"></div>
+      </div>
+      <label class="ide-drawer-search">
+        <span>⌕</span>
+        <input type="search" placeholder="Search problems" aria-label="Search problems">
+      </label>
+    </div>
+    <div class="ide-drawer-table">
+      <div class="ide-drawer-table-head" aria-hidden="true">
+        <span>Status</span><span>Star</span><span>Problem</span><span>Difficulty</span><span>Solution</span>
+      </div>
+      <div class="ide-drawer-table-scroll">
+        <div class="ide-drawer-table-body"></div>
+        <div class="ide-drawer-empty" hidden>No matching problems.</div>
+      </div>
+    </div>`
+
+  topicMenu=drawer.querySelector('.ide-drawer-topic-menu')
+  topicButton=drawer.querySelector('.ide-drawer-topic-button')
+  tableBody=drawer.querySelector('.ide-drawer-table-body')
+  emptyState=drawer.querySelector('.ide-drawer-empty')
   searchInput=drawer.querySelector('input')
-  searchInput.addEventListener('input',()=>{
-    const q=searchInput.value.trim().toLowerCase()
-    drawer.querySelectorAll('.ide-drawer-group').forEach(group=>{
-      let visible=0
-      group.querySelectorAll('.ide-drawer-problem').forEach(row=>{
-        const show=!q||row.dataset.search.includes(q)
-        row.hidden=!show
-        if(show)visible++
-      })
-      group.hidden=visible===0
+
+  problemTopics.forEach(topic=>{
+    const button=document.createElement('button')
+    button.type='button'
+    button.className='ide-drawer-topic-item'
+    button.dataset.topic=topic
+    button.setAttribute('role','option')
+    button.innerHTML='<span></span><small></small>'
+    button.querySelector('span').textContent=topic
+    button.querySelector('small').textContent=String(topicProblems(topic).length)
+    button.addEventListener('click',event=>{
+      event.stopPropagation()
+      selectedTopic=topic
+      searchInput.value=''
+      topicMenu.classList.remove('open')
+      topicButton.setAttribute('aria-expanded','false')
+      updateTopicControl()
+      renderDrawerProblems()
     })
+    topicMenu.appendChild(button)
   })
+
+  topicButton.addEventListener('click',event=>{
+    event.stopPropagation()
+    const open=topicMenu.classList.toggle('open')
+    topicButton.setAttribute('aria-expanded',String(open))
+  })
+  searchInput.addEventListener('input',renderDrawerProblems)
   drawer.querySelector('.ide-drawer-close').addEventListener('click',closeDrawer)
+  drawer.addEventListener('click',event=>{
+    if(!event.target.closest('.ide-drawer-topic')){
+      topicMenu.classList.remove('open')
+      topicButton.setAttribute('aria-expanded','false')
+    }
+  })
+
+  selectedTopic=currentTopic()
+  updateTopicControl()
+  renderDrawerProblems()
   return drawer
 }
 
@@ -142,7 +270,7 @@ function createTopbarButton(){
   button.id='hdlforge-ide-problems-button'
   button.className='ide-topbar-problems'
   button.setAttribute('aria-label','Open problems')
-  button.innerHTML=`<span class="ide-topbar-problems-icon">☰</span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count">${problems.length}</span>`
+  button.innerHTML=`<span class="ide-topbar-problems-icon" aria-hidden="true"><i></i><i></i><i></i></span><span class="ide-topbar-problems-label">Problems</span><span class="ide-topbar-problems-count">${problems.length}</span>`
   button.addEventListener('click',()=>drawer?.classList.contains('open')?closeDrawer():openDrawer())
   return button
 }
@@ -207,7 +335,7 @@ function unmount(){
   signInButton?.remove()
   drawer?.remove()
   backdrop?.remove()
-  topbarButton=signInButton=drawer=backdrop=searchInput=null
+  topbarButton=signInButton=drawer=backdrop=searchInput=topicMenu=topicButton=tableBody=emptyState=null
   problemRows=[]
   document.body.classList.remove('hdlforge-ide-active','ide-drawer-open')
 }
