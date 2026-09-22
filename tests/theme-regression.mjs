@@ -33,9 +33,11 @@ for (const [name,value] of Object.entries(expected)) {
 
 const paletteImport = main.indexOf("import './neetcode-palette.css'")
 const topicImport = main.indexOf("import './topic-browser.css'")
-const sideEffectImport = main.indexOf("import './lockedEditor.js'")
 assert.ok(paletteImport > topicImport, 'NeetCode palette must load after legacy global CSS')
-assert.ok(paletteImport < sideEffectImport, 'NeetCode palette must remain in stylesheet import block')
+const cssImports=[...main.matchAll(/import\s+['"]([^'"]+\.css)['"]/g)].map(match=>({path:match[1],index:match.index}))
+assert.ok(cssImports.length>0, 'main.jsx must keep its global stylesheet imports')
+assert.equal(cssImports.at(-1)?.path,'./neetcode-palette.css','NeetCode palette must remain the final global stylesheet override')
+assert.ok(!main.includes("import './lockedEditor.js'"),'editor-only lockedEditor code must not return to the initial app bundle')
 
 const banned = [
   '#615fff','#4f4bcf','#7772ff','#7b76ff','#8884ff','#8e8aff','#9b97ff',
