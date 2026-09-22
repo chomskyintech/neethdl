@@ -44,7 +44,6 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
 
   <main className="career-content">
    <header className="career-hero">
-    <span className="career-eyebrow">{career.eyebrow||'CAREER ROADMAP'}</span>
     <h1>{career.label}</h1>
     <p>{career.summary}</p>
     {career.skills?.length?<div className="career-skill-row">{career.skills.map(skill=><span key={skill}>{skill}</span>)}</div>:null}
@@ -52,7 +51,7 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
 
    <section className="career-section" aria-labelledby="career-problems-heading">
     <div className="career-section-head">
-     <div><span>Practice</span><h2 id="career-problems-heading">Problems for this path</h2><p>Work through the blocks that map directly to this role.</p></div>
+     <div><h2 id="career-problems-heading">Problems for this path</h2><p>Work through the blocks that map directly to this role.</p></div>
      <strong>{completed}/{careerProblems.length} solved</strong>
     </div>
 
@@ -76,7 +75,7 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
 
    <section className="career-section" aria-labelledby="career-projects-heading">
     <div className="career-section-head">
-     <div><span>Build</span><h2 id="career-projects-heading">Projects for this path</h2><p>Use these projects to turn the interview topics into portfolio-level hardware work.</p></div>
+     <div><h2 id="career-projects-heading">Projects for this path</h2><p>Use these projects to turn the interview topics into portfolio-level hardware work.</p></div>
      <strong>{careerProjects.length} projects</strong>
     </div>
     <div className="career-project-grid">{careerProjects.map(project=><article className="career-project-card" key={project.slug}>
@@ -97,10 +96,6 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
     <div className="career-progress-number"><strong>{progress}%</strong><small>{completed} of {careerProblems.length} problems</small></div>
     <div className="career-progress-track"><i style={{width:`${progress}%`}}/></div>
     <div className="career-progress-meta"><div><span>Problems</span><strong>{careerProblems.length}</strong></div><div><span>Projects</span><strong>{careerProjects.length}</strong></div></div>
-   </section>
-   <section className="career-next-card">
-    <span>How to use this roadmap</span>
-    <ol><li>Finish the core RTL problems.</li><li>Build at least one intermediate project.</li><li>Move to an advanced integration project.</li></ol>
    </section>
   </aside>
  </div>
