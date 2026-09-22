@@ -40,6 +40,7 @@ body.hdlforge-ide-active .ide-page .problem-heading{
   align-items:center!important;
   justify-content:flex-start!important;
   gap:6px!important;
+  padding-bottom:0!important;
 }
 body.hdlforge-ide-active .ide-page .problem-heading>div{
   display:contents!important;
