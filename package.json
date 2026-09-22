@@ -16,7 +16,8 @@
     "test:theme": "node tests/theme-regression.mjs",
     "test:navigation": "node tests/problem-navigation-regression.mjs",
     "test:solution-coverage": "node tests/reference-solution-coverage.mjs",
-    "runner:vhdl": "npm --prefix server install --no-audit --no-fund && node server/ghdl-proxy.js"
+    "runner:vhdl": "npm --prefix server install --no-audit --no-fund && node server/ghdl-proxy.js",
+    "test:testbench-coverage": "node tests/testbench-coverage.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
