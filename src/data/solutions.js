@@ -135,7 +135,7 @@ end
 
 endmodule`,
     SystemVerilog: `module priority_encoder (
-  input logic [7:0] inp,
+  input logic [7:0] in,
   output logic [2:0] index,
   output logic valid
 );
@@ -145,7 +145,7 @@ always_comb begin
   valid = 1'b0;
 
   for (int i = 7; i >= 0; i--) begin
-    if (inp[i] && !valid) begin
+    if (in[i] && !valid) begin
       index = i[2:0];
       valid = 1'b1;
     end
@@ -168,14 +168,17 @@ end entity priority_encoder;
 architecture rtl of priority_encoder is
 begin
   process(inp)
+    variable found : boolean;
   begin
     index <= (others => '0');
     valid <= '0';
+    found := false;
 
     for i in 7 downto 0 loop
-      if inp(i) = '1' and valid = '0' then
+      if inp(i) = '1' and not found then
         index <= std_logic_vector(to_unsigned(i, 3));
         valid <= '1';
+        found := true;
       end if;
     end loop;
   end process;
