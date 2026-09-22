@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { createRequire } from 'node:module'
+import standaloneBenches from './standalone-benches.js'
 
 const require=createRequire(import.meta.url)
 const {beautify,BeautifierSettings,NewLineSettings,signAlignSettings}=require('./vendor/VHDLFormatter.cjs')
@@ -34,7 +35,7 @@ const vhdlBenches={
 'rtl-lfsr':`library ieee; use ieee.std_logic_1164.all; entity tb is end; architecture sim of tb is signal clk,reset,enable: std_logic:='0';signal state: std_logic_vector(7 downto 0);begin dut: entity work.{{DUT}}(rtl) port map(clk=>clk,reset=>reset,enable=>enable,state=>state);clk<=not clk after 1 ns;process begin reset<='1';wait until rising_edge(clk);wait for 0.1 ns;assert state=x"01" report "seed" severity failure;reset<='0';enable<='1';for i in 1 to 4 loop wait until rising_edge(clk);end loop;wait for 0.1 ns;assert state=x"11" report "sequence" severity failure;enable<='0';wait until rising_edge(clk);wait for 0.1 ns;assert state=x"11" report "enable hold" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`,
 'rtl-clock-divider':`library ieee; use ieee.std_logic_1164.all; entity tb is end; architecture sim of tb is signal clk,reset,enable,clk_out: std_logic:='0';begin dut: entity work.{{DUT}}(rtl) port map(clk=>clk,reset=>reset,enable=>enable,clk_out=>clk_out);clk<=not clk after 1 ns;process begin reset<='1';enable<='0';wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='0' report "reset" severity failure;reset<='0';enable<='1';wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='0' report "edge 1" severity failure;wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='1' report "edge 2 toggle" severity failure;wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='1' report "edge 3 hold" severity failure;wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='0' report "edge 4 toggle" severity failure;enable<='0';wait until rising_edge(clk);wait for 0.1 ns;assert clk_out='0' report "disabled hold" severity failure;report "HDLFORGE_PASS" severity note;wait;end process;end;`
 }
-const allowed=new Set(Object.keys(vhdlBenches))
+const allowed=new Set([...Object.keys(vhdlBenches), ...Object.keys(standaloneBenches)])
 async function runVhdl(problemId,source){
   let dir
   try{
@@ -48,6 +49,60 @@ async function runVhdl(problemId,source){
     let waveform='';try{waveform=await readFile(join(dir,'wave.vcd'),'utf8')}catch{}
     return {passed:output.includes('HDLFORGE_PASS'),output,waveform}
   }catch(e){return {passed:false,output:`${e.stdout||''}${e.stderr||''}${e.message||''}`,waveform:''}}finally{if(dir)await rm(dir,{recursive:true,force:true}).catch(()=>{})}
+}
+
+function stripInstanceParameters(bench, entityName){
+  const needle = new RegExp(`\\b${entityName}\\s*#\\s*\\(`, 'i')
+  const match = needle.exec(bench)
+  if(!match) return bench
+
+  const open = bench.indexOf('(', match.index)
+  let depth = 0
+  let close = -1
+  for(let i=open;i<bench.length;i+=1){
+    if(bench[i]==='(') depth+=1
+    else if(bench[i]===')'){
+      depth-=1
+      if(depth===0){close=i;break}
+    }
+  }
+  if(close<0) return bench
+  return bench.slice(0, match.index) + entityName + bench.slice(close+1)
+}
+
+async function runSynthesizedVhdl(problemId,source){
+  let dir
+  try{
+    dir=await mkdtemp(join(tmpdir(),'hdlforge-vhdl-synth-'))
+    const entity=source.match(/\bentity\s+([A-Za-z_]\w*)\s+is\b/i)?.[1]
+    if(!entity) return {passed:false,output:'VHDL compilation failed: no entity declaration was found.',waveform:''}
+
+    const rawBench=standaloneBenches[problemId]
+    if(!rawBench) return {passed:false,output:'No standalone behavioral testbench is registered for this problem.',waveform:''}
+
+    await writeFile(join(dir,'design.vhd'),source+'\n','utf8')
+    await execFileAsync('ghdl',['-a','--std=08','design.vhd'],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:1024*1024})
+    const synth=await execFileAsync('ghdl',['--synth','--std=08','--out=verilog',entity],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:1024*1024})
+    await writeFile(join(dir,'design.v'),synth.stdout,'utf8')
+
+    const bench=stripInstanceParameters(rawBench,entity)
+      .replace('module tb;','module tb; initial begin $dumpfile("wave.vcd"); $dumpvars(0,tb); end')
+    await writeFile(join(dir,'tb.sv'),`\`timescale 1ns/1ps\n${bench}\n`,'utf8')
+
+    const compile=await execFileAsync('verilator',[
+      '--binary','--sv','--timing','--trace','--top-module','tb',
+      'design.v','tb.sv'
+    ],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:1024*1024})
+    const run=await execFileAsync(join(dir,'obj_dir','Vtb'),[],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:1024*1024})
+    const output=`${compile.stdout}${compile.stderr}${run.stdout}${run.stderr}`
+    let waveform=''
+    try{waveform=await readFile(join(dir,'wave.vcd'),'utf8')}catch{}
+    return {passed:output.includes('HDLFORGE_PASS'),output,waveform}
+  }catch(e){
+    return {passed:false,output:`${e.stdout||''}${e.stderr||''}${e.message||''}`,waveform:''}
+  }finally{
+    if(dir) await rm(dir,{recursive:true,force:true}).catch(()=>{})
+  }
 }
 
 function vhdlFormatterSettings(){
@@ -157,7 +212,7 @@ const proxy=http.createServer(async(req,res)=>{
     }
   }
   if(req.method==='POST'&&(req.url==='/run'||req.url==='/interview/run')){
-    try{const data=await body(req);if(data.language==='VHDL'){if(!allowed.has(data.problemId))return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'VHDL simulation is not available for this problem yet.'}));if(typeof data.source!=='string'||data.source.length<20)return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is required.'}));if(data.source.length>MAX_SOURCE)return res.writeHead(413,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is too large.'}));const result=await runVhdl(data.problemId,data.source);return res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({ok:true,...result}))}}
+    try{const data=await body(req);if(data.language==='VHDL'){if(!allowed.has(data.problemId))return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'VHDL simulation is not available for this problem yet.'}));if(typeof data.source!=='string'||data.source.length<20)return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is required.'}));if(data.source.length>MAX_SOURCE)return res.writeHead(413,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:'Source code is too large.'}));const result=vhdlBenches[data.problemId]?await runVhdl(data.problemId,data.source):await runSynthesizedVhdl(data.problemId,data.source);return res.writeHead(200,{'Content-Type':'application/json'}).end(JSON.stringify({ok:true,...result}))}}
     catch(e){return res.writeHead(400,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:e.message||'Invalid request.'}))}
   }
   const upstream=http.request({hostname:'127.0.0.1',port:BACKEND_PORT,path:req.url,method:req.method,headers:{...req.headers,host:`127.0.0.1:${BACKEND_PORT}`}},r=>{res.writeHead(r.statusCode||502,r.headers);r.pipe(res)});upstream.on('error',e=>{res.writeHead(502,{'Content-Type':'application/json'}).end(JSON.stringify({ok:false,error:e.message}))});req.pipe(upstream)
