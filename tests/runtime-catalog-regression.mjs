@@ -51,6 +51,20 @@ for(const problem of problemCatalog){
   }
 }
 
+const detailDir=path.join(root,'public/problem-data')
+const detailFiles=fs.readdirSync(detailDir).filter(file=>file.endsWith('.json'))
+if(detailFiles.length!==fullProblems.length){
+  console.error(`Expected ${fullProblems.length} problem detail payloads, found ${detailFiles.length}.`)
+  process.exit(1)
+}
+for(const problem of fullProblems){
+  const file=path.join(detailDir,`${encodeURIComponent(problem.id)}.json`)
+  if(!fs.existsSync(file)){
+    console.error(`Missing on-demand problem payload: ${problem.id}`)
+    process.exit(1)
+  }
+}
+
 const problemBytes=Buffer.byteLength(JSON.stringify(problemCatalog))
 const projectBytes=Buffer.byteLength(JSON.stringify(projectCatalog))
 if(problemBytes>140000){
@@ -58,4 +72,4 @@ if(problemBytes>140000){
   process.exit(1)
 }
 
-console.log(`Runtime catalog regression passed: ${problemCatalog.length} problems (${problemBytes} bytes) and ${projectCatalog.length} projects (${projectBytes} bytes), with full editor payloads excluded.`)
+console.log(`Runtime catalog regression passed: ${problemCatalog.length} lightweight problems (${problemBytes} bytes), ${projectCatalog.length} projects (${projectBytes} bytes), and ${detailFiles.length} on-demand detail payloads.`)
