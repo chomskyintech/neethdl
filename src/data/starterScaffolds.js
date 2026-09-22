@@ -1,3 +1,5 @@
+import solutions from './solutions.js'
+
 export const legacyStarterCodeById = {
   "rtl-counter": "module counter #(parameter WIDTH=8) (input logic clk, reset, output logic [WIDTH-1:0] count);\n  // Your RTL here\nendmodule",
   "rtl-priority": "module priority_encoder(input logic [7:0] in, output logic [2:0] index, output logic valid);\n  // Your RTL here\nendmodule",
@@ -57,10 +59,33 @@ function verilogFromSystemVerilog(source = '') {
     .replace(/\binput reg\b/g, 'input')
 }
 
+function vhdlStarterFromReference(problem) {
+  const source = solutions[problem.id]?.VHDL
+  if (typeof source !== 'string' || !source.trim()) return null
+
+  const entityMatch = source.match(/\bentity\s+([A-Za-z_]\w*)\s+is\b/i)
+  if (!entityMatch) return null
+
+  const entityName = entityMatch[1]
+  const tail = source.slice(entityMatch.index)
+  const endMatch = tail.match(/\bend\s+entity(?:\s+[A-Za-z_]\w*)?\s*;/i)
+  if (!endMatch) return null
+
+  const entityEnd = entityMatch.index + endMatch.index + endMatch[0].length
+  const declaration = source.slice(0, entityEnd).trimEnd()
+
+  return `${declaration}
+
+architecture rtl of ${entityName} is
+begin
+  -- Your RTL here
+end architecture rtl;`
+}
+
 export function languageStarter(problem, language) {
   if (language === 'SystemVerilog' || language === 'C') return problem.starterCode || ''
   if (language === 'Verilog') return verilogFromSystemVerilog(problem.starterCode || '')
-  return vhdlStarters[problem.id] || `library ieee;
+  return vhdlStarters[problem.id] || vhdlStarterFromReference(problem) || `library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
