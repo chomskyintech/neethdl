@@ -19,7 +19,8 @@
     "runner:vhdl": "npm --prefix server install --no-audit --no-fund && node server/ghdl-proxy.js",
     "test:testbench-coverage": "node tests/testbench-coverage.mjs",
     "test:language-parity": "node tests/language-parity-regression.mjs",
-    "generate:runtime-catalogs": "node scripts/generate-runtime-catalogs.mjs"
+    "generate:runtime-catalogs": "node scripts/generate-runtime-catalogs.mjs",
+    "test:runtime-catalog": "node tests/runtime-catalog-regression.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
