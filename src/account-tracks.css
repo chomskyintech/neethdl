@@ -450,9 +450,24 @@
 .guided-roadmap,
 .problems-side-rail{
   position:sticky;
-  top:122px;
+  top:92px;
   align-self:start;
   min-width:0;
+  margin-top:-30px;
+}
+.guided-roadmap{
+  max-height:calc(100vh - 150px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:4px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--nc-border,#39393b) transparent;
+}
+.guided-roadmap::-webkit-scrollbar{width:6px}
+.guided-roadmap::-webkit-scrollbar-track{background:transparent}
+.guided-roadmap::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:var(--nc-border,#39393b);
 }
 .guided-roadmap-card,
 .problem-progress-panel,
@@ -748,6 +763,10 @@
   .guided-roadmap{
     position:static;
     grid-column:1/-1;
+    max-height:none;
+    overflow:visible;
+    padding-right:0;
+    margin-top:0;
   }
   .guided-roadmap-list{
     grid-template-columns:repeat(5,minmax(0,1fr));
@@ -766,6 +785,7 @@
   }
   .problems-side-rail{
     top:104px;
+    margin-top:0;
   }
 }
 @media(max-width:900px){
