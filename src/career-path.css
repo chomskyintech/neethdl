@@ -26,18 +26,7 @@
   align-self:start;
   min-width:0;
   margin-top:-30px;
-  max-height:calc(100vh - 150px);
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  padding-right:4px;
-  scrollbar-width:thin;
-  scrollbar-color:var(--career-border) transparent;
-}
-.career-roadmap::-webkit-scrollbar{width:6px}
-.career-roadmap::-webkit-scrollbar-track{background:transparent}
-.career-roadmap::-webkit-scrollbar-thumb{
-  border-radius:999px;
-  background:var(--career-border);
+  overflow:visible;
 }
 .career-side-rail{
   position:sticky;
@@ -50,13 +39,31 @@
 
 /* Match the Problems page guided-roadmap surface and state colours. */
 .career-workspace .guided-roadmap-card{
+  max-height:calc(100vh - 108px);
   padding:18px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
   border:1px solid var(--career-border)!important;
   border-radius:17px;
   background:var(--career-panel)!important;
   box-shadow:none!important;
   backdrop-filter:none;
   -webkit-backdrop-filter:none;
+}
+.career-workspace .guided-roadmap-list{
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:4px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--career-border) transparent;
+}
+.career-workspace .guided-roadmap-list::-webkit-scrollbar{width:6px}
+.career-workspace .guided-roadmap-list::-webkit-scrollbar-track{background:transparent}
+.career-workspace .guided-roadmap-list::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:var(--career-border);
 }
 .career-workspace .guided-roadmap-card h2{
   margin:0 0 8px;
@@ -438,10 +445,15 @@
   .career-roadmap{
     position:static;
     grid-column:1/-1;
+    margin-top:0;
+  }
+  .career-workspace .guided-roadmap-card{
     max-height:none;
     overflow:visible;
+  }
+  .career-workspace .guided-roadmap-list{
+    overflow:visible;
     padding-right:0;
-    margin-top:0;
   }
   .career-side-rail{top:104px;margin-top:0}
 }
