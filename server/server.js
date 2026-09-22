@@ -18,7 +18,7 @@ const AI_RATE_LIMIT = Number(process.env.AI_RATE_LIMIT || 20)
 const aiRequests = new Map()
 const dangerous = /\$(system|popen|fopen|fwrite|fread|fclose|fseek|rewind)\b|`include\b|`system\b/i
 
-app.use(express.json({ limit: '32kb' }))
+app.use(express.json({ limit: '64kb' }))
 app.use((req,res,next)=>{ res.setHeader('Access-Control-Allow-Origin',process.env.ALLOWED_ORIGIN||'*'); res.setHeader('Access-Control-Allow-Headers','Content-Type'); res.setHeader('Access-Control-Allow-Methods','POST, OPTIONS'); if(req.method==='OPTIONS') return res.sendStatus(204); next() })
 
 const benches = standaloneBenches
