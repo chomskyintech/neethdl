@@ -1,9 +1,23 @@
 .career-workspace{
+  --career-bg:#1c1c1e;
+  --career-panel:#232326;
+  --career-surface:#29292c;
+  --career-surface-2:#303034;
+  --career-border:#3a3a3f;
+  --career-border-soft:#303034;
+  --career-text:#f4f4f5;
+  --career-text-soft:#d5d5d9;
+  --career-muted:#9a9aa0;
+  --career-dim:#7f7f85;
+  --career-accent:#36a487;
+  --career-accent-strong:#43b595;
+
   width:100%;
   display:grid;
   grid-template-columns:245px minmax(0,1fr) 300px;
   gap:24px;
   align-items:start;
+  color:var(--career-text-soft);
 }
 .career-roadmap,.career-side-rail{
   position:sticky;
@@ -11,24 +25,59 @@
   align-self:start;
 }
 .career-content{min-width:0}
+
+/* Career pages own their roadmap palette. Shared Problems/Projects roadmap styles
+   remain in account-tracks.css, but cannot recolor this workspace. */
+.career-workspace .guided-roadmap-card{
+  padding:18px;
+  border:1px solid var(--career-border)!important;
+  border-radius:17px;
+  background:var(--career-panel)!important;
+  box-shadow:none!important;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+.career-workspace .guided-roadmap-card h2{
+  margin:0 0 8px;
+  padding:0 0 12px;
+  border-bottom:1px solid var(--career-border-soft)!important;
+  color:var(--career-text)!important;
+}
+.career-workspace .guided-roadmap-item{
+  color:var(--career-text-soft)!important;
+  background:transparent!important;
+}
+.career-workspace .guided-roadmap-item:hover{
+  color:var(--career-text)!important;
+}
+.career-workspace .guided-roadmap-item.active{
+  color:var(--career-accent)!important;
+  background:transparent!important;
+  border-color:var(--career-border-soft)!important;
+  box-shadow:none!important;
+}
+.career-workspace .guided-roadmap-item svg{
+  color:var(--career-dim)!important;
+}
+
 .career-hero{
   margin:18px 0 34px;
   padding:30px;
-  border:1px solid #303034;
+  border:1px solid var(--career-border);
   border-radius:18px;
-  background:#1e1e21;
+  background:var(--career-panel);
 }
 .career-eyebrow{
   display:inline-block;
   margin-bottom:13px;
-  color:#a6a6ac;
+  color:var(--career-accent);
   font-size:10px;
   font-weight:800;
   letter-spacing:.09em;
 }
 .career-hero h1{
   margin:0;
-  color:#f5f5f6;
+  color:var(--career-text);
   font-size:46px;
   line-height:1.02;
   letter-spacing:-.035em;
@@ -36,7 +85,7 @@
 .career-hero p{
   max-width:850px;
   margin:18px 0 0;
-  color:#b8b8bd;
+  color:var(--career-muted);
   font-size:15px;
   line-height:1.75;
 }
@@ -48,16 +97,14 @@
 }
 .career-skill-row span{
   padding:6px 9px;
-  border:1px solid #414146;
+  border:1px solid var(--career-border);
   border-radius:999px;
-  background:#27272a;
-  color:#d5d5d9;
+  background:var(--career-surface);
+  color:var(--career-text-soft);
   font-size:10px;
   font-weight:700;
 }
-.career-section{
-  margin:0 0 42px;
-}
+.career-section{margin:0 0 42px}
 .career-section-head{
   display:flex;
   align-items:flex-end;
@@ -68,7 +115,7 @@
 .career-section-head>div>span{
   display:block;
   margin-bottom:6px;
-  color:#9a9aa0;
+  color:var(--career-accent);
   font-size:9px;
   font-weight:800;
   letter-spacing:.1em;
@@ -76,17 +123,17 @@
 }
 .career-section-head h2{
   margin:0;
-  color:#f2f2f4;
+  color:var(--career-text);
   font-size:25px;
   letter-spacing:-.025em;
 }
 .career-section-head p{
   margin:7px 0 0;
-  color:#94949a;
+  color:var(--career-muted);
   font-size:12px;
 }
 .career-section-head>strong{
-  color:#c8c8cc;
+  color:var(--career-accent);
   font-size:11px;
 }
 .career-milestones{
@@ -95,9 +142,9 @@
 }
 .career-milestone{
   overflow:hidden;
-  border:1px solid #303034;
+  border:1px solid var(--career-border);
   border-radius:14px;
-  background:#202023;
+  background:var(--career-panel);
 }
 .career-milestone-head{
   min-height:52px;
@@ -106,20 +153,18 @@
   justify-content:space-between;
   gap:16px;
   padding:0 16px;
-  border-bottom:1px solid #303034;
+  border-bottom:1px solid var(--career-border-soft);
 }
 .career-milestone-head h3{
   margin:0;
-  color:#e9e9eb;
+  color:var(--career-text);
   font-size:14px;
 }
 .career-milestone-head span{
-  color:#a0a0a6;
+  color:var(--career-accent);
   font:500 10px ui-monospace,SFMono-Regular,Consolas,monospace;
 }
-.career-problem-list{
-  display:grid;
-}
+.career-problem-list{display:grid}
 .career-problem{
   width:100%;
   min-height:60px;
@@ -129,24 +174,26 @@
   gap:10px;
   padding:10px 14px;
   border:0;
-  border-bottom:1px solid #2d2d31;
-  background:#1b1b1e;
-  color:#d7d7db;
+  border-bottom:1px solid var(--career-border-soft);
+  background:var(--career-bg);
+  color:var(--career-text-soft);
   cursor:pointer;
   text-align:left;
 }
 .career-problem:last-child{border-bottom:0}
-.career-problem:hover{background:#232326}
-.career-problem>svg{color:#7f7f85}
+.career-problem:hover{background:var(--career-surface)}
+.career-problem>svg{color:var(--career-dim)}
 .career-problem-check{
-  width:17px;height:17px;
-  display:grid;place-items:center;
-  border:1px solid #4a4a50;
+  width:17px;
+  height:17px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--career-border);
   border-radius:50%;
 }
 .career-problem-check.done{
-  border-color:#36a487;
-  color:#36a487;
+  border-color:var(--career-accent);
+  color:var(--career-accent);
 }
 .career-problem-copy{
   min-width:0;
@@ -157,11 +204,11 @@
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  color:#e5e5e8;
+  color:var(--career-text);
   font-size:12px;
 }
 .career-problem-copy small{
-  color:#8f8f95;
+  color:var(--career-muted);
   font-size:10px;
 }
 .career-project-grid{
@@ -174,29 +221,30 @@
   padding:20px;
   display:flex;
   flex-direction:column;
-  border:1px solid #303034;
+  border:1px solid var(--career-border);
   border-radius:14px;
-  background:#202023;
+  background:var(--career-panel);
 }
 .career-project-level{
   width:max-content;
   padding:4px 7px;
-  border:1px solid #45454a;
+  border:1px solid var(--career-border);
   border-radius:999px;
-  color:#c4c4c9;
+  background:var(--career-surface);
+  color:var(--career-text-soft);
   font-size:9px;
   font-weight:800;
   text-transform:uppercase;
 }
 .career-project-card h3{
   margin:14px 0 9px;
-  color:#f0f0f2;
+  color:var(--career-text);
   font-size:17px;
   line-height:1.35;
 }
 .career-project-card p{
   margin:0;
-  color:#9e9ea4;
+  color:var(--career-muted);
   font-size:11px;
   line-height:1.65;
 }
@@ -208,9 +256,10 @@
 }
 .career-project-tags span{
   padding:4px 7px;
-  border:1px solid #3d3d42;
+  border:1px solid var(--career-border);
   border-radius:7px;
-  color:#b8b8bd;
+  background:var(--career-surface);
+  color:var(--career-text-soft);
   font-size:9px;
 }
 .career-project-card a,.career-project-card button{
@@ -222,37 +271,39 @@
   padding:18px 0 0;
   border:0;
   background:transparent;
-  color:#f0f0f2;
+  color:var(--career-accent);
   cursor:pointer;
   font-size:10px;
   font-weight:800;
   text-decoration:none;
 }
+.career-project-card a:hover,.career-project-card button:hover{
+  color:var(--career-accent-strong);
+  background:transparent;
+}
 .career-progress-card,.career-next-card{
   padding:20px;
-  border:1px solid #303034;
+  border:1px solid var(--career-border);
   border-radius:16px;
-  background:#202023;
+  background:var(--career-panel);
 }
 .career-progress-card>span,.career-next-card>span{
-  color:#a0a0a6;
+  color:var(--career-muted);
   font-size:9px;
   font-weight:800;
   letter-spacing:.08em;
   text-transform:uppercase;
 }
-.career-progress-number{
-  margin-top:18px;
-}
+.career-progress-number{margin-top:18px}
 .career-progress-number strong{
   display:block;
-  color:#f4f4f5;
+  color:var(--career-accent);
   font-size:34px;
 }
 .career-progress-number small{
   display:block;
   margin-top:5px;
-  color:#99999f;
+  color:var(--career-muted);
   font-size:10px;
 }
 .career-progress-track{
@@ -260,11 +311,12 @@
   margin-top:16px;
   overflow:hidden;
   border-radius:999px;
-  background:#3b3b40;
+  background:var(--career-surface);
 }
 .career-progress-track i{
-  display:block;height:100%;
-  background:#36a487;
+  display:block;
+  height:100%;
+  background:var(--career-accent);
 }
 .career-progress-meta{
   display:grid;
@@ -274,31 +326,30 @@
 }
 .career-progress-meta div{
   padding:10px;
-  border:1px solid #35353a;
+  border:1px solid var(--career-border);
   border-radius:9px;
-  background:#252528;
+  background:var(--career-surface);
 }
 .career-progress-meta span{
   display:block;
-  color:#8f8f95;
+  color:var(--career-muted);
   font-size:9px;
 }
 .career-progress-meta strong{
   display:block;
   margin-top:4px;
-  color:#ececee;
+  color:var(--career-text);
   font-size:15px;
 }
-.career-next-card{
-  margin-top:14px;
-}
+.career-next-card{margin-top:14px}
 .career-next-card ol{
   margin:14px 0 0;
   padding-left:18px;
-  color:#b4b4b9;
+  color:var(--career-text-soft);
   font-size:11px;
   line-height:1.7;
 }
+
 @media(max-width:1200px){
   .career-workspace{grid-template-columns:210px minmax(0,1fr)}
   .career-side-rail{position:static;grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px}
