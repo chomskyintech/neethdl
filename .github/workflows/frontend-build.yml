@@ -39,5 +39,8 @@ jobs:
       - name: Validate testbench coverage
         run: npm run test:testbench-coverage
 
+      - name: Validate lightweight runtime catalogs
+        run: npm run test:runtime-catalog
+
       - name: Build production bundle
         run: npm run build
