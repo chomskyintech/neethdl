@@ -496,3 +496,198 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   background:var(--nc-editor)!important;
   border-color:var(--nc-border)!important;
 }
+
+
+/* Three-part ChatGPT-style app header */
+.app>.nav.app-section-nav{
+  width:100%!important;
+  max-width:none!important;
+  height:80px!important;
+  margin:0!important;
+  padding:14px 32px 0!important;
+  top:0!important;
+  left:auto!important;
+  transform:none!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:none!important;
+}
+.app>.nav.app-section-nav .nav-inner{
+  width:100%;
+  max-width:1680px;
+  height:66px;
+  margin:0 auto;
+  padding:0;
+  display:grid!important;
+  grid-template-columns:1fr auto 1fr!important;
+  align-items:center;
+  gap:24px;
+  position:relative;
+}
+.app>.nav.app-section-nav .nav-inner::before,
+.app>.nav.app-section-nav .nav-inner::after{
+  display:none!important;
+  content:none!important;
+}
+.app>.nav.app-section-nav .brand{
+  grid-column:1;
+  justify-self:start;
+  min-width:0;
+  height:66px;
+  padding:0 20px 0 14px;
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  border:1px solid #3a3a3d!important;
+  border-radius:34px!important;
+  background:#242424!important;
+  color:#f3f3f3!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.app>.nav.app-section-nav .brand:hover{
+  background:#2c2c2c!important;
+  border-color:#4a4a4d!important;
+}
+.app>.nav.app-section-nav .brand:active{transform:scale(.99)}
+.app>.nav.app-section-nav .brand-menu{
+  width:28px;
+  height:22px;
+  display:flex;
+  flex:0 0 auto;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  color:#f3f3f3;
+}
+.app>.nav.app-section-nav .brand-menu>span{
+  display:block;
+  height:4px;
+  border-radius:999px;
+  background:currentColor;
+}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:28px}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:19px}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:24px}
+.app>.nav.app-section-nav .brand-icon{
+  width:40px!important;
+  height:40px!important;
+  flex:0 0 40px;
+  border-radius:12px!important;
+  background:var(--nc-teal)!important;
+  color:#102b27!important;
+}
+.app>.nav.app-section-nav .brand-wordmark{
+  display:inline;
+  color:#f3f3f3!important;
+  font-size:22px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:-.03em;
+  white-space:nowrap;
+}
+.app>.nav.app-section-nav .brand-wordmark .brand-accent{
+  color:var(--nc-teal)!important;
+}
+.app>.nav.app-section-nav .desktop-nav{
+  grid-column:2;
+  justify-self:center;
+  margin:0!important;
+  min-width:340px;
+  height:66px;
+  padding:5px;
+  display:flex!important;
+  align-items:center;
+  gap:0!important;
+  border:1px solid #3a3a3d;
+  border-radius:34px;
+  background:#242424;
+  box-shadow:0 7px 20px rgba(0,0,0,.22);
+}
+.app>.nav.app-section-nav .desktop-nav button{
+  flex:1;
+  min-width:165px;
+  height:54px;
+  padding:0 24px!important;
+  border:0!important;
+  border-radius:28px!important;
+  background:transparent!important;
+  color:#d9d9d9!important;
+  font-size:20px!important;
+  font-weight:600!important;
+  line-height:1;
+  box-shadow:none!important;
+  transition:background .16s ease,color .16s ease!important;
+}
+.app>.nav.app-section-nav .desktop-nav button:hover{
+  background:rgba(255,255,255,.04)!important;
+  color:#fff!important;
+}
+.app>.nav.app-section-nav .desktop-nav button.active{
+  background:#3a3a3a!important;
+  color:#fff!important;
+}
+.app>.nav.app-section-nav .top-signin{
+  grid-column:3;
+  justify-self:end;
+  width:66px!important;
+  min-width:66px!important;
+  height:66px!important;
+  padding:0!important;
+  display:inline-flex!important;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #3a3a3d!important;
+  border-radius:50%!important;
+  background:#242424!important;
+  color:#f2f2f2!important;
+  box-shadow:0 7px 20px rgba(0,0,0,.22)!important;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.app>.nav.app-section-nav .top-signin:hover{
+  background:#2c2c2c!important;
+  border-color:#4a4a4d!important;
+  color:#fff!important;
+}
+.app>.nav.app-section-nav .top-signin:active{transform:scale(.97)}
+.app>.nav.app-section-nav .signin-icon{
+  width:28px;
+  height:28px;
+  display:block;
+  color:currentColor;
+}
+.app>.nav.app-section-nav .nav-spacer{display:none!important}
+.app>.nav.app-section-nav + .layout{
+  max-width:1740px!important;
+  width:100%;
+  padding-top:0!important;
+}
+
+@media(max-width:900px){
+  .app>.nav.app-section-nav{padding:12px 16px 0!important;height:74px!important}
+  .app>.nav.app-section-nav .nav-inner{height:62px;gap:12px}
+  .app>.nav.app-section-nav .brand{height:62px;padding:0 14px;gap:10px}
+  .app>.nav.app-section-nav .brand-wordmark{display:none}
+  .app>.nav.app-section-nav .brand-icon{width:36px!important;height:36px!important;flex-basis:36px}
+  .app>.nav.app-section-nav .desktop-nav{height:62px;min-width:270px}
+  .app>.nav.app-section-nav .desktop-nav button{height:50px;min-width:130px;font-size:16px!important;padding:0 16px!important}
+  .app>.nav.app-section-nav .top-signin{width:62px!important;min-width:62px!important;height:62px!important}
+}
+@media(max-width:600px){
+  .app>.nav.app-section-nav{padding:10px 10px 0!important;height:66px!important}
+  .app>.nav.app-section-nav .nav-inner{height:56px;gap:8px}
+  .app>.nav.app-section-nav .brand{height:56px;padding:0 11px;gap:8px}
+  .app>.nav.app-section-nav .brand-menu{width:24px;height:18px}
+  .app>.nav.app-section-nav .brand-menu>span{height:3px}
+  .app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:24px}
+  .app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:17px}
+  .app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:21px}
+  .app>.nav.app-section-nav .brand-icon{display:none!important}
+  .app>.nav.app-section-nav .desktop-nav{height:56px;min-width:0;width:min(58vw,250px);padding:4px}
+  .app>.nav.app-section-nav .desktop-nav button{height:46px;min-width:0;padding:0 10px!important;font-size:14px!important}
+  .app>.nav.app-section-nav .top-signin{width:56px!important;min-width:56px!important;height:56px!important}
+  .app>.nav.app-section-nav .signin-icon{width:25px;height:25px}
+}
