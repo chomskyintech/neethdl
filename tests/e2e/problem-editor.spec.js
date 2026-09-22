@@ -123,21 +123,36 @@ test.describe('HDLForge Monaco problem editor', () => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
 
     const viewer = page.locator('.reference-monaco')
-    await expect(viewer).toBeVisible()
-    const beforeColumn = Number(await viewer.getAttribute('data-format-column'))
-    expect(beforeColumn).toBeGreaterThan(40)
-
     const resizer = page.locator('.ide-panel-resizer')
-    const box = await resizer.boundingBox()
+    const body = page.locator('.ide-body')
+    await expect(viewer).toBeVisible()
+
+    const bodyBox = await body.boundingBox()
+    expect(bodyBox).toBeTruthy()
+
+    // Establish a non-narrow baseline first. Depending on CI viewport timing,
+    // the solution viewer can initially mount at the minimum 52-column mode.
+    let box = await resizer.boundingBox()
     expect(box).toBeTruthy()
     await page.mouse.move(box.x + box.width / 2, box.y + 100)
     await page.mouse.down()
-    await page.mouse.move(box.x - 160, box.y + 100, { steps: 6 })
+    await page.mouse.move(bodyBox.x + bodyBox.width * 0.65, box.y + 100, { steps: 8 })
     await page.mouse.up()
 
-    await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeLessThan(beforeColumn)
-    await expect(viewer).toHaveAttribute('data-format-mode', 'narrow')
+    await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeGreaterThan(52)
+    const wideColumn = Number(await viewer.getAttribute('data-format-column'))
 
+    // Then shrink the problem pane to its 25% limit and verify the
+    // reference formatter responds structurally.
+    box = await resizer.boundingBox()
+    expect(box).toBeTruthy()
+    await page.mouse.move(box.x + box.width / 2, box.y + 100)
+    await page.mouse.down()
+    await page.mouse.move(bodyBox.x + bodyBox.width * 0.25, box.y + 100, { steps: 8 })
+    await page.mouse.up()
+
+    await expect.poll(async () => Number(await viewer.getAttribute('data-format-column'))).toBeLessThan(wideColumn)
+    await expect(viewer).toHaveAttribute('data-format-mode', 'narrow')
   })
 
   test('adapts the editable HDL formatter width to the editor pane', async ({ page }) => {
