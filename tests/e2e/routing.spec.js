@@ -4,6 +4,7 @@ test.describe('HDLForge application routing',()=>{
  test('main navigation updates the browser URL and history',async({page})=>{
   await page.goto('/')
 
+  await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
   await page.getByRole('button',{name:'Problems',exact:true}).click()
   await expect(page).toHaveURL(/\/app\/problems\/$/)
 
@@ -23,7 +24,7 @@ test.describe('HDLForge application routing',()=>{
   await expect(page.getByRole('button',{name:'Progress',exact:true})).toHaveCount(0)
 
   await page.getByRole('button',{name:'HDLForge home',exact:true}).click()
-  await expect(page).toHaveURL(/\/$/)
+  await expect(page).toHaveURL(/\/home\/$/)
  })
 
  test('legacy Progress URL redirects into Problems',async({page})=>{
