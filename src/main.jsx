@@ -64,6 +64,8 @@ function appPath(page,problem,projectId=null,trackId=null,careerId=null){
 }
 function routeFromLocation(){
  const path=normalizePath(window.location.pathname)
+ const legacyId=new URLSearchParams(window.location.search).get('problem')
+ if(legacyId){const problem=problems.find(p=>p.id===legacyId);if(problem)return {page:'problem',problem,legacy:true,projectId:null,trackId:null}}
  if(path==='/')return {page:'problems',problem:null,projectId:null,trackId:null,rootLanding:true}
  const careerMatch=path.match(/^\/app\/roadmaps\/([^/]+)$/)
  if(careerMatch){const career=careerPathBySlug[decodeURIComponent(careerMatch[1])];if(career)return {page:'career',problem:null,projectId:null,trackId:null,careerId:career.id}}
@@ -94,8 +96,6 @@ function routeFromLocation(){
   const problem=problems.find(p=>p.id===id)
   if(problem)return {page:'problem',problem,projectId:null,trackId:null}
  }
- const legacyId=new URLSearchParams(window.location.search).get('problem')
- if(legacyId){const problem=problems.find(p=>p.id===legacyId);if(problem)return {page:'problem',problem,legacy:true,projectId:null,trackId:null}}
  for(const [page,target] of Object.entries(appPaths))if(normalizePath(target)===path)return {page,problem:null,projectId:null,trackId:null}
  return {page:'home',problem:null,projectId:null,trackId:null}
 }
