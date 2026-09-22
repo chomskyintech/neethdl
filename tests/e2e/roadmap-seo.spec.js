@@ -150,16 +150,11 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(progress).toContainText('Solved')
   })
 
-  test('shows company tracks and guided role roadmaps inside Problems', async ({ page }) => {
+  test('shows guided role roadmaps inside Problems without the Company Tracks card', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.locator('.desktop-nav').getByRole('button', { name: 'Tracks', exact: true })).toHaveCount(0)
-    await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Company tracks' })).toHaveCount(0)
     await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
-    await expect(page.getByRole('button', { name: /AMD/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Arm/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Qualcomm/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /NVIDIA/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Jane Street/ })).toBeVisible()
     await expect(page.getByRole('button', { name: 'RTL Design Engineer', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'CPU / GPU Hardware', exact: true })).toBeVisible()
     await expect(page.getByRole('button', { name: 'SoC Design / Integration Engineer', exact: true })).toBeVisible()
@@ -204,18 +199,10 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('a[href="/projects/asynchronous-fifo/"]')).toBeVisible()
   })
 
-  test('company track filters and orders its existing Problems, then opens a guided sequence', async ({ page }) => {
-    await page.goto('/app/problems/')
-    await page.getByRole('button', { name: /AMD/ }).click()
-
-    const rows = page.locator('.problem-list .problem-row')
-    await expect(rows).toHaveCount(10)
-    await expect(rows.first()).toContainText(/FIFO/i)
-    await expect(page.locator('.company-track-banner')).toContainText('AMD Track')
-
-    await rows.first().click()
-    await expect(page).toHaveURL(/\/app\/problems\/company\/amd\/rtl-fifo\/$/)
+  test('existing company-track deep links still open their guided sequence', async ({ page }) => {
+    await page.goto('/app/problems/company/amd/rtl-fifo/')
     await expect(page.locator('.section-navigation')).toHaveText('AMD Track')
+    await expect(page.getByRole('heading', { name: /Synchronous FIFO/i })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Next →' })).toBeDisabled()
   })
 
@@ -284,6 +271,41 @@ test.describe('HDLForge navigation and SEO content', () => {
       await page.goto(`/careers/${slug}/index.html`)
       await expect(page.getByRole('heading',{name:label,exact:true})).toBeVisible()
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href',`https://hdlforge.netlify.app/careers/${slug}/`)
+    }
+  })
+
+  test('all career roadmap problem sections are titled collapsible dropdowns', async ({ page }) => {
+    const careers=[
+      ['rtl-design',4],
+      ['design-verification',4],
+      ['fpga-engineer',4],
+      ['cpu-gpu-hardware',4],
+      ['hardware-accelerator',4],
+      ['soc-design-integration',3],
+      ['formal-verification-engineer',3],
+      ['embedded-hardware-firmware',3],
+      ['noc-interconnect',4],
+    ]
+
+    for(const [slug,count] of careers){
+      await page.goto(`/app/roadmaps/${slug}/`)
+      const sections=page.locator('.career-milestone')
+      const headers=page.locator('.career-milestone-head')
+      await expect(sections).toHaveCount(count)
+      await expect(headers).toHaveCount(count)
+
+      await expect(headers.first()).toHaveAttribute('aria-expanded','true')
+      if(count>1){
+        await expect(headers.nth(1)).toHaveAttribute('aria-expanded','false')
+        const secondList=sections.nth(1).locator('.career-problem-list')
+        await expect(secondList).toBeHidden()
+        await headers.nth(1).click()
+        await expect(headers.nth(1)).toHaveAttribute('aria-expanded','true')
+        await expect(secondList).toBeVisible()
+        await headers.nth(1).click()
+        await expect(headers.nth(1)).toHaveAttribute('aria-expanded','false')
+        await expect(secondList).toBeHidden()
+      }
     }
   })
 
