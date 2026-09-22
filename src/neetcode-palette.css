@@ -514,6 +514,7 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   backdrop-filter:none!important;
   -webkit-backdrop-filter:none!important;
   box-shadow:none!important;
+  pointer-events:none!important;
 }
 .app>.nav.app-section-nav .nav-inner{
   width:100%;
@@ -526,6 +527,11 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   align-items:center;
   gap:24px;
   position:relative;
+}
+.app>.nav.app-section-nav .brand,
+.app>.nav.app-section-nav .desktop-nav,
+.app>.nav.app-section-nav .top-signin{
+  pointer-events:auto;
 }
 .app>.nav.app-section-nav .nav-inner::before,
 .app>.nav.app-section-nav .nav-inner::after{
@@ -555,25 +561,6 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   border-color:#4a4a4d!important;
 }
 .app>.nav.app-section-nav .brand:active{transform:scale(.99)}
-.app>.nav.app-section-nav .brand-menu{
-  width:22px;
-  height:16px;
-  display:flex;
-  flex:0 0 auto;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:space-between;
-  color:#f3f3f3;
-}
-.app>.nav.app-section-nav .brand-menu>span{
-  display:block;
-  height:3px;
-  border-radius:999px;
-  background:currentColor;
-}
-.app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:22px}
-.app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:15px}
-.app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:19px}
 .app>.nav.app-section-nav .brand-icon{
   width:30px!important;
   height:30px!important;
@@ -627,12 +614,13 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   transition:background .16s ease,color .16s ease!important;
 }
 .app>.nav.app-section-nav .desktop-nav button:hover{
-  background:rgba(255,255,255,.04)!important;
+  background:transparent!important;
   color:#fff!important;
 }
 .app>.nav.app-section-nav .desktop-nav button.active{
-  background:rgba(58,58,58,.42)!important;
+  background:transparent!important;
   color:#fff!important;
+  box-shadow:none!important;
 }
 .app>.nav.app-section-nav .top-signin{
   grid-column:3;
@@ -686,11 +674,6 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   .app>.nav.app-section-nav{padding:10px 10px 0!important;height:66px!important}
   .app>.nav.app-section-nav .nav-inner{height:56px;gap:8px}
   .app>.nav.app-section-nav .brand{height:56px;padding:0 11px;gap:8px}
-  .app>.nav.app-section-nav .brand-menu{width:24px;height:18px}
-  .app>.nav.app-section-nav .brand-menu>span{height:3px}
-  .app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:24px}
-  .app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:17px}
-  .app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:21px}
   .app>.nav.app-section-nav .brand-icon{display:none!important}
   .app>.nav.app-section-nav .desktop-nav{height:56px;min-width:0;width:min(58vw,250px);padding:4px}
   .app>.nav.app-section-nav .desktop-nav button{height:46px;min-width:0;padding:0 10px!important;font-size:14px!important}
