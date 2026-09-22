@@ -35,7 +35,12 @@ function ensureStyle(href){
     link.dataset.hdlforgeIdeStyle=href
     link.addEventListener('load',()=>{link.dataset.loaded='true';resolve()},{once:true})
     link.addEventListener('error',resolve,{once:true})
-    document.head.appendChild(link)
+    const productionCss=[...document.querySelectorAll('link[rel="stylesheet"]')]
+      .find(node=>{try{return new URL(node.href,window.location.href).pathname.startsWith('/assets/')}catch{return false}})
+    const devCss=document.querySelector('style[data-vite-dev-id]')
+    const anchor=productionCss||devCss
+    if(anchor)document.head.insertBefore(link,anchor)
+    else document.head.appendChild(link)
   })
 }
 
