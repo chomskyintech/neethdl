@@ -283,4 +283,58 @@ test.describe('HDLForge navigation and SEO content', () => {
     }
   })
 
+  test('all career roadmap pages share one canonical palette', async ({ page }) => {
+    const slugs=[
+      'rtl-design',
+      'design-verification',
+      'fpga-engineer',
+      'cpu-gpu-hardware',
+      'hardware-accelerator',
+      'soc-design-integration',
+      'formal-verification-engineer',
+      'embedded-hardware-firmware',
+      'noc-interconnect',
+    ]
+
+    let baseline=null
+    for(const slug of slugs){
+      await page.goto(`/app/roadmaps/${slug}/`)
+      await expect(page.locator('.career-workspace')).toBeVisible()
+
+      const palette=await page.evaluate(() => {
+        const style = selector => getComputedStyle(document.querySelector(selector))
+        const hero=style('.career-hero')
+        const roadmap=style('.career-workspace .guided-roadmap-card')
+        const active=style('.career-workspace .guided-roadmap-item.active')
+        const project=style('.career-project-card')
+        const progress=style('.career-progress-track i')
+        const number=style('.career-progress-number strong')
+        const eyebrow=style('.career-eyebrow')
+        return {
+          heroBackground:hero.backgroundColor,
+          heroBorder:hero.borderColor,
+          roadmapBackground:roadmap.backgroundColor,
+          roadmapBorder:roadmap.borderColor,
+          activeColor:active.color,
+          projectBackground:project.backgroundColor,
+          projectBorder:project.borderColor,
+          progressColor:progress.backgroundColor,
+          numberColor:number.color,
+          eyebrowColor:eyebrow.color,
+        }
+      })
+
+      baseline ||= palette
+      expect(palette).toEqual(baseline)
+    }
+
+    expect(baseline.heroBackground).toBe('rgb(35, 35, 38)')
+    expect(baseline.projectBackground).toBe('rgb(35, 35, 38)')
+    expect(baseline.heroBorder).toBe('rgb(58, 58, 63)')
+    expect(baseline.activeColor).toBe('rgb(54, 164, 135)')
+    expect(baseline.progressColor).toBe('rgb(54, 164, 135)')
+    expect(baseline.numberColor).toBe('rgb(54, 164, 135)')
+    expect(baseline.eyebrowColor).toBe('rgb(54, 164, 135)')
+  })
+
 })
