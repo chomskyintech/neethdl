@@ -84,6 +84,30 @@ for(const script of globallyLoadedIdeScripts){
   }
 }
 
+const globallyLoadedIdeStyles=[
+  'ide-redesign.css',
+  'ide-sizing-fix.css',
+  'ide-control-refinement.css',
+  'ide-brand-title-tweak.css',
+  'ide-leetcode-theme.css',
+  'ide-leetcode-monaco.css',
+  'ide-control-fix.css',
+  'ide-scrollbar-fix.css',
+  'ide-final-polish.css',
+  'ide-edge-alignment.css',
+  'ide-language-control.css',
+  'ide-compact-layout.css',
+  'ide-theme-lock.css',
+  'simulation-panel-v2.css',
+  'simulation-panel-quality.css',
+]
+for(const stylesheet of globallyLoadedIdeStyles){
+  if(indexHtml.includes(`href="/${stylesheet}"`)){
+    console.error(`IDE-only stylesheet is still globally loaded from index.html: ${stylesheet}`)
+    process.exit(1)
+  }
+}
+
 const mainSource=fs.readFileSync(path.join(root,'src/main.jsx'),'utf8')
 if(mainSource.includes("from './data/activeProblems'")||mainSource.includes("from './data/guidedProjects'")){
   console.error('Initial app entry imports a full problem/project catalog instead of runtimeCatalog.')
