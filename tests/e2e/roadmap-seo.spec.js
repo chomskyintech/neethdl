@@ -410,8 +410,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(careerPalette).toEqual(problemsPalette)
   })
 
-  test('career roadmap removes extra labels and keeps Guided Roadmap inside the viewport', async ({ page }) => {
-    await page.setViewportSize({width:1750,height:650})
+  test('career roadmap removes obsolete helper labels', async ({ page }) => {
     await page.goto('/app/roadmaps/rtl-design/')
 
     await expect(page.locator('.career-eyebrow')).toHaveCount(0)
@@ -419,37 +418,9 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page.locator('.career-next-card')).toHaveCount(0)
     await expect(page.getByText('Practice',{exact:true})).toHaveCount(0)
     await expect(page.getByText('Build',{exact:true})).toHaveCount(0)
-
-    const roadmap=page.locator('.career-roadmap')
-    const progressRail=page.locator('.career-side-rail')
-    const bounds=await roadmap.boundingBox()
-    const progressBounds=await progressRail.boundingBox()
-    expect(bounds).toBeTruthy()
-    expect(progressBounds).toBeTruthy()
-    expect(Math.abs(bounds.y-progressBounds.y)).toBeLessThanOrEqual(1)
-    expect(bounds.y).toBeLessThanOrEqual(150)
-    expect(bounds.y + bounds.height).toBeLessThanOrEqual(650)
-
-    const card=roadmap.locator('.guided-roadmap-card')
-    const list=roadmap.locator('.guided-roadmap-list')
-    const cardBounds=await card.boundingBox()
-    expect(cardBounds).toBeTruthy()
-    expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
-
-    const scrollState=await list.evaluate(node=>{
-      const style=getComputedStyle(node)
-      return {
-        overflowY:style.overflowY,
-        clientHeight:node.clientHeight,
-        scrollHeight:node.scrollHeight,
-      }
-    })
-    expect(scrollState.overflowY).toBe('auto')
-    expect(scrollState.scrollHeight).toBeGreaterThanOrEqual(scrollState.clientHeight)
-    expect(await card.evaluate(node=>getComputedStyle(node).maxHeight)).not.toBe('none')
   })
 
-  test('all Guided Roadmap pages keep aligned side rails inside the viewport', async ({ page }) => {
+  test('Guided Roadmap cards stay complete while only their inner lists scroll', async ({ page }) => {
     await page.setViewportSize({width:1750,height:650})
 
     const cases=[
@@ -460,25 +431,49 @@ test.describe('HDLForge navigation and SEO content', () => {
 
     for(const [url,leftSelector,rightSelector] of cases){
       await page.goto(url)
+
       const left=page.locator(leftSelector)
       const right=page.locator(rightSelector)
+      const card=left.locator('.guided-roadmap-card')
+      const list=left.locator('.guided-roadmap-list')
+
       await expect(left).toBeVisible()
       await expect(right).toBeVisible()
+      await expect(card).toBeVisible()
+      await expect(list).toBeVisible()
 
       const leftBounds=await left.boundingBox()
       const rightBounds=await right.boundingBox()
+      const cardBounds=await card.boundingBox()
+
       expect(leftBounds).toBeTruthy()
       expect(rightBounds).toBeTruthy()
-      expect(Math.abs(leftBounds.y-rightBounds.y)).toBeLessThanOrEqual(1)
-      expect(leftBounds.y).toBeLessThanOrEqual(150)
-
-      const card=left.locator('.guided-roadmap-card')
-      const list=left.locator('.guided-roadmap-list')
-      const cardBounds=await card.boundingBox()
       expect(cardBounds).toBeTruthy()
-      expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
 
-      const listStyle=await list.evaluate(node=>{
+      // Left and right rails deliberately start at the same vertical position.
+      expect(Math.abs(leftBounds.y-rightBounds.y)).toBeLessThanOrEqual(1)
+      expect(await left.evaluate(node=>getComputedStyle(node).marginTop)).toBe('-30px')
+
+      // The complete rounded card, including its bottom border, stays in view.
+      expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
+      const cardStyle=await card.evaluate(node=>{
+        const style=getComputedStyle(node)
+        return {
+          overflowY:style.overflowY,
+          maxHeight:style.maxHeight,
+          borderBottomWidth:style.borderBottomWidth,
+          borderBottomLeftRadius:style.borderBottomLeftRadius,
+          borderBottomRightRadius:style.borderBottomRightRadius,
+        }
+      })
+      expect(cardStyle.overflowY).toBe('hidden')
+      expect(cardStyle.maxHeight).not.toBe('none')
+      expect(cardStyle.borderBottomWidth).not.toBe('0px')
+      expect(cardStyle.borderBottomLeftRadius).not.toBe('0px')
+      expect(cardStyle.borderBottomRightRadius).not.toBe('0px')
+
+      // Scrolling belongs to the list, not to the outer rail/card.
+      const listState=await list.evaluate(node=>{
         const style=getComputedStyle(node)
         return {
           overflowY:style.overflowY,
@@ -486,11 +481,35 @@ test.describe('HDLForge navigation and SEO content', () => {
           scrollHeight:node.scrollHeight,
         }
       })
-      expect(listStyle.overflowY).toBe('auto')
-      expect(listStyle.scrollHeight).toBeGreaterThanOrEqual(listStyle.clientHeight)
-      expect(await card.evaluate(node=>getComputedStyle(node).maxHeight)).not.toBe('none')
-      expect(await left.evaluate(node=>getComputedStyle(node).marginTop)).toBe('-30px')
+      expect(listState.overflowY).toBe('auto')
+      expect(listState.scrollHeight).toBeGreaterThanOrEqual(listState.clientHeight)
+      expect(await left.evaluate(node=>getComputedStyle(node).overflowY)).toBe('visible')
     }
+  })
+
+  test('career Guided Roadmap inner list can reach the last item without clipping the card', async ({ page }) => {
+    await page.setViewportSize({width:1750,height:650})
+    await page.goto('/app/roadmaps/rtl-design/')
+
+    const card=page.locator('.career-roadmap .guided-roadmap-card')
+    const list=page.locator('.career-roadmap .guided-roadmap-list')
+    const lastItem=list.locator('.guided-roadmap-item').last()
+
+    await expect(card).toBeVisible()
+    await expect(lastItem).toBeAttached()
+
+    const before=await list.evaluate(node=>({scrollTop:node.scrollTop,scrollHeight:node.scrollHeight,clientHeight:node.clientHeight}))
+    expect(before.scrollHeight).toBeGreaterThan(before.clientHeight)
+
+    await list.evaluate(node=>{node.scrollTop=node.scrollHeight})
+    await expect(lastItem).toBeVisible()
+
+    const after=await list.evaluate(node=>node.scrollTop)
+    expect(after).toBeGreaterThan(0)
+
+    const cardBounds=await card.boundingBox()
+    expect(cardBounds).toBeTruthy()
+    expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
   })
 
   test('new standalone interview problems open in the editor', async ({ page }) => {
