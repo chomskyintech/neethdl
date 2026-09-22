@@ -6,6 +6,15 @@ import { languageStarter, resolveInitialStarterDraft } from './data/starterScaff
 import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
 import './ide-overrides.css'
 import './waveform-window.css'
+import './ide-redesign.js'
+import './ide-section-label.js'
+import './ide-language-control.js'
+import './console-panel-resize.js'
+import './simulation-panel-v2.js'
+import './simulation-panel-quality.js'
+import './simulation-panel-behavior.js'
+import './waveform-window-refinement.js'
+import './riscv-project-ui.js'
 
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
