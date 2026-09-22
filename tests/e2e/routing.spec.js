@@ -53,7 +53,7 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveURL(/\/app\/problems\/rtl-skid-buffer\/$/)
 
   await page.getByRole('button',{name:/Next/i}).first().click()
-  await expect(page).toHaveURL(/\/app\/problems\/rtl-regfile\/$/)
+  await expect(page).toHaveURL(/\/app\/problems\/fifo-counted\/$/)
 
   await page.getByRole('button',{name:/Previous/i}).first().click()
   await expect(page).toHaveURL(/\/app\/problems\/rtl-skid-buffer\/$/)
