@@ -6,7 +6,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -38,7 +39,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -68,7 +70,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -98,7 +101,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -128,7 +132,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -158,7 +163,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -188,7 +194,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -219,7 +226,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -251,7 +259,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -283,7 +292,8 @@
     "difficulty": "Easy",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -312,7 +322,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -343,7 +354,8 @@
     "difficulty": "Easy",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -373,7 +385,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -404,7 +417,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -434,7 +448,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -465,7 +480,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -496,7 +512,8 @@
     "difficulty": "Hard",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -527,7 +544,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -558,7 +576,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -586,7 +606,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -614,7 +636,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -642,7 +666,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -670,7 +696,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -698,7 +726,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -726,7 +756,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -755,7 +787,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -783,7 +817,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -811,7 +847,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -839,7 +877,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -867,7 +907,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -895,7 +937,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -923,7 +967,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -951,7 +997,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -979,7 +1027,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1007,7 +1057,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1035,7 +1087,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1064,7 +1118,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1093,7 +1149,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1122,7 +1180,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1151,7 +1211,9 @@
     "category": "RTL Design",
     "difficulty": "Easy",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1180,7 +1242,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1209,7 +1273,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1238,7 +1304,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1267,7 +1335,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1296,7 +1366,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1325,7 +1397,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1354,7 +1428,9 @@
     "category": "RTL Design",
     "difficulty": "Medium",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1383,7 +1459,9 @@
     "category": "RTL Design",
     "difficulty": "Hard",
     "languages": [
-      "SystemVerilog"
+      "Verilog",
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
