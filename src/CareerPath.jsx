@@ -1,5 +1,5 @@
-import React,{useMemo} from 'react'
-import{ArrowRight,CheckCircle2,ChevronRight}from'lucide-react'
+import React,{useEffect,useMemo,useState} from 'react'
+import{ArrowRight,CheckCircle2,ChevronDown,ChevronRight}from'lucide-react'
 import {allProjects} from './data/projects'
 import {guidedProjectBySlug} from './data/guidedProjects'
 import {careerPathList} from './data/careerPaths'
@@ -19,6 +19,20 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
    ...milestone,
    problems:milestone.problemIds.map(id=>careerProblems.find(problem=>problem.id===id)).filter(Boolean),
  }))||null
+ const [openMilestones,setOpenMilestones]=useState(()=>new Set([0]))
+
+ useEffect(()=>{
+   setOpenMilestones(new Set([0]))
+ },[career.id])
+
+ const toggleMilestone=index=>{
+   setOpenMilestones(current=>{
+     const next=new Set(current)
+     if(next.has(index))next.delete(index)
+     else next.add(index)
+     return next
+   })
+ }
 
  return <div className="career-workspace">
   <aside className="career-roadmap" aria-label="Guided Roadmap">
@@ -42,10 +56,18 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
      <strong>{completed}/{careerProblems.length} solved</strong>
     </div>
 
-    {grouped?<div className="career-milestones">{grouped.map(milestone=><section className="career-milestone" key={milestone.title}>
-      <div className="career-milestone-head"><h3>{milestone.title}</h3><span>{milestone.problems.filter(problem=>solved.includes(problem.id)).length}/{milestone.problems.length}</span></div>
-      <div className="career-problem-list">{milestone.problems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>
-     </section>)}</div>:
+    {grouped?<div className="career-milestones">{grouped.map((milestone,index)=>{
+      const open=openMilestones.has(index)
+      const panelId=`career-milestone-${career.id}-${index}`
+      const solvedCount=milestone.problems.filter(problem=>solved.includes(problem.id)).length
+      return <section className={open?'career-milestone open':'career-milestone'} key={milestone.title}>
+       <button type="button" className="career-milestone-head" aria-expanded={open} aria-controls={panelId} onClick={()=>toggleMilestone(index)}>
+        <h3>{milestone.title}</h3>
+        <span className="career-milestone-meta"><span>{solvedCount}/{milestone.problems.length}</span><ChevronDown size={16}/></span>
+       </button>
+       <div id={panelId} className="career-problem-list" hidden={!open}>{milestone.problems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>
+      </section>
+     })}</div>:
      <div className="career-problem-list">{careerProblems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>}
    </section>
 
