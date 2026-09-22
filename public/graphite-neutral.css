@@ -117,7 +117,8 @@ html::-webkit-scrollbar-button{
 
 
 /* Homepage floating navigation stays translucent so the hero portrait remains visible beneath it. */
-.app:has(.landing-hub)>.nav{
+.app:has(.landing-hub)>.nav,
+.app>.nav.home-nav{
   background:linear-gradient(
     90deg,
     rgba(15,15,15,.42) 0%,
