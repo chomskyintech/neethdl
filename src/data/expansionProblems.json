@@ -857,7 +857,7 @@
       "Use synthesizable SystemVerilog.",
       "Do not use delays."
     ],
-    "starterCode": "module sticky_flag(input logic clk,reset,clear,event_in,output logic flag);\n  // TODO\nendmodule",
+    "starterCode": "module sticky_flag(\n  input logic clk,\n  input logic reset,\n  input logic clear,\n  input logic event_in,\n  output logic flag\n);\n  // TODO\nendmodule",
     "solution": "module sticky_flag(input logic clk,reset,clear,event_in,output logic flag);\n  always_ff @(posedge clk) begin\n    if(reset) flag<=1'b0;\n    else if(clear) flag<=1'b0;\n    else if(event_in) flag<=1'b1;\n  end\nendmodule"
   },
   {
