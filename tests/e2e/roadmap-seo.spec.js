@@ -430,18 +430,23 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(bounds.y).toBeLessThanOrEqual(150)
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(650)
 
-    const scrollState=await roadmap.evaluate(node=>{
+    const card=roadmap.locator('.guided-roadmap-card')
+    const list=roadmap.locator('.guided-roadmap-list')
+    const cardBounds=await card.boundingBox()
+    expect(cardBounds).toBeTruthy()
+    expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
+
+    const scrollState=await list.evaluate(node=>{
       const style=getComputedStyle(node)
       return {
         overflowY:style.overflowY,
-        maxHeight:style.maxHeight,
         clientHeight:node.clientHeight,
         scrollHeight:node.scrollHeight,
       }
     })
     expect(scrollState.overflowY).toBe('auto')
-    expect(scrollState.maxHeight).not.toBe('none')
     expect(scrollState.scrollHeight).toBeGreaterThanOrEqual(scrollState.clientHeight)
+    expect(await card.evaluate(node=>getComputedStyle(node).maxHeight)).not.toBe('none')
   })
 
   test('all Guided Roadmap pages keep aligned side rails inside the viewport', async ({ page }) => {
@@ -466,19 +471,25 @@ test.describe('HDLForge navigation and SEO content', () => {
       expect(rightBounds).toBeTruthy()
       expect(Math.abs(leftBounds.y-rightBounds.y)).toBeLessThanOrEqual(1)
       expect(leftBounds.y).toBeLessThanOrEqual(150)
-      expect(leftBounds.y+leftBounds.height).toBeLessThanOrEqual(650)
 
-      const leftStyle=await left.evaluate(node=>{
+      const card=left.locator('.guided-roadmap-card')
+      const list=left.locator('.guided-roadmap-list')
+      const cardBounds=await card.boundingBox()
+      expect(cardBounds).toBeTruthy()
+      expect(cardBounds.y+cardBounds.height).toBeLessThanOrEqual(650)
+
+      const listStyle=await list.evaluate(node=>{
         const style=getComputedStyle(node)
         return {
           overflowY:style.overflowY,
-          maxHeight:style.maxHeight,
-          marginTop:style.marginTop,
+          clientHeight:node.clientHeight,
+          scrollHeight:node.scrollHeight,
         }
       })
-      expect(leftStyle.overflowY).toBe('auto')
-      expect(leftStyle.maxHeight).not.toBe('none')
-      expect(leftStyle.marginTop).toBe('-30px')
+      expect(listStyle.overflowY).toBe('auto')
+      expect(listStyle.scrollHeight).toBeGreaterThanOrEqual(listStyle.clientHeight)
+      expect(await card.evaluate(node=>getComputedStyle(node).maxHeight)).not.toBe('none')
+      expect(await left.evaluate(node=>getComputedStyle(node).marginTop)).toBe('-30px')
     }
   })
 
