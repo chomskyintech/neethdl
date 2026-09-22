@@ -1,4 +1,6 @@
 import additionalSolutions from './additionalSolutions.js'
+import additionalVhdlSolutions from './additionalVhdlSolutions.js'
+import expansionPortableSolutions from './expansionPortableSolutions.js'
 
 const solutions = {
   ...additionalSolutions,
@@ -837,4 +839,20 @@ end architecture rtl;`
   }
 }
 
-export default solutions
+const portableSolutions = { ...solutions }
+
+for (const [problemId, vhdl] of Object.entries(additionalVhdlSolutions)) {
+  portableSolutions[problemId] = {
+    ...(portableSolutions[problemId] || {}),
+    VHDL: vhdl,
+  }
+}
+
+for (const [problemId, languages] of Object.entries(expansionPortableSolutions)) {
+  portableSolutions[problemId] = {
+    ...(portableSolutions[problemId] || {}),
+    ...languages,
+  }
+}
+
+export default portableSolutions
