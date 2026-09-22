@@ -502,9 +502,9 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 .app>.nav.app-section-nav{
   width:100%!important;
   max-width:none!important;
-  height:80px!important;
+  height:68px!important;
   margin:0!important;
-  padding:14px 32px 0!important;
+  padding:10px 28px 0!important;
   top:0!important;
   left:auto!important;
   transform:none!important;
@@ -518,7 +518,7 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 .app>.nav.app-section-nav .nav-inner{
   width:100%;
   max-width:1680px;
-  height:66px;
+  height:56px;
   margin:0 auto;
   padding:0;
   display:grid!important;
@@ -536,11 +536,11 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   grid-column:1;
   justify-self:start;
   min-width:0;
-  height:66px;
-  padding:0 20px 0 14px;
+  height:56px;
+  padding:0 16px 0 12px;
   display:inline-flex;
   align-items:center;
-  gap:14px;
+  gap:11px;
   border:1px solid #3a3a3d!important;
   border-radius:34px!important;
   background:#242424!important;
@@ -554,8 +554,8 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 }
 .app>.nav.app-section-nav .brand:active{transform:scale(.99)}
 .app>.nav.app-section-nav .brand-menu{
-  width:28px;
-  height:22px;
+  width:24px;
+  height:18px;
   display:flex;
   flex:0 0 auto;
   flex-direction:column;
@@ -565,17 +565,17 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 }
 .app>.nav.app-section-nav .brand-menu>span{
   display:block;
-  height:4px;
+  height:3px;
   border-radius:999px;
   background:currentColor;
 }
-.app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:28px}
-.app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:19px}
-.app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:24px}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(1){width:24px}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(2){width:17px}
+.app>.nav.app-section-nav .brand-menu>span:nth-child(3){width:21px}
 .app>.nav.app-section-nav .brand-icon{
-  width:40px!important;
-  height:40px!important;
-  flex:0 0 40px;
+  width:34px!important;
+  height:34px!important;
+  flex:0 0 34px;
   border-radius:12px!important;
   background:var(--nc-teal)!important;
   color:#102b27!important;
@@ -583,7 +583,7 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 .app>.nav.app-section-nav .brand-wordmark{
   display:inline;
   color:#f3f3f3!important;
-  font-size:22px;
+  font-size:19px;
   line-height:1;
   font-weight:800;
   letter-spacing:-.03em;
@@ -596,8 +596,8 @@ body.hdlforge-ide-active .ide-page .file-tabs{
   grid-column:2;
   justify-self:center;
   margin:0!important;
-  min-width:340px;
-  height:66px;
+  min-width:300px;
+  height:56px;
   padding:5px;
   display:flex!important;
   align-items:center;
@@ -609,14 +609,14 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 }
 .app>.nav.app-section-nav .desktop-nav button{
   flex:1;
-  min-width:165px;
-  height:54px;
+  min-width:145px;
+  height:46px;
   padding:0 24px!important;
   border:0!important;
   border-radius:28px!important;
   background:transparent!important;
   color:#d9d9d9!important;
-  font-size:20px!important;
+  font-size:17px!important;
   font-weight:600!important;
   line-height:1;
   box-shadow:none!important;
@@ -633,9 +633,9 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 .app>.nav.app-section-nav .top-signin{
   grid-column:3;
   justify-self:end;
-  width:66px!important;
-  min-width:66px!important;
-  height:66px!important;
+  width:56px!important;
+  min-width:56px!important;
+  height:56px!important;
   padding:0!important;
   display:inline-flex!important;
   align-items:center;
@@ -654,8 +654,8 @@ body.hdlforge-ide-active .ide-page .file-tabs{
 }
 .app>.nav.app-section-nav .top-signin:active{transform:scale(.97)}
 .app>.nav.app-section-nav .signin-icon{
-  width:28px;
-  height:28px;
+  width:24px;
+  height:24px;
   display:block;
   color:currentColor;
 }
