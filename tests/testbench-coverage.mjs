@@ -38,18 +38,20 @@ const [base, accelerators, expansion, vhdlBenches] = await Promise.all([
   loadVhdlBenches(),
 ])
 
-const catalog = [
+const standaloneCatalog = [
   ...base,
   ...accelerators,
   ...expansion,
-  ...guidedProjectProblems,
 ].filter(problem => problem.evaluation?.type !== 'answer')
+
+const projectCatalog = guidedProjectProblems.filter(problem => problem.evaluation?.type !== 'answer')
 
 const failures = []
 const structuralExceptions = []
+const projectPatternExceptions = []
 let simulationProblems = 0
 
-for (const problem of catalog) {
+for (const problem of standaloneCatalog) {
   const evaluationType = problem.evaluation?.type || 'simulation'
   const topic = problem.topic || problem.category || ''
   const languages = Array.isArray(problem.languages) ? problem.languages : []
@@ -96,6 +98,29 @@ for (const problem of catalog) {
   }
 }
 
+for (const problem of projectCatalog) {
+  const evaluationType = problem.evaluation?.type || 'simulation'
+  if (evaluationType === 'pattern') {
+    const checks = Array.isArray(problem.checks) ? problem.checks : []
+    if (!checks.length) failures.push(`${problem.id}: guided project pattern evaluator has no checks`)
+    else projectPatternExceptions.push(problem.id)
+    continue
+  }
+
+  if (evaluationType !== 'simulation') {
+    failures.push(`${problem.id}: unsupported guided-project evaluation type "${evaluationType}"`)
+    continue
+  }
+
+  simulationProblems++
+  const languages = Array.isArray(problem.languages) ? problem.languages : []
+  if (languages.some(language => language === 'Verilog' || language === 'SystemVerilog')) {
+    const bench = getBrowserSimulatorBench(problem.id)
+    if (!bench) failures.push(`${problem.id}: guided project simulation is missing its production testbench`)
+    else if (!bench.includes('HDLFORGE_PASS')) failures.push(`${problem.id}: guided project bench is not self-checking`)
+  }
+}
+
 if (failures.length) {
   console.error('Testbench coverage failures:')
   for (const failure of failures) console.error(`  - ${failure}`)
@@ -104,5 +129,6 @@ if (failures.length) {
 
 console.log(
   `Testbench coverage passed: ${simulationProblems} simulation-graded problems have production testbenches. ` +
-  `${structuralExceptions.length} verification-language exercises remain explicitly structural/pattern-graded.`
+  `${structuralExceptions.length} standalone verification-language exercises and ` +
+  `${projectPatternExceptions.length} guided-project steps remain explicitly structural/pattern-graded.`
 )
