@@ -5,7 +5,10 @@ import {assignProblemTopic,problemTopics} from '../src/data/problemTopics.js'
 
 const root=process.cwd()
 const outDir=path.join(root,'src/data/.generated')
+const detailDir=path.join(root,'public/problem-data')
 fs.mkdirSync(outDir,{recursive:true})
+fs.rmSync(detailDir,{recursive:true,force:true})
+fs.mkdirSync(detailDir,{recursive:true})
 
 const readJson=file=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))
 const baseProblems=readJson('src/data/problems.json').filter(problem=>problem.evaluation?.type!=='answer')
@@ -46,4 +49,11 @@ fs.writeFileSync(path.join(outDir,'problemCatalog.json'),JSON.stringify(problemC
 fs.writeFileSync(path.join(outDir,'guidedProjectCatalog.json'),JSON.stringify(projectCatalog,null,2)+'\n')
 fs.writeFileSync(path.join(outDir,'problemTopics.json'),JSON.stringify(problemTopics,null,2)+'\n')
 
-console.log(`Generated lightweight runtime catalogs: ${problemCatalog.length} problems, ${projectCatalog.length} guided projects.`)
+for(const problem of activeProblems){
+  fs.writeFileSync(
+    path.join(detailDir,`${encodeURIComponent(problem.id)}.json`),
+    JSON.stringify(problem)+'\n'
+  )
+}
+
+console.log(`Generated lightweight runtime catalogs: ${problemCatalog.length} problems, ${projectCatalog.length} guided projects, and ${activeProblems.length} on-demand problem payloads.`)
