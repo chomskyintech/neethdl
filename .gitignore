@@ -12,3 +12,4 @@ dist/
 
 # Build-generated lightweight browser catalogs
 src/data/.generated/
+public/problem-data/
