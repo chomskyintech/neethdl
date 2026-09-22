@@ -59,7 +59,8 @@ async function runIcarus(problemId,language,source,bench){
     const tb=join(dir,'tb.sv')
     const output=join(dir,'sim.out')
     await writeFile(design,source.endsWith('\n')?source:`${source}\n`,'utf8')
-    await writeFile(tb,bench.endsWith('\n')?bench:`${bench}\n`,'utf8')
+    const timedBench=`\`timescale 1ns/1ps\n${bench}`
+    await writeFile(tb,timedBench.endsWith('\n')?timedBench:`${timedBench}\n`,'utf8')
     const compile=await execFileAsync('iverilog',['-g2012','-s','tb','-o',output,design,tb],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
     const run=await execFileAsync('vvp',[output],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
     const transcript=`${compile.stdout||''}${compile.stderr||''}${run.stdout||''}${run.stderr||''}`
