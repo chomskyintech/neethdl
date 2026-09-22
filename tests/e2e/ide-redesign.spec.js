@@ -7,8 +7,9 @@ test.describe('redesigned IDE shell',()=>{
   await expect(page.locator('#hdlforge-ide-rail')).toHaveCount(0)
   await page.goto('/app/problems/rtl-fifo/')
   await expect(page.getByRole('button',{name:'Open problems'})).toBeVisible()
-  const problemCount=await page.locator('.ide-drawer-problem').count()
-  await expect(page.locator('.ide-topbar-problems-count')).toHaveText(String(problemCount))
+  const topicCounts=await page.locator('.ide-drawer-topic-item small').allTextContents()
+  const catalogCount=topicCounts.reduce((total,value)=>total+Number(value),0)
+  await expect(page.locator('.ide-topbar-problems-count')).toHaveText(String(catalogCount))
   await expect(page.locator('#hdlforge-ide-rail')).toHaveCount(0)
   await expect(page.locator('body')).toHaveClass(/hdlforge-ide-active/)
  })
@@ -124,16 +125,27 @@ test.describe('redesigned IDE shell',()=>{
   await expect(consolePanel).toHaveClass(/collapsed/)
  })
 
- test('opens, searches and closes the problem drawer',async({page})=>{
+ test('opens, searches and closes the topic-first problem drawer',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await page.getByRole('button',{name:'Open problems'}).click()
   await expect(page.locator('#hdlforge-ide-drawer')).toHaveClass(/open/)
+  await expect(page.locator('.ide-drawer-topic-label')).toHaveText('FIFOs & Buffers')
   await expect(page.locator('.ide-drawer-problem.active')).toContainText('Synchronous FIFO')
-  await page.getByRole('searchbox',{name:'Search problems'}).fill('systolic')
+  await page.getByRole('searchbox',{name:'Search problems'}).fill('counted')
   await expect(page.locator('.ide-drawer-problem:visible')).toHaveCount(1)
-  await expect(page.locator('.ide-drawer-problem:visible')).toContainText('Systolic')
+  await expect(page.locator('.ide-drawer-problem:visible')).toContainText('Counted Synchronous FIFO')
   await page.keyboard.press('Escape')
   await expect(page.locator('#hdlforge-ide-drawer')).not.toHaveClass(/open/)
+ })
+
+ test('uses topic titles and keeps combinational problems correctly grouped',async({page})=>{
+  await page.goto('/app/problems/rtl-mux/')
+  await page.getByRole('button',{name:'Open problems'}).click()
+  await expect(page.locator('.ide-drawer-topic-label')).toHaveText('Combinational Logic')
+  await expect(page.locator('.ide-drawer-problem')).toContainText(['2:1 Multiplexer'])
+  await expect(page.locator('.ide-drawer-problem').filter({hasText:'3-to-8 Decoder'})).toHaveCount(1)
+  await expect(page.locator('.ide-drawer-problem').filter({hasText:'Parameterized Counter'})).toHaveCount(0)
+  await expect(page.locator('.ide-drawer-group-title')).toHaveCount(0)
  })
 
  test('uses the larger neutral IDE palette in the problem drawer',async({page})=>{
@@ -155,11 +167,19 @@ test.describe('redesigned IDE shell',()=>{
   expect(await header.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(38, 37, 39)')
   expect(await search.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(41, 40, 42)')
   expect(await active.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgb(46, 45, 48)')
+  const scroller=drawer.locator('.ide-drawer-table-scroll')
+  const scrollbar=await scroller.evaluate(el=>{const s=getComputedStyle(el);return{width:s.scrollbarWidth,color:s.scrollbarColor}})
+  expect(scrollbar.width).toBe('thin')
+  expect(scrollbar.color).toContain('rgb(102, 102, 102)')
+  expect(scrollbar.color).toContain('rgb(38, 38, 38)')
  })
 
- test('navigates between coding problems from the drawer without a full page reload',async({page})=>{
+ test('switches topics and navigates without a full page reload',async({page})=>{
   await page.goto('/app/problems/rtl-fifo/')
   await page.getByRole('button',{name:'Open problems'}).click()
+  await page.locator('.ide-drawer-topic-button').click()
+  await page.locator('.ide-drawer-topic-item',{hasText:'Protocols & Handshakes'}).click()
+  await expect(page.locator('.ide-drawer-topic-label')).toHaveText('Protocols & Handshakes')
   await page.getByRole('searchbox',{name:'Search problems'}).fill('APB Register Peripheral')
   await page.locator('.ide-drawer-problem:visible').click()
   await expect(page).toHaveURL(/\/app\/problems\/proto-apb-register\/$/)
