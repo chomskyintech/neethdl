@@ -1,5 +1,5 @@
 import React,{lazy,Suspense,useEffect,useMemo,useRef,useState} from 'react'
-import {ChevronDown,ChevronRight,Filter,Flame,Sparkles,Search,Target,UserCircle,Zap}from'lucide-react'
+import {ChevronDown,ChevronRight,Filter,Flame,Sparkles,Search,UserCircle,Zap}from'lucide-react'
 import {createRoot} from 'react-dom/client'
 import './styles.css'
 import './language-ui.css'
@@ -25,7 +25,6 @@ const CareerPath=lazy(()=>import('./CareerPath'))
 
 const categories=['All',...problemTopics]
 const difficulties=['All','Easy','Medium','Hard']
-const companyTrackIds=['jane-street','amd','arm','nvidia','qualcomm','apple']
 const careerRoadmaps=[
  {id:'rtl-digital',label:'RTL Design Engineer'},
  {id:'verification',label:'Design Verification'},
@@ -203,15 +202,14 @@ function App(){
 
  return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||Boolean(projectId)?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
- {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} tracks={tracks} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
+ {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
  {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!trackId||solved.includes(selected.id))} navigationLabel={activeProject?.title||(careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic)}/>} 
  {page==='projects'&&<Projects onStartProject={startProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
  {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartProject={startProject} onSelectCareer={openCareer}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
 }
 
-function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,tracks,activeTrack,onSelectTrack,onSelectCareer}){
- const companyTracks=tracks.filter(track=>companyTrackIds.includes(track.id))
+function Problems({problems,allProblems,solved,query,setQuery,category,setCategory,difficulty,setDifficulty,language,setLanguage,status,setStatus,onOpen,activeTrack,onSelectTrack,onSelectCareer}){
  const solvedInTrack=activeTrack?activeTrack.problemIds.filter(id=>solved.includes(id)).length:0
  const [expandedTopics,setExpandedTopics]=useState(['Combinational Logic'])
  const [topicsExpanded,setTopicsExpanded]=useState(false)
@@ -297,10 +295,6 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
     </div>
    </section>
 
-   <section className="company-tracks sidebar-company-tracks" aria-label="Company tracks">
-    <div className="company-tracks-head"><div className="company-tracks-title"><span className="company-tracks-icon"><Target size={17}/></span><span><strong>Company Tracks</strong><small>Practice company-focused problem sequences.</small></span></div></div>
-    <div className="sidebar-company-list">{companyTracks.map(track=><button key={track.id} className={activeTrack?.id===track.id?'company-track-chip active':'company-track-chip'} onClick={()=>onSelectTrack(track.id)}><span>{track.name}</span><em>{track.problemIds.length}</em></button>)}</div>
-   </section>
   </aside>
  </div>
 }
