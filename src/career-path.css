@@ -270,16 +270,17 @@
   margin-top:auto;
   padding:18px 0 0;
   border:0;
-  background:transparent;
-  color:var(--career-accent);
+  background:transparent!important;
+  border-color:transparent!important;
+  color:var(--career-accent)!important;
   cursor:pointer;
   font-size:10px;
   font-weight:800;
   text-decoration:none;
 }
 .career-project-card a:hover,.career-project-card button:hover{
-  color:var(--career-accent-strong);
-  background:transparent;
+  color:var(--career-accent-strong)!important;
+  background:transparent!important;
 }
 .career-progress-card,.career-next-card{
   padding:20px;
