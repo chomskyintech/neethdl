@@ -27,24 +27,24 @@ test.describe('HDLForge application routing',()=>{
   await expect(page).toHaveURL(/\/home\/$/)
  })
 
- test('Problems landing defers editor payloads and styles until an editor opens',async({page})=>{
+ test('Problems landing defers editor JavaScript and full problem payloads until an editor opens',async({page})=>{
   const detailRequests=[]
-  const ideStyleRequests=[]
+  const problemIdeScriptRequests=[]
   page.on('request',request=>{
    const url=request.url()
    if(url.includes('/problem-data/'))detailRequests.push(url)
-   if(/\/(?:ide-[^/]+|simulation-panel-[^/]+)\.css(?:\?|$)/.test(url))ideStyleRequests.push(url)
+   if(/\/assets\/ProblemIDE-[^/]+\.js(?:\?|$)/.test(url))problemIdeScriptRequests.push(url)
   })
 
   await page.goto('/')
   await expect(page.getByRole('heading',{name:'Problems',exact:true})).toBeVisible()
   expect(detailRequests).toHaveLength(0)
-  expect(ideStyleRequests).toHaveLength(0)
+  expect(problemIdeScriptRequests).toHaveLength(0)
 
   await page.locator('.problem-row').first().click()
   await expect(page).toHaveURL(/\/app\/problems\/[^/]+\/$/)
   await expect.poll(()=>detailRequests.length).toBeGreaterThan(0)
-  await expect.poll(()=>ideStyleRequests.length).toBeGreaterThan(0)
+  await expect.poll(()=>problemIdeScriptRequests.length).toBeGreaterThan(0)
   await expect(page.locator('.ide-page')).toBeVisible()
  })
 
