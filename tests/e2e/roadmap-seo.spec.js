@@ -105,9 +105,9 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(expandTopics).toBeVisible()
     await expandTopics.click()
     await expect(page.locator('.topic-cloud-item')).toHaveCount(21)
-    await expect(page.getByRole('button', { name: /FSMs\s*2/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /FSMs\s*10/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*2/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*10/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /CPU \/ RISC-V\s*28/ })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Collapse', exact: true })).toBeVisible()
     await expect(page.locator('.problem-row').first()).toBeVisible()
@@ -128,9 +128,13 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(topicRows.filter({ hasText: 'Scoreboards' })).toBeVisible()
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toBeVisible()
 
-    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/4')
-    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/3')
+    await expect(topicRows.filter({ hasText: 'Constrained Random' })).toContainText('0/8')
+    await expect(topicRows.filter({ hasText: 'Functional Coverage' })).toContainText('0/8')
     await expect(topicRows.filter({ hasText: 'Formal Verification' })).toContainText('0/14')
+    await expect(topicRows.filter({ hasText: 'Testbenches' })).toContainText('0/10')
+    await expect(topicRows.filter({ hasText: 'Interfaces' })).toContainText('0/8')
+    await expect(topicRows.filter({ hasText: 'SVA' })).toContainText('0/12')
+    await expect(topicRows.filter({ hasText: 'UVM' })).toContainText('0/10')
   })
 
   test('renders compact progress inside Problems and removes standalone Progress navigation', async ({ page }) => {
@@ -335,6 +339,26 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(baseline.progressColor).toBe('rgb(54, 164, 135)')
     expect(baseline.numberColor).toBe('rgb(54, 164, 135)')
     expect(baseline.eyebrowColor).toBe('rgb(54, 164, 135)')
+  })
+
+  test('new standalone interview problems open in the editor', async ({ page }) => {
+    const cases=[
+      ['/app/problems/comb-decoder3to8/','3-to-8 Decoder'],
+      ['/app/problems/seq-sticky-flag/','Sticky Status Flag'],
+      ['/app/problems/fsm-seq1011/','1011 Sequence Detector'],
+      ['/app/problems/fifo-counted/','Counted Synchronous FIFO'],
+      ['/app/problems/tb-clock-reset/','Clock and Reset Generator'],
+      ['/app/problems/if-clocking-block/','Interface Clocking Block'],
+      ['/app/problems/sva-onehot-grant/','One-Hot Grant Assertion'],
+      ['/app/problems/cr-weighted-distribution/','Weighted Random Distribution'],
+      ['/app/problems/cov-cross-operation-size/','Cross Operation and Size'],
+      ['/app/problems/uvm-sequence-item/','UVM Sequence Item'],
+    ]
+    for(const [url,title] of cases){
+      await page.goto(url)
+      await expect(page.getByRole('heading',{name:title,exact:true})).toBeVisible()
+      await expect(page.locator('.editor-language select')).toHaveValue('SystemVerilog')
+    }
   })
 
 })
