@@ -102,6 +102,51 @@ async function runGhdl(problemId,source,benchTemplate){
   }
 }
 
+function stripInstanceParameters(bench, entityName){
+  const needle=new RegExp(`\\b${entityName}\\s*#\\s*\\(`,'i')
+  const match=needle.exec(bench)
+  if(!match) return bench
+
+  const open=bench.indexOf('(',match.index)
+  let depth=0
+  let close=-1
+  for(let i=open;i<bench.length;i+=1){
+    if(bench[i]==='(') depth+=1
+    else if(bench[i]===')'){
+      depth-=1
+      if(depth===0){close=i;break}
+    }
+  }
+  if(close<0) return bench
+  return bench.slice(0,match.index)+entityName+bench.slice(close+1)
+}
+
+async function runSynthesizedVhdl(problemId,source,bench){
+  const entity=source.match(/\bentity\s+([A-Za-z_]\w*)\s+is\b/i)?.[1]
+  if(!entity) throw new Error('Reference VHDL does not contain an entity declaration.')
+
+  const dir=await mkdtemp(join(tmpdir(),'hdlforge-vhdl-synth-sol-'))
+  try{
+    await writeFile(join(dir,'design.vhd'),source.endsWith('\n')?source:`${source}\n`,'utf8')
+    await execFileAsync('ghdl',['-a','--std=08','design.vhd'],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
+    const synth=await execFileAsync('ghdl',['--synth','--std=08','--out=verilog',entity],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
+    await writeFile(join(dir,'design.v'),synth.stdout,'utf8')
+
+    const tb=stripInstanceParameters(bench,entity)
+    const timedBench=`\`timescale 1ns/1ps\n${tb}\n`
+    await writeFile(join(dir,'tb.sv'),timedBench,'utf8')
+
+    const output=join(dir,'sim.out')
+    const compile=await execFileAsync('iverilog',['-g2012','-s','tb','-o',output,'design.v','tb.sv'],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
+    const run=await execFileAsync('vvp',[output],{cwd:dir,timeout:TIMEOUT_MS,maxBuffer:4*1024*1024})
+    const transcript=`${compile.stdout||''}${compile.stderr||''}${run.stdout||''}${run.stderr||''}`
+    if(!transcript.includes('HDLFORGE_PASS')) throw new Error(`Simulation completed without HDLFORGE_PASS.\n${transcript}`)
+    return transcript
+  }finally{
+    await rm(dir,{recursive:true,force:true}).catch(()=>{})
+  }
+}
+
 function compactError(error){
   return String(error?.stderr||error?.stdout||error?.message||error)
     .replaceAll(root,'<repo>')
@@ -163,13 +208,16 @@ for(const problem of catalog){
       continue
     }
 
-    const bench=language==='VHDL'?vhdlBenches[problem.id]:getBrowserSimulatorBench(problem.id)
+    const nativeVhdlBench=language==='VHDL'?vhdlBenches[problem.id]:null
+    const sharedBench=getBrowserSimulatorBench(problem.id)
+    const bench=language==='VHDL'?(nativeVhdlBench||sharedBench):sharedBench
     if(!bench){
       inventoryIssues.push(`${problem.id} / ${language}: missing HDLForge simulator testbench`)
       continue
     }
 
-    runnable.push({problem,language,source,bench})
+    const runner=language==='VHDL'?(nativeVhdlBench?'ghdl':'vhdl-synth'):'icarus'
+    runnable.push({problem,language,source,bench,runner})
   }
 }
 
@@ -186,7 +234,8 @@ let passed=0
 for(const item of runnable){
   const label=`${item.problem.id} / ${item.language}`
   try{
-    if(item.language==='VHDL') await runGhdl(item.problem.id,item.source,item.bench)
+    if(item.runner==='ghdl') await runGhdl(item.problem.id,item.source,item.bench)
+    else if(item.runner==='vhdl-synth') await runSynthesizedVhdl(item.problem.id,item.source,item.bench)
     else await runIcarus(item.problem.id,item.language,item.source,item.bench)
     passed++
     console.log(`PASS ${label}`)
