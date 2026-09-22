@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('HDLForge navigation and SEO content', () => {
   test('landing page keeps only the primary hero content', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/home/')
     await expect(page.getByRole('heading', { name: /Hardware design practice for RTL, FPGA, VLSI & verification roles/i })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Start practice', exact: true })).toBeVisible()
     await expect(page.locator('.landing-stats')).toHaveCount(0)
@@ -15,7 +15,7 @@ test.describe('HDLForge navigation and SEO content', () => {
 
 
   test('uses an integrated graphite scrollbar instead of the browser default rail', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/home/')
     const scrollbar = await page.evaluate(() => {
       const root = document.documentElement
       const base = getComputedStyle(root)
@@ -42,7 +42,7 @@ test.describe('HDLForge navigation and SEO content', () => {
 
 
   test('homepage floating nav remains visibly translucent over the hero', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/home/')
     const nav = page.locator('.app>.nav')
     await expect(nav).toBeVisible()
     const style = await nav.evaluate(el => {
@@ -59,14 +59,14 @@ test.describe('HDLForge navigation and SEO content', () => {
   })
 
   test('Start practice opens the Problems workspace', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/home/')
     await page.getByRole('button', { name: 'Start practice', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
     await expect(page).toHaveURL(/\/app\/problems\/$/)
   })
 
   test('homepage SEO links remain crawlable and normal clicks open working app sections', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/home/')
     const problems = page.locator('.landing-resource-links a[href="/problems/"]')
     const learning = page.locator('.landing-resource-links a[href="/learn/"]')
     const companies = page.locator('.landing-resource-links a[href="/companies/"]')
@@ -80,25 +80,31 @@ test.describe('HDLForge navigation and SEO content', () => {
     await expect(page).toHaveURL(/\/app\/problems\/$/)
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
 
-    await page.goto('/')
+    await page.goto('/home/')
     await page.locator('.landing-resource-links a[href="/learn/"]').click()
     await expect(page).toHaveURL(/\/learn\/$/)
     await expect(page.locator('h1').first()).toBeVisible()
 
-    await page.goto('/')
+    await page.goto('/home/')
     await page.locator('.landing-resource-links a[href="/companies/"]').click()
     await expect(page).toHaveURL(/\/app\/problems\/$/)
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
 
-    await page.goto('/')
+    await page.goto('/home/')
     await page.locator('.landing-resource-links a[href="/projects/"]').click()
     await expect(page).toHaveURL(/\/app\/projects\/$/)
     await expect(page.getByRole('heading', { name: 'Hardware design projects' })).toBeVisible()
   })
 
-  test('Problems page owns problem sections and problem rows', async ({ page }) => {
+  test('site root opens the Problems workspace by default', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('button', { name: 'Problems', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Problems', exact: true })).toBeVisible()
+    await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
+    await expect(page.locator('.landing-hub')).toHaveCount(0)
+  })
+
+  test('Problems page owns problem sections and problem rows', async ({ page }) => {
+    await page.goto('/app/problems/')
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
     await expect(page.locator('.topic-cloud-item')).toHaveCount(4)
     const expandTopics = page.getByRole('button', { name: 'Expand', exact: true })
