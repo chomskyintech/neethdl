@@ -10,15 +10,14 @@ import './neutral-accent.css'
 import './topic-browser.css'
 import './neetcode-palette.css'
 import './lockedEditor.js'
-import problems,{problemTopics} from './data/activeProblems'
+import problems,{problemTopics,guidedProjectById,guidedProjectBySlug,loadProblemDetails} from './data/runtimeCatalog'
 import {buildTopicOrderedProblems} from './problemNavigation'
-import {guidedProjectById,guidedProjectBySlug} from './data/guidedProjects'
 import tracks from './data/tracks'
 import {careerPaths,careerPathBySlug} from './data/careerPaths'
-import LandingHub from './LandingHub'
 import {addActivityDay,calculatePoints,calculateStreak} from './progressTracking'
 
 const ProblemIDE=lazy(()=>import('./ProblemIDE'))
+const LandingHub=lazy(()=>import('./LandingHub'))
 const AccountModal=lazy(()=>import('./AccountModal'))
 const Projects=lazy(()=>import('./Projects'))
 const CareerPath=lazy(()=>import('./CareerPath'))
@@ -104,6 +103,8 @@ function RouteLoading(){return <div role="status" aria-live="polite" style={{pad
 function App(){
  const initialRoute=useRef(routeFromLocation()).current
  const [page,setPage]=useState(initialRoute.page),[selected,setSelected]=useState(initialRoute.problem||problems[0]||null),[projectId,setProjectId]=useState(initialRoute.projectId||null),[trackId,setTrackId]=useState(initialRoute.trackId||null),[careerId,setCareerId]=useState(initialRoute.careerId||null),[query,setQuery]=useState(''),[category,setCategory]=useState('All'),[difficulty,setDifficulty]=useState('All'),[language,setLanguage]=useState('All'),[status,setStatus]=useState('All'),[solved,setSolved]=useState(()=>load('hdlforge-solved',[])),[drafts,setDrafts]=useState(()=>load('hdlforge-drafts',{})),[draftUpdatedAt,setDraftUpdatedAt]=useState(()=>load('hdlforge-draft-updated-at',{})),[activityDays,setActivityDays]=useState(()=>load('hdlforge-activity-days',[])),[user,setUser]=useState(null),[accountOpen,setAccountOpen]=useState(false),[cloudReady,setCloudReady]=useState(false),[syncStatus,setSyncStatus]=useState('Local only')
+ const [selectedFull,setSelectedFull]=useState(null)
+ const [problemLoadError,setProblemLoadError]=useState('')
  const syncTimer=useRef(null)
  const markSolved=id=>{if(solved.includes(id))return;const n=[...solved,id];setSolved(n);localStorage.setItem('hdlforge-solved',JSON.stringify(n));const days=addActivityDay(activityDays);setActivityDays(days);localStorage.setItem('hdlforge-activity-days',JSON.stringify(days))}
  const saveDraft=(id,code)=>{const n={...drafts,[id]:code},updated={...draftUpdatedAt,[id]:new Date().toISOString()};setDrafts(n);setDraftUpdatedAt(updated);localStorage.setItem('hdlforge-drafts',JSON.stringify(n));localStorage.setItem('hdlforge-draft-updated-at',JSON.stringify(updated))}
@@ -164,6 +165,25 @@ function App(){
  },[])
 
  useEffect(()=>{
+  if(page!=='problem'||!selected?.id){
+   setSelectedFull(null)
+   setProblemLoadError('')
+   return
+  }
+  let cancelled=false
+  setProblemLoadError('')
+  setSelectedFull(current=>current?.id===selected.id?current:null)
+  loadProblemDetails(selected.id).then(problem=>{
+   if(cancelled)return
+   if(problem)setSelectedFull(problem)
+   else setProblemLoadError('Problem details could not be loaded.')
+  }).catch(()=>{
+   if(!cancelled)setProblemLoadError('Problem details could not be loaded.')
+  })
+  return()=>{cancelled=true}
+ },[page,selected?.id])
+
+ useEffect(()=>{
   document.title=page==='problem'&&selected?`${selected.title} | HDLForge`:page==='career'&&careerId?`${careerPaths[careerId]?.label||'Career Roadmap'} | HDLForge`:(pageTitles[page]||pageTitles.home)
  },[page,selected?.id,careerId])
 
@@ -204,7 +224,7 @@ function App(){
  return <div className="app">{page==='home'?<header className="nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')}><span className="brand-icon"><Zap size={17}/></span><span>HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav"><button className="active" onClick={()=>go('home')}>Home</button><button onClick={()=>go('problems')}>Problems</button><button onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><div className="nav-stat"><Flame size={15}/><strong>{streak}</strong><span>streak</span></div><div className="nav-stat"><Sparkles size={15}/><strong>{points}</strong><span>points</span></div><button className="profile" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><UserCircle size={20}/></button></div></header>:<header className="nav app-section-nav"><div className="nav-inner"><button className="brand" onClick={()=>go('home')} aria-label="HDLForge home"><span className="brand-icon"><Zap size={17}/></span><span className="brand-wordmark">HDL<span className="brand-accent">Forge</span></span></button><nav className="desktop-nav" aria-label="HDLForge sections"><button className={page==='problems'||(page==='problem'&&!projectId)?'active':''} onClick={()=>go('problems')}>Problems</button><button className={page==='projects'||Boolean(projectId)?'active':''} onClick={()=>go('projects')}>Projects</button></nav><div className="nav-spacer"/><button className="top-signin" onClick={()=>setAccountOpen(true)} title={user?syncStatus:'Sign in to sync progress'} aria-label={user?'Open account':'Sign in'}><svg className="signin-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="10.5" r="5" stroke="currentColor" strokeWidth="2.5"/><path d="M7.5 26c.9-5.3 4.2-8.1 8.5-8.1s7.6 2.8 8.5 8.1" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg></button></div></header>}<div className="layout"><main className="main"><Suspense fallback={<RouteLoading/>}>
  {page==='home'&&<LandingHub go={go} problemCount={problems.length} solvedCount={solved.length}/>} 
  {page==='problems'&&<Problems problems={filtered} allProblems={problems} solved={solved} query={query} setQuery={setQuery} category={category} setCategory={setCategory} difficulty={difficulty} setDifficulty={setDifficulty} language={language} setLanguage={setLanguage} status={status} setStatus={setStatus} onOpen={openProblem} activeTrack={activeTrack} onSelectTrack={selectTrack} onSelectCareer={openCareer}/>} 
- {page==='problem'&&selected&&<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selected} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!trackId||solved.includes(selected.id))} navigationLabel={activeProject?.title||(careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic)}/>} 
+ {page==='problem'&&selected&&(selectedFull?.id===selected.id?<ProblemIDE key={(projectId||trackId||'problem')+'-'+selected.id} problem={selectedFull} solved={solved.includes(selected.id)} draft={drafts[selected.id] || undefined} onBack={()=>careerId?openCareer(careerId):go(projectId?'projects':'problems')} onSolved={markSolved} onSave={saveDraft} onPrevious={openPrevious} onNext={openNext} hasPrevious={Boolean(previousProblem)} hasNext={Boolean(nextProblem)&&(!trackId||solved.includes(selected.id))} navigationLabel={activeProject?.title||(careerId?careerPaths[careerId]?.label:activeTrack?trackLabel(activeTrack)+' Track':selected.topic)}/>:problemLoadError?<div role="alert" style={{padding:'48px 24px',color:'var(--muted)'}}>{problemLoadError}</div>:<RouteLoading/>)} 
  {page==='projects'&&<Projects onStartProject={startProject} solved={solved} drafts={drafts} onSelectCareer={openCareer}/>} 
  {page==='career'&&careerId&&careerPaths[careerId]&&<CareerPath career={careerPaths[careerId]} allProblems={problems} solved={solved} onOpenProblem={openProblem} onStartProject={startProject} onSelectCareer={openCareer}/>} 
  </Suspense></main></div>{accountOpen&&<Suspense fallback={null}><AccountModal open user={user} onClose={()=>setAccountOpen(false)} syncStatus={syncStatus}/></Suspense>}</div>
