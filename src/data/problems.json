@@ -356,7 +356,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "syntax",
@@ -372,7 +372,19 @@
       "Use SystemVerilog.",
       "Avoid incomplete combinational assignments."
     ],
-    "starterCode": "always_comb begin\n  // next-state logic\nend\n\nalways_ff @(posedge clk) begin\n  // state update\nend"
+    "starterCode": "always_comb begin\n  // next-state logic\nend\n\nalways_ff @(posedge clk) begin\n  // state update\nend",
+    "checks": [
+      {
+        "label": "Uses always_comb",
+        "pattern": "always_comb",
+        "flags": "i"
+      },
+      {
+        "label": "Uses clocked always_ff",
+        "pattern": "always_ff\\s*@\\s*\\(\\s*posedge\\s+clk",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "sv-interface",
@@ -383,7 +395,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "interface",
@@ -399,7 +411,24 @@
       "Use modports.",
       "Keep directionality explicit."
     ],
-    "starterCode": "interface stream_if #(parameter WIDTH=32) (input logic clk);\n  logic valid, ready;\n  logic [WIDTH-1:0] data;\n  // Add modports\nendinterface"
+    "starterCode": "interface stream_if #(parameter WIDTH=32) (input logic clk);\n  logic valid, ready;\n  logic [WIDTH-1:0] data;\n  // Add modports\nendinterface",
+    "checks": [
+      {
+        "label": "Defines interface",
+        "pattern": "interface\\s+stream_if",
+        "flags": "i"
+      },
+      {
+        "label": "Defines producer modport",
+        "pattern": "modport\\s+producer",
+        "flags": "i"
+      },
+      {
+        "label": "Defines consumer modport",
+        "pattern": "modport\\s+consumer",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "sva-handshake",
@@ -410,7 +439,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "assertion",
@@ -427,7 +456,24 @@
       "Sample on the rising clock edge.",
       "Do not require ready to be high immediately."
     ],
-    "starterCode": "property valid_holds_until_ready;\n  // Write your SVA property\nendproperty\n\nassert property(valid_holds_until_ready);"
+    "starterCode": "property valid_holds_until_ready;\n  // Write your SVA property\nendproperty\n\nassert property(valid_holds_until_ready);",
+    "checks": [
+      {
+        "label": "Defines property",
+        "pattern": "property\\s+valid_holds_until_ready",
+        "flags": "i"
+      },
+      {
+        "label": "Holds valid until ready",
+        "pattern": "until_with\\s+ready",
+        "flags": "i"
+      },
+      {
+        "label": "Asserts property",
+        "pattern": "assert\\s+property",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "sva-reset",
@@ -438,7 +484,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "assertion",
@@ -452,7 +498,19 @@
     "constraints": [
       "Account for synchronous reset semantics."
     ],
-    "starterCode": "assert property (@(posedge clk) reset |=> count == '0);"
+    "starterCode": "assert property (@(posedge clk) reset |=> count == '0);",
+    "checks": [
+      {
+        "label": "Checks next-cycle reset state",
+        "pattern": "reset\\s*\\|=>\\s*count\\s*==\\s*'0",
+        "flags": "i"
+      },
+      {
+        "label": "Asserts property",
+        "pattern": "assert\\s+property",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "uvm-driver",
@@ -463,7 +521,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "driver",
@@ -478,7 +536,19 @@
       "Use the UVM sequencer-driver handshake.",
       "Do not drop transactions."
     ],
-    "starterCode": "task run_phase(uvm_phase phase);\n  forever begin\n    // Fetch, drive and complete the transaction\n  end\nendtask"
+    "starterCode": "task run_phase(uvm_phase phase);\n  forever begin\n    // Fetch, drive and complete the transaction\n  end\nendtask",
+    "checks": [
+      {
+        "label": "Gets sequence item",
+        "pattern": "get_next_item\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Completes sequence item",
+        "pattern": "item_done\\s*\\(",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "uvm-scoreboard",
@@ -489,7 +559,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "simulation"
+      "type": "pattern"
     },
     "tags": [
       "scoreboard",
@@ -506,7 +576,24 @@
       "Use uvm_analysis_imp or an equivalent analysis connection.",
       "Include useful mismatch information."
     ],
-    "starterCode": "class scoreboard extends uvm_scoreboard;\n  // Add analysis connection and comparison logic\nendclass"
+    "starterCode": "class scoreboard extends uvm_scoreboard;\n  // Add analysis connection and comparison logic\nendclass",
+    "checks": [
+      {
+        "label": "Uses analysis implementation",
+        "pattern": "uvm_analysis_imp",
+        "flags": "i"
+      },
+      {
+        "label": "Implements write callback",
+        "pattern": "function\\s+void\\s+write\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Reports mismatch",
+        "pattern": "uvm_error|MISMATCH",
+        "flags": "i"
+      }
+    ]
   },
   {
     "id": "arch-hazard",
