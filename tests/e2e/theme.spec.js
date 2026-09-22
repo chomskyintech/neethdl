@@ -80,12 +80,18 @@ test.describe('NeetCode theme regression', () => {
     await page.goto('/app/problems/rtl-shift-register/')
     await expect(page.locator('.monaco-editor-wrap .view-lines')).toBeVisible()
 
-    const coloursSeen = await page.locator('.monaco-editor-wrap .view-lines span').evaluateAll(nodes =>
-      [...new Set(nodes.filter(node => (node.textContent || '').trim()).map(node => getComputedStyle(node).color))]
+    const tokenColours = page.locator('.monaco-editor-wrap .view-lines span')
+
+    await expect.poll(async () =>
+      tokenColours.evaluateAll(nodes =>
+        [...new Set(nodes.filter(node => (node.textContent || '').trim()).map(node => getComputedStyle(node).color).filter(Boolean))]
+      )
+    ).toEqual(expect.arrayContaining(['rgb(194, 194, 196)', 'rgb(57, 126, 115)']))
+
+    const coloursSeen = await tokenColours.evaluateAll(nodes =>
+      [...new Set(nodes.filter(node => (node.textContent || '').trim()).map(node => getComputedStyle(node).color).filter(Boolean))]
     )
 
-    expect(coloursSeen).toContain('rgb(194, 194, 196)')
-    expect(coloursSeen).toContain('rgb(57, 126, 115)')
     expect(coloursSeen).not.toContain('rgb(76, 200, 176)')
     expect(coloursSeen).not.toContain('rgb(220, 220, 168)')
   })
