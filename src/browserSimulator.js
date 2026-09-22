@@ -1,4 +1,4 @@
-import extraBenches from './data/extraBenches'
+import extraBenches from './data/extraBenches.js'
 
 const SIM_BASE = 'https://senolgulgonul.github.io/verisim/'
 const MAX_SOURCE = 20000
