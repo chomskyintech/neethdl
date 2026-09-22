@@ -1,3 +1,9 @@
+declare const Netlify: {
+  env: {
+    get(name: string): string | undefined
+  }
+}
+
 const MAX_SOURCE = 20000
 const MAX_SELECTION = 6000
 const MAX_QUESTION = 2000
