@@ -49,6 +49,14 @@ try{
  const buildResult=await build()
  const outputs=(Array.isArray(buildResult)?buildResult:[buildResult]).flatMap(result=>result?.output||[])
  const entryChunk=outputs.find(output=>output?.type==='chunk'&&output.isEntry)
+ if(entryChunk?.code){
+  const entryBytes=Buffer.byteLength(entryChunk.code)
+  const maxEntryBytes=400_000
+  console.log(`Initial entry JavaScript: ${entryBytes} bytes (budget ${maxEntryBytes} bytes).`)
+  if(entryBytes>maxEntryBytes){
+   throw new Error(`Initial JavaScript bundle exceeded performance budget: ${entryBytes} > ${maxEntryBytes} bytes`)
+  }
+ }
  if(entryChunk?.modules){
   const largestModules=Object.entries(entryChunk.modules)
    .map(([id,meta])=>({id:id.replace(root,''),bytes:meta.renderedLength||0}))
