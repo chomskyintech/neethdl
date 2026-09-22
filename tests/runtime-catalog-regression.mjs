@@ -65,6 +65,31 @@ for(const problem of fullProblems){
   }
 }
 
+const indexHtml=fs.readFileSync(path.join(root,'index.html'),'utf8')
+const globallyLoadedIdeScripts=[
+  'ide-redesign.js',
+  'ide-section-label.js',
+  'ide-language-control.js',
+  'console-panel-resize.js',
+  'simulation-panel-v2.js',
+  'simulation-panel-quality.js',
+  'simulation-panel-behavior.js',
+  'waveform-window-refinement.js',
+  'riscv-project-ui.js',
+]
+for(const script of globallyLoadedIdeScripts){
+  if(indexHtml.includes(`/src/${script}`)){
+    console.error(`IDE-only script is still globally loaded from index.html: ${script}`)
+    process.exit(1)
+  }
+}
+
+const mainSource=fs.readFileSync(path.join(root,'src/main.jsx'),'utf8')
+if(mainSource.includes("from './data/activeProblems'")||mainSource.includes("from './data/guidedProjects'")){
+  console.error('Initial app entry imports a full problem/project catalog instead of runtimeCatalog.')
+  process.exit(1)
+}
+
 const problemBytes=Buffer.byteLength(JSON.stringify(problemCatalog))
 const projectBytes=Buffer.byteLength(JSON.stringify(projectCatalog))
 if(problemBytes>140000){
