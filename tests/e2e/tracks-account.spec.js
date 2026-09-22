@@ -7,17 +7,17 @@ test.describe('HDLForge tracks and accounts', () => {
     await page.reload()
   })
 
-  test('opens company tracks and guided career roadmaps from Problems', async ({ page }) => {
+  test('opens guided career roadmaps from Problems without the removed Company Tracks card', async ({ page }) => {
     await page.getByRole('button', { name: 'Problems', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
-    await expect(page.getByRole('region', { name: 'Company tracks' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Company tracks' })).toHaveCount(0)
     await expect(page.getByRole('complementary', { name: 'Guided Roadmap' })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Jane Street/i })).toBeVisible()
     await expect(page.getByRole('button', { name: 'FPGA Engineer', exact: true })).toBeVisible()
 
     await page.getByRole('button', { name: 'Design Verification', exact: true }).click()
     await expect(page).toHaveURL(/\/app\/roadmaps\/design-verification\/$/)
     await expect(page.getByRole('heading', { name: 'Design Verification', exact: true })).toBeVisible()
+    await expect(page.locator('.career-milestone-head')).toHaveCount(4)
     await expect(page.locator('.career-problem').first()).toBeVisible()
     await expect(page.locator('.career-project-card').first()).toBeVisible()
   })
