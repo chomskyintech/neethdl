@@ -2,15 +2,16 @@
   --career-bg:#1f1f20;
   --career-panel:#262527;
   --career-surface:#29282a;
-  --career-surface-2:#303033;
+  --career-surface-2:#2e2d30;
+  --career-surface-3:#302f31;
   --career-border:#39393b;
-  --career-border-soft:#303034;
-  --career-text:#f4f4f5;
-  --career-text-soft:#d5d5d9;
-  --career-muted:#9a9aa0;
-  --career-dim:#7f7f85;
-  --career-accent:#36a487;
-  --career-accent-strong:#43b595;
+  --career-border-soft:#302f32;
+  --career-text:#ececec;
+  --career-text-soft:#c2c2c4;
+  --career-muted:#76767a;
+  --career-dim:#66666b;
+  --career-accent:#397e73;
+  --career-accent-strong:#4b82ac;
 
   width:100%;
   display:grid;
@@ -19,15 +20,33 @@
   align-items:start;
   color:var(--career-text-soft);
 }
-.career-roadmap,.career-side-rail{
+.career-roadmap{
   position:sticky;
   top:122px;
   align-self:start;
+  min-width:0;
+  max-height:calc(100vh - 138px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:4px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--career-border) transparent;
+}
+.career-roadmap::-webkit-scrollbar{width:6px}
+.career-roadmap::-webkit-scrollbar-track{background:transparent}
+.career-roadmap::-webkit-scrollbar-thumb{
+  border-radius:999px;
+  background:var(--career-border);
+}
+.career-side-rail{
+  position:sticky;
+  top:122px;
+  align-self:start;
+  min-width:0;
 }
 .career-content{min-width:0}
 
-/* Career pages own their roadmap palette. Shared Problems/Projects roadmap styles
-   remain in account-tracks.css, but cannot recolor this workspace. */
+/* Match the Problems page guided-roadmap surface and state colours. */
 .career-workspace .guided-roadmap-card{
   padding:18px;
   border:1px solid var(--career-border)!important;
@@ -52,8 +71,8 @@
 }
 .career-workspace .guided-roadmap-item.active{
   color:var(--career-accent)!important;
-  background:transparent!important;
-  border-color:var(--career-border-soft)!important;
+  background:var(--career-surface-2)!important;
+  border-color:var(--career-accent)!important;
   box-shadow:none!important;
 }
 .career-workspace .guided-roadmap-item svg{
@@ -66,15 +85,6 @@
   border:0;
   border-radius:0;
   background:transparent;
-}
-.career-eyebrow{
-  display:inline-block;
-  margin-bottom:16px;
-  color:var(--career-accent);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
 }
 .career-hero h1{
   margin:0;
@@ -100,7 +110,7 @@
   padding:6px 10px;
   border:1px solid var(--career-border);
   border-radius:999px;
-  background:var(--career-panel);
+  background:var(--career-surface);
   color:var(--career-text-soft);
   font-size:10px;
   font-weight:700;
@@ -112,15 +122,6 @@
   justify-content:space-between;
   gap:18px;
   margin-bottom:22px;
-}
-.career-section-head>div>span{
-  display:block;
-  margin-bottom:9px;
-  color:var(--career-accent);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
 }
 .career-section-head h2{
   margin:0;
@@ -144,9 +145,9 @@
 }
 .career-milestone{
   overflow:hidden;
-  border:1px solid #303034;
+  border:1px solid var(--career-border);
   border-radius:14px;
-  background:#232326;
+  background:var(--career-panel);
 }
 .career-milestone-head{
   width:100%;
@@ -157,20 +158,24 @@
   gap:12px;
   padding:0 18px;
   border:0;
-  background:transparent;
-  color:#f1f1f2;
+  background:var(--career-surface);
+  color:var(--career-muted);
   cursor:pointer;
   text-align:left;
 }
 .career-milestone-head:hover{
-  background:#28282b;
+  background:var(--career-surface-2);
+  color:var(--career-text);
+}
+.career-milestone.open>.career-milestone-head{
+  background:var(--career-surface-2);
+  color:var(--career-text);
 }
 .career-milestone-chevron{
-  color:#b7b7bb;
+  color:var(--career-accent);
   transition:transform .16s ease,color .16s ease;
 }
 .career-milestone.open .career-milestone-chevron{
-  color:var(--career-accent);
   transform:rotate(90deg);
 }
 .career-milestone-head h3{
@@ -186,7 +191,7 @@
 }
 .career-milestone-count{
   justify-self:end;
-  color:#c5c5c9;
+  color:var(--career-muted);
   font:500 11px ui-monospace,SFMono-Regular,Consolas,monospace;
 }
 .career-milestone-progress{
@@ -194,7 +199,7 @@
   height:8px;
   overflow:hidden;
   border-radius:999px;
-  background:#555559;
+  background:var(--career-surface-3);
 }
 .career-milestone-progress i{
   position:absolute;
@@ -211,8 +216,8 @@
 }
 .career-problem-list{
   display:grid;
-  border-top:1px solid #343438;
-  background:#1c1c1e;
+  border-top:1px solid var(--career-border);
+  background:var(--career-panel);
 }
 .career-problem-list[hidden]{display:none}
 .career-problem{
@@ -224,30 +229,30 @@
   gap:12px;
   padding:8px 18px;
   border:0;
-  border-bottom:1px solid #2b2b2e;
+  border-bottom:1px solid var(--career-border-soft);
   background:transparent;
   color:var(--career-text-soft);
   cursor:pointer;
   text-align:left;
 }
 .career-problem:last-child{border-bottom:0}
-.career-problem:hover{background:#242427}
+.career-problem:hover{background:var(--career-surface)}
 .career-problem-check{
   width:22px;
   height:22px;
   display:grid;
   place-items:center;
-  border:1px solid #45454a;
+  border:1px solid var(--career-border);
   border-radius:50%;
-  color:#55555a;
+  color:var(--career-dim);
 }
 .career-problem-check.done{
-  border-color:#1d6b51;
-  background:#133329;
-  color:#42c68d;
+  border-color:var(--career-accent);
+  background:var(--career-accent);
+  color:var(--career-bg);
 }
 .career-problem-index{
-  color:#73737a;
+  color:var(--career-muted);
   font:11px ui-monospace,SFMono-Regular,Consolas,monospace;
 }
 .career-problem-copy{
@@ -259,13 +264,14 @@
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  color:#dedee1;
+  color:var(--career-text-soft);
   font-size:14px;
   font-weight:700;
 }
+.career-problem:hover .career-problem-copy strong{color:var(--career-text)}
 .career-problem-copy small{
   overflow:hidden;
-  color:#85858c;
+  color:var(--career-muted);
   font-size:11px;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -273,17 +279,18 @@
 .career-problem-difficulty{
   justify-self:end;
   padding:4px 8px;
+  border:1px solid var(--career-border);
   border-radius:999px;
-  background:#29292c;
+  background:var(--career-surface);
   font-size:10px;
   font-weight:800;
 }
-.career-problem-difficulty.easy{color:#45bd88}
-.career-problem-difficulty.medium{color:#d8c86e}
-.career-problem-difficulty.hard{color:#df7b83}
+.career-problem-difficulty.easy{color:#397e73}
+.career-problem-difficulty.medium{color:#aaa672}
+.career-problem-difficulty.hard{color:#a37261}
 .career-problem-chevron{
   justify-self:end;
-  color:#7d7d83;
+  color:var(--career-muted);
 }
 
 .career-project-grid{
@@ -357,13 +364,13 @@
   color:var(--career-accent-strong)!important;
   background:transparent!important;
 }
-.career-progress-card,.career-next-card{
-  padding:20px;
+.career-progress-card{
+  padding:22px;
   border:1px solid var(--career-border);
-  border-radius:16px;
+  border-radius:17px;
   background:var(--career-panel);
 }
-.career-progress-card>span,.career-next-card>span{
+.career-progress-card>span{
   color:var(--career-muted);
   font-size:9px;
   font-weight:800;
@@ -387,7 +394,7 @@
   margin-top:16px;
   overflow:hidden;
   border-radius:999px;
-  background:var(--career-surface);
+  background:var(--career-surface-3);
 }
 .career-progress-track i{
   display:block;
@@ -417,14 +424,6 @@
   color:var(--career-text);
   font-size:15px;
 }
-.career-next-card{margin-top:14px}
-.career-next-card ol{
-  margin:14px 0 0;
-  padding-left:18px;
-  color:var(--career-text-soft);
-  font-size:11px;
-  line-height:1.7;
-}
 
 @media(max-width:1480px){
   .career-workspace{grid-template-columns:220px minmax(0,1fr) 300px;gap:20px}
@@ -434,13 +433,18 @@
 }
 @media(max-width:1040px){
   .career-workspace{grid-template-columns:minmax(0,1fr) 280px}
-  .career-roadmap{position:static;grid-column:1/-1}
+  .career-roadmap{
+    position:static;
+    grid-column:1/-1;
+    max-height:none;
+    overflow:visible;
+    padding-right:0;
+  }
   .career-side-rail{top:104px}
 }
 @media(max-width:900px){
   .career-workspace{grid-template-columns:1fr}
-  .career-side-rail{position:static;display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .career-next-card{margin-top:0}
+  .career-side-rail{position:static}
   .career-project-grid{grid-template-columns:1fr}
 }
 @media(max-width:760px){
@@ -466,7 +470,6 @@
 }
 @media(max-width:600px){
   .career-hero h1{font-size:36px}
-  .career-side-rail{grid-template-columns:1fr}
   .career-problem-difficulty{display:none}
   .career-problem{grid-template-columns:24px minmax(0,1fr) 18px}
 }
