@@ -456,16 +456,25 @@
   margin-top:-30px;
 }
 .guided-roadmap{
-  max-height:calc(100vh - 150px);
+  overflow:visible;
+}
+.guided-roadmap>.guided-roadmap-card{
+  max-height:calc(100vh - 108px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.guided-roadmap>.guided-roadmap-card .guided-roadmap-list{
+  min-height:0;
   overflow-y:auto;
   overscroll-behavior:contain;
   padding-right:4px;
   scrollbar-width:thin;
   scrollbar-color:var(--nc-border,#39393b) transparent;
 }
-.guided-roadmap::-webkit-scrollbar{width:6px}
-.guided-roadmap::-webkit-scrollbar-track{background:transparent}
-.guided-roadmap::-webkit-scrollbar-thumb{
+.guided-roadmap>.guided-roadmap-card .guided-roadmap-list::-webkit-scrollbar{width:6px}
+.guided-roadmap>.guided-roadmap-card .guided-roadmap-list::-webkit-scrollbar-track{background:transparent}
+.guided-roadmap>.guided-roadmap-card .guided-roadmap-list::-webkit-scrollbar-thumb{
   border-radius:999px;
   background:var(--nc-border,#39393b);
 }
@@ -763,10 +772,15 @@
   .guided-roadmap{
     position:static;
     grid-column:1/-1;
+    margin-top:0;
+  }
+  .guided-roadmap>.guided-roadmap-card{
     max-height:none;
     overflow:visible;
+  }
+  .guided-roadmap>.guided-roadmap-card .guided-roadmap-list{
+    overflow:visible;
     padding-right:0;
-    margin-top:0;
   }
   .guided-roadmap-list{
     grid-template-columns:repeat(5,minmax(0,1fr));
