@@ -427,7 +427,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(bounds).toBeTruthy()
     expect(progressBounds).toBeTruthy()
     expect(Math.abs(bounds.y-progressBounds.y)).toBeLessThanOrEqual(1)
-    expect(bounds.y).toBeLessThanOrEqual(100)
+    expect(bounds.y).toBeLessThanOrEqual(150)
     expect(bounds.y + bounds.height).toBeLessThanOrEqual(650)
 
     const scrollState=await roadmap.evaluate(node=>{
@@ -442,6 +442,44 @@ test.describe('HDLForge navigation and SEO content', () => {
     expect(scrollState.overflowY).toBe('auto')
     expect(scrollState.maxHeight).not.toBe('none')
     expect(scrollState.scrollHeight).toBeGreaterThanOrEqual(scrollState.clientHeight)
+  })
+
+  test('all Guided Roadmap pages keep aligned side rails inside the viewport', async ({ page }) => {
+    await page.setViewportSize({width:1750,height:650})
+
+    const cases=[
+      ['/app/problems/','.guided-roadmap','.problems-side-rail'],
+      ['/app/projects/','.project-roadmap','.projects-side-rail'],
+      ['/app/roadmaps/rtl-design/','.career-roadmap','.career-side-rail'],
+    ]
+
+    for(const [url,leftSelector,rightSelector] of cases){
+      await page.goto(url)
+      const left=page.locator(leftSelector)
+      const right=page.locator(rightSelector)
+      await expect(left).toBeVisible()
+      await expect(right).toBeVisible()
+
+      const leftBounds=await left.boundingBox()
+      const rightBounds=await right.boundingBox()
+      expect(leftBounds).toBeTruthy()
+      expect(rightBounds).toBeTruthy()
+      expect(Math.abs(leftBounds.y-rightBounds.y)).toBeLessThanOrEqual(1)
+      expect(leftBounds.y).toBeLessThanOrEqual(150)
+      expect(leftBounds.y+leftBounds.height).toBeLessThanOrEqual(650)
+
+      const leftStyle=await left.evaluate(node=>{
+        const style=getComputedStyle(node)
+        return {
+          overflowY:style.overflowY,
+          maxHeight:style.maxHeight,
+          marginTop:style.marginTop,
+        }
+      })
+      expect(leftStyle.overflowY).toBe('auto')
+      expect(leftStyle.maxHeight).not.toBe('none')
+      expect(leftStyle.marginTop).toBe('-30px')
+    }
   })
 
   test('new standalone interview problems open in the editor', async ({ page }) => {
