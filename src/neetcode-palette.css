@@ -66,7 +66,7 @@ html,body,.app,.layout,.main{
 body{background-image:none!important}
 ::selection{background:rgba(75,130,172,.22)!important;color:var(--nc-text-strong)!important}
 
-a,.text-btn,.chevron,.eyebrow,.brand-accent,.project-guide-link,.company-track-step,.career-eyebrow{
+a,.text-btn,.chevron,.eyebrow,.brand-accent,.project-guide-link,.company-track-step{
   color:var(--nc-blue)!important;
 }
 a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important}
@@ -92,26 +92,24 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
   background:linear-gradient(90deg,var(--nc-bg) 0%,var(--nc-bg) 52%,rgba(31,30,32,.84) 72%,rgba(31,30,32,.18) 100%)!important;
 }
 .landing-hero h1,.page-head h1,.project-role-head h2,.problem-progress-title,
-.guided-roadmap-card h2,.project-activity-head h2,.career-hero h1,.career-section h2{color:var(--nc-text-strong)!important}
-.landing-hero p,.page-head p,.project-role-head p,.career-hero p,.career-section-head p{color:var(--nc-muted)!important}
-.landing-start,.primary,.success,.career-project-card button{
+.guided-roadmap-card h2,.project-activity-head h2{color:var(--nc-text-strong)!important}
+.landing-hero p,.page-head p,.project-role-head p{color:var(--nc-muted)!important}
+.landing-start,.primary,.success{
   background:var(--nc-teal)!important;border-color:var(--nc-teal)!important;color:var(--nc-bg)!important;box-shadow:none!important;
 }
-.landing-start:hover,.primary:hover,.success:hover,.career-project-card button:hover{
+.landing-start:hover,.primary:hover,.success:hover{
   background:var(--nc-blue)!important;border-color:var(--nc-blue)!important;color:var(--nc-bg)!important;
 }
 
 /* Shared cards and surfaces */
 .guided-roadmap-card,.problem-progress-panel,.sidebar-company-tracks,.project-activity-panel,
 .project-card-modern,.project-card,.guided-project,.featured-project,.company-tracks,.track-detail,.track-card,
-.account-modal,.content-card,.problem-list,.topic-card,.stats,.progress-hero,.career-hero,.career-section,
-.career-milestone,.career-project-card,.career-progress-card,.career-next-card,.account-tabs,.account-message,
+.account-modal,.content-card,.problem-list,.topic-card,.stats,.progress-hero,.account-tabs,.account-message,
 .account-sync,.discussion-post,.discussion-form{
   background:var(--nc-editor)!important;border-color:var(--nc-border)!important;box-shadow:none!important;
 }
 .project-section-btn,.problem-section-btn,.project-category-chip,.company-track-chip,.project-activity-item,
-.track-card,.track-problem,.career-skill-row span,.career-project-tags span,.career-project-level,
-.project-level,.project-tags span{
+.track-card,.track-problem,.project-level,.project-tags span{
   background:var(--nc-surface)!important;border-color:var(--nc-border)!important;color:var(--nc-text)!important;
 }
 .project-section-btn:hover,.problem-section-btn:hover,.project-category-chip:hover,.company-track-chip:hover,
@@ -169,9 +167,6 @@ a:hover,.text-btn:hover,.project-guide-link:hover{color:var(--nc-teal)!important
 .project-activity-empty,.project-activity-item{background:var(--nc-surface)!important;border-color:var(--nc-border)!important}
 .project-activity-item em{background:var(--nc-surface-2)!important;border-color:var(--nc-border)!important;color:var(--nc-blue)!important}
 .project-activity-item em.complete{color:var(--nc-teal)!important}
-.career-progress-track{background:var(--nc-surface)!important}
-.career-progress-track i{background:var(--nc-teal)!important}
-.career-section-head>strong,.career-milestone-head span,.career-progress-number strong{color:var(--nc-teal)!important}
 
 /* Account */
 .account-overlay{background:rgba(0,0,0,.62)!important}
