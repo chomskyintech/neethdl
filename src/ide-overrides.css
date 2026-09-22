@@ -355,7 +355,7 @@
 }
 .problem-task-copy{
   max-width:650px;
-  margin-top:21.5px;
+  margin-top:30px;
   color:#aab8c8;
   font-size:13px;
   line-height:1.75;
@@ -401,7 +401,7 @@
 .structured-examples{
   min-width:0;
   margin-top:0;
-  padding-top:48px;
+  padding-top:30px;
   display:grid;
   gap:42px;
 }
