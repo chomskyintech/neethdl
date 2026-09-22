@@ -44,7 +44,7 @@ test.describe('HDLForge generated SEO coverage',()=>{
  })
 
  test('homepage exposes crawlable links to SEO hubs',async({page})=>{
-  await page.goto('/')
+  await page.goto('/home/')
   await expect(page.locator('a[href="/learn/"]')).toBeVisible()
   await expect(page.locator('a[href="/problems/"]')).toBeVisible()
   await expect(page.locator('a[href="/learn/verilog-interview/"]')).toBeVisible()
@@ -69,7 +69,6 @@ test.describe('HDLForge generated SEO coverage',()=>{
 
 test('problem rows stay dark and problem names use a softer neutral color',async({page})=>{
  await page.goto('/')
- await page.getByRole('button',{name:'Problems',exact:true}).click()
  const row=page.locator('.problem-row').first()
  await expect(row).toBeVisible()
  const bg=await row.evaluate(el=>getComputedStyle(el).backgroundColor)
