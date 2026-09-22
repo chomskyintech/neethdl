@@ -601,7 +601,7 @@
       "SystemVerilog"
     ],
     "evaluation": {
-      "type": "pattern"
+      "type": "simulation"
     },
     "tags": [
       "mux",
@@ -617,19 +617,7 @@
       "Do not use delays."
     ],
     "starterCode": "module onehot_mux4(\n  input logic [3:0] sel,\n  input logic [7:0] d0,d1,d2,d3,\n  output logic [7:0] y\n);\n  // TODO\nendmodule",
-    "solution": "module onehot_mux4(input logic [3:0] sel,input logic [7:0] d0,d1,d2,d3,output logic [7:0] y);\n  always_comb begin\n    case(sel)\n      4'b0001: y=d0;\n      4'b0010: y=d1;\n      4'b0100: y=d2;\n      4'b1000: y=d3;\n      default: y='0;\n    endcase\n  end\nendmodule",
-    "checks": [
-      {
-        "label": "One-hot cases",
-        "pattern": "4'b0001[\\s\\S]*4'b0010[\\s\\S]*4'b0100[\\s\\S]*4'b1000",
-        "flags": "i"
-      },
-      {
-        "label": "Invalid select clears output",
-        "pattern": "default\\s*:\\s*y\\s*=\\s*'0",
-        "flags": "i"
-      }
-    ]
+    "solution": "module onehot_mux4(input logic [3:0] sel,input logic [7:0] d0,d1,d2,d3,output logic [7:0] y);\n  always_comb begin\n    case(sel)\n      4'b0001: y=d0;\n      4'b0010: y=d1;\n      4'b0100: y=d2;\n      4'b1000: y=d3;\n      default: y=8'd0;\n    endcase\n  end\nendmodule"
   },
   {
     "id": "comb-comparator16",
