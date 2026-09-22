@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">HDLForge logo</title>
+  <circle cx="128" cy="128" r="112" fill="#3C8F82"/>
+  <path
+    d="M145 66 82 130c-5 5-1 13 6 13h33l-17 51c-3 9 8 15 15 8l58-59c5-5 1-13-6-13h-32l17-52c3-9-5-18-11-12Z"
+    fill="none"
+    stroke="#102B29"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
