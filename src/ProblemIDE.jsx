@@ -8,6 +8,7 @@ import './ide-overrides.css'
 import './waveform-window.css'
 
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/$/, '')
+const AI_URL = (import.meta.env.VITE_AI_URL || '/api/ai').replace(/\/$/, '')
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
 const referenceFormatCache = new Map()
 
@@ -860,14 +861,8 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     const priorMessages = aiMessages.slice(-6)
     setAiMessages(messages => [...messages, { role: 'user', text: questionText }])
 
-    if (!RUNNER_URL) {
-      setAiError('AI is not configured for this HDLForge deployment yet.')
-      setAiLoading(false)
-      return
-    }
-
     try {
-      const response = await fetch(`${RUNNER_URL}/ai`, {
+      const response = await fetch(AI_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
