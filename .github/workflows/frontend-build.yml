@@ -33,6 +33,10 @@ jobs:
       - name: Validate reference solution coverage
         run: npm run test:solution-coverage
 
+      - name: Audit Verilog/SystemVerilog/VHDL parity
+        continue-on-error: true
+        run: npm run test:language-parity
+
       - name: Validate testbench coverage
         run: npm run test:testbench-coverage
 
