@@ -22,10 +22,10 @@
 }
 .career-roadmap{
   position:sticky;
-  top:122px;
+  top:92px;
   align-self:start;
   min-width:0;
-  max-height:calc(100vh - 190px);
+  max-height:calc(100vh - 108px);
   overflow-y:auto;
   overscroll-behavior:contain;
   padding-right:4px;
@@ -40,7 +40,7 @@
 }
 .career-side-rail{
   position:sticky;
-  top:122px;
+  top:92px;
   align-self:start;
   min-width:0;
 }
