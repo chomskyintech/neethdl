@@ -22,6 +22,8 @@ async function runGenerator(name){
 }
 
 try{
+ await runGenerator('generate-runtime-catalogs.mjs')
+
  // Legacy SEO generators read problems.json (and the accelerator generator reads
  // acceleratorProblems.json) directly. Temporarily expose the complete coding-only
  // catalogs to those generators, then restore source data BEFORE Vite bundles the app.
