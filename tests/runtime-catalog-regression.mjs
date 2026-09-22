@@ -9,10 +9,18 @@ const generated=path.join(root,'src/data/.generated')
 const problemCatalog=JSON.parse(fs.readFileSync(path.join(generated,'problemCatalog.json'),'utf8'))
 const projectCatalog=JSON.parse(fs.readFileSync(path.join(generated,'guidedProjectCatalog.json'),'utf8'))
 
-const [{default:fullProblems},{guidedProjects}] = await Promise.all([
-  import('../src/data/activeProblems.js'),
+const [{guidedProjectProblems,guidedProjects},{assignProblemTopic}] = await Promise.all([
   import('../src/data/guidedProjects.js'),
+  import('../src/data/problemTopics.js'),
 ])
+
+const readJson=file=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))
+const fullProblems=[
+  ...readJson('src/data/problems.json').filter(problem=>problem.evaluation?.type!=='answer'),
+  ...readJson('src/data/acceleratorProblems.json'),
+  ...readJson('src/data/expansionProblems.json'),
+  ...guidedProjectProblems,
+].map(problem=>({...problem,topic:assignProblemTopic(problem)}))
 
 const ids=list=>list.map(item=>item.id).sort()
 const same=(left,right)=>JSON.stringify(left)===JSON.stringify(right)
