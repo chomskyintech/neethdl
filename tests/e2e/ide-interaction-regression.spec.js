@@ -127,6 +127,35 @@ test.describe('IDE interaction regressions', () => {
     expect(await taskList.evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
   })
 
+  test('keeps paragraph-to-bullet spacing equal to bullet spacing', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/app/problems/rtl-arbiter/')
+
+    const paragraph = page.locator('.problem-task-copy > p')
+    const items = page.locator('.problem-task-list > li')
+
+    await expect(items).toHaveCount(5)
+
+    const paragraphBox = await paragraph.boundingBox()
+    const firstBox = await items.nth(0).boundingBox()
+    const secondBox = await items.nth(1).boundingBox()
+
+    expect(paragraphBox).toBeTruthy()
+    expect(firstBox).toBeTruthy()
+    expect(secondBox).toBeTruthy()
+
+    const paragraphToBullets = firstBox.y - (paragraphBox.y + paragraphBox.height)
+    const bulletToBullet = secondBox.y - (firstBox.y + firstBox.height)
+
+    expect(paragraphToBullets).toBeGreaterThanOrEqual(13)
+    expect(paragraphToBullets).toBeLessThanOrEqual(15)
+    expect(bulletToBullet).toBeGreaterThanOrEqual(13)
+    expect(bulletToBullet).toBeLessThanOrEqual(15)
+    expect(Math.abs(paragraphToBullets - bulletToBullet)).toBeLessThanOrEqual(1)
+    expect(await page.locator('.problem-task-list').evaluate(el => getComputedStyle(el).marginTop)).toBe('14px')
+    expect(await page.locator('.problem-task-list').evaluate(el => getComputedStyle(el).rowGap)).toBe('14px')
+  })
+
   test('keeps waveform, reset and search controls together on the right', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await page.goto('/app/problems/rtl-fifo/')
