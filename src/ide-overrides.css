@@ -444,3 +444,194 @@
   color:#d9d9dc;
   font:17px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;
 }
+
+
+/* Priority encoder teaching layout */
+.priority-approach-guide .approach-guide-intro > p{
+  max-width:760px;
+}
+
+.priority-example{
+  margin-top:22px;
+  padding:18px 20px;
+  border:1px solid #37373b;
+  border-radius:11px;
+  background:#202023;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:14px 18px;
+  align-items:center;
+}
+
+.priority-example-value{
+  min-width:0;
+}
+
+.priority-example-value > span{
+  display:block;
+  margin-bottom:7px;
+  color:#8f8f95;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.priority-example-value code{
+  display:inline-block;
+  padding:8px 10px;
+  border:1px solid #343438;
+  border-radius:7px;
+  background:#19191b;
+  color:#ededf0;
+  font:600 12px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.priority-example-arrow{
+  color:#4db38a;
+  font-size:20px;
+  font-weight:800;
+}
+
+.priority-example > p{
+  grid-column:1 / -1;
+  margin:0;
+  color:#b8b8bd;
+  font-size:12px;
+  line-height:1.7;
+}
+
+.priority-example > p code,
+.priority-concept code,
+.priority-common-mistake code{
+  color:#ededf0;
+  font:600 .95em/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.priority-concepts{
+  gap:20px;
+  margin-top:4px;
+}
+
+/* These sections intentionally have no outer card/block. */
+.priority-concept{
+  padding:4px 0 10px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.priority-concept h3{
+  margin-bottom:9px;
+  font-size:12px;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+.priority-concept p{
+  max-width:780px;
+}
+
+.priority-theory-table{
+  margin-top:13px;
+  overflow:hidden;
+  border:1px solid #343438;
+  border-radius:9px;
+  background:#19191b;
+}
+
+.priority-theory-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:38px;
+  border-bottom:1px solid #2d2d31;
+  align-items:center;
+}
+
+.priority-theory-row:last-child{
+  border-bottom:0;
+}
+
+.priority-theory-row > *{
+  padding:9px 12px;
+}
+
+.priority-theory-head{
+  background:#1e1e21;
+  color:#929297;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+
+.priority-theory-row code{
+  color:#d9d9dc;
+  font:600 11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.priority-flow{
+  margin-top:13px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  align-items:center;
+}
+
+.priority-flow span{
+  padding:7px 9px;
+  border:1px solid #36363a;
+  border-radius:7px;
+  background:#19191b;
+  color:#dedee1;
+  font:600 11px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.priority-flow b{
+  color:#4db38a;
+  font-size:13px;
+}
+
+.priority-reasoning{
+  margin-top:0;
+}
+
+.priority-common-mistake{
+  margin-top:20px;
+  padding:15px 16px;
+  border-left:3px solid #4db38a;
+  border-radius:0 8px 8px 0;
+  background:rgba(77,179,138,.08);
+}
+
+.priority-common-mistake strong{
+  display:block;
+  margin-bottom:6px;
+  color:#efeff1;
+  font-size:10px;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+
+.priority-common-mistake p{
+  margin:0;
+  color:#bfc0c4;
+  font-size:12px;
+  line-height:1.7;
+}
+
+.priority-approach-hint{
+  margin-top:16px !important;
+  color:#8f8f95 !important;
+  font-size:11px !important;
+}
+
+@media(max-width:700px){
+  .priority-example{
+    grid-template-columns:1fr;
+  }
+  .priority-example-arrow{
+    transform:rotate(90deg);
+    justify-self:start;
+  }
+}
