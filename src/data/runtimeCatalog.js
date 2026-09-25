@@ -12,7 +12,7 @@ export async function loadProblemDetails(id){
   if(!id)return null
   if(detailPromises.has(id))return detailPromises.get(id)
 
-  const pending=fetch(`/problem-data/${encodeURIComponent(id)}.json`,{cache:'force-cache'})
+  const pending=fetch(`/problem-data/${encodeURIComponent(id)}.json`,{cache:import.meta.env.DEV?'no-store':'no-cache'})
     .then(response=>{
       if(!response.ok)throw new Error(`Problem payload returned HTTP ${response.status}`)
       return response.json()
