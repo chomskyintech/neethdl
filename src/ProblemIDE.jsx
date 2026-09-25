@@ -237,6 +237,97 @@ function Discussion({ problem }) {
   const submit = event => { event.preventDefault(); if (!draft.trim()) return; const next = [...posts, { id: Date.now(), name: 'You', text: draft.trim(), time: new Date().toLocaleString() }]; setPosts(next); localStorage.setItem(key, JSON.stringify(next)); setDraft('') }
   return <div className="discussion discussion-in-tab"><div className="discussion-head"><div><h2>Discussion</h2><p>Ask questions, compare implementations and discuss edge cases.</p></div><span><MessageSquare size={15} /> {posts.length} posts</span></div><form className="discussion-form" onSubmit={submit}><textarea value={draft} onChange={e => setDraft(e.target.value)} placeholder="Ask a question or share an approach…" /><button className="primary">Post discussion</button></form><div className="discussion-list">{posts.length ? posts.map(post => <article className="discussion-post" key={post.id}><div className="post-avatar">Y</div><div><strong>{post.name}</strong><small>{post.time}</small><p>{post.text}</p></div></article>) : <div className="discussion-empty"><MessageSquare size={22} /><strong>Start the discussion</strong><p>Be the first to ask a question about this problem.</p></div>}</div></div>
 }
+function PriorityEncoderApproach({problem}) {
+  const concepts = [
+    {
+      name: 'Priority encoding',
+      description: 'A normal encoder assumes only one input is asserted. A priority encoder still produces a defined result when several inputs are high: the input with the highest priority wins.',
+      table: [
+        ['10000000', '111'],
+        ['01000000', '110'],
+        ['00100000', '101'],
+        ['00010000', '100'],
+      ],
+    },
+    {
+      name: 'Highest-set-bit search',
+      description: 'Because bit 7 has the highest priority, inspect the input from bit 7 downward. The first asserted bit determines the encoded output.',
+      flow: ['bit 7', 'bit 6', 'bit 5', '...', 'bit 0'],
+    },
+    {
+      name: 'Combinational logic',
+      description: 'The output depends only on the current input value. No previous cycle needs to be remembered, so this circuit does not need a clock, register, or state machine.',
+      flow: ['input', 'priority logic', 'encoded output'],
+    },
+    {
+      name: 'The no-input case',
+      description: 'You must also define what happens when every input is zero. A clean design uses the valid output so that index=000 can be distinguished from a genuine bit-0 match.',
+      table: [
+        ['00000000', 'index=000, valid=0'],
+        ['00000001', 'index=000, valid=1'],
+      ],
+    },
+  ]
+  const steps = [
+    'Start with the highest-priority input, bit 7.',
+    'If bit 7 is high, encode 7 and do not allow lower bits to replace it.',
+    'Otherwise move downward through bits 6, 5, 4, and so on.',
+    'The first asserted bit you encounter determines the output.',
+    'If no bit is asserted, drive a safe default index and deassert valid.',
+  ]
+
+  return <article className="approach-guide priority-approach-guide">
+    <section className="approach-guide-section approach-guide-intro">
+      <h1>Approach</h1>
+      <p>Design an 8-to-3 priority encoder where bit 7 has the highest priority. The key idea is to identify the highest-numbered asserted input and return its binary index.</p>
+
+      <div className="priority-example">
+        <div className="priority-example-value">
+          <span>Input</span>
+          <code>00101000</code>
+        </div>
+        <span className="priority-example-arrow">→</span>
+        <div className="priority-example-value">
+          <span>Output</span>
+          <code>101</code>
+        </div>
+        <p>Bits 5 and 3 are both high, but bit 5 has the higher priority. Therefore the output is <code>101</code>, which is 5 in binary.</p>
+      </div>
+    </section>
+
+    <section className="approach-guide-section">
+      <h2>Core theory</h2>
+      <div className="approach-concepts priority-concepts">
+        {concepts.map(concept => <div className="approach-concept priority-concept" key={concept.name}>
+          <h3>{concept.name}</h3>
+          <p>{concept.description}</p>
+          {concept.table && <div className="priority-theory-table">
+            <div className="priority-theory-row priority-theory-head"><span>Input</span><span>{concept.name === 'The no-input case' ? 'Result' : 'Output'}</span></div>
+            {concept.table.map(([input, output]) => <div className="priority-theory-row" key={input}><code>{input}</code><code>{output}</code></div>)}
+          </div>}
+          {concept.flow && <div className="priority-flow">
+            {concept.flow.map((item,index) => <React.Fragment key={item + index}>
+              <span>{item}</span>{index < concept.flow.length - 1 && <b>→</b>}
+            </React.Fragment>)}
+          </div>}
+        </div>)}
+      </div>
+    </section>
+
+    <section className="approach-guide-section">
+      <h2>How to think about the solution</h2>
+      <ol className="approach-reasoning priority-reasoning">
+        {steps.map((step,index)=><li key={index}>{step}</li>)}
+      </ol>
+      <div className="priority-common-mistake">
+        <strong>Common mistake</strong>
+        <p>Using separate independent <code>if</code> statements can allow a lower-priority condition to overwrite an earlier result. An <code>if / else if</code> chain naturally expresses the required priority.</p>
+      </div>
+      <p className="priority-approach-hint">This section explains the reasoning without giving away the full RTL implementation.</p>
+    </section>
+  </article>
+}
+
 function approachTheory(problem) {
   const topic = problem.topic || ''
   if (problem.id === 'rtl-mux') return [
@@ -384,6 +475,7 @@ function approachReasoning(problem) {
 }
 
 function ApproachGuide({problem}) {
+  if (problem.id === 'rtl-priority') return <PriorityEncoderApproach problem={problem} />
   const concepts = approachTheory(problem)
   const reasoning = approachReasoning(problem)
   return <article className="approach-guide">
