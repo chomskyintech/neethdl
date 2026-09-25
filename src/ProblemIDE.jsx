@@ -482,6 +482,7 @@ function ApproachGuide({problem}) {
       <p>{problem.approach || problem.description || 'Understand the hardware behavior first, then map it to a synthesizable structure.'}</p>
     </section>
     <section className="approach-guide-section">
+      <h2>Core theory</h2>
       <p>These concepts are the foundation of this problem:</p>
       <div className="approach-concepts">{concepts.map(([name,description])=><div className="approach-concept" key={name}><h3>{name}</h3><p>{description}</p></div>)}</div>
     </section>
