@@ -783,9 +783,9 @@
   counter-reset:priority-step;
   display:grid;
   gap:14px;
-  color:#c9c9cd !important;
-  font-size:17px !important;
-  line-height:1.62 !important;
+  color:#d0d0d3 !important;
+  font-size:18px !important;
+  line-height:1.72 !important;
 }
 
 .ide-problem-content .priority-approach-guide .priority-reasoning li{
@@ -844,6 +844,6 @@
     font-size:24px !important;
   }
   .ide-problem-content .priority-approach-guide .priority-reasoning{
-    font-size:16px !important;
+    font-size:17px !important;
   }
 }
