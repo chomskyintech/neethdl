@@ -911,3 +911,23 @@
     font-size:23px !important;
   }
 }
+
+
+/* Priority encoder heading size alignment */
+.ide-problem-content .priority-approach-guide h2,
+.ide-problem-content .priority-approach-guide .priority-concept h3,
+.ide-problem-content .priority-approach-guide section:has(.priority-reasoning) > h2{
+  font-size:20px !important;
+  line-height:1.25 !important;
+  font-weight:500 !important;
+  letter-spacing:-.02em !important;
+  text-transform:none !important;
+}
+
+@media(max-width:700px){
+  .ide-problem-content .priority-approach-guide h2,
+  .ide-problem-content .priority-approach-guide .priority-concept h3,
+  .ide-problem-content .priority-approach-guide section:has(.priority-reasoning) > h2{
+    font-size:20px !important;
+  }
+}
