@@ -697,3 +697,79 @@
   }
 }
 
+
+
+/* Priority encoder readability correction — final visual override */
+.ide-problem-content .priority-approach-guide .approach-guide-intro > p{
+  font-size:20px !important;
+  line-height:1.72 !important;
+  color:#d7d7da !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-concept p{
+  font-size:18px !important;
+  line-height:1.72 !important;
+  color:#d0d0d3 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-example > p{
+  font-size:18px !important;
+  line-height:1.7 !important;
+  color:#d0d0d3 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-example{
+  background:#303033 !important;
+  border-color:#444448 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-example-value code,
+.ide-problem-content .priority-approach-guide .priority-flow span{
+  background:#29292c !important;
+  border-color:#414145 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-theory-table{
+  background:#2d2d30 !important;
+  border-color:#444448 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-theory-head{
+  background:#343437 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-theory-row{
+  border-bottom-color:#414145 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-theory-row:not(.priority-theory-head){
+  background:#2d2d30 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-theory-row code{
+  font-size:16px !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-concept h3{
+  font-size:19px !important;
+  margin-bottom:16px !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-reasoning{
+  font-size:18px !important;
+  line-height:1.72 !important;
+}
+
+.ide-problem-content .priority-approach-guide .priority-common-mistake p{
+  font-size:17px !important;
+}
+
+@media(max-width:700px){
+  .ide-problem-content .priority-approach-guide .approach-guide-intro > p{
+    font-size:18px !important;
+  }
+  .ide-problem-content .priority-approach-guide .priority-concept p,
+  .ide-problem-content .priority-approach-guide .priority-example > p{
+    font-size:17px !important;
+  }
+}
