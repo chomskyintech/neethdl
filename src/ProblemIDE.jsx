@@ -681,6 +681,23 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
 
+    {problem.youtubeVideoId ? (
+      <section className="solution-guide-section solution-video">
+        <h2>Video walkthrough</h2>
+        <p>Watch the problem being solved step by step, then compare the final RTL with the reference implementation below.</p>
+        <div className="solution-video-frame">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${problem.youtubeVideoId}`}
+            title={`${problem.title} video walkthrough`}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
+      </section>
+    ) : null}
+
     <section className="solution-guide-section solution-reference">
       <div className="solution-reference-head"><div><h2>Reference implementation</h2><p>Compare this with your design after you have attempted the problem.</p></div></div>
       <div className="solution-reference-tabs-row">
