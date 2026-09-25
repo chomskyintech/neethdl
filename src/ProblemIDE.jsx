@@ -644,6 +644,7 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
   const steps = solutionSteps(problem)
   const hardware = inferredHardware(problem)
   const mistakes = commonMistakes(problem)
+  const videoId = problem.youtubeVideoId || (problem.id === 'rtl-priority' ? '9a5AEh4zdYI' : '')
   const copy = async () => {
     if (!code) return
     try { await navigator.clipboard.writeText(displayCode || code); setCopied(true); setTimeout(()=>setCopied(false),1200) } catch {}
@@ -681,13 +682,13 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
 
-    {problem.youtubeVideoId ? (
+    {videoId ? (
       <section className="solution-guide-section solution-video">
         <h2>Video walkthrough</h2>
         <p>Watch the problem being solved step by step, then compare the final RTL with the reference implementation below.</p>
         <div className="solution-video-frame">
           <iframe
-            src={`https://www.youtube-nocookie.com/embed/${problem.youtubeVideoId}`}
+            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
             title={`${problem.title} video walkthrough`}
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
