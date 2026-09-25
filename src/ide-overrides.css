@@ -847,3 +847,29 @@
     font-size:17px !important;
   }
 }
+
+
+/* Priority encoder typography correction */
+.ide-problem-content .priority-approach-guide .priority-reasoning,
+.ide-problem-content .priority-approach-guide .priority-reasoning li{
+  font-size:20px !important;
+  line-height:1.72 !important;
+  color:#d0d0d3 !important;
+  font-weight:400 !important;
+}
+
+.ide-problem-content .priority-approach-guide h2,
+.ide-problem-content .priority-approach-guide .priority-concept h3{
+  font-weight:400 !important;
+}
+
+.ide-problem-content .priority-approach-guide section:has(.priority-reasoning) > h2{
+  font-weight:400 !important;
+}
+
+@media(max-width:700px){
+  .ide-problem-content .priority-approach-guide .priority-reasoning,
+  .ide-problem-content .priority-approach-guide .priority-reasoning li{
+    font-size:18px !important;
+  }
+}
