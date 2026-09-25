@@ -278,7 +278,6 @@ function PriorityEncoderApproach({problem}) {
 
   return <article className="approach-guide priority-approach-guide">
     <section className="approach-guide-section approach-guide-intro">
-      <h1>Approach</h1>
       <p>Design an 8-to-3 priority encoder where bit 7 has the highest priority. The key idea is to identify the highest-numbered asserted input and return its binary index.</p>
 
       <div className="priority-example">
