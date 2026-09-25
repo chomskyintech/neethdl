@@ -931,3 +931,23 @@
     font-size:20px !important;
   }
 }
+
+
+/* Priority encoder heading size alignment — match visible problem title */
+body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide h2,
+body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide .priority-concept h3,
+body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide section:has(.priority-reasoning) > h2{
+  font-size:29px !important;
+  line-height:1.15 !important;
+  font-weight:500 !important;
+  letter-spacing:-.025em !important;
+  text-transform:none !important;
+}
+
+@media(max-width:700px){
+  body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide h2,
+  body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide .priority-concept h3,
+  body.hdlforge-ide-active .ide-page .ide-problem-content .priority-approach-guide section:has(.priority-reasoning) > h2{
+    font-size:29px !important;
+  }
+}
