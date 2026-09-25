@@ -295,7 +295,6 @@ function PriorityEncoderApproach({problem}) {
     </section>
 
     <section className="approach-guide-section">
-      <h2>Core theory</h2>
       <div className="approach-concepts priority-concepts">
         {concepts.map(concept => <div className="approach-concept priority-concept" key={concept.name}>
           <h3>{concept.name}</h3>
