@@ -590,7 +590,9 @@
     "description": "Decode a 3-bit input into a one-hot 8-bit output.",
     "task": "Exactly one output bit must be high: y = 1 << a.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "a=3'b000 → y=8'b00000001",
+      "a=3'b011 → y=8'b00001000",
+      "a=3'b111 → y=8'b10000000"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
