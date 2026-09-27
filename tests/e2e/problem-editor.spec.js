@@ -92,17 +92,18 @@ test.describe('HDLForge Monaco problem editor', () => {
     await expect(guide).toContainText('latch')
   })
 
-  test('renders the rich hardware Solution guide with compact reference actions', async ({ page }) => {
+  test('renders the streamlined Solution guide with compact reference actions', async ({ page }) => {
     await page.getByRole('button', { name: 'Solution', exact: true }).click()
 
     const guide = page.locator('.solution-guide')
     await expect(guide).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Prerequisites' })).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Intuition' })).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Implementation', exact: true })).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Hardware behavior' })).toBeVisible()
-    await expect(guide.getByRole('heading', { name: 'Common mistakes' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Solution', exact: true })).toBeVisible()
     await expect(guide.getByRole('heading', { name: 'Reference implementation' })).toBeVisible()
+    await expect(guide.getByRole('heading', { name: 'Prerequisites' })).toHaveCount(0)
+    await expect(guide.getByRole('heading', { name: 'Intuition' })).toHaveCount(0)
+    await expect(guide.getByRole('heading', { name: 'Implementation', exact: true })).toHaveCount(0)
+    await expect(guide.getByRole('heading', { name: 'Hardware behavior' })).toHaveCount(0)
+    await expect(guide.getByRole('heading', { name: 'Common mistakes' })).toHaveCount(0)
 
     const languageTabs = guide.locator('.solution-language-tabs')
     await expect(languageTabs.getByRole('button', { name: 'Verilog', exact: true })).toBeVisible()
