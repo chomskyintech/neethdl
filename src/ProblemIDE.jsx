@@ -640,10 +640,6 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
     return ()=>{active=false}
   },[language,code,formatColumn])
   const displayCode = addTeachingComments(problem.id, language, formattedCode || code)
-  const prerequisites = solutionPrerequisites(problem)
-  const steps = solutionSteps(problem)
-  const hardware = inferredHardware(problem)
-  const mistakes = commonMistakes(problem)
   const videoId = problem.youtubeVideoId || (problem.id === 'rtl-priority' ? '9a5AEh4zdYI' : '')
   const copy = async () => {
     if (!code) return
@@ -688,32 +684,6 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       </div>
     </section>
 
-    <section className="solution-guide-section">
-      <h2>Prerequisites</h2>
-      <p>Before attempting this problem, you should be comfortable with:</p>
-      <ul className="solution-prerequisites">{prerequisites.map(([name,description])=><li key={name}><strong>{name}</strong><span> — {description}</span></li>)}</ul>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Intuition</h2>
-      <p>{problem.approach || problem.description || 'Start from the hardware behavior in the specification, then choose the smallest synthesizable structure that implements it directly.'}</p>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Implementation</h2>
-      <ol className="solution-steps">{steps.map((step,index)=><li key={index}>{step}</li>)}</ol>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Hardware behavior</h2>
-      <div className="solution-hardware-tags">{hardware.map(item=><span key={item}>{item}</span>)}</div>
-      {problem.constraints?.length ? <ul className="solution-constraints">{problem.constraints.slice(0,4).map((item,index)=><li key={index}>{item}</li>)}</ul> : null}
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Common mistakes</h2>
-      <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
-    </section>
   </article>
 }
 
