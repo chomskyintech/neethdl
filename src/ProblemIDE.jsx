@@ -655,33 +655,6 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
       <p>{problem.description || problem.task}</p>
     </section>
 
-    <section className="solution-guide-section">
-      <h2>Prerequisites</h2>
-      <p>Before attempting this problem, you should be comfortable with:</p>
-      <ul className="solution-prerequisites">{prerequisites.map(([name,description])=><li key={name}><strong>{name}</strong><span> — {description}</span></li>)}</ul>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Intuition</h2>
-      <p>{problem.approach || problem.description || 'Start from the hardware behavior in the specification, then choose the smallest synthesizable structure that implements it directly.'}</p>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Implementation</h2>
-      <ol className="solution-steps">{steps.map((step,index)=><li key={index}>{step}</li>)}</ol>
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Hardware behavior</h2>
-      <div className="solution-hardware-tags">{hardware.map(item=><span key={item}>{item}</span>)}</div>
-      {problem.constraints?.length ? <ul className="solution-constraints">{problem.constraints.slice(0,4).map((item,index)=><li key={index}>{item}</li>)}</ul> : null}
-    </section>
-
-    <section className="solution-guide-section">
-      <h2>Common mistakes</h2>
-      <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
-    </section>
-
     {videoId ? (
       <section className="solution-guide-section solution-video">
         <h2>Video walkthrough</h2>
@@ -713,6 +686,33 @@ function SolutionGuide({ problem, referenceSolutions, initialLanguage }) {
         {formatting && <span className="solution-formatting-status" aria-live="polite">Formatting…</span>}
         {displayCode ? <ReadOnlyHDLViewer code={displayCode} language={language} formatMode={formatMode} formatColumn={formatColumn} /> : <div className="solution-code-empty">Reference solution will be added for this problem.</div>}
       </div>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Prerequisites</h2>
+      <p>Before attempting this problem, you should be comfortable with:</p>
+      <ul className="solution-prerequisites">{prerequisites.map(([name,description])=><li key={name}><strong>{name}</strong><span> — {description}</span></li>)}</ul>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Intuition</h2>
+      <p>{problem.approach || problem.description || 'Start from the hardware behavior in the specification, then choose the smallest synthesizable structure that implements it directly.'}</p>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Implementation</h2>
+      <ol className="solution-steps">{steps.map((step,index)=><li key={index}>{step}</li>)}</ol>
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Hardware behavior</h2>
+      <div className="solution-hardware-tags">{hardware.map(item=><span key={item}>{item}</span>)}</div>
+      {problem.constraints?.length ? <ul className="solution-constraints">{problem.constraints.slice(0,4).map((item,index)=><li key={index}>{item}</li>)}</ul> : null}
+    </section>
+
+    <section className="solution-guide-section">
+      <h2>Common mistakes</h2>
+      <ul className="solution-mistakes">{mistakes.map((item,index)=><li key={index}>{item}</li>)}</ul>
     </section>
   </article>
 }
