@@ -622,7 +622,9 @@
     "description": "Select one of four 8-bit inputs using a one-hot select vector.",
     "task": "When sel is 0001/0010/0100/1000 choose d0/d1/d2/d3. Invalid select values return zero.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "sel=4'b0001, d0=8'h12 → y=8'h12",
+      "sel=4'b0100, d2=8'hA5 → y=8'hA5",
+      "sel=4'b0011 → y=8'h00 because the select is invalid"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -652,7 +654,9 @@
     "description": "Compare two unsigned 16-bit values.",
     "task": "Drive exactly one of lt, eq, or gt high according to the relationship between a and b.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "a=16'd10, b=16'd25 → lt=1, eq=0, gt=0",
+      "a=16'd42, b=16'd42 → lt=0, eq=1, gt=0",
+      "a=16'd100, b=16'd7 → lt=0, eq=0, gt=1"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -682,7 +686,9 @@
     "description": "Shift an 8-bit word left or right by 0-7 positions in one combinational stage.",
     "task": "Use dir=0 for left shift and dir=1 for right shift.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "data=8'b00010110, shamt=2, dir=0 → y=8'b01011000",
+      "data=8'b10010000, shamt=3, dir=1 → y=8'b00010010",
+      "data=8'b11110000, shamt=0 → y=8'b11110000"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -712,7 +718,9 @@
     "description": "Count the number of leading zeros in an 8-bit value.",
     "task": "Return count=8 for an all-zero input; otherwise count zeros before the highest set bit.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "in=8'b00010000 → count=3",
+      "in=8'b10000000 → count=0",
+      "in=8'b00000000 → count=8"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -742,7 +750,9 @@
     "description": "Count how many bits are set in an 8-bit input.",
     "task": "Produce a 4-bit result from 0 through 8.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "in=8'b00000000 → count=0",
+      "in=8'b10110100 → count=4",
+      "in=8'b11111111 → count=8"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -773,7 +783,9 @@
     "description": "Find the minimum and maximum of four unsigned 8-bit values.",
     "task": "Produce min_value and max_value combinationally.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "a=8, b=3, c=12, d=5 → min_value=3, max_value=12",
+      "a=7, b=7, c=7, d=7 → min_value=7, max_value=7",
+      "a=255, b=0, c=64, d=128 → min_value=0, max_value=255"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
@@ -803,7 +815,9 @@
     "description": "Generate the parity bit required to make an 8-bit word have even parity.",
     "task": "Use reduction XOR so data plus parity contains an even number of ones.",
     "examples": [
-      "Implement the stated behavior for all legal input combinations."
+      "data=8'b00000000 → parity=0",
+      "data=8'b00000001 → parity=1",
+      "data=8'b10110010 → parity=0 because the data already contains an even number of 1s"
     ],
     "constraints": [
       "Use synthesizable SystemVerilog.",
