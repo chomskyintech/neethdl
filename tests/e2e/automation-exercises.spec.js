@@ -48,3 +48,16 @@ test('Exit exercise returns to the Problems page', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/problems\/$/)
 })
+
+
+test('tooling exercise link from the automation roadmap opens the interactive exercise', async ({ page }) => {
+  await page.goto('/learn/hardware-verification-automation/')
+
+  await page.getByRole('link', { name: /Open interactive tooling exercise/ }).click()
+
+  await expect(page).toHaveTitle(/HDLForge — Automation Exercises/)
+  await expect(
+    page.getByRole('heading', { name: 'Inspect a simulation run' }),
+  ).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Exercise files' })).toBeVisible()
+})
