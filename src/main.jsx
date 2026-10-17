@@ -29,6 +29,7 @@ const difficulties=['All','Easy','Medium','Hard']
 const careerRoadmaps=[
  {id:'rtl-digital',label:'RTL Design Engineer'},
  {id:'verification',label:'Design Verification'},
+ {id:'verification-automation',label:'Hardware Verification & Automation'},
  {id:'hft-fpga',label:'FPGA Engineer'},
  {id:'cpu-gpu',label:'CPU / GPU Hardware'},
  {id:'accelerators',label:'Hardware Accelerator'},
