@@ -124,7 +124,6 @@ export const careerPaths={
     ],
     projectSlugs:['axi4-interconnect-crossbar','axi-crossbar-verification','axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
   },
-},
   'verification-automation':{
     id:'verification-automation',
     slug:'hardware-verification-automation',
