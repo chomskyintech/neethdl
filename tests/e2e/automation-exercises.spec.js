@@ -48,25 +48,3 @@ test('Exit exercise returns to the Problems page', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/problems\/$/)
 })
-))
-  })
-}
-
-test('exercise file tabs and demo check action work in the browser', async ({ page }) => {
-  await page.goto('/learn/automation-exercises/')
-
-  await page.getByRole('button', { name: /test_config\.yaml/ }).click()
-  await expect(page.getByText('test_config.yaml', { exact: true })).toBeVisible()
-  await expect(page.getByLabel('Selected file content')).toContainText('counter_reset_test')
-
-  await page.getByRole('button', { name: /Run checks/ }).click()
-  await expect(page.getByText('DEMO ONLY:', { exact: false })).toBeVisible()
-  await expect(page.getByText('No real tool was executed.', { exact: false })).toBeVisible()
-})
-
-test('Exit exercise returns to the Problems page', async ({ page }) => {
-  await page.goto('/learn/automation-exercises/')
-  await page.getByRole('button', { name: 'Exit exercise' }).click()
-
-  await expect(page).toHaveURL(/\/problems\/$/)
-})
