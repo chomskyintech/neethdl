@@ -124,6 +124,34 @@ export const careerPaths={
     ],
     projectSlugs:['axi4-interconnect-crossbar','axi-crossbar-verification','axi-lite-slave','axi-lite-apb-bridge','dma-engine','async-fifo','small-risc-v-soc'],
   },
+  'verification-automation':{
+    id:'verification-automation',
+    slug:'hardware-verification-automation',
+    label:'Hardware Verification & Automation',
+    summary:'Learn the workflow around RTL: version control, self-checking tests, regression runners, shell and Python automation, RISC-V ELF execution and continuous integration.',
+    skills:['Git / GitHub','Self-checking testbenches','Regression automation','Shell / Python','RISC-V ELF','GitHub Actions'],
+    problemIds:['sv-always','sv-interface','sva-handshake','sva-reset','uvm-driver','uvm-scoreboard','rtl-fifo','rtl-skid-buffer','rv32-core-integration'],
+    milestones:[
+      {title:'1. Testbench foundations',problemIds:['sv-always','sv-interface']},
+      {title:'2. Checking and failure detection',problemIds:['sva-handshake','sva-reset','rtl-fifo','rtl-skid-buffer']},
+      {title:'3. Reusable verification structure',problemIds:['uvm-driver','uvm-scoreboard']},
+      {title:'4. Processor-level context',problemIds:['rv32-core-integration']},
+    ],
+    projectSlugs:['risc-v-core-verification','uvm-axi4-lite-verification'],
+    lessons:[
+      {id:1,title:'Create a repository and commit RTL',level:'Beginner',summary:'Initialise a repository, add a README, and make a descriptive first commit.'},
+      {id:2,title:'Review a diff and use a feature branch',level:'Beginner',summary:'Create a branch, make a small RTL change, inspect the diff, and commit only the intended change.'},
+      {id:3,title:'Write a self-checking testbench',level:'Beginner',summary:'Check reset, increment and hold behaviour, then inject a bug to prove the test detects it.'},
+      {id:4,title:'Build a regression runner',level:'Beginner',summary:'Run multiple tests from one command and return a nonzero exit code if any test fails.'},
+      {id:5,title:'Compile and simulate from a shell script',level:'Intermediate',summary:'Automate compilation, simulation, exit-code handling and concise result reporting.'},
+      {id:6,title:'Parse logs with Python',level:'Intermediate',summary:'Summarise pass, fail and missing results; never count an incomplete test as a pass.'},
+      {id:7,title:'Compile a RISC-V program to ELF',level:'Intermediate',summary:'Build a small RV32I program, inspect its ELF metadata and extract a memory image.'},
+      {id:8,title:'Run an ELF through a simulation harness',level:'Intermediate',summary:'Load the program image, define a completion protocol and detect timeouts reliably.'},
+      {id:9,title:'Create a GitHub Actions smoke test',level:'Advanced',summary:'Run a hardware test automatically on pushes and pull requests and make failures visible.'},
+      {id:10,title:'Debug CI from logs and artifacts',level:'Advanced',summary:'Find the first failing step, identify the root cause, apply a minimal fix and rerun.'},
+    ],
+    exerciseUrl:'/learn/hardware-verification-automation/',
+  },
 }
 
 export const careerPathList=Object.values(careerPaths)

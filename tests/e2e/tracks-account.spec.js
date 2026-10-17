@@ -22,6 +22,16 @@ test.describe('HDLForge tracks and accounts', () => {
     await expect(page.locator('.career-project-card').first()).toBeVisible()
   })
 
+  test('opens the Hardware Verification & Automation roadmap and its ten hands-on exercises', async ({ page }) => {
+    await page.getByRole('button', { name: 'Problems', exact: true }).click()
+    await page.getByRole('button', { name: 'Hardware Verification & Automation', exact: true }).click()
+    await expect(page).toHaveURL(url => url.pathname === '/app/roadmaps/hardware-verification-automation/')
+    await expect(page.getByRole('heading', { name: 'Hardware Verification & Automation', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Tooling exercises', exact: true })).toBeVisible()
+    await expect(page.locator('.career-exercise-card')).toHaveCount(10)
+    await expect(page.getByRole('link', { name: 'Open exercise', exact: true }).last()).toHaveAttribute('href', '/learn/hardware-verification-automation/#exercise-10')
+  })
+
   test('opens the account sign-in and signup dialog without affecting local mode', async ({ page }) => {
     await page.getByRole('button', { name: /Sign in/i }).click()
     await expect(page.getByRole('dialog', { name: 'HDLForge account' })).toBeVisible()
