@@ -8,6 +8,7 @@
 <link rel="canonical" href="https://hdlforge.netlify.app/learn/hardware-verification-automation/">
 <style>
 :root{color-scheme:light;--ink:#17231d;--muted:#58675f;--line:#dfe7e1;--green:#167448;--wash:#f5f8f5}*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:920px;margin:0 auto;padding:36px 22px 80px}a{color:var(--green)}.eyebrow{font-size:.76rem;letter-spacing:.12em;font-weight:700;color:var(--green)}h1{font-size:clamp(2rem,5vw,3.3rem);line-height:1.1;letter-spacing:-.04em;margin:.5rem 0 1rem}h2{font-size:1.45rem;margin:0 0 .5rem}p{color:var(--muted)}.intro{font-size:1.1rem;max-width:740px}.notice{background:var(--wash);border:1px solid var(--line);padding:16px;border-radius:12px;margin:24px 0}.exercise{border-top:1px solid var(--line);padding:22px 0;scroll-margin-top:20px}.meta{font-size:.8rem;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.06em}.deliverable{margin:.6rem 0 0}.deliverable strong{color:var(--ink)}code{background:var(--wash);padding:.1rem .35rem;border-radius:4px}ol{padding-left:1.3rem}li{margin:.35rem 0}.back{display:inline-block;margin-bottom:24px}
+.interactive-exercise-link{margin:18px 0}.interactive-exercise-link a:hover{background:#f5f8f5}
 </style>
 </head>
 <body><main>
@@ -15,6 +16,7 @@
 <div class="eyebrow">GUIDED ROADMAP · BEGINNER TO ADVANCED</div>
 <h1>Hardware Verification &amp; Automation</h1>
 <p class="intro">Learn the engineering workflow around RTL: version control, self-checking tests, regression automation, build scripts, processor-level execution and continuous integration. These exercises are designed as hands-on tasks; they do not assume that Git, Linux or CI knowledge is already familiar.</p>
+<p class="interactive-exercise-link"><a href="/learn/automation-exercises/index.html" style="display:inline-block;padding:10px 14px;border:1px solid #167448;border-radius:8px;text-decoration:none;font-weight:700">Open interactive tooling exercise →</a></p>
 <div class="notice"><strong>How to use this roadmap:</strong> work in a separate practice repository. For each exercise, save the command or file you created, run the check, and write down what a failure looks like. RTL simulation tasks can use your normal simulator; shell, Python and GitHub Actions tasks need a local development environment or a practice repository.</div>
 <h2>Stage 1 — Git and project workflow</h2>
 <section class="exercise" id="exercise-1"><div class="meta">Exercise 01 · Beginner</div><h2>Create a repository and commit an RTL module</h2><p>Create a repository for a simple counter. Add the RTL and its testbench, then make a commit with a descriptive message.</p><ol><li>Run <code>git init</code> in the project directory.</li><li>Add a <code>README.md</code> describing the module and how to test it.</li><li>Use <code>git status</code>, <code>git add</code> and <code>git commit</code>.</li></ol><p class="deliverable"><strong>Deliverable:</strong> a clean initial commit and a README with reproducible test instructions.</p></section>
