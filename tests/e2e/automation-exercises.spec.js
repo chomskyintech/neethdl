@@ -9,7 +9,7 @@ const exerciseRoutes = [
 ]
 
 for (const route of exerciseRoutes) {
-  test(\`opens the automation exercise directly at \${route}\`, async ({ page }) => {
+  test('opens the automation exercise directly at ' + route, async ({ page }) => {
     await page.goto(route)
 
     await expect(page).toHaveTitle(/HDLForge — Automation Exercises/)
@@ -19,7 +19,7 @@ for (const route of exerciseRoutes) {
     await expect(page.getByRole('navigation', { name: 'Exercise files' })).toBeVisible()
     await expect(page.getByLabel('Selected file content')).toContainText('CHECK_014')
     await expect(page.getByRole('heading', { name: 'Problems' })).toHaveCount(0)
-    await expect(page).toHaveURL(new RegExp(route.replace(/[.*+?^\${}()|[\]\\]/g, '\\$&') + '$'))
+    await expect(page).toHaveURL(new RegExp(route.replaceAll('/', '\\/') + '$'))
   })
 }
 
