@@ -73,6 +73,19 @@ export default function CareerPath({career,allProblems,solved=[],onOpenProblem,o
      <div className="career-problem-list">{careerProblems.map(problem=><CareerProblem key={problem.id} problem={problem} solved={solved.includes(problem.id)} onOpen={onOpenProblem}/>)}</div>}
    </section>
 
+   {career.lessons?.length?<section className="career-section" aria-labelledby="career-lessons-heading">
+    <div className="career-section-head">
+     <div><h2 id="career-lessons-heading">Tooling exercises</h2><p>Practice the Git, scripting, ELF and CI workflow alongside the RTL problems.</p></div>
+     <strong>{career.lessons.length} exercises</strong>
+    </div>
+    <div className="career-exercise-grid">{career.lessons.map(lesson=><article className="career-exercise-card" key={lesson.id}>
+     <span className="career-exercise-meta">Exercise {String(lesson.id).padStart(2,'0')} · {lesson.level}</span>
+     <h3>{lesson.title}</h3>
+     <p>{lesson.summary}</p>
+     <a href={`${career.exerciseUrl}#exercise-${lesson.id}`}>Open exercise <ArrowRight size={14}/></a>
+    </article>)}</div>
+   </section>:null}
+
    <section className="career-section" aria-labelledby="career-projects-heading">
     <div className="career-section-head">
      <div><h2 id="career-projects-heading">Projects for this path</h2><p>Use these projects to turn the interview topics into portfolio-level hardware work.</p></div>
