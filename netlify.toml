@@ -36,6 +36,33 @@
   to = "/learn/automation-exercises/index.html"
   status = 200
 
+
+# Support direct navigation whether the browser URL has a trailing slash or not.
+[[redirects]]
+  from = "/learn/automation-exercises"
+  to = "/learn/automation-exercises/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/automation-exercises"
+  to = "/learn/automation-exercises/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/tooling-exercises"
+  to = "/learn/automation-exercises/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/learn/tooling-exercises"
+  to = "/learn/automation-exercises/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/learn/automation"
+  to = "/learn/automation-exercises/index.html"
+  status = 200
+
 [[redirects]]
   from = "/learn/rtl-design-exercises/"
   to = "/learn/rtl-design-exercises/index.html"
