@@ -2,10 +2,15 @@ import { expect, test } from '@playwright/test'
 
 const exerciseRoutes = [
   '/learn/automation-exercises/',
+  '/learn/automation-exercises',
   '/automation-exercises/',
+  '/automation-exercises',
   '/tooling-exercises/',
+  '/tooling-exercises',
   '/learn/tooling-exercises/',
+  '/learn/tooling-exercises',
   '/learn/automation/',
+  '/learn/automation',
 ]
 
 for (const route of exerciseRoutes) {
