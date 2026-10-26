@@ -3,6 +3,7 @@ import { Activity, CheckCircle2, Code2, Copy, FileCode2, MessageSquare, Play, Ro
 import { runBrowserSimulation } from './browserSimulator'
 import solutions from './data/solutions'
 import { languageStarter, resolveInitialStarterDraft } from './data/starterScaffolds'
+import { runPython } from './pythonRunner'
 import MonacoHDLEditor, { ReadOnlyHDLViewer } from './MonacoHDLEditor'
 import './lockedEditor.js'
 import './ide-overrides.css'
@@ -18,7 +19,7 @@ import './waveform-window-refinement.js'
 import './riscv-project-ui.js'
 
 const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'http://localhost:8787' : '')).replace(/\/$/, '')
-const languages = ['Verilog', 'SystemVerilog', 'VHDL']
+const languages = ['Verilog', 'SystemVerilog', 'VHDL', 'C', 'Python']
 const referenceFormatCache = new Map()
 
 function runPatternEvaluation(problem,source){
@@ -676,7 +677,7 @@ function ReactOwnedRunResult({ result, isConceptual }) {
   const tests = Array.isArray(result?.tests) ? result.tests : []
   const output = result?.output || ''
   const compileError = !result?.pass && !tests.length &&
-    /syntax\s+error|parse\s+error|compil(?:e|ation)|unexpected\s+token|malformed|unknown\s+module|error\s*:/i.test(output)
+    /syntax\s+error|SyntaxError|IndentationError|parse\s+error|compil(?:e|ation)|unexpected\s+token|malformed|unknown\s+module|error\s*:/i.test(output)
 
   if (compileError) {
     return <div className="run-result fail sim-v2-result" data-react-owned="true">
@@ -836,7 +837,7 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   }
 
   const formatEditorText = async (source, columnLimit = editorFormatColumn) => {
-    if (!RUNNER_URL || isConceptual || !source) return source
+    if (!RUNNER_URL || isConceptual || editorLanguage === 'Python' || !source) return source
     try {
       return await requestFormattedReference(editorLanguage, source, columnLimit)
     } catch {
@@ -845,7 +846,7 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
   }
 
   useEffect(()=>{
-    if (isConceptual || editorDirty || !RUNNER_URL) return undefined
+    if (isConceptual || editorLanguage === 'Python' || editorDirty || !RUNNER_URL) return undefined
     const requestId = ++editorFormatRequest.current
     const source = languageStarter(problem, editorLanguage)
     let active = true
@@ -869,7 +870,8 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     setRunning(true); setBottomTab('console'); setBottomCollapsed(false)
     try {
       let data
-      if (evaluationType === 'pattern') data = runPatternEvaluation(problem,code)
+      if (editorLanguage === 'Python' || evaluationType === 'python') data = await runPython(problem, code)
+      else if (evaluationType === 'pattern') data = runPatternEvaluation(problem,code)
       else if (editorLanguage === 'VHDL') { if (!RUNNER_URL) throw new Error('VHDL simulator is not configured. Set VITE_RUNNER_URL to the HDLForge GHDL runner.'); const response = await fetch(`${RUNNER_URL}/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ problemId: problem.id, source: code, language: 'VHDL' }) }); data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || 'VHDL runner failed.') }
       else data = await runBrowserSimulation(problem.id, code)
       const passed = Boolean(data.passed); setResult({ pass: passed, output: data.output || 'Simulation completed.', waveform: data.waveform, tests: Array.isArray(data.tests) ? data.tests : [] }); if (passed && !solved) (onSolved || onToggle)?.(problem.id)
@@ -926,7 +928,7 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     : centralSolutions
   return <div className="ide-page"><header className="ide-topbar"><button className="ide-brand topbar-brand" onClick={onBack} aria-label="Back to HDLForge problems" style={{flex:'0 0 auto',margin:0,padding:'7px 9px',border:'0',background:'transparent',color:'#e8eef5',cursor:'pointer'}}><span className="ide-brand-icon">HDL</span><strong>HDLForge</strong></button><div className="ide-problem-navigation topbar-navigation" style={{position:'absolute',left:'50%',transform:'translateX(-50%)'}}><button onClick={onPrevious} disabled={!hasPrevious}>← Previous</button><button className="section-navigation" onClick={onBack} aria-label={`Back to ${navigationLabel || problem.topic || problem.category}`}>{navigationLabel || problem.topic || problem.category}</button><button onClick={onNext} disabled={!hasNext}>Next →</button></div><div className="ide-actions">{solved ? <div className="solve-status passed"><CheckCircle2 size={15} /> {isConceptual ? 'Evaluated · Solved' : 'Tests passed · Solved'}</div> : <div className="solve-status">{isConceptual ? 'Evaluation not configured' : 'Run tests to solve'}</div>}<button className="primary" disabled={running} onClick={run}>{running ? <><Activity size={15} /> Running…</> : <><Play size={15} /> {isConceptual ? 'Evaluate' : 'Run tests'}</>}</button></div></header>
     <div className="ide-body" style={{ '--ide-panel-split': `${panelSplit}%` }} onPointerMove={resizePanel} onPointerUp={() => setDraggingPanel(false)}><aside className="ide-problem"><nav className="problem-tabs" aria-label="Problem information">{['problem', 'approach', 'solution', 'discussion'].map(tab => <button key={tab} className={statementTab === tab ? 'active' : ''} onClick={() => setStatementTab(tab)}>{tab === 'discussion' && <MessageSquare size={13} />}{tab[0].toUpperCase() + tab.slice(1)}</button>)}</nav><ProblemScrollPane refreshKey={`${problem.id}:${statementTab}`}>{statementTab === 'problem' && renderProblem()}{statementTab === 'approach' && <ApproachGuide problem={problem}/>}{statementTab === 'solution' && <SolutionGuide problem={problem} referenceSolutions={referenceSolutions} initialLanguage={editorLanguage}/>}{statementTab === 'discussion' && <Discussion problem={problem} />}</ProblemScrollPane></aside><div className={`ide-panel-resizer${draggingPanel ? ' dragging' : ''}`} onPointerDown={e => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); setDraggingPanel(true) }} role="separator" aria-label="Resize task and editor panels" aria-valuenow={Math.round(panelSplit)}><span>⋮</span></div>
-      <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : editorLanguage === 'C' ? 'c' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
+      <section className="ide-workspace"><div className="file-tabs"><div className="file-tab active"><FileCode2 size={14} /><span>{isConceptual ? 'answer.txt' : `solution.${editorLanguage === 'VHDL' ? 'vhd' : editorLanguage === 'Verilog' ? 'v' : editorLanguage === 'C' ? 'c' : editorLanguage === 'Python' ? 'py' : 'sv'}`}</span></div>{!isConceptual && <><div className="editor-language"><select value={editorLanguage} onChange={e => changeLanguage(e.target.value)}>{supported.map(language => <option key={language}>{language}</option>)}</select></div><button type="button" className={`icon-btn waveform-launch-button${waveformOpen ? ' active' : ''}`} title="Waveform" aria-label="Waveform" aria-pressed={waveformOpen} onClick={() => setWaveformOpen(value => !value)}><Activity size={14} /></button><button className="icon-btn" title="Reset editor" onClick={() => changeLanguage(editorLanguage)}><RotateCcw size={14} /></button></>}</div>
       <div className="waveform-editor-stage">{isConceptual ? <div className="editor-shell"><div className="editor-gutter">{code.split('\n').map((_, i) => <span key={i}>{i + 1}</span>)}</div><textarea className="ide-editor" value={code} onChange={e => update(e.target.value)} spellCheck="false" /></div> : <Editor code={code} language={editorLanguage} onChange={update} onRun={run} onFormat={formatEditorText} onLayoutColumnChange={setEditorFormatColumn} />}{!isConceptual && waveformOpen && <WaveformWindow vcd={result?.waveform} onClose={() => setWaveformOpen(false)} />}</div>
       <div className={`ide-bottom${bottomCollapsed ? ' collapsed' : ''}`}><div className="bottom-tabs"><button className={bottomTab === 'console' ? 'active' : ''} onClick={() => { setBottomTab('console'); setBottomCollapsed(false) }}><Terminal size={14} /> Console</button><button className={bottomTab === 'testbench' ? 'active' : ''} onClick={() => { setBottomTab('testbench'); setBottomCollapsed(false) }}><Code2 size={14} /> {isConceptual ? 'Evaluation' : 'Testbench'}</button><button className="bottom-collapse" title={bottomCollapsed ? 'Expand console' : 'Collapse console'} onClick={() => setBottomCollapsed(v => !v)}>{bottomCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}{bottomCollapsed ? 'Expand' : 'Collapse'}</button></div>{!bottomCollapsed && <div className="console">{bottomTab === 'console' && (result ? <ReactOwnedRunResult result={result} isConceptual={isConceptual}/> : <div className="console-empty"><Terminal size={18} /><span>{isConceptual ? 'Evaluation is not configured for this conceptual problem.' : 'Run the tests to see compiler and test output.'}</span></div>)}{bottomTab === 'testbench' && <div className="testbench-info"><strong><Code2 size={15} /> {isConceptual ? 'Evaluation' : 'Testbench'}</strong><p>{isConceptual ? 'This problem is conceptual and uses answer evaluation. Automated answer evaluation will be added with Interview Mode.' : 'HDLForge runs the problem\'s testbench against your submitted design. Hidden tests will be server-side in Interview Mode.'}</p><pre>{problem.testbench || 'The evaluator is managed by the problem harness.'}</pre></div>}</div>}</div></section></div></div>
 }
