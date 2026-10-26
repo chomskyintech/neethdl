@@ -13,7 +13,8 @@ const languageIds = {
   Verilog: 'verilog',
   SystemVerilog: 'systemverilog',
   VHDL: 'vhdl',
-  C: 'c'
+  C: 'c',
+  Python: 'python'
 }
 
 const verilogControlKeywords = [
