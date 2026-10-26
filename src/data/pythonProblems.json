@@ -232,5 +232,474 @@
       }
     ],
     "solution": "def summarize_latency(samples):\n    if not samples:\n        return {\"min\": None, \"max\": None, \"average\": None}\n\n    return {\n        \"min\": min(samples),\n        \"max\": max(samples),\n        \"average\": sum(samples) / len(samples),\n    }"
+  },
+  {
+    "id": "py-extract-log-errors",
+    "title": "Extract Errors from a Simulation Log",
+    "difficulty": "Easy",
+    "tags": [
+      "python",
+      "regex",
+      "log-parsing",
+      "verification-automation"
+    ],
+    "description": "Extract error and fatal messages from a simulator transcript.",
+    "task": "Implement extract_errors(lines). Return a list containing each line that includes an ERROR or FATAL token, case-insensitively. Match the whole token, so ERROR_COUNT is not an error message. Preserve original line text and order.",
+    "examples": [
+      "['INFO: start', 'UVM_ERROR: mismatch', 'fatal: timeout'] → ['UVM_ERROR: mismatch', 'fatal: timeout']"
+    ],
+    "constraints": [
+      "Use Python's re module or equivalent token-aware string logic.",
+      "Do not modify the input."
+    ],
+    "starterCode": "import re\n\ndef extract_errors(lines):\n    # TODO: find ERROR or FATAL as whole tokens, ignoring case\n    pass",
+    "testCases": [
+      {
+        "name": "mixed-case severity tokens",
+        "code": "assert extract_errors(['INFO: start', 'UVM_ERROR: mismatch', 'fatal: timeout']) == ['UVM_ERROR: mismatch', 'fatal: timeout']"
+      },
+      {
+        "name": "avoid partial-token matches",
+        "code": "assert extract_errors(['ERROR_COUNT=0', 'NO_ERROR found', 'ERROR: real failure']) == ['ERROR: real failure']"
+      },
+      {
+        "name": "empty and no-error logs",
+        "code": "assert extract_errors([]) == [] and extract_errors(['INFO: ready']) == []"
+      }
+    ],
+    "solution": "import re\n\ndef extract_errors(lines):\n    pattern = re.compile(r'\\b(ERROR|FATAL)\\b', re.IGNORECASE)\n    return [line for line in lines if pattern.search(line)]",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-read-json-config",
+    "title": "Read a JSON Test Configuration",
+    "difficulty": "Easy",
+    "tags": [
+      "python",
+      "json",
+      "configuration",
+      "verification-automation"
+    ],
+    "description": "Decode a JSON configuration string used to set up a verification run.",
+    "task": "Implement parse_test_config(json_text). Parse the JSON text and return the resulting Python object. If the text is invalid JSON, return None instead of raising an exception.",
+    "examples": [
+      "'{\"seed\": 12, \"width\": 8}' → {'seed': 12, 'width': 8}"
+    ],
+    "constraints": [
+      "Use the standard-library json module.",
+      "Valid JSON values may be objects, lists, strings, numbers, booleans, or null."
+    ],
+    "starterCode": "import json\n\ndef parse_test_config(json_text):\n    # TODO: parse JSON and handle invalid input\n    pass",
+    "testCases": [
+      {
+        "name": "parse object config",
+        "code": "assert parse_test_config('{\"seed\": 12, \"width\": 8}') == {'seed': 12, 'width': 8}"
+      },
+      {
+        "name": "parse list config",
+        "code": "assert parse_test_config('[1, 2, 3]') == [1, 2, 3]"
+      },
+      {
+        "name": "invalid JSON",
+        "code": "assert parse_test_config('{seed: 12}') is None"
+      },
+      {
+        "name": "valid JSON null",
+        "code": "assert parse_test_config('null') is None"
+      }
+    ],
+    "solution": "import json\n\ndef parse_test_config(json_text):\n    try:\n        return json.loads(json_text)\n    except (json.JSONDecodeError, TypeError):\n        return None",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-validate-test-config",
+    "title": "Validate Verification Configuration",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "validation",
+      "configuration",
+      "verification-automation"
+    ],
+    "description": "Reject invalid simulation settings before starting a regression.",
+    "task": "Implement validate_config(config). Return a list of validation error strings. Require width to be a positive integer (not a bool), seed to be a non-negative integer (not a bool), and mode to be one of 'directed' or 'random'. Report errors in that order using exactly: 'width must be a positive integer', 'seed must be a non-negative integer', and 'mode must be directed or random'.",
+    "examples": [
+      "{'width': 8, 'seed': 0, 'mode': 'random'} → []"
+    ],
+    "constraints": [
+      "Return every applicable error, not just the first.",
+      "Do not modify config."
+    ],
+    "starterCode": "def validate_config(config):\n    # TODO: validate width, seed, and mode\n    pass",
+    "testCases": [
+      {
+        "name": "valid config",
+        "code": "assert validate_config({'width': 8, 'seed': 0, 'mode': 'random'}) == []"
+      },
+      {
+        "name": "multiple invalid fields",
+        "code": "assert validate_config({'width': 0, 'seed': -1, 'mode': 'unknown'}) == ['width must be a positive integer', 'seed must be a non-negative integer', 'mode must be directed or random']"
+      },
+      {
+        "name": "reject bool as integer",
+        "code": "assert validate_config({'width': True, 'seed': False, 'mode': 'directed'}) == ['width must be a positive integer', 'seed must be a non-negative integer']"
+      }
+    ],
+    "solution": "def validate_config(config):\n    errors = []\n    width = config.get('width')\n    seed = config.get('seed')\n    mode = config.get('mode')\n\n    if not isinstance(width, int) or isinstance(width, bool) or width <= 0:\n        errors.append('width must be a positive integer')\n    if not isinstance(seed, int) or isinstance(seed, bool) or seed < 0:\n        errors.append('seed must be a non-negative integer')\n    if mode not in ('directed', 'random'):\n        errors.append('mode must be directed or random')\n    return errors",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-compare-transactions",
+    "title": "Compare Expected and Actual Transactions",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "scoreboard",
+      "transactions",
+      "verification"
+    ],
+    "description": "Compare transaction records from a reference model and a DUT monitor.",
+    "task": "Implement transaction_mismatches(expected, actual). Each list contains dictionaries representing transactions. Return the indices where corresponding dictionaries differ. If the list lengths differ, also include each unmatched index from the longer list. Return indices in ascending order.",
+    "examples": [
+      "[{'data': 4}, {'data': 5}] vs [{'data': 4}, {'data': 7}] → [1]"
+    ],
+    "constraints": [
+      "Compare complete dictionaries, including missing or extra keys.",
+      "Do not mutate the inputs."
+    ],
+    "starterCode": "def transaction_mismatches(expected, actual):\n    # TODO: return indices with different or missing transactions\n    pass",
+    "testCases": [
+      {
+        "name": "one differing transaction",
+        "code": "assert transaction_mismatches([{'data': 4}, {'data': 5}], [{'data': 4}, {'data': 7}]) == [1]"
+      },
+      {
+        "name": "missing transactions",
+        "code": "assert transaction_mismatches([{'id': 0}, {'id': 1}, {'id': 2}], [{'id': 0}]) == [1, 2]"
+      },
+      {
+        "name": "identical transactions",
+        "code": "assert transaction_mismatches([{'addr': 4, 'data': 9}], [{'addr': 4, 'data': 9}]) == []"
+      },
+      {
+        "name": "different dictionary fields",
+        "code": "assert transaction_mismatches([{'data': 4, 'last': False}], [{'data': 4, 'last': True}]) == [0]"
+      }
+    ],
+    "solution": "def transaction_mismatches(expected, actual):\n    mismatches = []\n    shared = min(len(expected), len(actual))\n    for index in range(shared):\n        if expected[index] != actual[index]:\n            mismatches.append(index)\n    mismatches.extend(range(shared, max(len(expected), len(actual))))\n    return mismatches",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-reproducible-test-vectors",
+    "title": "Generate Reproducible Random Test Vectors",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "random",
+      "seeds",
+      "verification"
+    ],
+    "description": "Generate repeatable randomized stimulus from a recorded seed.",
+    "task": "Implement generate_vectors(seed, count, width). Return count integers, each in the range 0 through (2**width)-1, generated using random.Random(seed). The same seed and arguments must produce the same list without changing Python's global random state.",
+    "examples": [
+      "generate_vectors(7, 3, 4) → a repeatable list of three values from 0 to 15"
+    ],
+    "constraints": [
+      "Use a local random.Random(seed) instance.",
+      "Assume count is non-negative and width is a positive integer."
+    ],
+    "starterCode": "import random\n\ndef generate_vectors(seed, count, width):\n    # TODO: create deterministic vectors with a local RNG\n    pass",
+    "testCases": [
+      {
+        "name": "same seed is repeatable",
+        "code": "assert generate_vectors(17, 8, 8) == generate_vectors(17, 8, 8)"
+      },
+      {
+        "name": "values fit requested width",
+        "code": "values = generate_vectors(2, 100, 4)\nassert len(values) == 100 and all(0 <= value < 16 for value in values)"
+      },
+      {
+        "name": "empty request",
+        "code": "assert generate_vectors(3, 0, 8) == []"
+      },
+      {
+        "name": "does not change global RNG",
+        "code": "import random\nrandom.seed(1234)\nexpected_next = random.random()\nrandom.seed(1234)\ngenerate_vectors(9, 10, 8)\nassert random.random() == expected_next"
+      }
+    ],
+    "solution": "import random\n\ndef generate_vectors(seed, count, width):\n    rng = random.Random(seed)\n    limit = 1 << width\n    return [rng.randrange(limit) for _ in range(count)]",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-interpret-simulation-result",
+    "title": "Interpret a Simulation Command Result",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "exit-codes",
+      "automation",
+      "regression"
+    ],
+    "description": "Classify a simulation run using its process return code and transcript.",
+    "task": "Implement classify_simulation_result(return_code, stdout, stderr). Return 'PASS' only when return_code is 0, stdout contains the exact token 'TEST_PASS', and neither stdout nor stderr contains the exact token 'TEST_FAIL'. Otherwise return 'FAIL'. Tokens are case-sensitive and must not match as part of a longer alphanumeric/underscore token.",
+    "examples": [
+      "(0, 'TEST_PASS\\n', '') → 'PASS'",
+      "(0, 'TEST_PASS TEST_FAIL', '') → 'FAIL'"
+    ],
+    "constraints": [
+      "Use token-aware matching rather than a substring-only check.",
+      "This exercise interprets a supplied process result; the browser runner cannot launch native simulator processes."
+    ],
+    "starterCode": "import re\n\ndef classify_simulation_result(return_code, stdout, stderr):\n    # TODO: inspect the exit code and result tokens\n    pass",
+    "testCases": [
+      {
+        "name": "clean passing run",
+        "code": "assert classify_simulation_result(0, 'starting\\nTEST_PASS\\n', '') == 'PASS'"
+      },
+      {
+        "name": "nonzero exit code",
+        "code": "assert classify_simulation_result(1, 'TEST_PASS', '') == 'FAIL'"
+      },
+      {
+        "name": "failure token overrides pass",
+        "code": "assert classify_simulation_result(0, 'TEST_PASS TEST_FAIL', '') == 'FAIL'"
+      },
+      {
+        "name": "failure reported on stderr",
+        "code": "assert classify_simulation_result(0, 'TEST_PASS', 'TEST_FAIL: timeout') == 'FAIL'"
+      },
+      {
+        "name": "substring is not a token",
+        "code": "assert classify_simulation_result(0, 'MY_TEST_PASS_EXTRA', '') == 'FAIL'"
+      }
+    ],
+    "solution": "import re\n\ndef classify_simulation_result(return_code, stdout, stderr):\n    pass_token = re.search(r'(?<![A-Za-z0-9_])TEST_PASS(?![A-Za-z0-9_])', stdout) is not None\n    fail_pattern = r'(?<![A-Za-z0-9_])TEST_FAIL(?![A-Za-z0-9_])'\n    fail_token = re.search(fail_pattern, stdout) or re.search(fail_pattern, stderr)\n    return 'PASS' if return_code == 0 and pass_token and not fail_token else 'FAIL'",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-summarize-regression-logs",
+    "title": "Summarise Multiple Regression Logs",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "file-handling",
+      "log-parsing",
+      "regression"
+    ],
+    "description": "Aggregate test outcomes from several already-read log contents.",
+    "task": "Implement summarize_logs(logs). logs is a dictionary mapping a log name to a list of transcript lines. Return a dictionary with keys 'logs', 'passed', 'failed', and 'failed_logs'. Count lines starting exactly with 'PASS:' or 'FAIL:'. 'logs' is the number of input logs, and 'failed_logs' is a sorted list of names whose log has at least one FAIL line. Ignore other lines.",
+    "examples": [
+      "{'seed_1.log': ['PASS: a'], 'seed_2.log': ['FAIL: b']} → {'logs': 2, 'passed': 1, 'failed': 1, 'failed_logs': ['seed_2.log']}"
+    ],
+    "constraints": [
+      "A log with multiple FAIL lines appears only once in failed_logs.",
+      "Do not mutate the input dictionary or its line lists."
+    ],
+    "starterCode": "def summarize_logs(logs):\n    # TODO: aggregate outcomes and identify failed logs\n    pass",
+    "testCases": [
+      {
+        "name": "aggregate two logs",
+        "code": "assert summarize_logs({'seed_1.log': ['PASS: a'], 'seed_2.log': ['FAIL: b']}) == {'logs': 2, 'passed': 1, 'failed': 1, 'failed_logs': ['seed_2.log']}"
+      },
+      {
+        "name": "multiple failures in one log",
+        "code": "assert summarize_logs({'b.log': ['FAIL: a', 'FAIL: b'], 'a.log': ['INFO: idle']}) == {'logs': 2, 'passed': 0, 'failed': 2, 'failed_logs': ['b.log']}"
+      },
+      {
+        "name": "empty regression",
+        "code": "assert summarize_logs({}) == {'logs': 0, 'passed': 0, 'failed': 0, 'failed_logs': []}"
+      },
+      {
+        "name": "sort failed log names",
+        "code": "assert summarize_logs({'z.log': ['FAIL: z'], 'a.log': ['FAIL: a']})['failed_logs'] == ['a.log', 'z.log']"
+      }
+    ],
+    "solution": "def summarize_logs(logs):\n    passed = 0\n    failed = 0\n    failed_logs = []\n    for name, lines in logs.items():\n        log_failed = False\n        for line in lines:\n            if line.startswith('PASS:'):\n                passed += 1\n            elif line.startswith('FAIL:'):\n                failed += 1\n                log_failed = True\n        if log_failed:\n            failed_logs.append(name)\n    return {'logs': len(logs), 'passed': passed, 'failed': failed, 'failed_logs': sorted(failed_logs)}",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-find-failed-seeds",
+    "title": "Find Failed Regression Seeds",
+    "difficulty": "Easy",
+    "tags": [
+      "python",
+      "regression",
+      "seeds",
+      "automation"
+    ],
+    "description": "Identify which randomized seeds should be rerun after a regression.",
+    "task": "Implement failed_seeds(results). results maps integer seed values to status strings. Return the seeds whose status is exactly 'FAIL', sorted in ascending order. Ignore other statuses such as 'PASS' and 'SKIP'.",
+    "examples": [
+      "{30: 'PASS', 7: 'FAIL', 12: 'FAIL'} → [7, 12]"
+    ],
+    "constraints": [
+      "Do not mutate results.",
+      "Return an empty list when no seed failed."
+    ],
+    "starterCode": "def failed_seeds(results):\n    # TODO: return failed seed numbers in ascending order\n    pass",
+    "testCases": [
+      {
+        "name": "select and sort failures",
+        "code": "assert failed_seeds({30: 'PASS', 7: 'FAIL', 12: 'FAIL'}) == [7, 12]"
+      },
+      {
+        "name": "ignore skipped seeds",
+        "code": "assert failed_seeds({1: 'SKIP', 2: 'PASS'}) == []"
+      },
+      {
+        "name": "empty results",
+        "code": "assert failed_seeds({}) == []"
+      }
+    ],
+    "solution": "def failed_seeds(results):\n    return sorted(seed for seed, status in results.items() if status == 'FAIL')",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-merge-coverage-results",
+    "title": "Merge Coverage Results",
+    "difficulty": "Medium",
+    "tags": [
+      "python",
+      "coverage",
+      "sets",
+      "verification"
+    ],
+    "description": "Combine per-run coverage hit counts into a cumulative summary.",
+    "task": "Implement merge_coverage(runs). Each run is a dictionary mapping coverage-bin names to non-negative integer hit counts. Return a dictionary containing every bin found in any run, with counts summed across runs; bins absent from a run contribute zero. Return {} for no runs.",
+    "examples": [
+      "[{'read': 2, 'write': 1}, {'read': 3, 'error': 1}] → {'read': 5, 'write': 1, 'error': 1}"
+    ],
+    "constraints": [
+      "Do not mutate any input dictionary.",
+      "Preserve zero-hit bins if they appear in an input."
+    ],
+    "starterCode": "def merge_coverage(runs):\n    # TODO: sum each bin's hit count across runs\n    pass",
+    "testCases": [
+      {
+        "name": "merge overlapping bins",
+        "code": "assert merge_coverage([{'read': 2, 'write': 1}, {'read': 3, 'error': 1}]) == {'read': 5, 'write': 1, 'error': 1}"
+      },
+      {
+        "name": "preserve zero-hit bins",
+        "code": "assert merge_coverage([{'rare_case': 0}, {'common_case': 4}]) == {'rare_case': 0, 'common_case': 4}"
+      },
+      {
+        "name": "no runs",
+        "code": "assert merge_coverage([]) == {}"
+      },
+      {
+        "name": "single run",
+        "code": "assert merge_coverage([{'a': 1, 'b': 2}]) == {'a': 1, 'b': 2}"
+      }
+    ],
+    "solution": "def merge_coverage(runs):\n    merged = {}\n    for run in runs:\n        for bin_name, hits in run.items():\n            merged[bin_name] = merged.get(bin_name, 0) + hits\n    return merged",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
+  },
+  {
+    "id": "py-format-regression-report",
+    "title": "Generate a Regression Summary Report",
+    "difficulty": "Easy",
+    "tags": [
+      "python",
+      "formatting",
+      "reporting",
+      "regression"
+    ],
+    "description": "Turn aggregate regression metrics into a consistent human-readable report.",
+    "task": "Implement format_report(summary). Return exactly four newline-separated lines in this format: 'Regression summary', 'Logs: N', 'Passed: N', and 'Failed: N', using the values in summary under keys logs, passed, and failed.",
+    "examples": [
+      "{'logs': 4, 'passed': 19, 'failed': 1} → 'Regression summary\\nLogs: 4\\nPassed: 19\\nFailed: 1'"
+    ],
+    "constraints": [
+      "Return a string, not a list.",
+      "Do not add a trailing newline."
+    ],
+    "starterCode": "def format_report(summary):\n    # TODO: format the four-line regression summary\n    pass",
+    "testCases": [
+      {
+        "name": "format normal summary",
+        "code": "assert format_report({'logs': 4, 'passed': 19, 'failed': 1}) == 'Regression summary\\nLogs: 4\\nPassed: 19\\nFailed: 1'"
+      },
+      {
+        "name": "format zero results",
+        "code": "assert format_report({'logs': 0, 'passed': 0, 'failed': 0}) == 'Regression summary\\nLogs: 0\\nPassed: 0\\nFailed: 0'"
+      },
+      {
+        "name": "no trailing newline",
+        "code": "assert not format_report({'logs': 1, 'passed': 2, 'failed': 0}).endswith('\\n')"
+      }
+    ],
+    "solution": "def format_report(summary):\n    return (f\"Regression summary\\n\"\n            f\"Logs: {summary['logs']}\\n\"\n            f\"Passed: {summary['passed']}\\n\"\n            f\"Failed: {summary['failed']}\")",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    }
   }
 ]
