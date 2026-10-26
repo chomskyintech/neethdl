@@ -267,7 +267,7 @@
         "code": "assert extract_errors([]) == [] and extract_errors(['INFO: ready']) == []"
       }
     ],
-    "solution": "import re\n\ndef extract_errors(lines):\n    pattern = re.compile(r'\\b(ERROR|FATAL)\\b', re.IGNORECASE)\n    return [line for line in lines if pattern.search(line)]",
+    "solution": "import re\n\ndef extract_errors(lines):\n    pattern = re.compile(r'(?<![A-Za-z0-9_])(?:UVM_)?(?:ERROR|FATAL)\\b', re.IGNORECASE)\n    return [line for line in lines if pattern.search(line)]",
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "languages": [
@@ -311,8 +311,8 @@
         "code": "assert parse_test_config('{seed: 12}') is None"
       },
       {
-        "name": "valid JSON null",
-        "code": "assert parse_test_config('null') is None"
+        "name": "parse JSON boolean",
+        "code": "assert parse_test_config('false') is False"
       }
     ],
     "solution": "import json\n\ndef parse_test_config(json_text):\n    try:\n        return json.loads(json_text)\n    except (json.JSONDecodeError, TypeError):\n        return None",
