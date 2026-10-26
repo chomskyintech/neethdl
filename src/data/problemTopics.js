@@ -19,6 +19,7 @@ export const problemTopics=[
   'Scoreboards',
   'Formal Verification',
   'Embedded / Firmware',
+  'Python Scripting',
 ]
 
 const topicById={
