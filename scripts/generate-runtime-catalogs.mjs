@@ -14,7 +14,8 @@ const readJson=file=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))
 const baseProblems=readJson('src/data/problems.json').filter(problem=>problem.evaluation?.type!=='answer')
 const acceleratorProblems=readJson('src/data/acceleratorProblems.json')
 const expansionProblems=readJson('src/data/expansionProblems.json')
-const activeProblems=[...baseProblems,...acceleratorProblems,...expansionProblems,...guidedProjectProblems]
+const pythonProblems=readJson('src/data/pythonProblems.json')
+const activeProblems=[...baseProblems,...acceleratorProblems,...expansionProblems,...pythonProblems,...guidedProjectProblems]
   .map(problem=>({...problem,topic:assignProblemTopic(problem)}))
 
 const problemCatalog=activeProblems.map(problem=>({
