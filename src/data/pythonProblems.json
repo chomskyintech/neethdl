@@ -10,7 +10,7 @@
     "tags": ["python", "log-parsing", "verification-automation"],
     "description": "Turn a simple simulation transcript into a test summary.",
     "task": "Implement parse_test_results(lines). Each line may start with PASS:, FAIL:, or SKIP:. Return a dictionary with integer counts under the keys passed, failed, and skipped. Ignore blank lines and unrecognized lines.",
-    "examples": ["["PASS: reset", "FAIL: fifo_order", "SKIP: dma"] → {'passed': 1, 'failed': 1, 'skipped': 1}"],
+    "examples": ["['PASS: reset', 'FAIL: fifo_order', 'SKIP: dma'] → {'passed': 1, 'failed': 1, 'skipped': 1}"],
     "constraints": ["Do not count lines without one of the three recognized prefixes.", "The result must always contain all three keys."],
     "starterCode": "def parse_test_results(lines):\n    # TODO: count PASS:, FAIL:, and SKIP: lines\n    pass",
     "testCases": [
