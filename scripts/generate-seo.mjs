@@ -19,7 +19,8 @@ const topicMap={
  'UVM':{slug:'uvm',title:'UVM Practice & Interview Preparation',desc:'Build UVM verification skills with sequence items, drivers, monitors, scoreboards, config_db, factory overrides and objection handling.'},
  'FPGA':{slug:'fpga',title:'FPGA Design Practice & Interview Preparation',desc:'Practice FPGA-oriented design topics including debouncing, FSMs, CDC synchronizers, BRAM inference, timing constraints and reset strategy.'},
  'Protocols':{slug:'protocols',title:'Digital Protocol Practice: UART, SPI, AXI, APB & I2C',desc:'Practice digital interface and protocol reasoning across UART, SPI, AXI ready/valid, AXI-Lite, APB and I2C arbitration.'},
- 'Computer Architecture':{slug:'computer-architecture',title:'Computer Architecture Practice & Interview Preparation',desc:'Practice pipeline hazards, caches, branch prediction, AMAT, TLBs, reorder buffers and other computer architecture interview topics.'}
+ 'Computer Architecture':{slug:'computer-architecture',title:'Computer Architecture Practice & Interview Preparation',desc:'Practice pipeline hazards, caches, branch prediction, AMAT, TLBs, reorder buffers and other computer architecture interview topics.'},
+ 'Python Scripting':{slug:'python-scripting',title:'Python Scripting for Hardware Verification',desc:'Practice Python automation for hardware verification, including simulation log parsing, scoreboard comparisons, signal transitions, coverage gaps and latency summaries.'}
 }
 
 for(const [category,topic] of Object.entries(topicMap)){
