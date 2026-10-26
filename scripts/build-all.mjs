@@ -12,8 +12,9 @@ const originalAccelerators=fs.readFileSync(acceleratorFile,'utf8')
 const baseProblems=JSON.parse(originalProblems)
 const acceleratorProblems=JSON.parse(originalAccelerators)
 const expansionProblems=JSON.parse(fs.readFileSync(expansionFile,'utf8'))
+const pythonProblems=JSON.parse(fs.readFileSync(path.join(root,'src/data/pythonProblems.json'),'utf8'))
 const codingProblems=baseProblems.filter(problem=>problem.evaluation?.type!=='answer')
-const activeProblems=[...codingProblems,...acceleratorProblems,...expansionProblems,...guidedProjectProblems]
+const activeProblems=[...codingProblems,...acceleratorProblems,...expansionProblems,...pythonProblems,...guidedProjectProblems]
 const allAccelerators=activeProblems.filter(problem=>problem.category==='Accelerators')
 const removedCount=baseProblems.length-codingProblems.length
 
