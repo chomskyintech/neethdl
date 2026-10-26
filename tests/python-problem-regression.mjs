@@ -23,6 +23,7 @@ for (const problem of problems) {
   assert.deepEqual(problem.languages, ['Python'], `${problem.id} should offer only Python`)
   assert.equal(problem.evaluation?.type, 'python', `${problem.id} should use the Python runner`)
   assert.ok(problem.starterCode.includes('def '), `${problem.id} should start with a function scaffold`)
+  assert.ok(typeof problem.solution === 'string' && problem.solution.includes('def '), `${problem.id} should include a Python reference solution`)
   assert.ok(Array.isArray(problem.testCases) && problem.testCases.length >= 3, `${problem.id} should have multiple regression cases`)
   for (const test of problem.testCases) {
     assert.ok(test.name && typeof test.code === 'string' && test.code.includes('assert '), `${problem.id} has an invalid test case`)
@@ -35,6 +36,7 @@ assert.match(buildScript, /pythonProblems=JSON\.parse/, 'production build must l
 assert.match(buildScript, /\.\.\.pythonProblems/, 'production build must include Python exercises')
 assert.match(topics, /'Python Scripting'/, 'Python Scripting must be a visible problem topic')
 assert.match(ide, /runPython\(problem, code\)/, 'the problem IDE must route Python submissions to the Python runner')
+assert.match(ide, /evaluationType === 'python' && problem\.solution/, 'the solution tab must show Python reference solutions')
 assert.match(ide, /editorLanguage === 'Python' \? 'py'/, 'Python problems must use the .py editor tab')
 assert.match(editor, /Python: 'python'/, 'Monaco must select Python syntax highlighting')
 assert.match(runner, /PYTHON_TIMEOUT_MS = 20000/, 'Python execution must have a time limit')
