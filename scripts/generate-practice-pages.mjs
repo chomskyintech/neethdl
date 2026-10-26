@@ -20,6 +20,15 @@ const paths=[
   stages:['Start with combinational and sequential RTL fundamentals.','Move into FIFOs, register files, arbiters and protocol state machines.','Add SystemVerilog, assertions and UVM-style checking.','Finish with CDC, FPGA implementation concerns and architecture problems.']
  },
  {
+  slug:'python-scripting',
+  title:'Python Scripting for Hardware Verification Practice',
+  description:'Practice Python scripting for hardware verification automation, simulation logs, scoreboards, signal analysis, coverage and performance summaries.',
+  intro:'This path focuses on the Python tasks that appear in design-verification and hardware-automation workflows. Every exercise runs in the browser, so you do not need to install Python to practise.',
+  filter:p=>p.category==='Python Scripting',
+  limit:20,
+  stages:['Parse simulation logs and summarize pass/fail/skip results.','Compare reference-model and DUT transactions with scoreboard helpers.','Analyze sampled signals and count transitions.','Find missing coverage bins and summarize transaction latency.']
+ },
+ {
   slug:'verilog',
   title:'Verilog Practice Problems',
   description:'Solve Verilog practice problems covering combinational logic, counters, FIFOs, FSMs, memories, UART, SPI and FPGA-oriented RTL.',
