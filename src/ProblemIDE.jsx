@@ -21,21 +21,6 @@ const RUNNER_URL = (import.meta.env.VITE_RUNNER_URL || (import.meta.env.DEV ? 'h
 const languages = ['Verilog', 'SystemVerilog', 'VHDL']
 const referenceFormatCache = new Map()
 
-function detectStrongSourceLanguage(source) {
-  const text = String(source || '')
-  const looksVhdl =
-    /\blibrary\s+ieee\s*;/i.test(text) ||
-    (/\bentity\s+[A-Za-z_]\w*\s+is\b/i.test(text) &&
-     /\barchitecture\s+[A-Za-z_]\w*\s+of\s+[A-Za-z_]\w*\s+is\b/i.test(text))
-  if (looksVhdl) return 'VHDL'
-
-  const looksVerilog =
-    /\bmodule\s+[A-Za-z_$][\w$]*\b/.test(text) &&
-    /\bendmodule\b/.test(text)
-  if (looksVerilog) return 'SystemVerilog'
-
-  return null
-}
 function runPatternEvaluation(problem,source){
   const checks=Array.isArray(problem.checks)?problem.checks:[]
   const tests=checks.map((check,index)=>{
@@ -833,17 +818,6 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     editorFormatRequest.current += 1
     editorDirtyRef.current = true
     setEditorDirty(true)
-
-    const detectedLanguage = detectStrongSourceLanguage(value)
-    if (
-      detectedLanguage &&
-      detectedLanguage !== editorLanguage &&
-      supported.includes(detectedLanguage)
-    ) {
-      setEditorLanguage(detectedLanguage)
-      setResult(null)
-      setWaveformOpen(false)
-    }
 
     setCode(value)
     onSave(problem.id, value)
