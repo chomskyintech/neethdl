@@ -5,19 +5,42 @@
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "difficulty": "Easy",
-    "languages": ["Python"],
-    "evaluation": { "type": "python" },
-    "tags": ["python", "log-parsing", "verification-automation"],
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "log-parsing",
+      "verification-automation"
+    ],
     "description": "Turn a simple simulation transcript into a test summary.",
     "task": "Implement parse_test_results(lines). Each line may start with PASS:, FAIL:, or SKIP:. Return a dictionary with integer counts under the keys passed, failed, and skipped. Ignore blank lines and unrecognized lines.",
-    "examples": ["['PASS: reset', 'FAIL: fifo_order', 'SKIP: dma'] → {'passed': 1, 'failed': 1, 'skipped': 1}"],
-    "constraints": ["Do not count lines without one of the three recognized prefixes.", "The result must always contain all three keys."],
+    "examples": [
+      "['PASS: reset', 'FAIL: fifo_order', 'SKIP: dma'] → {'passed': 1, 'failed': 1, 'skipped': 1}"
+    ],
+    "constraints": [
+      "Do not count lines without one of the three recognized prefixes.",
+      "The result must always contain all three keys."
+    ],
     "starterCode": "def parse_test_results(lines):\n    # TODO: count PASS:, FAIL:, and SKIP: lines\n    pass",
     "testCases": [
-      { "name": "one of each result", "code": "assert parse_test_results(['PASS: reset', 'FAIL: fifo_order', 'SKIP: dma']) == {'passed': 1, 'failed': 1, 'skipped': 1}" },
-      { "name": "ignore blank and unknown lines", "code": "assert parse_test_results(['', 'INFO: starting', 'PASS: a', ' PASS: b']) == {'passed': 1, 'failed': 0, 'skipped': 0}" },
-      { "name": "empty transcript", "code": "assert parse_test_results([]) == {'passed': 0, 'failed': 0, 'skipped': 0}" }
-    ]
+      {
+        "name": "one of each result",
+        "code": "assert parse_test_results(['PASS: reset', 'FAIL: fifo_order', 'SKIP: dma']) == {'passed': 1, 'failed': 1, 'skipped': 1}"
+      },
+      {
+        "name": "ignore blank and unknown lines",
+        "code": "assert parse_test_results(['', 'INFO: starting', 'PASS: a', ' PASS: b']) == {'passed': 1, 'failed': 0, 'skipped': 0}"
+      },
+      {
+        "name": "empty transcript",
+        "code": "assert parse_test_results([]) == {'passed': 0, 'failed': 0, 'skipped': 0}"
+      }
+    ],
+    "solution": "def parse_test_results(lines):\n    counts = {\"passed\": 0, \"failed\": 0, \"skipped\": 0}\n    prefixes = {\n        \"PASS:\": \"passed\",\n        \"FAIL:\": \"failed\",\n        \"SKIP:\": \"skipped\",\n    }\n\n    for line in lines:\n        for prefix, key in prefixes.items():\n            if line.startswith(prefix):\n                counts[key] += 1\n                break\n\n    return counts"
   },
   {
     "id": "py-first-mismatch",
@@ -25,20 +48,47 @@
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "difficulty": "Easy",
-    "languages": ["Python"],
-    "evaluation": { "type": "python" },
-    "tags": ["python", "scoreboard", "verification"],
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "scoreboard",
+      "verification"
+    ],
     "description": "Find the first index where a reference model and DUT output disagree.",
     "task": "Implement first_mismatch(expected, actual). Return the first index where the values differ. If all shared positions match but the lists have different lengths, return the length of the shorter list. Return None if the lists are identical.",
-    "examples": ["[3, 5, 8] vs [3, 5, 7] → 2", "[1, 2] vs [1, 2] → None"],
-    "constraints": ["Do not modify either input list.", "Treat a length difference as a mismatch."],
+    "examples": [
+      "[3, 5, 8] vs [3, 5, 7] → 2",
+      "[1, 2] vs [1, 2] → None"
+    ],
+    "constraints": [
+      "Do not modify either input list.",
+      "Treat a length difference as a mismatch."
+    ],
     "starterCode": "def first_mismatch(expected, actual):\n    # TODO: compare values and list lengths\n    pass",
     "testCases": [
-      { "name": "mismatch in middle", "code": "assert first_mismatch([3, 5, 8], [3, 5, 7]) == 2" },
-      { "name": "identical lists", "code": "assert first_mismatch([1, 2], [1, 2]) is None" },
-      { "name": "length mismatch", "code": "assert first_mismatch([1, 2, 3], [1, 2]) == 2" },
-      { "name": "empty lists", "code": "assert first_mismatch([], []) is None" }
-    ]
+      {
+        "name": "mismatch in middle",
+        "code": "assert first_mismatch([3, 5, 8], [3, 5, 7]) == 2"
+      },
+      {
+        "name": "identical lists",
+        "code": "assert first_mismatch([1, 2], [1, 2]) is None"
+      },
+      {
+        "name": "length mismatch",
+        "code": "assert first_mismatch([1, 2, 3], [1, 2]) == 2"
+      },
+      {
+        "name": "empty lists",
+        "code": "assert first_mismatch([], []) is None"
+      }
+    ],
+    "solution": "def first_mismatch(expected, actual):\n    shared_length = min(len(expected), len(actual))\n\n    for index in range(shared_length):\n        if expected[index] != actual[index]:\n            return index\n\n    if len(expected) != len(actual):\n        return shared_length\n\n    return None"
   },
   {
     "id": "py-count-transitions",
@@ -46,20 +96,47 @@
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "difficulty": "Easy",
-    "languages": ["Python"],
-    "evaluation": { "type": "python" },
-    "tags": ["python", "waveform", "verification"],
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "waveform",
+      "verification"
+    ],
     "description": "Count rising and falling transitions in a sampled digital signal.",
     "task": "Implement count_transitions(samples). Count each adjacent pair whose values differ. For example, [0, 0, 1, 1, 0] contains two transitions. Return 0 for fewer than two samples.",
-    "examples": ["[0, 0, 1, 1, 0] → 2", "[1] → 0"],
-    "constraints": ["Only adjacent samples are compared.", "Do not mutate the input."],
+    "examples": [
+      "[0, 0, 1, 1, 0] → 2",
+      "[1] → 0"
+    ],
+    "constraints": [
+      "Only adjacent samples are compared.",
+      "Do not mutate the input."
+    ],
     "starterCode": "def count_transitions(samples):\n    # TODO: count changes between adjacent samples\n    pass",
     "testCases": [
-      { "name": "rising and falling edges", "code": "assert count_transitions([0, 0, 1, 1, 0]) == 2" },
-      { "name": "no transitions", "code": "assert count_transitions([1, 1, 1]) == 0" },
-      { "name": "single sample", "code": "assert count_transitions([1]) == 0" },
-      { "name": "empty samples", "code": "assert count_transitions([]) == 0" }
-    ]
+      {
+        "name": "rising and falling edges",
+        "code": "assert count_transitions([0, 0, 1, 1, 0]) == 2"
+      },
+      {
+        "name": "no transitions",
+        "code": "assert count_transitions([1, 1, 1]) == 0"
+      },
+      {
+        "name": "single sample",
+        "code": "assert count_transitions([1]) == 0"
+      },
+      {
+        "name": "empty samples",
+        "code": "assert count_transitions([]) == 0"
+      }
+    ],
+    "solution": "def count_transitions(samples):\n    transitions = 0\n\n    for index in range(1, len(samples)):\n        if samples[index] != samples[index - 1]:\n            transitions += 1\n\n    return transitions"
   },
   {
     "id": "py-coverage-gaps",
@@ -67,20 +144,46 @@
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "difficulty": "Medium",
-    "languages": ["Python"],
-    "evaluation": { "type": "python" },
-    "tags": ["python", "functional-coverage", "verification"],
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "functional-coverage",
+      "verification"
+    ],
     "description": "Compare observed coverage bins with the bins required by a test plan.",
     "task": "Implement missing_bins(required, observed). Return the required bin names that are absent from observed, preserving the order in required. Each bin name is a string.",
-    "examples": ["required=['reset', 'read', 'write'], observed=['reset', 'write'] → ['read']"],
-    "constraints": ["Preserve the order of required bins.", "Do not return duplicates from required."],
+    "examples": [
+      "required=['reset', 'read', 'write'], observed=['reset', 'write'] → ['read']"
+    ],
+    "constraints": [
+      "Preserve the order of required bins.",
+      "Do not return duplicates from required."
+    ],
     "starterCode": "def missing_bins(required, observed):\n    # TODO: return required bins not present in observed\n    pass",
     "testCases": [
-      { "name": "one missing bin", "code": "assert missing_bins(['reset', 'read', 'write'], ['reset', 'write']) == ['read']" },
-      { "name": "all covered", "code": "assert missing_bins(['a', 'b'], ['b', 'a']) == []" },
-      { "name": "preserve required order", "code": "assert missing_bins(['a', 'b', 'c'], ['c']) == ['a', 'b']" },
-      { "name": "empty observations", "code": "assert missing_bins(['reset', 'read'], []) == ['reset', 'read']" }
-    ]
+      {
+        "name": "one missing bin",
+        "code": "assert missing_bins(['reset', 'read', 'write'], ['reset', 'write']) == ['read']"
+      },
+      {
+        "name": "all covered",
+        "code": "assert missing_bins(['a', 'b'], ['b', 'a']) == []"
+      },
+      {
+        "name": "preserve required order",
+        "code": "assert missing_bins(['a', 'b', 'c'], ['c']) == ['a', 'b']"
+      },
+      {
+        "name": "empty observations",
+        "code": "assert missing_bins(['reset', 'read'], []) == ['reset', 'read']"
+      }
+    ],
+    "solution": "def missing_bins(required, observed):\n    observed_set = set(observed)\n    missing = []\n    seen = set()\n\n    for bin_name in required:\n        if bin_name not in observed_set and bin_name not in seen:\n            missing.append(bin_name)\n            seen.add(bin_name)\n\n    return missing"
   },
   {
     "id": "py-latency-summary",
@@ -88,19 +191,46 @@
     "category": "Python Scripting",
     "topic": "Python Scripting",
     "difficulty": "Medium",
-    "languages": ["Python"],
-    "evaluation": { "type": "python" },
-    "tags": ["python", "performance", "verification-automation"],
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "performance",
+      "verification-automation"
+    ],
     "description": "Compute simple latency statistics from transaction measurements.",
     "task": "Implement summarize_latency(samples). Return a dictionary with min, max, and average. The average must be a float. For an empty list, return None for all three values.",
-    "examples": ["[4, 8, 12] → {'min': 4, 'max': 12, 'average': 8.0}", "[] → all values None"],
-    "constraints": ["Do not modify the input list.", "Use average = sum(samples) / len(samples)."],
+    "examples": [
+      "[4, 8, 12] → {'min': 4, 'max': 12, 'average': 8.0}",
+      "[] → all values None"
+    ],
+    "constraints": [
+      "Do not modify the input list.",
+      "Use average = sum(samples) / len(samples)."
+    ],
     "starterCode": "def summarize_latency(samples):\n    # TODO: calculate min, max, and average\n    pass",
     "testCases": [
-      { "name": "three samples", "code": "assert summarize_latency([4, 8, 12]) == {'min': 4, 'max': 12, 'average': 8.0}" },
-      { "name": "single sample", "code": "assert summarize_latency([7]) == {'min': 7, 'max': 7, 'average': 7.0}" },
-      { "name": "empty samples", "code": "assert summarize_latency([]) == {'min': None, 'max': None, 'average': None}" },
-      { "name": "unsorted samples", "code": "assert summarize_latency([9, 1, 5]) == {'min': 1, 'max': 9, 'average': 5.0}" }
-    ]
+      {
+        "name": "three samples",
+        "code": "assert summarize_latency([4, 8, 12]) == {'min': 4, 'max': 12, 'average': 8.0}"
+      },
+      {
+        "name": "single sample",
+        "code": "assert summarize_latency([7]) == {'min': 7, 'max': 7, 'average': 7.0}"
+      },
+      {
+        "name": "empty samples",
+        "code": "assert summarize_latency([]) == {'min': None, 'max': None, 'average': None}"
+      },
+      {
+        "name": "unsorted samples",
+        "code": "assert summarize_latency([9, 1, 5]) == {'min': 1, 'max': 9, 'average': 5.0}"
+      }
+    ],
+    "solution": "def summarize_latency(samples):\n    if not samples:\n        return {\"min\": None, \"max\": None, \"average\": None}\n\n    return {\n        \"min\": min(samples),\n        \"max\": max(samples),\n        \"average\": sum(samples) / len(samples),\n    }"
   }
 ]
