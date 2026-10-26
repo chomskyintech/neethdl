@@ -245,7 +245,7 @@ function Problems({problems,allProblems,solved,query,setQuery,category,setCatego
   const items=allProblems.filter(problem=>problem.topic===name)
   return {name,total:items.length,solved:items.filter(problem=>solved.includes(problem.id)).length}
  }),[allProblems,solved])
- const compactTopicStats=topicsExpanded?topicStats:topicStats.slice(0,3)
+ const compactTopicStats=topicsExpanded?topicStats:[...topicStats.slice(0,3),...topicStats.filter(topic=>topic.name==='Python Scripting')]
  const visibleTopicNames=category==='All'?problemTopics:problemTopics.filter(name=>name===category)
  const groupedProblems=visibleTopicNames.map(name=>({
   name,
