@@ -20,7 +20,8 @@
     "test:testbench-coverage": "node tests/testbench-coverage.mjs",
     "test:language-parity": "node tests/language-parity-regression.mjs",
     "generate:runtime-catalogs": "node scripts/generate-runtime-catalogs.mjs",
-    "test:runtime-catalog": "node tests/runtime-catalog-regression.mjs"
+    "test:runtime-catalog": "node tests/runtime-catalog-regression.mjs",
+    "test:editor-language": "node tests/editor-language-stability-regression.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
