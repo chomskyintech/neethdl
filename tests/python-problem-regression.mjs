@@ -15,7 +15,7 @@ const [catalogGenerator, buildScript, ide, runner, worker, editor, topics, packa
   read('../package.json').then(JSON.parse)
 ])
 
-assert.equal(problems.length, 5, 'the initial Python track should contain five exercises')
+assert.equal(problems.length, 15, 'the Python track should contain fifteen exercises after the scripting expansion')
 assert.equal(new Set(problems.map(problem => problem.id)).size, problems.length, 'Python problem IDs must be unique')
 
 for (const problem of problems) {
@@ -42,5 +42,8 @@ assert.match(editor, /Python: 'python'/, 'Monaco must select Python syntax highl
 assert.match(runner, /PYTHON_TIMEOUT_MS = 20000/, 'Python execution must have a time limit')
 assert.match(worker, /pyodide\.mjs/, 'the browser worker must load Pyodide')
 assert.equal(packageJson.scripts['test:python-problems'], 'node tests/python-problem-regression.mjs', 'the Python regression test must be available through npm')
+
+assert.ok(problems.some(problem => problem.id === 'py-interpret-simulation-result'), 'the track should teach simulation-result classification without requiring native subprocess access in the browser')
+assert.ok(problems.some(problem => problem.id === 'py-merge-coverage-results'), 'the track should teach cumulative coverage aggregation')
 
 console.log(`Python problem regression passed: validated ${problems.length} exercises, their test cases, catalog inclusion, editor integration, and timed Pyodide execution.`)
