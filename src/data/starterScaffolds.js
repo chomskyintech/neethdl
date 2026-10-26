@@ -83,7 +83,7 @@ end architecture rtl;`
 }
 
 export function languageStarter(problem, language) {
-  if (language === 'SystemVerilog' || language === 'C') return problem.starterCode || ''
+  if (language === 'SystemVerilog' || language === 'C' || language === 'Python') return problem.starterCode || ''
   if (language === 'Verilog') return verilogFromSystemVerilog(problem.starterCode || '')
   return vhdlStarters[problem.id] || vhdlStarterFromReference(problem) || `library ieee;
 use ieee.std_logic_1164.all;
