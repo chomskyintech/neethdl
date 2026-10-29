@@ -106,11 +106,11 @@ test.describe('HDLForge navigation and SEO content', () => {
   test('Problems page owns problem sections and problem rows', async ({ page }) => {
     await page.goto('/app/problems/')
     await expect(page.getByRole('heading', { name: 'Problems' })).toBeVisible()
-    await expect(page.locator('.topic-cloud-item')).toHaveCount(4)
+    await expect(page.locator('.topic-cloud-item')).toHaveCount(5)
     const expandTopics = page.getByRole('button', { name: 'Expand', exact: true })
     await expect(expandTopics).toBeVisible()
     await expandTopics.click()
-    await expect(page.locator('.topic-cloud-item')).toHaveCount(21)
+    await expect(page.locator('.topic-cloud-item')).toHaveCount(22)
     await expect(page.getByRole('button', { name: /FSMs\s*10/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*10/ })).toBeVisible()
