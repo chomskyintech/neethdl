@@ -701,5 +701,404 @@
     "evaluation": {
       "type": "python"
     }
+  },
+  {
+    "id": "py-oop-transaction-class",
+    "title": "Create a Verification Transaction Class",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "classes",
+      "initialization"
+    ],
+    "description": "Represent one bus transaction as an object.",
+    "task": "Implement Transaction with __init__(self, address, data, write). Store the three values as instance attributes named address, data, and write.",
+    "examples": [
+      "tx = Transaction(16, 255, True) → tx.address == 16, tx.data == 255, tx.write is True"
+    ],
+    "constraints": [
+      "Use instance attributes, not class attributes.",
+      "Do not rename the constructor parameters or attributes."
+    ],
+    "starterCode": "class Transaction:\n    def __init__(self, address, data, write):\n        # TODO: store the transaction fields\n        pass",
+    "testCases": [
+      {
+        "name": "store transaction fields",
+        "code": "tx = Transaction(16, 255, True)\nassert (tx.address, tx.data, tx.write) == (16, 255, True)"
+      },
+      {
+        "name": "allow zero values",
+        "code": "tx = Transaction(0, 0, False)\nassert (tx.address, tx.data, tx.write) == (0, 0, False)"
+      },
+      {
+        "name": "instances are independent",
+        "code": "a = Transaction(1, 10, True)\nb = Transaction(2, 20, False)\nassert a.address == 1 and b.address == 2 and a.data == 10 and b.data == 20"
+      }
+    ],
+    "solution": "class Transaction:\n    def __init__(self, address, data, write):\n        self.address = address\n        self.data = data\n        self.write = write"
+  },
+  {
+    "id": "py-oop-transaction-comparison",
+    "title": "Compare Transaction Objects",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "methods",
+      "equality"
+    ],
+    "description": "Add useful methods to a transaction object so scoreboards can compare transactions.",
+    "task": "Implement Transaction with address, data, and write attributes. Implement matches(self, other), returning True only when other has the same three attribute values; return False for objects without those attributes.",
+    "examples": [
+      "Transaction(4, 9, True).matches(Transaction(4, 9, True)) → True"
+    ],
+    "constraints": [
+      "Compare all three fields.",
+      "Do not assume other is a Transaction instance."
+    ],
+    "starterCode": "class Transaction:\n    def __init__(self, address, data, write):\n        self.address = address\n        self.data = data\n        self.write = write\n\n    def matches(self, other):\n        # TODO: compare transaction fields safely\n        pass",
+    "testCases": [
+      {
+        "name": "all fields match",
+        "code": "assert Transaction(4, 9, True).matches(Transaction(4, 9, True)) is True"
+      },
+      {
+        "name": "data differs",
+        "code": "assert Transaction(4, 9, True).matches(Transaction(4, 8, True)) is False"
+      },
+      {
+        "name": "direction differs",
+        "code": "assert Transaction(4, 9, True).matches(Transaction(4, 9, False)) is False"
+      },
+      {
+        "name": "unrelated object",
+        "code": "assert Transaction(1, 2, False).matches(object()) is False"
+      }
+    ],
+    "solution": "class Transaction:\n    def __init__(self, address, data, write):\n        self.address = address\n        self.data = data\n        self.write = write\n\n    def matches(self, other):\n        return all(hasattr(other, field) for field in ('address', 'data', 'write')) and (self.address, self.data, self.write) == (other.address, other.data, other.write)"
+  },
+  {
+    "id": "py-oop-fifo-model",
+    "title": "Build a FIFO Reference Model",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Medium",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "fifo",
+      "reference-model",
+      "methods"
+    ],
+    "description": "Build a software FIFO model to predict expected DUT behaviour.",
+    "task": "Implement FIFOModel with capacity. It starts empty. enqueue(value) appends and returns True, or returns False when full. dequeue() returns and removes the oldest value, or returns None when empty. Implement is_empty() and is_full().",
+    "examples": [
+      "fifo = FIFOModel(2); fifo.enqueue(7) → True; fifo.dequeue() → 7"
+    ],
+    "constraints": [
+      "Maintain FIFO order (first in, first out).",
+      "A rejected enqueue or empty dequeue must not change the queue.",
+      "Capacity is a positive integer in test inputs."
+    ],
+    "starterCode": "class FIFOModel:\n    def __init__(self, capacity):\n        # TODO: initialize capacity and storage\n        pass\n\n    def enqueue(self, value):\n        pass\n\n    def dequeue(self):\n        pass\n\n    def is_empty(self):\n        pass\n\n    def is_full(self):\n        pass",
+    "testCases": [
+      {
+        "name": "FIFO order",
+        "code": "f = FIFOModel(3)\nassert f.enqueue(10) is True and f.enqueue(20) is True\nassert f.dequeue() == 10 and f.dequeue() == 20 and f.is_empty()"
+      },
+      {
+        "name": "reject when full",
+        "code": "f = FIFOModel(1)\nassert f.enqueue(1) is True and f.enqueue(2) is False\nassert f.is_full() and f.dequeue() == 1"
+      },
+      {
+        "name": "empty dequeue",
+        "code": "f = FIFOModel(2)\nassert f.dequeue() is None and f.is_empty()"
+      },
+      {
+        "name": "reuse after dequeue",
+        "code": "f = FIFOModel(1)\nf.enqueue(3)\nassert f.dequeue() == 3 and f.enqueue(4) is True and f.dequeue() == 4"
+      }
+    ],
+    "solution": "class FIFOModel:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self._items = []\n\n    def enqueue(self, value):\n        if self.is_full():\n            return False\n        self._items.append(value)\n        return True\n\n    def dequeue(self):\n        if self.is_empty():\n            return None\n        return self._items.pop(0)\n\n    def is_empty(self):\n        return len(self._items) == 0\n\n    def is_full(self):\n        return len(self._items) >= self.capacity"
+  },
+  {
+    "id": "py-oop-scoreboard",
+    "title": "Implement a Transaction Scoreboard",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Medium",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "scoreboard",
+      "composition",
+      "queues"
+    ],
+    "description": "Use a class to track expected and observed transactions during verification.",
+    "task": "Implement Scoreboard with expected and actual lists. add_expected(tx) and add_actual(tx) append transactions. compare() returns a dictionary with keys 'matches' (True only if the lists have equal lengths and pairwise equal values) and 'first_mismatch' (the first differing index, or the shorter length if only lengths differ, or None if identical).",
+    "examples": [
+      "Two identical one-item lists → {'matches': True, 'first_mismatch': None}"
+    ],
+    "constraints": [
+      "Do not modify either list during compare().",
+      "Use transaction equality as provided by Python."
+    ],
+    "starterCode": "class Scoreboard:\n    def __init__(self):\n        self.expected = []\n        self.actual = []\n\n    def add_expected(self, tx):\n        pass\n\n    def add_actual(self, tx):\n        pass\n\n    def compare(self):\n        # TODO: return matches and first_mismatch\n        pass",
+    "testCases": [
+      {
+        "name": "identical streams",
+        "code": "s = Scoreboard()\ns.add_expected(10); s.add_actual(10)\nassert s.compare() == {'matches': True, 'first_mismatch': None}"
+      },
+      {
+        "name": "first mismatch",
+        "code": "s = Scoreboard()\nfor x in [1, 2, 3]: s.add_expected(x)\nfor x in [1, 9, 3]: s.add_actual(x)\nassert s.compare() == {'matches': False, 'first_mismatch': 1}"
+      },
+      {
+        "name": "length mismatch",
+        "code": "s = Scoreboard()\ns.add_expected(1); s.add_expected(2); s.add_actual(1)\nassert s.compare() == {'matches': False, 'first_mismatch': 1}"
+      },
+      {
+        "name": "empty streams",
+        "code": "assert Scoreboard().compare() == {'matches': True, 'first_mismatch': None}"
+      }
+    ],
+    "solution": "class Scoreboard:\n    def __init__(self):\n        self.expected = []\n        self.actual = []\n\n    def add_expected(self, tx):\n        self.expected.append(tx)\n\n    def add_actual(self, tx):\n        self.actual.append(tx)\n\n    def compare(self):\n        shared = min(len(self.expected), len(self.actual))\n        for index in range(shared):\n            if self.expected[index] != self.actual[index]:\n                return {'matches': False, 'first_mismatch': index}\n        if len(self.expected) != len(self.actual):\n            return {'matches': False, 'first_mismatch': shared}\n        return {'matches': True, 'first_mismatch': None}"
+  },
+  {
+    "id": "py-oop-coverage-collector",
+    "title": "Create a Functional Coverage Collector",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Medium",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "coverage",
+      "dictionaries",
+      "methods"
+    ],
+    "description": "Model a small functional coverage collector with per-bin hit counts.",
+    "task": "Implement CoverageCollector(bins). Initialize every supplied bin to zero hits. sample(bin_name) increments that bin if it exists and otherwise does nothing. hit_count(bin_name) returns the count, or 0 for an unknown bin. missing_bins() returns the bins with zero hits in their original input order.",
+    "examples": [
+      "CoverageCollector(['read', 'write']).sample('read') → missing_bins() returns ['write']"
+    ],
+    "constraints": [
+      "Repeated samples increment counts.",
+      "Unknown bins must not raise an exception.",
+      "Preserve the original bin order in missing_bins()."
+    ],
+    "starterCode": "class CoverageCollector:\n    def __init__(self, bins):\n        pass\n\n    def sample(self, bin_name):\n        pass\n\n    def hit_count(self, bin_name):\n        pass\n\n    def missing_bins(self):\n        pass",
+    "testCases": [
+      {
+        "name": "count repeated hits",
+        "code": "c = CoverageCollector(['read', 'write'])\nc.sample('read'); c.sample('read')\nassert c.hit_count('read') == 2 and c.hit_count('write') == 0"
+      },
+      {
+        "name": "missing bins preserve order",
+        "code": "c = CoverageCollector(['reset', 'read', 'write'])\nc.sample('write')\nassert c.missing_bins() == ['reset', 'read']"
+      },
+      {
+        "name": "unknown bin ignored",
+        "code": "c = CoverageCollector(['read'])\nc.sample('invalid')\nassert c.hit_count('invalid') == 0 and c.missing_bins() == ['read']"
+      },
+      {
+        "name": "all covered",
+        "code": "c = CoverageCollector(['a', 'b'])\nc.sample('a'); c.sample('b')\nassert c.missing_bins() == []"
+      }
+    ],
+    "solution": "class CoverageCollector:\n    def __init__(self, bins):\n        self._counts = {name: 0 for name in bins}\n\n    def sample(self, bin_name):\n        if bin_name in self._counts:\n            self._counts[bin_name] += 1\n\n    def hit_count(self, bin_name):\n        return self._counts.get(bin_name, 0)\n\n    def missing_bins(self):\n        return [name for name, count in self._counts.items() if count == 0]"
+  },
+  {
+    "id": "py-oop-inheritance-transactions",
+    "title": "Use Inheritance for Bus Transactions",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Medium",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "inheritance",
+      "subclasses"
+    ],
+    "description": "Represent read and write transactions with a shared base class and specialized subclasses.",
+    "task": "Implement base class BusTransaction(address). Implement ReadTransaction(address) with method summary() returning 'READ address=N'. Implement WriteTransaction(address, data) with summary() returning 'WRITE address=N data=D'. Both subclasses must inherit from BusTransaction and store address on the base class.",
+    "examples": [
+      "ReadTransaction(8).summary() → 'READ address=8'"
+    ],
+    "constraints": [
+      "Use inheritance rather than duplicating the address initialization.",
+      "Match the summary strings exactly."
+    ],
+    "starterCode": "class BusTransaction:\n    def __init__(self, address):\n        pass\n\nclass ReadTransaction(BusTransaction):\n    def summary(self):\n        pass\n\nclass WriteTransaction(BusTransaction):\n    def __init__(self, address, data):\n        pass\n\n    def summary(self):\n        pass",
+    "testCases": [
+      {
+        "name": "read inherits and formats",
+        "code": "r = ReadTransaction(8)\nassert isinstance(r, BusTransaction) and r.address == 8\nassert r.summary() == 'READ address=8'"
+      },
+      {
+        "name": "write inherits and formats",
+        "code": "w = WriteTransaction(16, 255)\nassert isinstance(w, BusTransaction) and w.address == 16 and w.data == 255\nassert w.summary() == 'WRITE address=16 data=255'"
+      },
+      {
+        "name": "independent instances",
+        "code": "assert ReadTransaction(1).summary() == 'READ address=1'\nassert WriteTransaction(2, 3).summary() == 'WRITE address=2 data=3'"
+      }
+    ],
+    "solution": "class BusTransaction:\n    def __init__(self, address):\n        self.address = address\n\nclass ReadTransaction(BusTransaction):\n    def summary(self):\n        return f'READ address={self.address}'\n\nclass WriteTransaction(BusTransaction):\n    def __init__(self, address, data):\n        super().__init__(address)\n        self.data = data\n\n    def summary(self):\n        return f'WRITE address={self.address} data={self.data}'"
+  },
+  {
+    "id": "py-oop-polymorphic-test-cases",
+    "title": "Run Test Cases Using Polymorphism",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Medium",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "polymorphism",
+      "methods"
+    ],
+    "description": "Use a common interface to run different verification test classes.",
+    "task": "Implement base class TestCase with run() returning False. Implement ResetTest and FIFOTest as subclasses whose run() methods return True and False respectively. Implement run_tests(tests), which returns a list of each object's run() result in input order.",
+    "examples": [
+      "run_tests([ResetTest(), FIFOTest()]) → [True, False]"
+    ],
+    "constraints": [
+      "Override run() in both subclasses.",
+      "run_tests must not assume the concrete class of each test object."
+    ],
+    "starterCode": "class TestCase:\n    def run(self):\n        return False\n\nclass ResetTest(TestCase):\n    def run(self):\n        pass\n\nclass FIFOTest(TestCase):\n    def run(self):\n        pass\n\ndef run_tests(tests):\n    # TODO: run every test polymorphically\n    pass",
+    "testCases": [
+      {
+        "name": "different test outcomes",
+        "code": "assert run_tests([ResetTest(), FIFOTest()]) == [True, False]"
+      },
+      {
+        "name": "preserve input order",
+        "code": "assert run_tests([FIFOTest(), ResetTest(), ResetTest()]) == [False, True, True]"
+      },
+      {
+        "name": "empty test list",
+        "code": "assert run_tests([]) == []"
+      },
+      {
+        "name": "inherit common base",
+        "code": "assert isinstance(ResetTest(), TestCase) and isinstance(FIFOTest(), TestCase)"
+      }
+    ],
+    "solution": "class TestCase:\n    def run(self):\n        return False\n\nclass ResetTest(TestCase):\n    def run(self):\n        return True\n\nclass FIFOTest(TestCase):\n    def run(self):\n        return False\n\ndef run_tests(tests):\n    return [test.run() for test in tests]"
+  },
+  {
+    "id": "py-oop-regression-runner",
+    "title": "Build a Regression Runner",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Hard",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "object-oriented-programming",
+      "hardware-verification",
+      "regression",
+      "composition",
+      "aggregation"
+    ],
+    "description": "Combine test objects into a runner that aggregates pass/fail results.",
+    "task": "Implement RegressionRunner with a tests list. add_test(test) appends a test object. run() calls each test's run() method and returns {'total': N, 'passed': P, 'failed': F, 'results': [...]}, where results contains dictionaries {'name': test.name, 'passed': bool} in test order. Treat only the literal value True as a pass; every other return value is a failure.",
+    "examples": [
+      "Tests named 'reset' returning True and 'fifo' returning False → total 2, passed 1, failed 1"
+    ],
+    "constraints": [
+      "Use composition: the runner stores test objects.",
+      "Do not stop after the first failure.",
+      "The results list must preserve insertion order."
+    ],
+    "starterCode": "class RegressionRunner:\n    def __init__(self):\n        self.tests = []\n\n    def add_test(self, test):\n        pass\n\n    def run(self):\n        # TODO: run tests and aggregate results\n        pass",
+    "testCases": [
+      {
+        "name": "aggregate pass and fail",
+        "code": "class FakeTest:\n    def __init__(self, name, result): self.name, self.result = name, result\n    def run(self): return self.result\nr = RegressionRunner(); r.add_test(FakeTest('reset', True)); r.add_test(FakeTest('fifo', False))\nassert r.run() == {'total': 2, 'passed': 1, 'failed': 1, 'results': [{'name': 'reset', 'passed': True}, {'name': 'fifo', 'passed': False}]}"
+      },
+      {
+        "name": "only literal True passes",
+        "code": "class FakeTest:\n    name = 'strange'\n    def run(self): return 1\nr = RegressionRunner(); r.add_test(FakeTest())\nassert r.run()['failed'] == 1 and r.run()['results'][0]['passed'] is False"
+      },
+      {
+        "name": "empty regression",
+        "code": "r = RegressionRunner()\nassert r.run() == {'total': 0, 'passed': 0, 'failed': 0, 'results': []}"
+      },
+      {
+        "name": "runner does not stop after failure",
+        "code": "class FakeTest:\n    def __init__(self, name, result): self.name, self.result = name, result\n    def run(self): return self.result\nr = RegressionRunner()\nfor t in [FakeTest('a', False), FakeTest('b', True), FakeTest('c', True)]: r.add_test(t)\nassert r.run()['passed'] == 2 and len(r.run()['results']) == 3"
+      }
+    ],
+    "solution": "class RegressionRunner:\n    def __init__(self):\n        self.tests = []\n\n    def add_test(self, test):\n        self.tests.append(test)\n\n    def run(self):\n        results = []\n        for test in self.tests:\n            passed = test.run() is True\n            results.append({'name': test.name, 'passed': passed})\n        passed_count = sum(1 for result in results if result['passed'])\n        return {'total': len(results), 'passed': passed_count, 'failed': len(results) - passed_count, 'results': results}"
   }
 ]
