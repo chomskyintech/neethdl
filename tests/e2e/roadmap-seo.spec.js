@@ -110,7 +110,7 @@ test.describe('HDLForge navigation and SEO content', () => {
     const expandTopics = page.getByRole('button', { name: 'Expand', exact: true })
     await expect(expandTopics).toBeVisible()
     await expandTopics.click()
-    await expect(page.locator('.topic-cloud-item')).toHaveCount(22)
+    await expect(page.locator('.topic-cloud-item')).toHaveCount(23)
     await expect(page.getByRole('button', { name: /FSMs\s*10/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /Counters & Timers\s*4/ })).toBeVisible()
     await expect(page.getByRole('button', { name: /FIFOs & Buffers\s*10/ })).toBeVisible()
