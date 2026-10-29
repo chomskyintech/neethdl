@@ -19,6 +19,7 @@ const fullProblems=[
   ...readJson('src/data/problems.json').filter(problem=>problem.evaluation?.type!=='answer'),
   ...readJson('src/data/acceleratorProblems.json'),
   ...readJson('src/data/expansionProblems.json'),
+  ...readJson('src/data/pythonProblems.json'),
   ...guidedProjectProblems,
 ].map(problem=>({...problem,topic:assignProblemTopic(problem)}))
 
