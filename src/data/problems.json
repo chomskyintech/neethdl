@@ -1499,7 +1499,8 @@
     "difficulty": "Easy",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1530,7 +1531,8 @@
     "difficulty": "Easy",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
@@ -1562,7 +1564,8 @@
     "difficulty": "Medium",
     "languages": [
       "Verilog",
-      "SystemVerilog"
+      "SystemVerilog",
+      "VHDL"
     ],
     "evaluation": {
       "type": "simulation"
