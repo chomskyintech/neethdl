@@ -1100,5 +1100,389 @@
       }
     ],
     "solution": "class RegressionRunner:\n    def __init__(self):\n        self.tests = []\n\n    def add_test(self, test):\n        self.tests.append(test)\n\n    def run(self):\n        results = []\n        for test in self.tests:\n            passed = test.run() is True\n            results.append({'name': test.name, 'passed': passed})\n        passed_count = sum(1 for result in results if result['passed'])\n        return {'total': len(results), 'passed': passed_count, 'failed': len(results) - passed_count, 'results': results}"
+  },
+  {
+    "id": "py-basics-filter-invalid-samples",
+    "title": "Filter Invalid Signal Samples",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "fundamentals",
+      "lists",
+      "filtering"
+    ],
+    "description": "Practise lists, conditions, and returning a new list.",
+    "task": "Implement valid_samples(samples). Return a new list containing only values that are exactly 0 or 1. Keep their original order. Do not modify the input list.",
+    "examples": [
+      "[0, 1, 2, 1, -1, 0] → [0, 1, 1, 0]"
+    ],
+    "constraints": [
+      "Only integer values 0 and 1 are valid; do not treat True or False as valid samples.",
+      "Preserve order and do not mutate the input."
+    ],
+    "starterCode": "def valid_samples(samples):\n    # TODO: keep only integer 0 and 1 values\n    pass",
+    "testCases": [
+      {
+        "name": "filter invalid values",
+        "code": "assert valid_samples([0, 1, 2, 1, -1, 0]) == [0, 1, 1, 0]"
+      },
+      {
+        "name": "empty input",
+        "code": "assert valid_samples([]) == []"
+      },
+      {
+        "name": "reject booleans",
+        "code": "assert valid_samples([True, False, 0, 1]) == [0, 1]"
+      },
+      {
+        "name": "do not mutate input",
+        "code": "data = [0, 3, 1]\nvalid_samples(data)\nassert data == [0, 3, 1]"
+      }
+    ],
+    "solution": "def valid_samples(samples):\n    return [value for value in samples if type(value) is int and value in (0, 1)]"
+  },
+  {
+    "id": "py-basics-count-opcodes",
+    "title": "Count Instruction Types",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "fundamentals",
+      "dictionaries",
+      "loops"
+    ],
+    "description": "Use a dictionary to count repeated values in a list.",
+    "task": "Implement count_opcodes(opcodes). Return a dictionary mapping each opcode string to the number of times it appears. The dictionary should include only opcodes present in the input.",
+    "examples": [
+      "['ADD', 'LOAD', 'ADD'] → {'ADD': 2, 'LOAD': 1}"
+    ],
+    "constraints": [
+      "Opcode names are case-sensitive strings.",
+      "Do not modify the input list."
+    ],
+    "starterCode": "def count_opcodes(opcodes):\n    # TODO: count each opcode using a dictionary\n    pass",
+    "testCases": [
+      {
+        "name": "repeated opcodes",
+        "code": "assert count_opcodes(['ADD', 'LOAD', 'ADD']) == {'ADD': 2, 'LOAD': 1}"
+      },
+      {
+        "name": "empty input",
+        "code": "assert count_opcodes([]) == {}"
+      },
+      {
+        "name": "case-sensitive keys",
+        "code": "assert count_opcodes(['ADD', 'add', 'ADD']) == {'ADD': 2, 'add': 1}"
+      },
+      {
+        "name": "all unique",
+        "code": "assert count_opcodes(['ADD', 'SUB']) == {'ADD': 1, 'SUB': 1}"
+      }
+    ],
+    "solution": "def count_opcodes(opcodes):\n    counts = {}\n    for opcode in opcodes:\n        counts[opcode] = counts.get(opcode, 0) + 1\n    return counts"
+  },
+  {
+    "id": "py-basics-format-test-name",
+    "title": "Format a Test Name",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "fundamentals",
+      "strings",
+      "formatting"
+    ],
+    "description": "Practise string methods and f-strings for readable test reports.",
+    "task": "Implement format_test_name(block, test_id). Return a string in the exact format 'BLOCK_test_ID', where block is converted to uppercase and test_id is converted to an integer before formatting. For example, block='fifo', test_id='07' returns 'FIFO_test_7'.",
+    "examples": [
+      "format_test_name('fifo', '07') → 'FIFO_test_7'"
+    ],
+    "constraints": [
+      "Strip whitespace from block before converting it to uppercase.",
+      "Inputs contain a valid integer test_id."
+    ],
+    "starterCode": "def format_test_name(block, test_id):\n    # TODO: normalize the block and format the ID\n    pass",
+    "testCases": [
+      {
+        "name": "normalize case and ID",
+        "code": "assert format_test_name('fifo', '07') == 'FIFO_test_7'"
+      },
+      {
+        "name": "trim surrounding spaces",
+        "code": "assert format_test_name('  axi  ', 12) == 'AXI_test_12'"
+      },
+      {
+        "name": "already normalized",
+        "code": "assert format_test_name('ALU', 0) == 'ALU_test_0'"
+      }
+    ],
+    "solution": "def format_test_name(block, test_id):\n    return f\"{block.strip().upper()}_test_{int(test_id)}\""
+  },
+  {
+    "id": "py-basics-summarize-readings",
+    "title": "Summarize Signal Readings",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "fundamentals",
+      "functions",
+      "lists",
+      "loops"
+    ],
+    "description": "Use loops, conditionals, and return values to summarize measurements.",
+    "task": "Implement count_above_threshold(readings, threshold). Return how many readings are strictly greater than threshold. Do not count readings equal to the threshold.",
+    "examples": [
+      "count_above_threshold([2, 5, 8, 5], 5) → 1"
+    ],
+    "constraints": [
+      "Do not modify the readings list.",
+      "Return an integer, including when the list is empty."
+    ],
+    "starterCode": "def count_above_threshold(readings, threshold):\n    # TODO: count readings strictly above threshold\n    pass",
+    "testCases": [
+      {
+        "name": "count values above threshold",
+        "code": "assert count_above_threshold([2, 5, 8, 5], 5) == 1"
+      },
+      {
+        "name": "all readings qualify",
+        "code": "assert count_above_threshold([4, 5, 6], 3) == 3"
+      },
+      {
+        "name": "none qualify",
+        "code": "assert count_above_threshold([1, 2, 3], 3) == 0"
+      },
+      {
+        "name": "empty list",
+        "code": "assert count_above_threshold([], 0) == 0"
+      }
+    ],
+    "solution": "def count_above_threshold(readings, threshold):\n    count = 0\n    for reading in readings:\n        if reading > threshold:\n            count += 1\n    return count"
+  },
+  {
+    "id": "py-basics-safe-int",
+    "title": "Convert a Seed Safely",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "fundamentals",
+      "exceptions",
+      "type-conversion"
+    ],
+    "description": "Practise type conversion and handling invalid input with try/except.",
+    "task": "Implement parse_seed(value). Convert value to an integer and return it if it is non-negative. Return None if conversion fails or the converted integer is negative.",
+    "examples": [
+      "parse_seed('42') → 42; parse_seed('abc') → None; parse_seed('-1') → None"
+    ],
+    "constraints": [
+      "Handle ValueError and TypeError without raising them to the caller.",
+      "Integer strings may contain surrounding whitespace."
+    ],
+    "starterCode": "def parse_seed(value):\n    # TODO: convert to a non-negative integer safely\n    pass",
+    "testCases": [
+      {
+        "name": "integer string",
+        "code": "assert parse_seed('42') == 42"
+      },
+      {
+        "name": "whitespace around value",
+        "code": "assert parse_seed(' 7 ') == 7"
+      },
+      {
+        "name": "invalid text",
+        "code": "assert parse_seed('abc') is None"
+      },
+      {
+        "name": "negative value",
+        "code": "assert parse_seed('-1') is None"
+      },
+      {
+        "name": "unsupported value",
+        "code": "assert parse_seed(None) is None"
+      }
+    ],
+    "solution": "def parse_seed(value):\n    try:\n        seed = int(value)\n    except (ValueError, TypeError):\n        return None\n    return seed if seed >= 0 else None"
+  },
+  {
+    "id": "py-oop-test-counter",
+    "title": "Create a Test Counter Class",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "instance-methods",
+      "self"
+    ],
+    "description": "Learn how __init__, self, instance attributes, and methods work together.",
+    "task": "Implement TestCounter. The constructor starts passed and failed counts at zero. record_pass() increments passed, record_fail() increments failed, and summary() returns {'passed': P, 'failed': F, 'total': P + F}.",
+    "examples": [
+      "c = TestCounter(); c.record_pass(); c.record_fail() → {'passed': 1, 'failed': 1, 'total': 2}"
+    ],
+    "constraints": [
+      "Each object must maintain its own counts.",
+      "Do not use class-level mutable state for the counts."
+    ],
+    "starterCode": "class TestCounter:\n    def __init__(self):\n        # TODO: initialize instance counters\n        pass\n\n    def record_pass(self):\n        pass\n\n    def record_fail(self):\n        pass\n\n    def summary(self):\n        pass",
+    "testCases": [
+      {
+        "name": "record both outcomes",
+        "code": "c = TestCounter()\nc.record_pass(); c.record_pass(); c.record_fail()\nassert c.summary() == {'passed': 2, 'failed': 1, 'total': 3}"
+      },
+      {
+        "name": "empty counter",
+        "code": "assert TestCounter().summary() == {'passed': 0, 'failed': 0, 'total': 0}"
+      },
+      {
+        "name": "instances are independent",
+        "code": "a = TestCounter(); b = TestCounter()\na.record_pass()\nassert a.summary()['passed'] == 1 and b.summary()['passed'] == 0"
+      }
+    ],
+    "solution": "class TestCounter:\n    def __init__(self):\n        self.passed = 0\n        self.failed = 0\n\n    def record_pass(self):\n        self.passed += 1\n\n    def record_fail(self):\n        self.failed += 1\n\n    def summary(self):\n        return {'passed': self.passed, 'failed': self.failed, 'total': self.passed + self.failed}"
+  },
+  {
+    "id": "py-oop-register-model",
+    "title": "Model a Register with Methods",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "classes",
+      "state",
+      "methods"
+    ],
+    "description": "Represent hardware state inside an object and update it through methods.",
+    "task": "Implement Register(width). The initial value is zero. write(value) stores value masked to the register width, read() returns the current value, and reset() sets it back to zero. Inputs use positive integer widths.",
+    "examples": [
+      "r = Register(4); r.write(19); r.read() → 3"
+    ],
+    "constraints": [
+      "Use mask = (1 << width) - 1.",
+      "Each register instance must maintain independent state."
+    ],
+    "starterCode": "class Register:\n    def __init__(self, width):\n        # TODO: store width and initialize the value\n        pass\n\n    def write(self, value):\n        pass\n\n    def read(self):\n        pass\n\n    def reset(self):\n        pass",
+    "testCases": [
+      {
+        "name": "initial value is zero",
+        "code": "assert Register(8).read() == 0"
+      },
+      {
+        "name": "mask writes to width",
+        "code": "r = Register(4); r.write(19)\nassert r.read() == 3"
+      },
+      {
+        "name": "reset clears value",
+        "code": "r = Register(8); r.write(255); r.reset()\nassert r.read() == 0"
+      },
+      {
+        "name": "instances are independent",
+        "code": "a = Register(4); b = Register(4)\na.write(7)\nassert a.read() == 7 and b.read() == 0"
+      }
+    ],
+    "solution": "class Register:\n    def __init__(self, width):\n        self.width = width\n        self._value = 0\n\n    def write(self, value):\n        mask = (1 << self.width) - 1\n        self._value = value & mask\n\n    def read(self):\n        return self._value\n\n    def reset(self):\n        self._value = 0"
+  },
+  {
+    "id": "py-oop-override-summary",
+    "title": "Override a Method in a Subclass",
+    "category": "Python Scripting",
+    "topic": "Python Scripting",
+    "difficulty": "Easy",
+    "languages": [
+      "Python"
+    ],
+    "evaluation": {
+      "type": "python"
+    },
+    "tags": [
+      "python",
+      "oop",
+      "inheritance",
+      "method-overriding",
+      "super"
+    ],
+    "description": "Practise a simple inheritance hierarchy before moving to polymorphic verification tests.",
+    "task": "Implement base class Test with name and method result_text() returning 'name: NOT RUN'. Implement PassingTest and FailingTest subclasses. Their result_text() methods must return 'name: PASS' and 'name: FAIL' respectively. Use the base constructor to store name.",
+    "examples": [
+      "PassingTest('reset').result_text() → 'reset: PASS'"
+    ],
+    "constraints": [
+      "Both subclasses must inherit from Test.",
+      "Use super().__init__(name) in each subclass constructor."
+    ],
+    "starterCode": "class Test:\n    def __init__(self, name):\n        self.name = name\n\n    def result_text(self):\n        return f'{self.name}: NOT RUN'\n\nclass PassingTest(Test):\n    def __init__(self, name):\n        # TODO: initialize the base class\n        pass\n\n    def result_text(self):\n        pass\n\nclass FailingTest(Test):\n    def __init__(self, name):\n        # TODO: initialize the base class\n        pass\n\n    def result_text(self):\n        pass",
+    "testCases": [
+      {
+        "name": "base default method",
+        "code": "assert Test('fifo').result_text() == 'fifo: NOT RUN'"
+      },
+      {
+        "name": "override passing result",
+        "code": "p = PassingTest('reset')\nassert isinstance(p, Test) and p.result_text() == 'reset: PASS'"
+      },
+      {
+        "name": "override failing result",
+        "code": "f = FailingTest('memory')\nassert isinstance(f, Test) and f.result_text() == 'memory: FAIL'"
+      },
+      {
+        "name": "preserve name through super",
+        "code": "assert PassingTest('alu').name == 'alu' and FailingTest('axi').name == 'axi'"
+      }
+    ],
+    "solution": "class Test:\n    def __init__(self, name):\n        self.name = name\n\n    def result_text(self):\n        return f'{self.name}: NOT RUN'\n\nclass PassingTest(Test):\n    def __init__(self, name):\n        super().__init__(name)\n\n    def result_text(self):\n        return f'{self.name}: PASS'\n\nclass FailingTest(Test):\n    def __init__(self, name):\n        super().__init__(name)\n\n    def result_text(self):\n        return f'{self.name}: FAIL'"
   }
 ]
