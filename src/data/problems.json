@@ -1491,5 +1491,100 @@
       "Explain when the write response becomes legal."
     ],
     "starterCode": "// Explain robust AXI-Lite write-channel handling."
+  },
+  {
+    "id": "rtl-inst-half-adder",
+    "title": "Instantiate a Half Adder",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "module-instantiation",
+      "named-ports",
+      "hierarchy",
+      "combinational"
+    ],
+    "description": "Connect a provided half-adder submodule to a top-level wrapper.",
+    "task": "Complete half_adder_top by instantiating the provided half_adder module. Use the instance name u_half_adder and named port connections for a, b, sum, and carry. Do not reimplement the half-adder logic inside the top-level module.",
+    "examples": [
+      "a=0, b=1 → sum=1, carry=0",
+      "a=1, b=1 → sum=0, carry=1"
+    ],
+    "constraints": [
+      "Keep the supplied half_adder module unchanged.",
+      "Use named port connections (.port(signal)).",
+      "The top-level module must be named half_adder_top."
+    ],
+    "starterCode": "module half_adder(input wire a, b, output wire sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule half_adder_top(input wire a, b, output wire sum, carry);\n  // Instantiate half_adder here using named port connections.\n\nendmodule"
+  },
+  {
+    "id": "rtl-inst-parameterized-parity",
+    "title": "Instantiate a Parameterized Module",
+    "category": "RTL Design",
+    "difficulty": "Easy",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "module-instantiation",
+      "parameter-override",
+      "named-ports",
+      "combinational"
+    ],
+    "description": "Instantiate a parameterized parity reducer with an explicit width override.",
+    "task": "Complete parity_top by instantiating parity_reducer with WIDTH overridden to 8. Connect data and parity using named ports. The supplied submodule outputs the reduction XOR of its data input.",
+    "examples": [
+      "data=8'b00000000 → parity=0",
+      "data=8'b00000001 → parity=1",
+      "data=8'b00000011 → parity=0"
+    ],
+    "constraints": [
+      "Keep parity_reducer unchanged.",
+      "Use the parameter override syntax #(.WIDTH(8)).",
+      "Use named port connections and name the instance u_parity."
+    ],
+    "starterCode": "module parity_reducer #(parameter WIDTH = 4) (\n  input wire [WIDTH-1:0] data,\n  output wire parity\n);\n  assign parity = ^data;\nendmodule\n\nmodule parity_top(input wire [7:0] data, output wire parity);\n  // Instantiate parity_reducer with WIDTH=8.\n\nendmodule"
+  },
+  {
+    "id": "rtl-inst-full-adder",
+    "title": "Build a Full Adder from Submodules",
+    "category": "RTL Design",
+    "difficulty": "Medium",
+    "languages": [
+      "Verilog",
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "simulation"
+    },
+    "tags": [
+      "module-instantiation",
+      "hierarchy",
+      "named-ports",
+      "combinational"
+    ],
+    "description": "Compose two half adders to build a structural full adder.",
+    "task": "Complete full_adder_top using two instances of the provided half_adder. The first half adder adds a and b; the second adds the first sum to cin. OR the two carry outputs to produce cout. Use named port connections and instance names u_ha1 and u_ha2.",
+    "examples": [
+      "a=0, b=1, cin=1 → sum=0, cout=1",
+      "a=1, b=0, cin=0 → sum=1, cout=0"
+    ],
+    "constraints": [
+      "Keep the supplied half_adder module unchanged.",
+      "Use two half_adder instances; do not write the full-adder truth table directly.",
+      "Use an internal wire for the intermediate sum and carry signals.",
+      "The top-level module must be named full_adder_top."
+    ],
+    "starterCode": "module half_adder(input wire a, b, output wire sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule full_adder_top(input wire a, b, cin, output wire sum, cout);\n  // Declare internal wires for the intermediate sum and carries.\n\n  // Instantiate two half adders and combine their carry outputs.\n\nendmodule"
   }
 ]
