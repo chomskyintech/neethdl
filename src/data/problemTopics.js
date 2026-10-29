@@ -20,9 +20,13 @@ export const problemTopics=[
   'Formal Verification',
   'Embedded / Firmware',
   'Python Scripting',
+  'Module Instantiation',
 ]
 
 const topicById={
+  'rtl-inst-half-adder':'Module Instantiation',
+  'rtl-inst-parameterized-parity':'Module Instantiation',
+  'rtl-inst-full-adder':'Module Instantiation',
   'rtl-mux':'Combinational Logic',
   'rtl-priority':'Combinational Logic',
   'rtl-arbiter':'Combinational Logic',
