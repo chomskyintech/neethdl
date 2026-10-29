@@ -820,6 +820,13 @@ export default function ProblemIDE({ problem, solved, draft, onBack, onSave, onS
     editorDirtyRef.current = true
     setEditorDirty(true)
 
+    // Recognise pasted VHDL and switch the editor mode before saving the draft.
+    const looksLikeVhdl = /^\\s*(?:library\\s+ieee\\b|use\\s+ieee\\.|entity\\s+\\w+\\s+is\\b|architecture\\s+\\w+\\s+of\\s+\\w+\\s+is\\b)/im.test(value)
+    if (looksLikeVhdl && supported.includes('VHDL') && editorLanguage !== 'VHDL') {
+      setEditorLanguage('VHDL')
+      setResult(null)
+    }
+
     setCode(value)
     onSave(problem.id, value)
   }
