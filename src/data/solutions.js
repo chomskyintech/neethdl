@@ -836,6 +836,21 @@ begin
 
   clk_out <= q;
 end architecture rtl;`
+  },
+
+  'rtl-inst-half-adder': {
+    Verilog: "module half_adder(input wire a, b, output wire sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule half_adder_top(input wire a, b, output wire sum, carry);\n  half_adder u_half_adder(.a(a), .b(b), .sum(sum), .carry(carry));\nendmodule",
+    SystemVerilog: "module half_adder(input logic a, b, output logic sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule half_adder_top(input logic a, b, output logic sum, carry);\n  half_adder u_half_adder(.a(a), .b(b), .sum(sum), .carry(carry));\nendmodule"
+  },
+
+  'rtl-inst-parameterized-parity': {
+    Verilog: "module parity_reducer #(parameter WIDTH = 4) (input wire [WIDTH-1:0] data, output wire parity);\n  assign parity = ^data;\nendmodule\n\nmodule parity_top(input wire [7:0] data, output wire parity);\n  parity_reducer #(.WIDTH(8)) u_parity(.data(data), .parity(parity));\nendmodule",
+    SystemVerilog: "module parity_reducer #(parameter int WIDTH = 4) (input logic [WIDTH-1:0] data, output logic parity);\n  assign parity = ^data;\nendmodule\n\nmodule parity_top(input logic [7:0] data, output logic parity);\n  parity_reducer #(.WIDTH(8)) u_parity(.data(data), .parity(parity));\nendmodule"
+  },
+
+  'rtl-inst-full-adder': {
+    Verilog: "module half_adder(input wire a, b, output wire sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule full_adder_top(input wire a, b, cin, output wire sum, cout);\n  wire partial_sum, carry1, carry2;\n  half_adder u_ha1(.a(a), .b(b), .sum(partial_sum), .carry(carry1));\n  half_adder u_ha2(.a(partial_sum), .b(cin), .sum(sum), .carry(carry2));\n  assign cout = carry1 | carry2;\nendmodule",
+    SystemVerilog: "module half_adder(input logic a, b, output logic sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule full_adder_top(input logic a, b, cin, output logic sum, cout);\n  wire partial_sum, carry1, carry2;\n  half_adder u_ha1(.a(a), .b(b), .sum(partial_sum), .carry(carry1));\n  half_adder u_ha2(.a(partial_sum), .b(cin), .sum(sum), .carry(carry2));\n  assign cout = carry1 | carry2;\nendmodule"
   }
 }
 
