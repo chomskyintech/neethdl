@@ -90,6 +90,7 @@ const topicById={
   'sva-reset':'SVA',
   'uvm-driver':'UVM',
   'uvm-scoreboard':'Scoreboards',
+  'uvm-reference-model':'UVM',
 }
 
 export function projectTopic(problem){
