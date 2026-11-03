@@ -1589,5 +1589,74 @@
       "The top-level module must be named full_adder_top."
     ],
     "starterCode": "module half_adder(input wire a, b, output wire sum, carry);\n  assign sum = a ^ b;\n  assign carry = a & b;\nendmodule\n\nmodule full_adder_top(input wire a, b, cin, output wire sum, cout);\n  // Declare internal wires for the intermediate sum and carries.\n\n  // Instantiate two half adders and combine their carry outputs.\n\nendmodule"
+  },
+  {
+    "id": "uvm-reference-model",
+    "title": "Implement a UVM Reference Model",
+    "category": "UVM",
+    "difficulty": "Medium",
+    "languages": [
+      "SystemVerilog"
+    ],
+    "evaluation": {
+      "type": "pattern"
+    },
+    "tags": [
+      "reference-model",
+      "uvm",
+      "prediction",
+      "analysis-port"
+    ],
+    "description": "Build a transaction-level reference model that independently predicts the expected result of an 8-bit addition and sends that prediction to a scoreboard.",
+    "task": "Complete the UVM reference model's write() callback. It must create a separate predicted transaction, copy the input operands, calculate the 9-bit expected sum without reading any DUT output, and publish the predicted transaction through expected_ap.",
+    "examples": [
+      "a=8'h12, b=8'h23 → expected=9'h035",
+      "a=8'hFF, b=8'h01 → expected=9'h100"
+    ],
+    "constraints": [
+      "Use uvm_analysis_imp to receive input transactions.",
+      "Use uvm_analysis_port to publish predicted transactions to the scoreboard.",
+      "Create a new transaction with type_id::create(); do not modify the received transaction.",
+      "Zero-extend both 8-bit operands before addition so the carry bit is preserved.",
+      "The prediction must be calculated independently of the DUT output."
+    ],
+    "starterCode": "class adder_item extends uvm_sequence_item;\n  rand bit [7:0] a;\n  rand bit [7:0] b;\n  bit [8:0] expected;\n\n  `uvm_object_utils(adder_item)\n\n  function new(string name = \"adder_item\");\n    super.new(name);\n  endfunction\nendclass\n\nclass adder_ref_model extends uvm_component;\n  `uvm_component_utils(adder_ref_model)\n\n  uvm_analysis_imp #(adder_item, adder_ref_model) input_export;\n  uvm_analysis_port #(adder_item) expected_ap;\n\n  function new(string name = \"adder_ref_model\",\n               uvm_component parent = null);\n    super.new(name, parent);\n    input_export = new(\"input_export\", this);\n    expected_ap = new(\"expected_ap\", this);\n  endfunction\n\n  function void write(adder_item tr);\n    // Create a separate predicted transaction.\n    // Copy a and b, calculate the expected sum, and publish it.\n  endfunction\nendclass",
+    "checks": [
+      {
+        "label": "Receives transactions through analysis implementation",
+        "pattern": "uvm_analysis_imp",
+        "flags": "i"
+      },
+      {
+        "label": "Publishes predictions through analysis port",
+        "pattern": "uvm_analysis_port",
+        "flags": "i"
+      },
+      {
+        "label": "Implements write callback",
+        "pattern": "function\\s+void\\s+write\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Creates a separate transaction through factory",
+        "pattern": "type_id::create\\s*\\(",
+        "flags": "i"
+      },
+      {
+        "label": "Copies both operands",
+        "pattern": "predicted\\.a\\s*=\\s*tr\\.a[\\s\\S]*predicted\\.b\\s*=\\s*tr\\.b",
+        "flags": "i"
+      },
+      {
+        "label": "Preserves carry with 9-bit addition",
+        "pattern": "expected\\s*=\\s*\\{\\s*1'b0\\s*,\\s*tr\\.a\\s*\\}\\s*\\+\\s*\\{\\s*1'b0\\s*,\\s*tr\\.b\\s*\\}",
+        "flags": "i"
+      },
+      {
+        "label": "Publishes predicted transaction",
+        "pattern": "expected_ap\\.write\\s*\\(\\s*predicted\\s*\\)",
+        "flags": "i"
+      }
+    ]
   }
 ]
